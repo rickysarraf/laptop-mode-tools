@@ -340,14 +340,24 @@ if [ "$1" == "status" ] ; then
 	mount | sed "s/^/   /"
 	echo
 	echo Drive power status:
-	hdparm -C $HD 2>/dev/null | sed "s/^/   /"
+	for disk in $HD; do
+		if [ -r $disk ]; then
+			hdparm -C $disk 2>/dev/null | sed "s/^/   /"
+		else
+			echo "   Cannot read $disk, permission denied - $0 needs to be run as root"
+		fi
+	done
 	echo
 	echo "(NOTE: drive settings affected by Laptop Mode cannot be retrieved.)"
 	echo
 	echo Readahead states:
 	cat /etc/mtab | while read DEV MP FST OPTS DUMP PASS ; do
 		if [ -b $DEV ] ; then
-			echo "   $DEV: $((`/sbin/blockdev --getra $DEV` / 2)) kB"
+			if [ -r $DEV ] ; then
+				echo "   $DEV: $((`blockdev --getra $DEV` / 2)) kB"
+			else
+				echo "   Cannot read $DEV, permission denied - $0 needs to be run as root"
+			fi
 		fi
 	done
 	echo
@@ -364,7 +374,7 @@ if [ "$1" == "status" ] ; then
 			if [ -r $THISFILE ] ; then
 				cat $THISFILE | sed "s/^/   /"
 			else
-				echo "   Not accessible: permissions problem?"
+				echo "   Not accessible, permission denied - $0 needs to be run as root."
 			fi
 			echo
 		fi

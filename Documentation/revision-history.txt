@@ -5,6 +5,11 @@
       kind of default that you don't want.
     * Listen on ACPI events ac_adapter.* instead of just ac_adapter. This will
       catch more events, required for some laptops.
+    * Give better error messages when "laptop_mode status" is called by a
+      non-root user.
+    * Install laptop-mode.conf world-readable by default. It contains no
+      sensitive information and it is required by "laptop_mode status" when
+      it is run as a non-root user.
 
 1.34 -- 28 May 2007
 
