@@ -1607,10 +1607,12 @@ if [ $CONTROL_START_STOP -eq 1 -a "$STATE" == "enabled" ]; then
 fi
 
 # Finally, call laptop-mode-tools modules. The modules can use the settings
-# from the INI files, but they may NOT assume the settings actually exist,
+# from the config files, but they may NOT assume the settings actually exist,
 # as no defaults have been given for them.
+
+# Note that the /usr/local/lib path is deprecated.
 export FORCE STATE ON_AC ACTIVATE
-for SCRIPT in /usr/lib/laptop-mode-tools/modules/* /usr/local/lib/laptop-mode-tools/modules/* /etc/laptop-mode/modules/*; do
+for SCRIPT in /usr/share/laptop-mode-tools/modules/* /usr/local/lib/laptop-mode-tools/modules/* /usr/local/share/laptop-mode-tools/modules/* /etc/laptop-mode/modules/*; do
 	if [ -x "$SCRIPT" ] ; then
 		"$SCRIPT" >> $OUTPUT
 	else
