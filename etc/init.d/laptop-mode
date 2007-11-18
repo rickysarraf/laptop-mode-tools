@@ -13,11 +13,13 @@ if [ -f /lib/lsb/init-functions ] ; then
 else
   log_success_msg()
   {
-    echo $1
+    logger -t LAPTOP-MODE -p daemon.info -- $*
+    echo "$*"
   }
   log_failure_msg()
   {
-    echo $1
+    logger -t LAPTOP-MODE -p daemon.notice -- $*
+    echo "$*"
   }
 fi
 TEMPFILE=`mktemp`
