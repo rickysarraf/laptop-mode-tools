@@ -1,0 +1,302 @@
+#!/bin/bash
+
+# This script assists you in achieving very high power savings on laptops.
+# It can detect programs that perform regular, non-bursty disk operations,
+# and network services that listen on external addresses. When started,
+# lm-profiler will run for 10 minutes (or a configured number of minutes),
+# after which it will provide a series of recommendations. 
+#
+# It will try to find init scripts for any programs that it recommends for 
+# stopping, and it will ask if you want to place links to those scripts in 
+# /etc/laptop-mode/batt-stop, so that laptop mode tools will automatically 
+# stop those daemons when battery mode is detected.
+#
+#
+# This script is a part of Laptop Mode Tools.
+#
+# Configuration options for this script can be found in
+# /etc/laptop-mode/lm-profiler.conf.
+#
+# Maintainer: Bart Samwel (bart@samwel.tk)
+# Adapted from initial version written by Jan Polacek (jerome@ucw.cz).
+
+
+#
+# Read configuration.
+#
+
+# Defaults
+
+PROFILE_RUN_LENGTH=600
+ACTIVITY_INTERVAL_MAX=150
+ACTIVITY_INTERVAL_MIN=5
+RECOMMEND_DEFAULT_SERVICES=1
+DEFAULT_SERVICES="anacron cron atd"
+DEF_IGNORE_PROGRAMS="pdflush journald XFree86 acpid apmd lm-profiler dmesg syslogd awk sed grep mc bc xfs cat diff uniq vi mv sort sleep"
+IGNORE_PROGRAMS="$DEF_IGNORE_PROGRAMS"
+RECOMMEND_NETWORK_SERVICES=1
+DEF_IGNORE_NETWORK_SERVICES="perl" # Some daemons run on perl, not very informative
+IGNORE_NETWORK_SERVICES="$DEF_IGNORE_NETWORK_SERVICES"
+VERBOSE_OUTPUT=0
+if [ -f /etc/laptop-mode/lm-profiler.conf ] ; then
+	. /etc/laptop-mode/lm-profiler.conf
+fi
+
+#
+# Internal variables
+#
+
+DEBUG=0
+######################################################################
+
+if [ $DEBUG -eq 1 ]; then
+	set -eux
+fi
+
+if [ "$VERBOSE_OUTPUT" -eq 1 ] ; then
+	OUTPUT="/dev/stdout"
+else
+	OUTPUT="/dev/null"
+fi
+
+if [ ! `id -u` -eq 0 ]; then
+  echo "Only root can run profiler."
+  exit 0
+fi
+
+WORKDIR=`mktemp -d -t lm-profiler.XXXXXX`
+
+
+start_profiling(){
+	# Turn on disk access profilling
+	if [ -f /proc/sys/vm/block_dump ]; then
+		echo "1" > /proc/sys/vm/block_dump
+	else
+		echo "/proc/sys/vm/block_dump does not exist, exiting."
+		exit 1
+	fi
+}
+
+stop_profiling(){
+	# Turn off disk access profilling
+	echo "0" > /proc/sys/vm/block_dump
+}
+
+# Create a commandline for grep, checking for the presence of all
+# strings in a space-separated list passed as the first parameter.
+format_params(){
+	for PARAM in $1 ; do
+		echo -n "-e $PARAM " 
+	done
+}
+
+# Detect all processes that have accessed the disk since the last
+# invocation of dmesg. The results are written to files called
+# "write_accesses_N" and "read_accesses_N", where N is the first
+# parameter of this function.
+process_dmesg_diff(){
+	LEFT="$WORKDIR/dmesg_prev"
+	RIGHT="$WORKDIR/dmesg_next"
+	dmesg > $RIGHT
+	if [ -s $LEFT ] && [ -s $RIGHT ]; then
+		# The following command is long and complicated. It does
+		# the following things, separately for READ and WRITE
+		# accesses:
+		# 1. Retrieve only new lines, using diff.
+		# 2. Drop the first line -- it is probably a truncated
+		#    version of an earlier line.
+		# 3. Parse out the name of the process.
+		# 4. Filter out IGNORE_PROGRAMS.
+		# 5. Write process name to output.
+		
+		diff -u $LEFT $RIGHT \
+			|grep '^+' \
+			|grep -o '[^[:space:]]*([0-9]*): WRITE' \
+			|sed '1d' \
+			|awk -v FS="(" '{print $1}' \
+			|grep -v `format_params "$IGNORE_PROGRAMS"` \
+			|sort \
+			|uniq \
+			   > $WORKDIR/write_accesses_$1
+
+		diff -u $LEFT $RIGHT \
+			|grep '^+' \
+			|grep -o '[^[:space:]]*([0-9]*): READ' \
+			|sed '1d' \
+			|awk -v FS="(" '{print $1}' \
+			|grep -v `format_params "$IGNORE_PROGRAMS"` \
+			|sort \
+			|uniq \
+			   > $WORKDIR/read_accesses_$1
+
+		mv $RIGHT $LEFT
+		WRITE_ACCESSES_FOUND=0
+		for ACCESS in $(cat $WORKDIR/write_accesses_$1) ; do
+			if [ $WRITE_ACCESSES_FOUND -eq 0 ] ; then
+				echo -en "\r                                                                            \rWrite accesses at $1/$PROFILE_RUN_LENGTH in lm-profiler run:"
+				WRITE_ACCESSES_FOUND=1
+			fi
+			echo -n " $ACCESS"
+		done
+		if [ $WRITE_ACCESSES_FOUND -ne 0 ] ; then
+			echo ""
+		fi
+
+		READ_ACCESSES_FOUND=0
+		for ACCESS in $(cat $WORKDIR/read_accesses_$1) ; do
+			if [ $READ_ACCESSES_FOUND -eq 0 ] ; then
+				echo -en "\r                                                                            \rRead accesses at $1/$PROFILE_RUN_LENGTH in lm-profiler run:"
+				READ_ACCESSES_FOUND=1
+			fi
+			echo -n " $ACCESS"
+		done
+		if [ $READ_ACCESSES_FOUND -ne 0 ] ; then
+			echo ""
+		fi
+	else
+		echo "No dmesg data found to profile, exiting."
+		exit 1
+	fi
+}
+
+# Attempt to find an init script for ithe process given as an argument
+findinit(){
+	INITDIR=
+	if [ -d /etc/init.d ] ; then
+		INITDIR=/etc/init.d
+	elif [ -d /etc/rc.d/init.d ] ; then
+		INITDIR=/etc/rc.d/init.d
+	fi
+	if [ "$INITDIR" != "" ] ; then
+		INIT=`ls $INITDIR/ |grep ^$1$ |head -1`
+		if [ -z "$INIT" ]; then
+			INIT=`grep $1 $INITDIR/* |sed s/:.*// |head -1`
+		else
+			INIT="$INITDIR/$INIT"
+		fi
+		if [ ! -z "$INIT" ] && [ -x $INIT ]; then
+			echo "$INIT"
+		fi
+	fi
+}
+
+# Look for names of running network services
+profilenet(){
+	netstat -anp |grep ^tcp.*LISTEN |grep -v "Program name" |awk -v FS="/" '{print $2}' |sort |uniq |\
+	tr -d ['(',')','[',']']
+}
+			
+
+#
+# PROFILING RUN
+#
+
+# Disable profiling if the script gets interrupted.
+trap "stop_profiling; echo; exit 10" EXIT HUP INT ABRT QUIT SEGV TERM
+
+SECONDS_DONE=
+echo "Profiling run started."
+dmesg > $WORKDIR/dmesg_prev
+start_profiling
+echo > $WORKDIR/write_accesses_$SECONDS_DONE
+echo > $WORKDIR/read_accesses_$SECONDS_DONE
+SECONDS_DONE=0
+while [ $SECONDS_DONE -le $PROFILE_RUN_LENGTH ] ; do
+	echo -en "\r$SECONDS_DONE seconds elapsed, $(($PROFILE_RUN_LENGTH - $SECONDS_DONE)) remaining.         \b\b\b\b\b\b\b\b\b"
+	sleep 1
+	SECONDS_DONE=$(($SECONDS_DONE + 1))
+	process_dmesg_diff $SECONDS_DONE
+done
+echo -en "\r                                                    \r"
+stop_profiling
+NETPROFILE=`profilenet`
+echo "Profiling run completed."
+
+#
+# OUTPUT
+#
+ALREADY_SEEN=
+if [ "$RECOMMEND_DEFAULT_SERVICES" -ne 0 ] ; then
+	for SERVICE in $DEFAULT_SERVICES ; do
+		echo
+		echo "Program:     \"$SERVICE\""
+		echo "Reason:      standard recommendation (program may not be running)"
+		INIT=`findinit $SERVICE`
+		if [ "$INIT" == "" ] ; then
+			echo "Init script: none"
+			echo "If you want to disable this program, you should do so manually."
+		else
+			echo "Init script: $INIT (GUESSED)"
+			echo
+			echo -n "Do you want to disable this service in battery mode? [y/N]: "
+			read ANSWER
+			if ( echo "$ANSWER" | grep -i ^y > /dev/null ) ; then
+				ln -fs $INIT /etc/laptop-mode/batt-stop/`echo $INIT | sed 's/.*\///g'`
+			fi
+		fi
+		ALREADY_SEEN="$ALREADY_SEEN $SERVICE"
+	done
+fi
+
+
+
+
+if [ "$RECOMMEND_NETWORK_SERVICES" -ne 0 ] ; then
+	for SERVICE in $NETPROFILE ; do
+		if ( echo " $IGNORE_NETWORK_SERVICES " | grep -v " $SERVICE " > /dev/null ) ; then
+			echo
+			echo "Program:     \"$SERVICE\""
+			echo "Reason:      listens on network, may not be needed offline."
+			INIT=`findinit $SERVICE`
+			if [ "$INIT" == "" ] ; then
+				echo "Init script: none"
+				echo "If you want to disable this program, you should do so manually."
+			else
+				echo "Init script: $INIT (GUESSED)"
+				echo
+				echo -n "Do you want to disable this service in battery mode? [y/N]: "
+				read ANSWER
+				if ( echo "$ANSWER" | grep -i ^y > /dev/null ) ; then
+					ln -fs $INIT /etc/laptop-mode/batt-stop/`echo $INIT | sed 's/.*\///g'`
+				fi
+			fi
+			ALREADY_SEEN="$ALREADY_SEEN $SERVICE"
+		fi
+	done
+fi
+
+SECONDS_LEFT=$PROFILE_RUN_LENGTH
+while [ $SECONDS_LEFT -gt 0 ] ; do
+	for SERVICE in `cat $WORKDIR/*_accesses_$SECONDS_LEFT` ; do
+		if ( echo " $ALREADY_SEEN " | grep -v " $SERVICE " > /dev/null ) ; then
+			CUR_COMPARE_SECONDS=$(($SECONDS_LEFT - $ACTIVITY_INTERVAL_MIN))
+			while [ $CUR_COMPARE_SECONDS -gt $(($SECONDS_LEFT - $ACTIVITY_INTERVAL_MAX)) -a $CUR_COMPARE_SECONDS -gt 0 ] ; do
+				if ( grep "^$SERVICE$" $WORKDIR/*_accesses_$CUR_COMPARE_SECONDS > /dev/null ) ; then
+					if ( echo " $ALREADY_SEEN " | grep -v " $SERVICE " > /dev/null ) ; then
+						echo
+						echo "Program:     \"$SERVICE\""
+						echo "Reason:      disk access."
+						INIT=`findinit $SERVICE`
+						if [ "$INIT" == "" ] ; then
+							echo "Init script: none"
+							echo "If you want to disable this program, you should do so manually."
+						else
+							echo "Init script: $INIT (GUESSED)"
+							echo
+							echo -n "Do you want to disable this service in battery mode? [y/N]: "
+						fi
+						read ANSWER
+						if ( echo "$ANSWER" | grep -i ^y > /dev/null ) ; then
+							if [ -e $INIT ] ; then
+								ln -fs $INIT /etc/laptop-mode/batt-stop/`echo $INIT | sed 's/.*\///g'`
+							fi
+						fi
+						ALREADY_SEEN="$ALREADY_SEEN $SERVICE"
+					fi
+				fi
+				CUR_COMPARE_SECONDS=$(($CUR_COMPARE_SECONDS - 1))
+			done
+		fi
+	done
+	SECONDS_LEFT=$(($SECONDS_LEFT - 1))
+done

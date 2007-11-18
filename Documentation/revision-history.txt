@@ -1,0 +1,720 @@
+1.34 -- 28 May 2007
+
+    * Added support for modules. Modules should be executables,
+      and they should be placed in /usr/lib/laptop-mode-tools/modules,
+      /usr/local/lib/laptop-mode-tools/modules, or /etc/laptop-mode/modules.
+      The modules are called directly from the laptop_mode script, and can
+      use all configuration settings from the laptop-mode.conf, plus the
+      ON_AC and ACTIVATE variables.
+    * Added modularized configuration file. The main configuration file still
+      works, but in addition, configuration files in /etc/laptop-mode/conf.d
+      are processed as well. Modules should use modularized configuration
+      files. Module configuration files are loaded after the main configuration
+      file.
+    * The IGNORE_NICE_LOAD setting would only be set for the ondemand
+      governor, while it is also available for some other CPU frequency
+      governors. (Debian BTS #425387)
+    * Silenced error message from modprobe when the CPU frequency
+      governor was not compiled as a module. (Debian BTS #425957)
+    * Included support for setting IPW3945 and IPW2200 power management
+      levels. This feature is implemented as a module, with configuration
+      file /etc/laptop-mode/conf.d/wireless-ipw-power.conf. (Debian BTS
+      #425551)
+
+1.33 -- 19 May 2007
+
+    * LSB logging functions fixed. Apparently the stuff that was submitted
+      by David was Debian-specific, so it would only work on Debian. I now 
+      fixed the "normal" script to use the real LSB functions, while the Debian
+      diff contains the prettier Debian-only versions. Thanks to all who
+      reported this.
+    * PARTITIONS didn't support wildcards. Now it does, thanks to a nice
+      clean patch by Mikko Rapeli. (Debian BTS #394557.)
+    * Laptop mode state is now restored on resume for systems using
+      pbbuttonsd, thanks to a patch from John Wright. (Debian BTS #398179.)
+    * The FAQ has been removed from the package, as is the HTML version of
+      the revision history. For now, only the text version of the revision
+      history remains. The reason for this is that previously, I generated
+      all of these from a common source. Now, however, I can't do that
+      anymore since the HTML must satisfy the syntax accepted by the CMS
+      used for the web site. Perhaps it will be back some day when I
+      generate everything using some XSLT or something.
+    * Fixed a bug in the DPMS standby calculation code that caused incorrect
+      values to be calculated.
+    * Updated laptop mode homepage URL in /usr/sbin/laptop_mode.
+    * Layout tweaks in config file.
+    * Added ability to specify the ignore_nice_load setting for CPU frequency
+      scaling governors. The "IGNORE_NICE_LOAD" setting specifies that
+      background programs that have a low priority ("nice level") should not
+      cause the CPU frequency to be increased. (You generally want this to be
+      enabled in battery mode.) The settings are called 
+      BATT_CPU_IGNORE_NICE_LOAD, LM_AC_CPU_IGNORE_NICE_LOAD and
+      NOLM_AC_CPU_IGNORE_NICE_LOAD. (Debian BTS #416445.)
+    * Fix for terminal blanking (thanks in part to Giorgio Lando). This adds
+      a new configuration setting "TERMINALS", which should specify the
+      device file of at least one of the virtual consoles. (The default is
+      /dev/tty1.)
+    * Fix for X blanking. Determining the correct consoles and users has
+      caused a tremendous amount of headaches, I hope this solution will work
+      properly. At least this time I've thoroughly tested it. :-)
+    * Added documentation hints on how to configure apply X blanking settings
+      on new login sessions as well.
+    * Updated lm-profiler to be able to handle timestamps at the beginning of
+      kernel output lines.
+    * Updated lm-profiler so that it reports read and write accesses
+      separately. This was done because read accesses usually have a very
+      different cause (e.g., lack of prefetching) than write accesses (e.g.,
+      synchronous I/O calls).
+    * Added ability to set LCD brightness. The facility is extremely simple,
+      because brightness support is very different between laptop systems.
+      Basically, you need to set CONTROL_BRIGHTNESS=1 and then you need to
+      specify commands to set the LCD brightness in *_BRIGHTNESS_COMMAND,
+      and where the output of those commands should go in BRIGHTNESS_OUTPUT.
+      Suggestions for commands are given in laptop-mode.conf.
+      
+1.32 -- 6 October 2006
+
+    * CPU frequency settings now affect all CPUs instead of just CPU #0.
+    * The init script output now uses LSB logging functionality. (Thanks
+      David Härdeman!)
+    * Original mount options for filesystems were not correctly restored,
+      causing mounts to look like atime when they were actually originally
+      noatime. (Thanks Karl Tomlinson, Remy Blank!)
+    * Calls to "blockdev" now use the full path, in case /sbin is not in the
+      path.
+    * If multiple binaries for "xset" are found, use the first one instead
+      of applying the settings using each binary found. (Thanks Cyrill
+      Helg!)
+    * Correctly figure out screen to apply DPMI settings to. (Thanks Cyrill
+      Helg!)
+    * Increased default HD idle timeout to 20 seconds (from 5 seconds). (I'd
+      appreciate some feedback on good values for this setting!)
+    * Changed restart, reload and force-reload behaviour to forcibly disable
+      and stop laptop mode, remove all stored state files in /var/run, and
+      then enable and start laptop mode again. This is supposed to make
+      things work better when rebooting on Slackware, where users have been
+      instructed to put "/etc/rc.d/init.d/laptop-mode restart" in rc.local.
+    * The FAQ now includes a "date last updated" line.
+    * Fixed terminal powerdown/blanking default values. (Thanks Jose!)
+    * Modprobe CPU frequency governor modules before attempting to set the
+      governor.
+    * Don't redirect blockdev error output to /dev/null.
+
+1.31 -- 17 April 2006
+
+    * Removed incorrect assumption that gawk's asort() could be used.
+    * Added /dev/mapper/* to the default values for PARTITIONS. This ought
+      to make the default configuration work with Device Mapper devices.
+      Note that /dev/mapper/* hasn't been added to the "auto" list, it's
+      really a separate entry in the default, which is now "auto /dev/
+      mapper/*". This means that older configurations are not affected by
+      this change.
+    * Got rid of ^M characters that I'd inserted into some files by mistake.
+    * Installer now deals correctly with the case that /etc/rc.d is a link
+      to /etc/init.d, as in SuSE 10, and other cases where some of the
+      standard init script directories are links and some are files. The
+      installer now prefers non-link directories over links.
+    * Added config option ASSUME_SCSI_IS_SATA, which is enabled by default.
+      When this option is enabled, laptop mode tools will regard SCSI drives
+      as SATA drives and control them using hdparm instead of sdparm. This
+      stuff is really a mess -- ATA CD-ROM drives can be controlled only
+      using sdparm (but fortunately laptop mode tools currently ignores CD
+      drives), drives that seem like SCSI drives can be controlled only with
+      hdparm, and I really wouldn't know about USB drives. If anyone has a
+      USB drive and cares to tell me how to spin it down, please drop me a
+      note!
+
+1.30 -- 23 February 2006
+
+    * Fixed /dev/null vs. /dev/nul typo.
+    * Changed battery percentage check to count "greater than or equal" as
+      enough charge instead of just "greater than".
+    * If the minimum percentage check and all the other charge checks are
+      disabled (by setting them to 0), the critical battery state check now
+      considers a non-critical battery state as "enough". It doesn't
+      normally do this if any of the other checks are enabled because that
+      would fully override the other checks.
+    * "laptop_mode status" now also reports the CPU frequency scaling
+      governor settings.
+
+1.29 -- 22 February 2006
+
+    * The backward compatibility for the _MAH and _MWH didn't work as well
+      as I expected. Fixed.
+    * Nonexistent batteries weren't being handled properly. Fixed.
+
+1.28 -- 22 February 2006
+
+    * Removed useless config reading call from lm_battery.sh.
+    * Introduced MINIMUM_BATTERY_CHARGE_PERCENT, which is as intuitive as
+      MINIMUM_BATTERY_MINUTES except that it specifies the charge threshold
+      as a percentage of the battery design capacity.
+    * Support for MINIMUM_BATTERY_MINUTES has been removed. Many batteries
+      either report their discharge rates unreliably or not at all, so it's
+      not very useful. Also, disabling laptop mode increases power usage and
+      thereby increases discharge rate, which makes the rating even more
+      unreliable. If MINIMUM_BATTERY_MINUTES is specified in laptop-
+      mode.conf and MINIMUM_BATTERY_CHARGE_PERCENT is not, the value of the
+      former is used as if it were the value of the latter, as a backward
+      compatibility measure. That will give you one percent per minute,
+      which is correct on a battery that lasts for 100 minutes. A
+      conservative conversion.
+    * MINIMUM_BATTERY_CHARGE_MAH/MWH are still supported, but they are
+      removed from the default config and the manual page for now, to draw
+      out complaints from people for which MINIMUM_BATTERY_CHARGE_PERCENT
+      doesn't work. I hope that it will work for pretty much everyone, so
+      that I can remove these options in the future.
+    * Added DISABLE_LAPTOP_MODE_ON_CRITICAL_BATTERY_LEVEL. This uses the
+      state reported by the battery. (Thanks to Ken Milmore.)
+    * Similar changes have been made for auto-hibernation. We now have
+      AUTO_HIBERNATION_ON_CRITICAL_BATTERY_LEVEL and
+      AUTO_HIBERNATION_BATTERY_CHARGE_PERCENT.
+    * Config file explanation overhaul.
+    * Fixed a bug where the HD write cache would be disabled any time laptop
+      mode was disabled. (Thanks to Chung-chieh Shan AKA Ken.)
+    * Removed error output from "which" when udevinfo, sdparm or hdparm were
+      not found.
+
+1.27 -- 18 February 2006
+
+    * Added filtering for grep output used in determining the battery's
+      charge reporting units.
+    * Sometimes, when laptop_mode is called directly after unplugging, the
+      battery still reports that it is "charged" and not "discharging", even
+      though we're not on AC anymore. In this state, we used to miss
+      critically low battery charges, and we would enable data loss
+      sensistive features anyway. We now use the MINIMUM_BATTERY_CHARGE
+      logic (but not MINIMUM_BATTERY_MINUTES -- we have no (reliable)
+      discharge rate) to check for a minimum battery capacity.
+
+1.26 -- 7 February 2006
+
+    * Changed meaning of "medium" slightly so that on processors with only
+      two frequency levels, it selects the lower value and not the higher
+      one. (Thanks, Ken Milmore!)
+    * Fixed handling of discharge rate "unknown". This error was not noticed
+      before because the code used to be in an ACPI action script, whose
+      output only ends up in the acpid logs. :-/
+    * Various indentation and wrapping touchups.
+    * Check for errors on more kernel parameters.
+    * Include FAQ and the revision history in the package, in the
+      Documentation directory.
+    * Remove the revision history from the README. Saves me a lot of
+      redundant work.
+    * Replaced all references to "X Windows" with "X".
+
+1.25 -- 6 February 2006
+
+    * Added new CPU frequency setting "medium", which selects a frequency
+      somewhere between the slowest and the fastest available frequencies.
+    * Typo fix: default config talked about "highest" as a CPU frequency
+      value, while the actual value is called "fastest".
+    * Changed default governor for battery mode to "ondemand" and the
+      maximum frequency to "medium".
+    * Reverted Slackware fix from the 1.24 release. Doesn't work. Instead,
+      Slackware users have to call the laptop-mode service with "restart"
+      from their rc.local. I've put this in the FAQ.
+
+1.24 -- 5 February 2006
+
+    * Fixed up MINIMUM_BATTERY_MINUTES processing.
+    * Fixed up multiple-battery-slot handling (previous fix was broken).
+    * Remove /var/run/laptop-mode-* files when first starting laptop mode
+      service. Apparently on Slackware the /var/run directory isn't cleared
+      on bootup as the FHS standard specifies.
+
+1.23 -- 4 February 2006
+
+    * Fixed up MINIMUM_BATTERY_CHARGE_MAH processing.
+    * Fixed handling of multiple battery slots when only one battery is
+      present.
+    * Fixed up auto-hibernation. It should work now.
+    * Removed ACPI_WITHOUT_AC_EVENTS. No longer needed, as all the
+      processing is done by "laptop_mode auto".
+    * Clarified manpage laptop-mode.conf so that it is clear that
+      CONTROL_CPU_FREQUENCY also switches governor control.
+    * Fixed udev media detection. The fallback still worked, but it's
+      cleaner if it works this way.
+
+1.22 -- 28 January 2006
+
+    * The SECOND, inevitable bugfix release after such a large release. :-)
+    * Fixed typo in laptop_mode that broke terminal powerdown control.
+      (Blanking still worked though.)
+    * Added checks on whether the kernel sysctl settings were actually
+      applied. "echo value > /proc/..." does not show errors, so failure was
+      silent until now.
+    * Removed warnings on MAX_LOST_WORK_SECONDS > 85899. The real problem is
+      in the kernel, I submitted patches to fix that problem.
+    * In the debian package config directories were incorrectly created in
+      the root directory instead of under /etc.
+
+1.21 -- 26 January 2006
+
+    * The first, inevitable bugfix release after such a large release.
+    * Fixed installation problem with existing old /var/run/laptop-mode-
+      state.
+    * Changed installer to stop existing laptop mode service before
+      installing.
+    * Added check for 32-bit architecture to new warning about maximum
+      MAX_LOST_WORK_SECONDS. (The warning does not apply to 64-bit
+      architectures.)
+    * Fixed laptop_mode output when state unchanged. The prefix "Laptop mode
+      " was not printed.
+
+1.20 -- 25 January 2006
+
+    * Fixed a typo that broke the setting of the CPU governor. Thanks to a
+      *lot* of people for submitting exactly the same patch. :-) And sorry
+      that I didn't get around to actually applying the patches for so long.
+      :-(
+    * Adapted the "big fat warning" so that it gives more info on how to fix
+      the problem.
+    * Applied a patch by Chung-chieh Shan (aka Ken) that is supposed to fix
+      the feature that controls DPMS standby settings. Everybody, please
+      report back if this actually works, I have NOT tested this but as it
+      didn't work before either I'm not too worried about breaking it. ;-)
+    * Corrected a path that was shown in an error message in /etc/acpi/
+      actions/lm_battery.sh.
+    * Fixed typo in config: Shoudl should've been should.
+    * Changed the default for CONTROL_NOATIME to 0. Mutt doesn't work if
+      filesystems are mounted noatime, and the only thing it actually buys
+      you is that the disk doesn't spin up if you haven't changed *anything*
+      at all for a period of 10 minutes. The chances of that happening are
+      practically zero -- you might as well have suspended your system
+      during that time, that would have saved more power, as you weren't
+      actually doing anything!
+    * Fixed a problem that would cause the acpid log to be destroyed every
+      time it ran laptop_mode. As much a bug in acpid as in laptop_mode, but
+      anyway, it's fixed now.
+    * Modified lm-profiler so that block_dump is disabled when profiling is
+      interrupted.
+    * Added support for controlling terminal blanking settings:
+      CONTROL_TERMINAL, and BATT_TERMINAL_BLANK_MINUTES,
+      BATT_TERMINAL_POWERDOWN_MINUTES, etc. This feature is disabled by
+      default.
+    * Changed the default for CONTROL_START_STOP to 1. There are no scripts
+      in the start/stop directories initially anyway, and having to
+      explicitly enable this is problematic for any related programs that
+      want to use this feature.
+    * Changed the default for CONTROL_HD_WRITECACHE to 0. As several people
+      pointed out, it's very dangerous to turn on write caching without
+      explicit knowledge of the system's administrator.
+    * Added support for auto-hibernation once a configurable battery level
+      is reached. The control option is ENABLE_AUTO_HIBERNATION.
+    * Added "sort", "mv" and "sleep" to the default-ignored programs for lm-
+      profiler, as they are used by lm-profiler itself.
+    * Improved checking for media types, so that no actions are taken on CD-
+      ROM drives and the like. This gets rid of the errors that a lot of
+      people have been seeing. Thanks to Andrey Borzenkov for contributing
+      the bulk of this change. This does NOT yet use the new 2.6.16 kernel
+      sysfs "media" attribute, I'll add that when I have the time to upgrade
+      to 2.6.16 myself.
+    * Support for SCSI drives and sdparm. The appropriate command is
+      automatically detected. For now, only idle timeout setting is
+      supported (SCSI setting SCT, Standby Condition Timer).
+    * Improved the output of lm-profiler so that it doesn't scroll a line
+      every second.
+    * As it turns out, noatime remounting was only done on ext3, reiserfs
+      and xfs filesystems. Fixed.
+    * Removed LMTVERSION from the distribution. The version number is now
+      stored only in /usr/sbin/laptop_mode, and extracted as needed using
+      some grep/sed trickery. This saves me from the mistake of changing one
+      but not the other.
+    * Changed syslog.conf control so that when laptop mode is disabled by
+      the init script, the original syslog.conf is restored. While laptop
+      mode is active, it is saved as syslog.conf.no-lm. This fixes a problem
+      on some distros (most notably Debian) where the laptop mode
+      syslog.conf files were being deleted on purging laptop-mode-tools,
+      leaving the system in a state without a syslog.conf. Now, the purging
+      can only take place when the laptop mode service has been stopped,
+      which means that the original syslog.conf will be back in place before
+      the purging is done.
+    * When the laptop mode init script is stopped (i.e., laptop mode
+      processing is completely disabled), the start/stop program actions
+      taken by laptop mode are now completely undone. Previously, the
+      computer would be left in the state as if it were in nolm-ac mode with
+      laptop mode enabled.
+    * Added "force" option to /usr/sbin/laptop_mode script. This makes
+      laptop mode reapply all settings even though the new state is the same
+      as the previous state. This is useful when coming back from a state
+      that may have lost some hardware settings, such as hibernation. (Note
+      however that stopping the service during hibernation has the same
+      effect.) It is also useful for implementing the "reload" command on
+      the init script.
+    * Changed the implementation of the "reload" command in the init script
+      so that it does "laptop_mode auto force" instead of "start". That
+      works better.
+    * Removed special support for "start" and "stop" from the laptop_mode
+      command. These options now all do the same thing as "auto". This means
+      that it has become IMPOSSIBLE to do something like "/usr/sbin/
+      laptop_mode start" manually and expect it to work. Laptop mode will
+      always simply get into the state that it detects that it needs to get
+      into.
+    * Moved all special detection logic, such as "minimum battery minutes"
+      etc., into the main laptop_mode file. Previously, an ill-timed
+      "laptop_mode auto" could re-enable laptop mode even after it had been
+      disabled using "laptop_mode stop" by the lm_battery.sh script.
+    * From this version onward the "minimum battery minutes" only influences
+      the things that can cause data-loss, i.e., most settings stay at
+      maximum powersaving, only the HD keeps spun up when the system is low
+      on power.
+    * Minimum battery minutes now applies to ALL batteries, i.e., it only
+      kicks in when ALL of the batteries are below the threshold.
+    * Speed optimization: the laptop_mode script no longer needs to call
+      itself recursively in order to read the configuration file.
+    * AC state is now correctly applied when booting up on AC. This wasn't
+      done correctly in 1.11.
+    * The installer now creates the batt-start/stop, lm-ac-start/stop and
+      nolm-ac-start/stop subdirectories in /etc/laptop-mode.
+    * Added a check for MAX_LOST_WORK_SECONDS > 85899 for kernel versions
+      2.6.13 and greater. These kernels do some calculations on clock tick
+      counts and 2^31 / 250 = ~85899 is the maximum value for any centisecs
+      kernel setting that they can handle, due to integer overflow issues.
+      Note that this restriction only applies to kernels running on 32-bit
+      architectures.
+    * Prevented the output of the start-stop scripts from interfering with
+      the output of the laptop_mode script.
+
+1.11 -- 29 October 2005
+
+Special thaks go to Jan Polacek, who contributed a very big chunk of work.
+
+    * Cosmetic fix: "laptop_mode status" tried to get the readahead setting
+      for block devices that weren't, causing error messages.
+    * Fixed backward compatibility with VERBOSE setting (now called
+      VERBOSE_OUTPUT), because Debian's init system may define this before
+      calling laptop_mode.
+    * Cosmetic fix: sed would be run on /var/run/laptop-mode-nolm-mount-opts
+      when it didn't yet exist, causing an error message.
+    * Cosmetic fix: hdparm is not required, but it would be called even if
+      it wasn't installed. Now a warning message is given instead, if any of
+      the hdparm-requiring options are enabled while hdparm is not
+      installed.
+    * Changed default for CONTROL_HD_POWERMGMT to 0. Some people have been
+      experiencing system crashes when their hard drives' powermgmt settings
+      were modified.
+    * Cosmetic fix: updated config file to be 80-column compliant.
+    * Added ACPI-ONLY marker to every configuration setting that only works
+      on ACPI.
+    * Instead of /var/run/laptop-mode-active, there is now /var/run/laptop-
+      mode-state, which contains both the laptop mode and power state. This
+      is used to detect actual state changes, something which was not
+      possible before. If the state doesn't change, then laptop_mode doesn't
+      do anything.
+    * Added support for controlling the CPU minimum frequency, and frequency
+      scaling governor. Thanks to nokos for contributing this.
+    * Added the ability to run start/stop scripts. Although the
+      implementation is mine, thanks go to Jan Polacek for the inspiration
+      (and an initial implementation). You can put links to init scripts (or
+      any other scripts that take "start" and "stop" commands) in the
+      following directories:
+          o /etc/laptop-mode/nolm-ac-start
+          o /etc/laptop-mode/nolm-ac-stop
+          o /etc/laptop-mode/lm-ac-start
+          o /etc/laptop-mode/lm-ac-stop
+          o /etc/laptop-mode/batt-start
+          o /etc/laptop-mode/batt-stop
+    * Added the ability to adjust X-windows DPMS timing, using
+      CONTROL_DPMS_STANDBY. Thanks to Jan Polacek.
+    * Fixes to useless output of hdparm when laptop mode tries to determine
+      if a drive is a CD-ROM. Thanks to Jan Polacek.
+    * New tool "lm-profiler", adapted from a contribution by Jan Polacek. It
+      provides a profile of your system's disk usage and running network
+      services, and it can automatically disable network services and other
+      daemons when you are running on battery, by placing links to the
+      appropriate init scripts in /etc/laptop-mode/batt-stop.
+
+1.10 -- 14 August 2005
+
+    * Verbose output was on by default in earlier config files.
+    * Absence of AC adapters was interpreted as battery mode.
+    * HD powermanagement default was incorrect for when laptop mode was not
+      active.
+
+1.09 -- 9 August 2005
+
+    * Fixed a typo that caused CPU frequency scaling to no longer work.
+    * Support for CPU throttling, using CONTROL_CPU_THROTTLING etc.
+    * Stopped using /etc/fstab for determining the default values for
+      filesystem options. Instead, they are now stored when laptop mode is
+      activated, in /var/run/laptop-mode-nolm-mountopts.
+    * The init script does not send the output of laptop mode to /dev/null
+      anymore. The VERBOSE_OUTPUT option becomes more useful that way.
+    * The state reported by laptop mode is split into an enabled/disabled
+      state, which represents whether laptop mode processing is enabled at
+      all, and an active/not active state, which indicates whether laptop
+      mode is currently active.
+    * HD_IDLE_TIMEOUT_SECONDS settings to replace the HD_IDLE_TIMEOUT
+      settings. The old settings still work, but the new ones are much less
+      awkward.
+    * ENABLE_LAPTOP_MODE_ALWAYS has been renamed to
+      ENABLE_LAPTOP_MODE_ON_AC, and a new option
+      ENABLE_LAPTOP_MODE_ON_BATTERY has been added. This way, laptop mode
+      can be completely disabled by disabling all ENABLE_ options, which is
+      nice and intuitive.
+    * NOLM_MAX_LOST_WORK_SECONDS is removed, and replaced by DEF_MAX_AGE in
+      the kernel settings section. Changing this option will not get anyone
+      any longer battery life, it will just lose more work, so it's now in
+      the "don't change this unless you're really sure" section.
+
+1.08 -- 4 August 2005
+
+    * Fixed a typo in lm_battery.sh that broke the automatic disabling when
+      power is low, and the same typo in lm-syslog-setup.
+
+1.07 -- 29 July 2005
+
+    * Fixed the breakage in 1.06 -- it didn't work at all because of a typo.
+    * Cleaned up the complete configuration system. The old configurations
+      should still be working, but if it's not too much trouble I recommend
+      that you start with a fresh config file. The settings are named more
+      consistently, and there is a clear grouping of the options in the new
+      default config.
+    * Allowed separate configuration of MAX_AGE based on AC/non-AC.
+    * Allowed separate configuration of readahead when laptop mode is
+      disabled.
+
+1.06 -- 28 July 2005
+
+    * Integration with pbbuttonsd that listens to the user's power profile
+      (thanks to Matthias Grimm).
+    * "status" command for laptop_mode, displays all kinds of useful stuff.
+      Also supported by the init script, as is standard in Fedora/RH.
+      (Thanks to Piete Brooks for the suggestion.)
+    * Added option DO_WRITECACHE to enable laptop mode tools control over
+      write caching, and settings BATT_WRITECACHE, AC_WRITECACHE_WITH_LM and
+      AC_WRITECACHE_WITHOUT_LM to set the write caching off or on depending
+      on the power and laptop mode state. This is ENABLED by default -- it
+      always turns write caching off when you are on laptop mode.
+    * Support fstypes in fstab with fallbacks, e.g. "ext3,ext2".
+    * Allow REMOUNT_PARTITIONS to contain mount points as well as devices.
+    * Add "auto" keyword to REMOUNT_PARTITIONS, as a way to indicate "all
+      the default partitions".
+    * Split CPU_MAXFREQ option into BATT_CPU_MAXFREQ,
+      AC_CPU_MAXFREQ_WITH_LM, AC_CPU_MAXFREQ_WITHOUT_LM. (The CPU_MAXFREQ
+      setting is now interpreted as BATT_CPU_MAXFREQ.)
+    * Support "fastest" in CPU_MAXFREQ options, for use in
+      AC_CPU_MAXFREQ_WITHOUT_LM.
+    * Adjust syslog and HD settings even when basic laptop mode status does
+      not change. Previous versions bailed out, but this meant that
+      theAC_*_WITH_LM versus BATT_* options were not actually applied when
+      using LAPTOP_MODE_ALWAYS_ON=1!
+    * Add "--version" option for laptop_mode.
+    * Added BIG FAT WARNING when root filesystem is ext3 and doesn't support
+      mount option. This happens when the rootfs is mounted as ext2 at boot
+      because of a missing ext3 module, and there is no way to find out the
+      actual rootfstype later, so if you get this error you might be running
+      without journaling!
+    * Support for multiple CPUs for frequency scaling (in preparation for
+      multicore laptop processors.)
+    * Support /etc/default/laptop-mode, with option
+      ENABLE_LAPTOP_MODE="yes"/"no". This is for backward compatibility with
+      the Ubuntu "laptop-mode" package.
+    * Add VERBOSE configuration setting, for debugging purposes. Laptop mode
+      tools will log everything it does when you enable this option.
+    * Detect if a drive is not a CD/DVD player before setting spindown
+      timeouts on it. This gets rid of "command not supported" errors in
+      kernel logs.
+    * Include /dev/sda etc. in HD, because those are the device names Linux
+      gives to SATA drives.
+
+1.05 -- 10 April 2005
+
+    * Detection of init.d or rc.d locations. Should make things work better
+      on Slackware.
+    * Make things work if /proc/acpi/ac_adapter contains no AC adapters.
+    * Signal acpid to re-read its configuration after installing.
+    * Restore config file defaults, so that old config files will keep
+      working.
+    * Made syslog daemon name configurable, so that you can make it signal
+      alternative syslog daemons. (The signal to be sent still needs to be
+      SIGHUP though.)
+    * Remove error output from "which" in the install script. The result was
+      handled gracefully anyway, so why print the output?
+    * New configuration setting REMOUNT_PARTITIONS. Default is "", which
+      means all partitions on the drives listed in the HD option.
+    * New configuration settings MINIMUM_BATTERY_CHARGE_MAH and
+      MINIMUM_BATTERY_CHARGE_MWH to specify the minimum remaining charge in
+      the battery for laptop mode to remain enabled (in mAh and mWh,
+      respectively). This is intended as a replacement for
+      MINIMUM_BATTERY_MINUTES for systems that don't specify a discharge
+      rate.
+    * When booting up on AC, laptop mode did not set the correct
+      syslog.conf, because it thought "laptop mode is already disabled so I
+      don't need to do anything".
+    * Added a manual page for lm-syslog-setup.
+    * Attempt at support for pbbuttonsd and pmud. The APM support files are
+      no longer installed when /proc/pmu exists (i.e. your system has PMU
+      support), because those interfere with the native PMU support.
+    * Lowered READAHEAD default from 8MB to 3MB. The high readahead caused
+      the system cache to be flushed by too-large readaheads on other files.
+
+1.04 -- 9 November 2004
+
+    * SEE ALSO sections in manpages updated to respect the normal
+      conventions.
+    * Mention path of laptop_mode script in manual page.
+    * Make AC detection work again on PMU (i.e. Mac) systems.
+    * Remove config file defaults. Simply define them in the config file.
+      The defaults were a pain to maintain, and I had to repeat them in
+      several places (manual page, all files in which the config was used,
+      config file itself). This was simply too error-prone.
+    * Add support for syslog configuration switching based on laptop mode
+      and power state. See laptop-mode.conf(8) and the contents of /etc/
+      laptop-mode/laptop-mode.conf, and run /usr/sbin/lm-syslog-setup to set
+      it up.
+    * Added support for forcing laptop mode start/stop using a second
+      "force" option to /usr/sbin/laptop_mode.
+    * Added support for "/" in mount options. It was used as a delimiter for
+      the sed "s" command, and that went wrong when loopback devices were
+      used.
+    * Dropped the DocBook SGML sources for the manpages, started working
+      with pure nroff sources. The output of docbook-to-man was crap
+      recently, so I decided to cut it out of the loop.
+
+1.03 -- 27 October 2004
+
+    * Add LM_WHEN_LID_CLOSED, to enable laptop mode when the laptop's lid is
+      closed. Only works on ACPI.
+    * Fixed incorrect default in a comment in the config file.
+    * Fixed a bug in 1.01 which meant that laptop mode was never enabled
+      when using APM.
+
+1.02 -- 3 October 2004
+
+    * Choice between update-rc.d and chkconfig was incorrect, so install on
+      non-Debian systems didn't completely work. There's no new Debian
+      package for this version.
+
+1.01 -- 3 October 2004 (the herring and whitebread edition)
+
+    * Updated commented-out default values for configuration parameters in
+      config file, which were not all updated correctly in the previous
+      version.
+    * Updated the version number 0.100 in the release notes to 1.00. Just
+      goes to show how long I doubted on whether to call it 1.00. :)
+    * Changed the way the config file is read. Formerly used the construct $
+      {VAR:-'value'} to set defaults, now I simply set the values and then
+      source the config file. The immediate effect of this is that the
+      surrounding environment cannot influence the laptop mode anymore,
+      moving the app closer to being safe to use suid. Note that it is NOT
+      SAFE to run laptop_mode suid at this moment, I haven't taken all
+      necessary security measures!
+    * The "hdparm -B" values are now configurable using the
+      (AC|BATT)_HDPARM_POWERMGMT options. The option DO_HD_POWERMGMT can be
+      set to 0 to disable the -B behaviour altogether.
+    * The "hdparm -B" calls are now done BEFORE the -S calls. This is
+      because some HDs change the -S setting as a side-effect of using the -
+      B option.
+    * Use "chkconfig" when it is available to install the rc.d-to-init.d
+      links. (Until now only update-rc.d was supported.)
+    * AC_HD is split into AC_HD_WITH_LM and AC_HD_WITHOUT_LM. The former
+      value is used when AC power is present but laptop mode is still
+      enabled (e.g. when the option LAPTOP_MODE_ALWAYS_ON is enabled). The
+      latter value is used when AC power is present and laptop mode is
+      disabled. The AC_HDPARM_POWERMGMT option has been split in the same
+      way. The old option AC_HD is still supported, if the config file
+      specifies it then it overrides both new config values.
+    * Ripped usage of on_ac_power out of the script and included native
+      support for pmud. This is because on_ac_power is part of apmd, and
+      doesn't support pmud natively (except for the Debian version, which
+      does support pmud). I don't want to depend on having apmd installed or
+      on running on a Debian distro.
+
+1.00 -- 3 September 2004
+
+    * Use update-rc.d to install init scripts. Init scripts are now
+      installed in the default runlevels, not in the bootup/sysinit scripts.
+    * Reduced dependence on location of certain binaries, depend more on
+      PATH.
+    * Optimize away double actions -- if laptop mode is already in the
+      requested state, the laptop_mode script now does nothing instead of
+      re-initializing laptop mode to the state it was already in.
+    * Laptop mode is now enabled using the "master switch" /etc/init.d/
+      laptop-mode. If it has not been called with parameter "start", then
+      "laptop_mode start" will not start laptop mode. (The file that is used
+      to control this is /var/run/laptop-mode-enabled.)
+    * Reduced default value for LM_SECONDS_BEFORE_SYNC to 2 (was 5, but this
+      saves more power).
+    * Reduced default value for MINIMUM_BATTERY_MINUTES to 7 (was 10).
+    * Reduced default value for BATT_HD to 1 (5 seconds), was 4 (20
+      seconds).
+    * Reduced default value for DIRTY_BACKGROUND_RATIO to 1 (was 5).
+    * Increased default value for DIRTY_RATIO to 60 (was 40 previously).
+    * Default value for HD changed to "/dev/hda /dev/hdb /dev/hdc /dev/hdd".
+    * Corrected documentation to state that READAHEAD is in kilobytes, not
+      in 512-byte sectors.
+    * Added option ACPI_WITHOUT_AC_EVENTS. Use this if your ACPI doesn't
+      generate AC events but does generate battery events.
+
+0.99 -- 18 August 2004
+
+    * Fixed bug that made DO_CPU=1 fail.
+
+0.98 -- 18 August 2004
+
+    * Fixed bug in ACPI battery script -- missing discharge rate would lead
+      to division by zero.
+    * Added "auto" option to /usr/sbin/laptop_mode script. This autodetects
+      the AC state and enables/disables laptop mode accordingly, using
+      either /usr/bin/on_ac_power (if available) or using the /proc/acpi and
+      /proc/apm values.
+    * Modified the APM and ACPI event scripts to simply call "laptop_mode
+      auto".
+
+0.97 -- 12 August 2004
+
+    * Fixed: APM script was working backwards, it enabled laptop mode when
+      not on battery.
+    * Fixed: the default for the HD configuration option was not working.
+
+0.96 -- 5 August 2004
+
+    * Installer was broken in 0.95.
+    * APM scripts now support LAPTOP_MODE_ALWAYS_ON as well (i.e. they
+      didn't before :) )
+    * chkconfig support in the init script.
+
+0.95 -- 31 July 2004
+
+    * Moved Debian package support out of the regular package, into a
+      separate diff.
+    * Moved all config files to /etc/laptop-mode/laptop-mode.conf. Like to
+      keep this consistent. The installer moves all old config files to
+      their new locations.
+    * Fixed bashisms in /etc/init.d/laptop-mode.
+    * Added support for LAPTOP_MODE_ALWAYS_ON.
+    * Manual pages also included in the regular distribution, not only in
+      the Debian package.
+    * Init script now also stops, reloads etcetera.
+
+0.94 -- 29 July 2004
+
+    * Added Debian packaging support.
+    * Moved laptop_mode script to /usr/sbin/laptop_mode, because it uses
+      programs in /usr.
+    * Moved Debian-style config file to /etc/laptop-mode/laptop-mode.conf (/
+      etc/default/laptop-mode is intended only for init-scripts.)
+    * Wrote manual pages (only built and installed in non-Debian for now.)
+
+0.93 -- 28 July 2004
+
+    * Various small fixes.
+    * Enable laptop mode when booting on battery. (Tested only on Debian,
+      feedback on other distributions wanted!)
+
+0.92 -- 25 July 2004
+
+    * Add support for doing hdparm on multiple hard drives.
+    * Various other fixes (thanks to Peter Ross).
+
+0.91 -- 25 July 2004
+
+    * Add experimental APM support.
+
+0.90  -- 24 July 2004
+
+    * Initial release. Before this, the scripts were maintained in the
+      kernel documentation. (They are still in there BTW, it's just that
+      laptop-mode-tools contains some extras and is usually slightly ahead.)

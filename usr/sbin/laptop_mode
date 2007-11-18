@@ -1,0 +1,1609 @@
+#!/bin/bash
+
+# Script to start or stop laptop_mode, and to control various settings of the
+# kernel, hardware etc. that influence power consumption.
+#
+# This script is a part of Laptop Mode Tools. If you are running a supported
+# power management daemon, this script will be automatically called on power
+# state change.
+#
+# Configure laptop mode tools in /etc/laptop-mode/laptop-mode.conf, and in
+# the broken-out config files in /etc/laptop-mode/conf.d.
+#
+# Please consult the manual pages laptop-mode.conf(8) and laptop_mode(8) for
+# additional information.
+#
+# Maintainer:       Bart Samwel (bart@samwel.tk)
+# Project homepage: http://www.samwel.tk/laptop_mode
+#
+# Contributors to this script:   Bart Samwel
+#				 Kiko Piris
+#				 Micha Feigin
+#				 Andrew Morton
+#				 Herve Eychenne
+#				 Dax Kelson
+#				 Jan Polacek
+#				 ... and many others that I've stopped
+#				 keeping track of.
+#
+# Based on a script for Linux 2.4 written by Jens Axboe.
+
+#############################################################################
+
+set -a
+
+# The laptop mode tools version number. Extracted by the installer makefile
+# as well, so don't change the format!
+LMTVERSION=1.34
+
+# This script is loaded from multiple scripts to set the config defaults
+# and to read the configuration on top of those. Only when the command is
+# recognized does this script do anything else.
+VERBOSE_OUTPUT=0
+ENABLE_LAPTOP_MODE_ON_BATTERY=1
+ENABLE_LAPTOP_MODE_ON_AC=0
+ENABLE_LAPTOP_MODE_WHEN_LID_CLOSED=0
+PARTITIONS="auto /dev/mapper/*"
+LM_BATT_MAX_LOST_WORK_SECONDS=600
+LM_AC_MAX_LOST_WORK_SECONDS=360
+DEF_MAX_AGE=30
+LM_READAHEAD=3072
+NOLM_READAHEAD=128
+CONTROL_READAHEAD=1	
+CONTROL_NOATIME=0
+CONTROL_HD_IDLE_TIMEOUT=1
+LM_AC_HD_IDLE_TIMEOUT=4    # 20 seconds
+LM_BATT_HD_IDLE_TIMEOUT=4  # 20 seconds
+NOLM_HD_IDLE_TIMEOUT=244   # 2 hours
+DEF_UPDATE=5
+DEF_XFS_AGE_BUFFER=15
+DEF_XFS_SYNC_INTERVAL=30
+DEF_XFS_BUFD_INTERVAL=1
+XFS_HZ=100
+CONTROL_MOUNT_OPTIONS=1
+BATT_HD_POWERMGMT=1
+LM_AC_HD_POWERMGMT=255
+NOLM_AC_HD_POWERMGMT=255
+CONTROL_HD_POWERMGMT=0
+CONTROL_HD_WRITECACHE=0
+NOLM_AC_HD_WRITECACHE=1
+NOLM_BATT_HD_WRITECACHE=0
+LM_HD_WRITECACHE=0
+LM_DIRTY_RATIO=60
+LM_DIRTY_BACKGROUND_RATIO=1
+NOLM_DIRTY_BACKGROUND_RATIO=10
+NOLM_DIRTY_RATIO=40
+LM_SECONDS_BEFORE_SYNC=2	
+BATT_CPU_MAXFREQ=medium
+BATT_CPU_MINFREQ=slowest
+BATT_CPU_GOVERNOR=ondemand
+BATT_CPU_IGNORE_NICE_LOAD=1
+LM_AC_CPU_MAXFREQ=fastest
+LM_AC_CPU_MINFREQ=slowest
+LM_AC_CPU_GOVERNOR=ondemand
+LM_AC_CPU_IGNORE_NICE_LOAD=1
+NOLM_AC_CPU_MAXFREQ=fastest
+NOLM_AC_CPU_MINFREQ=slowest
+NOLM_AC_CPU_GOVERNOR=performance
+NOLM_AC_CPU_IGNORE_NICE_LOAD=0
+CONTROL_CPU_FREQUENCY=0
+HD="/dev/[hs]d[abcdefgh]"
+CONTROL_SYSLOG_CONF=0
+LM_AC_SYSLOG_CONF=/etc/syslog-on-ac-with-lm.conf
+NOLM_AC_SYSLOG_CONF=/etc/syslog-on-ac-without-lm.conf
+BATT_SYSLOG_CONF=/etc/syslog-on-battery.conf
+SYSLOG_CONF_SIGNAL_PROGRAM=syslogd
+SYSLOG_CONF=/etc/syslog.conf
+CONTROL_DPMS_STANDBY=0
+BATT_DPMS_STANDBY=300
+LM_AC_DPMS_STANDBY=1200
+NOLM_AC_DPMS_STANDBY=1200
+CONTROL_CPU_THROTTLING=0
+BATT_CPU_THROTTLING=medium
+LM_AC_CPU_THROTTLING=minimum
+NOLM_AC_CPU_THROTTLING=minimum
+CONTROL_START_STOP=1
+CONTROL_TERMINAL=0
+TERMINALS="/dev/vc/1 /dev/vcs1"
+BATT_TERMINAL_BLANK_MINUTES=1
+BATT_TERMINAL_POWERDOWN_MINUTES=2
+LM_AC_TERMINAL_BLANK_MINUTES=10
+LM_AC_TERMINAL_POWERDOWN_MINUTES=10
+NOLM_AC_TERMINAL_BLANK_MINUTES=10
+NOLM_AC_TERMINAL_POWERDOWN_MINUTES=50
+ENABLE_AUTO_HIBERNATION=0
+HIBERNATE_COMMAND=/usr/sbin/hibernate
+AUTO_HIBERNATION_ON_CRITICAL_BATTERY_LEVEL=1
+DISABLE_LAPTOP_MODE_ON_CRITICAL_BATTERY_LEVEL=1
+AUTO_HIBERNATION_BATTERY_CHARGE_MAH=0
+AUTO_HIBERNATION_BATTERY_CHARGE_MWH=0
+MINIMUM_BATTERY_CHARGE_MAH=0
+MINIMUM_BATTERY_CHARGE_MWH=0
+ASSUME_SCSI_IS_SATA=1
+CONTROL_BRIGHTNESS=0
+BATT_BRIGHTNESS_COMMAND=false
+LM_AC_BRIGHTNESS_COMMAND=false
+NOLM_AC_BRIGHTNESS_COMMAND=false
+
+# No default on these ones -- we need to detect if they have been set, for
+# backward compatibility with MINIMUM_BATTERY_MINUTES etc.
+AUTO_HIBERNATION_BATTERY_CHARGE_PERCENT=
+MINIMUM_BATTERY_CHARGE_PERCENT=
+
+# Backward compatibility variable that is sometimes
+# set externally (Debian init system)
+unset VERBOSE
+
+# Source config.
+if [ -r /etc/laptop-mode/laptop-mode.conf ] ; then
+	. /etc/laptop-mode/laptop-mode.conf
+else
+	echo $0: Configuration file /etc/laptop-mode/laptop-mode.conf not present or not readable.
+	exit 1
+fi
+if [ -d /etc/laptop-mode/conf.d ] ; then
+	for CONF in /etc/laptop-mode/conf.d/* ; do
+		if [ -r "$CONF" ] ; then
+			. "$CONF"
+		else
+			echo "Warning: Configuration file $CONF is not readable, skipping."
+		fi
+	done
+fi
+
+# Support for old config settings
+if [ "$AC_HD" != "" ] ; then
+	AC_HD_WITHOUT_LM="$AC_HD"
+	AC_HD_WITH_LM="$AC_HD"
+fi
+if [ "$VERBOSE" != "" ] ; then
+	VERBOSE_OUTPUT="$VERBOSE"
+fi
+if [ "$CPU_MAXFREQ" != "" ] ; then
+	BATT_CPU_MAXFREQ="$CPU_MAXFREQ"
+fi
+if [ "$MAX_AGE" != "" ] ; then
+	LM_BATT_MAX_LOST_WORK_SECONDS="$MAX_AGE"
+	LM_AC_MAX_LOST_WORK_SECONDS="$MAX_AGE"
+fi
+if [ "$DEF_AGE" != "" ] ; then
+	DEF_MAX_AGE="$DEF_AGE"
+fi
+if [ "$LAPTOP_MODE_ALWAYS_ON" != "" ] ; then
+	ENABLE_LAPTOP_MODE_ALWAYS="$LAPTOP_MODE_ALWAYS_ON"
+fi
+if [ "$LM_WHEN_LID_CLOSED" != "" ] ; then
+	ENABLE_LAPTOP_MODE_WHEN_LID_CLOSED="$LM_WHEN_LID_CLOSED"
+fi
+if [ "$REMOUNT_PARTITIONS" != "" ] ; then
+	PARTITIONS="$REMOUNT_PARTITIONS"
+fi
+if [ "$READAHEAD" != "" ] ; then
+	LM_READAHEAD="$READAHEAD"
+fi
+if [ "$DO_REMOUNT_NOATIME" != "" ] ; then
+	CONTROL_NOATIME="$DO_REMOUNT_NOATIME"
+fi
+if [ "$DO_HD" != "" ] ; then
+	CONTROL_HD_IDLE_TIMEOUT="$DO_HD"
+fi
+if [ "$AC_HD_WITH_LM" != "" ] ; then
+	LM_AC_HD_IDLE_TIMEOUT="$AC_HD_WITH_LM"
+fi
+if [ "$AC_HD_WITHOUT_LM" != "" ] ; then
+	NOLM_HD_IDLE_TIMEOUT="$AC_HD_WITHOUT_LM"
+fi
+if [ "$BATT_HD" != "" ] ; then
+	LM_BATT_HD_IDLE_TIMEOUT="$BATT_HD"
+fi		
+if [ "$DO_REMOUNTS" != "" ] ; then
+	CONTROL_MOUNT_OPTIONS="$DO_REMOUNTS"
+fi	
+if [ "$DO_HD_POWERMGMT" != "" ] ; then
+	CONTROL_HD_POWERMGMT="$DO_HD_POWERMGMT"
+fi
+if [ "$AC_HDPARM_POWERMGMT_WITH_LM" != "" ] ; then
+	LM_AC_HD_POWERMGMT="$AC_HDPARM_POWERMGMT_WITH_LM"
+fi
+if [ "$AC_HDPARM_POWERMGMT_WITHOUT_LM" != "" ] ; then
+	NOLM_AC_HD_POWERMGMT="$AC_HDPARM_POWERMGMT_WITHOUT_LM"
+fi
+if [ "$BATT_HDPARM_POWERMGMT" != "" ] ; then
+	BATT_HD_POWERMGMT="$BATT_HDPARM_POWERMGMT"
+fi
+if [ "$DO_WRITECACHE" != "" ] ; then
+	CONTROL_HD_WRITECACHE="$DO_WRITECACHE"
+fi
+if [ "$AC_WRITECACHE_WITHOUT_LM" != "" ] ; then
+	NOLM_AC_HD_WRITECACHE="$AC_WRITECACHE_WITHOUT_LM"
+fi
+if [ "$BATT_WRITECACHE" != "" ] ; then
+	LM_HD_WRITECACHE="$BATT_WRITECACHE"
+fi
+if [ "$DIRTY_RATIO" != "" ]; then
+	LM_DIRTY_RATIO="$DIRTY_RATIO"
+fi
+if [ "$DIRTY_BACKGROUND_RATIO" != "" ] ; then
+	LM_DIRTY_BACKGROUND_RATIO="$DIRTY_BACKGROUND_RATIO"
+fi
+if [ "$DEF_DIRTY_RATIO" != "" ]; then
+	NOLM_DIRTY_RATIO="$DEF_DIRTY_RATIO"
+fi
+if [ "$DEF_DIRTY_BACKGROUND_RATIO" != "" ] ; then
+	NOLM_DIRTY_BACKGROUND_RATIO="$DEF_DIRTY_BACKGROUND_RATIO"
+fi
+if [ "$DO_CPU" != "" ] ; then
+	CONTROL_CPU_FREQUENCY="$DO_CPU"
+fi
+if [ "$CONTROL_CPU_MAXFREQ" != "" ] ; then
+	CONTROL_CPU_FREQUENCY="$CONTROL_CPU_MAXFREQ"
+fi
+if [ "$AC_CPU_MAXFREQ_WITH_LM" != "" ] ; then
+	LM_AC_CPU_MAXFREQ="$AC_CPU_MAXFREQ_WITH_LM"
+fi
+if [ "$AC_CPU_MAXFREQ_WITHOUT_LM" != "" ] ; then
+	NOLM_AC_CPU_MAXFREQ="$AC_CPU_MAXFREQ_WITHOUT_LM"
+fi
+if [ "$DO_SYSLOG" != "" ] ; then
+	CONTROL_SYSLOG_CONF="$DO_SYSLOG"
+fi
+if [ "$SYSLOG_SIGNAL_PROGRAM" != "" ] ;then
+	SYSLOG_CONF_SIGNAL_PROGRAM="$SYSLOG_SIGNAL_PROGRAM"
+fi
+if [ "$AC_SYSLOG_WITH_LM" != "" ] ; then
+	LM_AC_SYSLOG_CONF="$AC_SYSLOG_WITH_LM"
+fi
+if [ "$AC_SYSLOG_WITHOUT_LM" != "" ] ; then
+	NOLM_AC_SYSLOG_CONF="$AC_SYSLOG_WITHOUT_LM"
+fi
+if [ "$BATT_SYSLOG" != "" ] ; then
+	BATT_SYSLOG_CONF="$BATT_SYSLOG"
+fi
+if [ "$ENABLE_LAPTOP_MODE_ALWAYS" != "" ] ; then
+	ENABLE_LAPTOP_MODE_ON_AC="$ENABLE_LAPTOP_MODE_ALWAYS"
+fi
+if [ "$MINIMUM_BATTERY_MINUTES" != "" -a "$MINIMUM_BATTERY_CHARGE_PERCENT" == "" ] ; then
+	# Use a very conservative estimate (1% = 1 battery minute, 100 minutes in a battery)
+	# for backward compatibility.
+	MINIMUM_BATTERY_CHARGE_PERCENT="$MINIMUM_BATTERY_MINUTES"
+fi
+if [ -z "$MINIMUM_BATTERY_CHARGE_PERCENT" ] ; then
+	# Apply the default, now that we've determined that this is the minimum.
+	MINIMUM_BATTERY_CHARGE_PERCENT=3
+fi
+if [ "$AUTO_HIBERNATION_BATTERY_MINUTES" != "" -a "$AUTO_HIBERNATION_BATTERY_CHARGE_PERCENT" == "" ] ; then
+	# Use a very conservative estimate (1% = 1 battery minute, 100 minutes in a battery)
+	# for backward compatibility.
+	AUTO_HIBERNATION_BATTERY_CHARGE_PERCENT="$AUTO_HIBERNATION_BATTERY_MINUTES"
+fi
+if [ -z "$AUTO_HIBERNATION_BATTERY_CHARGE_PERCENT" ] ; then
+	# Apply the default, now that we've determined that this is the minimum.
+	AUTO_HIBERNATION_BATTERY_CHARGE_PERCENT=2
+fi
+
+
+# Postprocessing
+if [ "$VERBOSE_OUTPUT" -ne 0 ] ; then
+	OUTPUT="/dev/stdout"
+else
+	OUTPUT="/dev/null"
+fi
+
+if [ "$PARTITIONS" == "" ] ; then
+	PARTITIONS="auto /dev/mapper/*"
+fi
+
+
+# Expand shell wild cards immediately.
+PARTITIONS=$( echo $PARTITIONS )
+TERMINALS=$( echo $TERMINALS )
+
+# Convert seconds to hdparm -S format
+# Everything over 20 minutes is interpreted as 2 hours.
+seconds_to_hdparm_S() {
+  if [ "$1" -eq 0 ] ; then
+	# disable.
+	echo 0
+ elif [ "$1" -gt 0 -a "$1" -lt 5 ] ; then
+	# 5 seconds minimum
+	echo 1 	
+  elif [ "$1" -le $((240*5)) ] ; then
+	# Values between 1 and 240 signify increments of 5 seconds
+	echo $(($1 / 5))
+  elif [ "$1" -lt $((30*60)) ] ; then
+	# Values between 20 and 30 minutes are rounded up to 30 minutes.
+	echo 241
+  elif [ "$1" -lt $((12*30*60)) ] ; then
+	# Values between 30 minutes and 6 hours (exclusive) yield values between
+	# 241 and 251, in 30-minute increments.
+	echo $(( 240 + ($1 / (30*60)) ))
+  else
+	# Larger values effectively indicate no timeout at all.
+	echo 0
+  fi
+}
+
+# Convert configured idle timeouts to hdparm -S format.
+if [ "$LM_AC_HD_IDLE_TIMEOUT_SECONDS" != "" ] ; then
+	LM_AC_HD_IDLE_TIMEOUT=$(seconds_to_hdparm_S $LM_AC_HD_IDLE_TIMEOUT_SECONDS)
+fi
+if [ "$LM_BATT_HD_IDLE_TIMEOUT_SECONDS" != "" ] ; then
+	LM_BATT_HD_IDLE_TIMEOUT=$(seconds_to_hdparm_S $LM_BATT_HD_IDLE_TIMEOUT_SECONDS)
+fi
+if [ "$NOLM_HD_IDLE_TIMEOUT_SECONDS" != "" ] ; then
+	NOLM_HD_IDLE_TIMEOUT=$(seconds_to_hdparm_S $NOLM_HD_IDLE_TIMEOUT_SECONDS)
+fi
+
+if [ "$1" == "status" ] ; then
+	# Display a status report.
+	echo Mounts:
+	mount | sed "s/^/   /"
+	echo
+	echo Drive power status:
+	hdparm -C $HD 2>/dev/null | sed "s/^/   /"
+	echo
+	echo "(NOTE: drive settings affected by Laptop Mode cannot be retrieved.)"
+	echo
+	echo Readahead states:
+	cat /etc/mtab | while read DEV MP FST OPTS DUMP PASS ; do
+		if [ -b $DEV ] ; then
+			echo "   $DEV: $((`/sbin/blockdev --getra $DEV` / 2)) kB"
+		fi
+	done
+	echo
+	if [ -e /var/run/laptop-mode-enabled ] ; then
+		echo Laptop Mode is allowed to run: /var/run/laptop-mode-enabled exists.
+	else
+		echo Laptop Mode is NOT allowed to run: /var/run/laptop-mode-enabled does not exist.
+	fi
+	echo
+	STATFILES="/proc/sys/vm/laptop_mode /proc/apm /proc/pmu/info /proc/sys/vm/bdflush /proc/sys/vm/dirty_ratio /proc/sys/fs/xfs/age_buffer /proc/sys/fs/xfs/sync_interval /proc/sys/fs/xfs/lm_age_buffer /proc/sys/fs/xfs/lm_sync_interval /proc/sys/vm/pagebuf/lm_flush_age /proc/sys/fs/xfs/xfsbufd_centisecs /proc/sys/fs/xfs/xfssyncd_centisecs /proc/sys/vm/dirty_background_ratio /proc/sys/vm/dirty_expire_centisecs /proc/sys/fs/xfs/age_buffer/centisecs /proc/sys/vm/dirty_writeback_centisecs /sys/devices/system/cpu/*/cpufreq/cpuinfo_*_freq /sys/devices/system/cpu/*/cpufreq/scaling_governor /proc/acpi/button/lid/*/state /proc/acpi/ac_adapter/*/state /proc/acpi/battery/*/state"
+	for THISFILE in $STATFILES ; do
+		if [ -e $THISFILE ] ; then
+			echo $THISFILE:
+			if [ -r $THISFILE ] ; then
+				cat $THISFILE | sed "s/^/   /"
+			else
+				echo "   Not accessible: permissions problem?"
+			fi
+			echo
+		fi
+	done
+
+elif [ "$1" != "readconfig" -a "$1" != "defaults" ] ; then
+
+#############################################################################
+
+KLEVEL="$(uname -r |
+			 {
+				 IFS='.-' read a b c
+				 echo $a.$b
+			 }
+)"
+KMINOR="$(uname -r |
+			{
+				IFS='.-' read a b c d
+				echo $c
+			}
+)"
+
+case "$KLEVEL" in
+	"2.4" ) ;;
+	"2.6" ) ;;
+	*)
+		echo "Unhandled kernel version: $KLEVEL ('uname -r' = '$(uname -r)')" >&2
+		exit 1
+		;;
+esac
+
+
+
+# Stop exporting everything -- what we do from here is private.
+set +a
+
+if [ "$1" == "--version" ] ; then
+	echo "Laptop Mode Tools $LMTVERSION"
+	exit 0
+fi
+echo "Laptop Mode Tools $LMTVERSION" >> $OUTPUT
+
+if [ ! -e /proc/sys/vm/laptop_mode ] ; then
+	echo "Kernel does not have support for laptop mode. Please apply the laptop mode" >&2
+	echo "patch or install a newer kernel." >&2
+	exit 1
+fi
+
+if [ ! -w /proc/sys/vm/laptop_mode ] ; then
+	echo "You do not have enough privileges to enable laptop_mode." >&2
+	exit 1
+fi
+
+# Remove an option (the first parameter) of the form option=<number> from
+# a mount options string (the rest of the parameters).
+remove_numeric_mount_option () {
+	OPT="$1"
+	shift
+	echo ",$*," | sed		\
+	 -e 's|,'"$OPT"'=[0-9]*,|,|g'	\
+	 -e 's/,,*/,/g'			\
+	 -e 's/^,//'			\
+	 -e 's/,$//'
+}
+
+# Remove an option (the first parameter) without any arguments from
+# a mount option string (the rest of the parameters).
+remove_yesno_mount_option () {
+	OPT="$1"
+	shift
+	echo ",$*," | sed		\
+	 -e 's|,'"$OPT"',|,|g'		\
+	 -e 's/,,*/,/g'			\
+	 -e 's/^,//'			\
+	 -e 's/,$//'
+}
+
+# Find out the state of a yes/no option (e.g. "atime"/"noatime") in
+# a set of mount options, and use this state to replace the
+# value of the option in another mount options string.
+#
+# Example:
+# replace_yesno_mount_option atime atime defaults,user=1000,atime defaults,noatime
+#
+# This yields "defaults,atime".
+replace_yesno_mount_option () {
+	OPT="$1"
+	DEF_OPT="$2"
+	REPLACEMENT_OPTS="$3"
+	OPTS="$4"
+	PARSEDOPTS="$(remove_yesno_mount_option $OPT $OPTS)"
+	PARSEDOPTS="$(remove_yesno_mount_option no$OPT $PARSEDOPTS)"
+
+	if echo ",$REPLACEMENT_OPTS," | grep ",no$OPT," > /dev/null ; then
+		echo "$PARSEDOPTS,no$OPT"
+	elif echo ",$REPLACEMENT_OPTS," | grep ",$OPT," > /dev/null ; then
+		echo "$PARSEDOPTS,$OPT"
+	else
+		echo "$PARSEDOPTS,$DEF_OPT"
+	fi
+}
+
+# Find out the state of a numbered option (e.g. "commit=NNN") in
+# a set of options, and use this state to replace the
+# value of the option in another mount options string. 
+#
+# Example:
+# replace_numeric_mount_option commit defaults,user=1000,commit=3 defaults,commit=7
+#
+# This example yields "defaults,commit=3".
+replace_numeric_mount_option () {
+	OPT="$1"
+	DEF_OPT="$2"
+	REPLACEMENT_OPTS="$3"
+	OPTS="$4"	
+	PARSEDOPTS="$(remove_numeric_mount_option $OPT $OPTS)"
+	
+	if echo ",$REPLACEMENT_OPTS," | grep ",$OPT=[0123456789]+," > /dev/null ; then
+		echo -n "$PARSEDOPTS,$OPT="
+		echo ",$REPLACEMENT_OPTS," | sed \
+		 -e 's/.*,'"$OPT"'=//'	\
+		 -e 's/,.*//'
+	else
+		# Option not present in REPLACEMENT_OPTS: use the default.
+		echo "$PARSEDOPTS,$DEF_OPT"
+	fi
+}
+
+deduce_fstype () {
+	MP="$1"
+	# My root filesystem unfortunately has type "unknown" in
+	# /etc/mtab. If we encounter "unknown", we try to get the
+	# type from fstab. This still might be wrong, in which
+	# case the code further down will issue a big warning.
+	cat /etc/fstab |
+	sed 's/[[:space:]]*#.*$//' |
+	while read FSTAB_DEV FSTAB_MP FSTAB_FST FSTAB_OPTS FSTAB_DUMP FSTAB_DUMP ; do
+		if [ "$FSTAB_MP" = "$MP" ]; then
+			echo $FSTAB_FST
+			exit 0
+		fi
+	done
+}
+
+if [ $CONTROL_NOATIME -eq 1 ] ; then
+	NOATIME_OPT=",noatime"
+fi
+
+INIT=0          # Display info in init script format?
+FORCE=0         # Force reapplying the current state?
+while [ "$1" != "" ] ; do
+	case "$1" in 
+		init) INIT=1 ;;
+		force) FORCE=1 ;;
+		# Old options. We always do "auto" for any option now, but
+		# we still have to accept the options.
+		start) ;;
+		stop) ;;
+		auto) ;;
+		*) echo "Unrecognized option $1."
+		   exit 1 ;;
+	esac
+	shift
+done
+
+# Used to display laptop mode state later on. This is the enabled/disabled 
+# state for laptop mode processing, it tells us nothing about whether laptop
+# mode is actually _active_.
+export STATE=enabled
+if [ "$ENABLE_LAPTOP_MODE_ON_BATTERY" -eq 0 -a "$ENABLE_LAPTOP_MODE_ON_AC" -eq 0 -a "$ENABLE_LAPTOP_MODE_WHEN_LID_CLOSED" -eq 0 ] ; then
+	STATE=disabled
+fi
+
+# Determine the power state.
+export ON_AC=1
+
+if [ -d /proc/acpi/ac_adapter ] ; then
+	ADAPTERS_FOUND=0
+	ON_AC=0
+	for ADAPTER in /proc/acpi/ac_adapter/* ; do
+		if [ -f $ADAPTER/state ] ; then
+			ADAPTERS_FOUND=1
+			STATUS=`awk '/^state: / { print $2 }' $ADAPTER/state`
+			if [ "$STATUS" = "on-line" ] ; then
+				ON_AC=1
+			fi
+		fi
+	done
+	if [ "$ADAPTERS_FOUND" -eq 0 ] ; then
+		ON_AC=1
+	fi
+elif [ -f /proc/apm ] ; then
+	read D1 D2 D3 APM_AC_STATE D0 </proc/apm
+	if [ "$APM_AC_STATE" = "0x00" ] ; then
+		ON_AC=0
+	else
+		ON_AC=1
+	fi
+elif [ -f /proc/pmu/info ] ; then
+	if ( grep "^AC Power.*0$" /proc/pmu/info ) ; then
+		echo "/proc/pmu/info indicates absence of AC power." >> $OUTPUT
+		ON_AC=0
+	else
+		# It is possible that there is no AC Power = 1 in the file,
+		# but we always assume AC power when we're not sure.
+		ON_AC=1
+		echo "/proc/pmu/info indicates presence of AC power." >> $OUTPUT
+	fi
+else
+	echo "No ACPI, APM or PMU power management information found -- assuming AC power is present." >> $OUTPUT
+fi
+
+
+
+# Determine whether to activate or deactivate laptop mode.
+export ACTIVATE=0
+
+if [ "$ON_AC" -eq 1 ] ; then
+	if [ "$ENABLE_LAPTOP_MODE_ON_AC" -ne 0 ] ; then
+		echo "On AC power: Activating, because ENABLE_LAPTOP_MODE_ON_AC is set." >> $OUTPUT
+		ACTIVATE=1
+	else
+		echo "On AC power: Deactivating, because ENABLE_LAPTOP_MODE_ON_AC is not set." >> $OUTPUT
+		ACTIVATE=0
+	fi
+else
+	if [ "$ENABLE_LAPTOP_MODE_ON_BATTERY" -ne 0 ] ; then
+		echo "On battery power: Activating, because ENABLE_LAPTOP_MODE_ON_BATTERY is set." >> $OUTPUT
+		ACTIVATE=1
+	else
+		echo "On battery power: Deactivating, because ENABLE_LAPTOP_MODE_ON_BATTERY is not set." >> $OUTPUT
+		ACTIVATE=0
+	fi
+fi
+
+if [ "$ENABLE_LAPTOP_MODE_WHEN_LID_CLOSED" -ne 0 ] ; then
+	if [ -f /proc/acpi/button/lid/*/state ] ; then
+		if ( cat /proc/acpi/button/lid/*/state | grep "closed" ) ; then
+			echo "Setting action to \"start\" because the lid is closed." >> $OUTPUT
+			ACTIVATE=1
+		fi
+	else
+		echo "Warning: ENABLE_LAPTOP_MODE_WHEN_LID_CLOSED is set, but there is no file"
+		echo "/proc/acpi/button/lid/.../state!"
+	fi
+fi
+
+# If the init script has not been run or has been run with the "stop"
+# argument, then we should never start laptop mode.
+if [ ! -f /var/run/laptop-mode-enabled ] ; then
+	echo "Laptop mode disabled because /var/run/laptop-mode-enabled is missing." >> $OUTPUT
+	STATE=disabled
+fi
+
+if [ "$ACTIVATE" -eq 1 -a -f /etc/default/laptop-mode ] ; then
+	. /etc/default/laptop-mode
+	if ! ( echo "$ENABLE_LAPTOP_MODE" |grep y ) ; then
+		echo "Not starting laptop mode because it is disabled in /etc/default/laptop-mode." >> $OUTPUT
+		STATE=disabled
+	fi
+fi
+
+if [ "$STATE" == "disabled" ] ; then
+	ACTIVATE=0
+fi
+
+# Check whether we are allowed to activate the data-loss-sensitive stuff.
+# If the battery charge is too low, we want to disable this, but not the
+# other power-saving stuff.
+
+if [ "$ACTIVATE" -eq 0 ] ; then
+	ACTIVATE_WITH_POSSIBLE_DATA_LOSS=0
+else
+	ACTIVATE_WITH_POSSIBLE_DATA_LOSS=1
+	if [ ! -d /proc/acpi ] ; then
+		echo "Not ACPI -> no support for minimum battery charge checking." >> $OUTPUT
+	elif [ "$ON_AC" -eq 0 ] ; then
+		echo "On ACPI and not on AC -- checking minimum battery charge." >> $OUTPUT
+		ENOUGH_CHARGE=0
+		ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=0
+		for BATT in /proc/acpi/battery/* ; do
+			PREV_ENOUGH_CHARGE=$ENOUGH_CHARGE
+			PREV_ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=$ENOUGH_CHARGE_TO_PREVENT_HIBERNATION
+
+			BATT_STATE=$BATT/state
+			BATT_INFO=$BATT/info
+			echo "Checking info and state for $BATT." >> $OUTPUT
+
+			# Only do if the battery is present
+			if ( cat $BATT_INFO | grep "present:.*yes" > /dev/null ) ; then
+				FOUND_AN_ENABLED_CHECK=0
+				FOUND_AN_ENABLED_HIBERNATION_CHECK=0
+				
+				# Get the remaining capacity.
+				REMAINING=`cat $BATT_STATE | grep "remaining capacity:" | sed  "s/.* \([0-9][0-9]* \).*/\1/" `
+				if [ -z "$REMAINING" ] ; then
+					echo "Battery does not report remaining capacity. Perhaps it is not present?" >> $OUTPUT
+					REMAINING=0
+				fi
+				echo "Remaining charge: $REMAINING" >> $OUTPUT
+	
+				CAPACITY=`cat $BATT_INFO | grep "design capacity:" | sed  "s/.* \([0-9][0-9]* \).*/\1/" `
+				if [ -z "$CAPACITY" ] ; then
+					CAPACITY=0
+				fi
+				echo "Design capacity: $CAPACITY" >> $OUTPUT
+	
+				# Check the charge percentage
+				if [ "$MINIMUM_BATTERY_CHARGE_PERCENT" -ne 0 ] ; then
+					FOUND_AN_ENABLED_CHECK=1
+					if [ "$CAPACITY" -eq 0 ] ; then
+						echo "WARNING: Battery does not report a design capacity. Minimum battery"
+						echo "charge checking does not work without a design capacity."
+					elif [ "$(($REMAINING * 100 / $CAPACITY))" -ge "$MINIMUM_BATTERY_CHARGE_PERCENT" ] ; then
+						ENOUGH_CHARGE=1
+					fi
+				fi
+				if [ "$AUTO_HIBERNATION_BATTERY_CHARGE_PERCENT" -ne 0 ] ; then
+					FOUND_AN_ENABLED_HIBERNATION_CHECK=1
+					if [ "$CAPACITY" -eq 0 ] ; then
+						echo "WARNING: Battery does not report a design capacity. Auto hibernation"
+						echo "does not work without a design capacity."
+					elif [ "$(($REMAINING * 100 / $CAPACITY))" -ge "$AUTO_HIBERNATION_BATTERY_CHARGE_PERCENT" ] ; then
+						ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=1
+					fi
+				fi
+	
+				#
+				# Fallback: hard values.
+				#
+				# Determine the reporting unit.
+				IN_MAH=0
+				IN_MWH=0
+				if ( cat $BATT_INFO | grep mWh > /dev/null ) ; then
+					IN_MWH=1
+				elif ( cat $BATT_INFO | grep mAh > /dev/null ) ; then
+					IN_MAH=1
+				fi
+				
+				if [ "$IN_MAH" -ne 0 ] ; then
+					if [ "$MINIMUM_BATTERY_CHARGE_MAH" -ne 0 ] ; then
+						FOUND_AN_ENABLED_CHECK=1
+						if [ "$REMAINING" -ge "$MINIMUM_BATTERY_CHARGE_MAH" ] ; then
+							ENOUGH_CHARGE=1
+						fi
+					fi
+					if [ "$AUTO_HIBERNATION_BATTERY_CHARGE_MAH" -ne 0 ] ; then
+						FOUND_AN_ENABLED_HIBERNATION_CHECK=1
+						if [ "$REMAINING" -ge "$AUTO_HIBERNATION_BATTERY_CHARGE_MAH" ] ; then
+							ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=1
+						fi
+					fi
+				elif [ "$IN_MWH" -ne 0 ] ; then
+					if [ "$MINIMUM_BATTERY_CHARGE_MWH" -ne 0 ] ; then
+						FOUND_AN_ENABLED_CHECK=1
+						if [ "$REMAINING" -ge "$MINIMUM_BATTERY_CHARGE_MWH" ] ; then
+							ENOUGH_CHARGE=1
+						fi
+					fi
+					if [ "$AUTO_HIBERNATION_BATTERY_CHARGE_MWH" -ne 0 ] ; then
+						FOUND_AN_ENABLED_HIBERNATION_CHECK=1
+						if [ "$REMAINING" -ge "$AUTO_HIBERNATION_BATTERY_CHARGE_MWH" ] ; then
+							ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=1
+						fi
+					fi
+				else
+					echo "Failed to determine battery charge. Battery charge units are not in"
+					echo "mWh or mAh."
+				fi
+				
+				CAP_STATE=`cat "$BATT_STATE" | sed -r 's/^capacity state:\s*(.*)\s*$/\1/;t;d'`
+				if [ "$DISABLE_LAPTOP_MODE_ON_CRITICAL_BATTERY_LEVEL" -ne 0 ] ; then
+					if [ "$CAP_STATE" == "critical" ] ; then				
+						# Restore the state we had before checking this battery, so that
+						# this battery does not count as having enough charge.
+						ENOUGH_CHARGE=$PREV_ENOUGH_CHARGE
+					elif [ "$FOUND_AN_ENABLED_CHECK" -eq 0 ] ; then
+						# This is the only check that is enabled. In that case a non-critical
+						# battery level counts as "enough". (If we would count non-critical
+						# battery levels as enough *always*, then the other settings would
+						# have no effect; this is only a final fallback.)
+						ENOUGH_CHARGE=1
+					fi
+				fi
+				if [ "$AUTO_HIBERNATION_ON_CRITICAL_BATTERY_LEVEL" -ne 0 ] ; then
+					if [ "$CAP_STATE" == "critical" ] ; then				
+						ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=$PREV_ENOUGH_CHARGE_TO_PREVENT_HIBERNATION
+					elif [ "$FOUND_AN_ENABLED_HIBERNATION_CHECK" -eq 0 ] ; then
+						ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=1
+					fi
+				fi
+			else
+				echo "Battery is not present." >> $OUTPUT
+			fi
+		done
+		if [ "$ENABLE_AUTO_HIBERNATION" -ne 0 -a "$ENOUGH_CHARGE_TO_PREVENT_HIBERNATION" -eq 0 ] ; then
+			echo "None of the batteries have a charge above the auto-hibernation level." >> $OUTPUT
+			echo "Starting hibernation." >> $OUTPUT
+			$HIBERNATE_COMMAND
+			# Don't continue -- if things are configured correctly, then we
+			# will be called on resume.
+			exit 0			
+		fi
+		if [ "$ENOUGH_CHARGE" -eq 0 ] ; then
+			echo "None of the batteries have a charge above the minimum level." >> $OUTPUT
+			echo "Deactivating data loss sensitive features." >> $OUTPUT
+			ACTIVATE_WITH_POSSIBLE_DATA_LOSS=0
+		fi
+	fi
+fi
+
+if [ "$INIT" -eq 0 ] ; then
+	echo -n "Laptop mode "
+fi
+
+# WAS_ACTIVE is used later on. If there is no /var/run/laptop-mode-state, then
+# we know that laptop mode wasn't active before.
+WAS_ACTIVE=0
+echo Checking if desired state is different from current state. >> $OUTPUT
+if [ -f /var/run/laptop-mode-state ] ; then
+	read WAS_ACTIVE WAS_ON_AC WAS_ACTIVATE_WITH_POSSIBLE_DATA_LOSS < /var/run/laptop-mode-state
+	if [ "$WAS_ON_AC" != "" ] ; then
+		if [ "$WAS_ACTIVE" -eq "$ACTIVATE" -a "$WAS_ON_AC" -eq "$ON_AC" -a "$WAS_ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -a "$FORCE" -eq 0 ] ; then
+			echo -n "$STATE, "
+			if [ "$WAS_ACTIVE" -eq 1 ] ; then
+				echo -n "active [unchanged]"
+				if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 0 ] ; then
+					echo -n ' (Data-loss sensitive features disabled.)'
+				fi
+				echo
+			else
+				echo "not active [unchanged]"
+			fi
+			exit 0
+		fi
+	else
+		echo "/var/run/laptop-mode-state in pre-1.20 format, ignoring previous state." >> $OUTPUT
+		WAS_ACTIVE=0
+	fi
+else
+	echo "/var/run/laptop-mode-state does not exist, no previous state." >> $OUTPUT
+fi
+echo $ACTIVATE $ON_AC $ACTIVATE_WITH_POSSIBLE_DATA_LOSS > /var/run/laptop-mode-state
+
+if [ "$ACTIVATE" -eq 1 ] ; then
+	echo -n "$STATE, active."
+	if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 0 ] ; then
+		echo -n ' (Data-loss sensitive features disabled.)'
+	fi
+	echo
+else
+	echo "$STATE, not active."
+fi
+
+
+
+# Adjust CPU speed first -- that way, response to a switch to AC power will be faster,
+# while switching to battery will take place while we're taking less power on the whole.
+
+#
+# get_medium_value
+#
+#   Get the medium value from a list of numerical values.
+#   $1 = file containing the list of values
+#
+get_medium_value() {
+	cat "$1" | sed 's/ /\n/g' | sort -n | awk -v RS="" '{n=split($0,a); print a[int((n+1)/2)]}'
+}
+
+# Set kernel setting, showing an error if this fails.
+# Parameter 1: sysctl/proc path
+# Parameter 2: the value
+set_sysctl() {
+	echo "Executing: echo $2 > $1" >> $OUTPUT
+	if ! echo "$2" > "$1" ; then
+		echo "SETTING OF KERNEL PARAMETER FAILED: echo $2 \> $1"
+	fi
+}
+export set_sysctl
+
+if [ $CONTROL_CPU_FREQUENCY -eq 1 ] ; then
+	if [ $ON_AC -eq 1 ] ; then
+		if [ "$ACTIVATE" -eq 1 ] ; then
+			CPU_MAXFREQ="$LM_AC_CPU_MAXFREQ"
+			CPU_MINFREQ="$LM_AC_CPU_MINFREQ"
+			CPU_GOVERNOR="$LM_AC_CPU_GOVERNOR"
+			CPU_IGNORE_NICE_LOAD="$LM_AC_CPU_IGNORE_NICE_LOAD"
+		else
+			CPU_MAXFREQ="$NOLM_AC_CPU_MAXFREQ"
+			CPU_MINFREQ="$NOLM_AC_CPU_MINFREQ"
+			CPU_GOVERNOR="$NOLM_AC_CPU_GOVERNOR"
+			CPU_IGNORE_NICE_LOAD="$NOLM_AC_CPU_IGNORE_NICE_LOAD"
+		fi
+	else
+		CPU_MAXFREQ="$BATT_CPU_MAXFREQ"
+		CPU_MINFREQ="$BATT_CPU_MINFREQ"
+		CPU_GOVERNOR="$BATT_CPU_GOVERNOR"
+		CPU_IGNORE_NICE_LOAD="$BATT_CPU_IGNORE_NICE_LOAD"
+	fi
+	for THISCPU in /sys/devices/system/cpu/* ; do
+		if [ -e $THISCPU/cpufreq/cpuinfo_min_freq ]; then
+			THIS_CPU_MAXFREQ="$CPU_MAXFREQ"
+			THIS_CPU_MINFREQ="$CPU_MINFREQ"
+			THIS_CPU_GOVERNOR="$CPU_GOVERNOR"
+			THIS_CPU_IGNORE_NICE_LOAD="$CPU_IGNORE_NICE_LOAD"
+			if [ "$CPU_MAXFREQ" = "slowest" ]; then
+				THIS_CPU_MAXFREQ=`cat $THISCPU/cpufreq/cpuinfo_min_freq`
+			fi
+			if [ "$CPU_MINFREQ" = 'slowest' ]; then
+				THIS_CPU_MINFREQ=`cat $THISCPU/cpufreq/cpuinfo_min_freq`
+			fi
+			if [ "$CPU_MAXFREQ" = "medium" ] ; then
+				THIS_CPU_MAXFREQ=$(get_medium_value $THISCPU/cpufreq/scaling_available_frequencies)
+			fi
+			if [ "$CPU_MINFREQ" = "medium" ] ; then
+				THIS_CPU_MINFREQ=$(get_medium_value $THISCPU/cpufreq/scaling_available_frequencies)
+			fi
+			if [ "$CPU_MAXFREQ" = "fastest" ] ; then
+				THIS_CPU_MAXFREQ=`cat $THISCPU/cpufreq/cpuinfo_max_freq`
+			fi
+			if [ "$CPU_MINFREQ" = "fastest" ] ; then
+				THIS_CPU_MINFREQ=`cat $THISCPU/cpufreq/cpuinfo_max_freq`
+			fi
+			echo "Setting CPU maximum frequency for cpu $THISCPU to $THIS_CPU_MAXFREQ." >> $OUTPUT
+			set_sysctl $THISCPU/cpufreq/scaling_max_freq $THIS_CPU_MAXFREQ
+			echo "Setting CPU minimum frequency for cpu $THISCPU to $THIS_CPU_MINFREQ." >> $OUTPUT
+			set_sysctl $THISCPU/cpufreq/scaling_min_freq $THIS_CPU_MINFREQ
+			echo "Setting CPU frequency governor for cpu $THISCPU to $THIS_CPU_GOVERNOR." >> $OUTPUT
+			/sbin/modprobe -q cpufreq_$THIS_CPU_GOVERNOR >> $OUTPUT 2>&1
+			set_sysctl $THISCPU/cpufreq/scaling_governor $THIS_CPU_GOVERNOR
+			if [ -f "$THISCPU/cpufreq/$THIS_CPU_GOVERNOR/ignore_nice_load" ] ; then
+				echo "Setting CPU ignore_nice_load for cpu $THISCPU to $THIS_CPU_IGNORE_NICE_LOAD." >> $OUTPUT
+				set_sysctl $THISCPU/cpufreq/$THIS_CPU_GOVERNOR/ignore_nice_load $THIS_CPU_IGNORE_NICE_LOAD
+			else
+				echo "Not setting CPU ignore_nice_load for cpu $THISCPU." >> $OUTPUT
+				echo "File $THISCPU/cpufreq/$THIS_CPU_GOVERNOR/ignore_nice_load does not exist." >> $OUTPUT
+			fi
+		fi
+	done
+fi
+
+if [ $CONTROL_CPU_THROTTLING -eq 1 ] ; then
+	if [ $ON_AC -eq 1 ] ; then
+		if [ "$ACTIVATE" -eq 1 ] ; then
+			CPU_THROTTLING="$LM_AC_CPU_THROTTLING"
+		else
+			CPU_THROTTLING="$NOLM_AC_CPU_THROTTLING"
+		fi
+	else
+		CPU_THROTTLING="$BATT_CPU_THROTTLING"
+	fi
+	for THISCPU in /proc/acpi/processor/* ; do
+		if [ -e $THISCPU/throttling ]; then
+			NUM_LEVELS=`cat $THISCPU/throttling | grep "T[0123456789]*\:" | wc -l`
+			if [ "$CPU_THROTTLING" = "minimum" ]; then
+				THIS_CPU_THROTTLING=0
+			elif [ "$CPU_THROTTLING" = "maximum" ] ; then				
+				THIS_CPU_THROTTLING=$(($NUM_LEVELS - 1))
+			elif [ "$CPU_THROTTLING" = "medium" ] ; then
+				# Divide but round up: that way, "medium" on a two-level system will
+				# lead to full throttling -- which is 50% on my system, quite reasonable.
+				THIS_CPU_THROTTLING=$(( ($NUM_LEVELS / 2 ) ))
+			else
+				THIS_CPU_THROTTLING="$CPU_THROTTLING"
+			fi
+			echo "Setting throttling level for cpu $THISCPU to $THIS_CPU_THROTTLING." >> $OUTPUT
+			set_sysctl $THISCPU/throttling $THIS_CPU_THROTTLING
+		fi
+	done
+fi
+
+if [ "$CONTROL_START_STOP" -ne 0 -a -f /var/run/laptop-mode-start-stop-undo-actions ] ; then
+	cat /var/run/laptop-mode-start-stop-undo-actions | \
+		while read SCRIPT STARTSTOPACTION ; do
+			$SCRIPT $STARTSTOPACTION
+		done
+	   
+fi
+
+
+
+# Adjust kernel settings and mount options (but only if data loss 
+# sensitive features are active)
+if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 1 ] ; then
+	# Take MAX_LOST_WORK_SECONDS from LM_BATT_MAX_LOST_WORK_SECONDS or LM_AC_MAX_LOST_WORK_SECONDS_WITH_LM, depending on power state.
+	MAX_LOST_WORK_SECONDS=$LM_BATT_MAX_LOST_WORK_SECONDS
+	if [ $ON_AC -eq 1 ] ; then
+		MAX_LOST_WORK_SECONDS=$LM_AC_MAX_LOST_WORK_SECONDS
+	fi
+
+	AGE=$((100*$MAX_LOST_WORK_SECONDS))
+	XFS_AGE=$(($XFS_HZ*$MAX_LOST_WORK_SECONDS))
+
+	if [ -d /proc/sys/vm/pagebuf ] ; then
+		# (For 2.4 and early 2.6.)
+		# This only needs to be set, not reset -- it is only used when
+		# laptop mode is enabled.
+		echo "Adjusting XFS kernel parameters for 2.4 and early 2.6 kernels." >> $OUTPUT
+		set_sysctl /proc/sys/vm/pagebuf/lm_flush_age  $XFS_AGE
+		set_sysctl /proc/sys/fs/xfs/lm_sync_interval  $XFS_AGE
+	elif [ -f /proc/sys/fs/xfs/lm_age_buffer ] ; then
+		# (A couple of early 2.6 laptop mode patches had these.)
+		# This only needs to be set, not reset -- it is only used when
+		# laptop mode is enabled.
+		echo "Adjusting XFS kernel parameters for early patched 2.6 kernels." >> $OUTPUT
+		set_sysctl /proc/sys/fs/xfs/lm_age_buffer    $XFS_AGE
+		set_sysctl /proc/sys/fs/xfs/lm_sync_interval $XFS_AGE
+	elif [ -f /proc/sys/fs/xfs/age_buffer ] ; then
+		# (2.6.6)
+		# But not for these -- they are also used in normal
+		# operation.
+		echo "Adjusting XFS kernel parameters for 2.6.6 kernel." >> $OUTPUT
+		set_sysctl /proc/sys/fs/xfs/age_buffer       $XFS_AGE 
+		set_sysctl /proc/sys/fs/xfs/sync_interval    $XFS_AGE
+	elif [ -f /proc/sys/fs/xfs/age_buffer_centisecs ] ; then
+		# (2.6.7 upwards)
+		# And not for these either. These are in centisecs,
+		# not USER_HZ, so we have to use $AGE, not $XFS_AGE.
+		echo "Adjusting XFS kernel parameters for >2.6.7 kernel." >> $OUTPUT
+		set_sysctl /proc/sys/fs/xfs/age_buffer_centisecs  $AGE
+		set_sysctl /proc/sys/fs/xfs/xfssyncd_centisecs    $AGE
+		set_sysctl /proc/sys/fs/xfs/xfsbufd_centisecs     3000
+	fi
+
+	case "$KLEVEL" in
+		"2.4")
+			echo "Adjusting 2.4 kernel parameters to enable laptop mode." >> $OUTPUT
+			set_sysctl /proc/sys/vm/laptop_mode   1
+			set_sysctl /proc/sys/vm/bdflush       "30 500 0 0 $AGE $AGE 60 20 0"
+			;;
+		"2.6")
+			echo "Adjusting 2.6 kernel parameters to enable laptop mode." >> $OUTPUT
+			set_sysctl /proc/sys/vm/laptop_mode		  "$LM_SECONDS_BEFORE_SYNC"
+			set_sysctl /proc/sys/vm/dirty_writeback_centisecs "$AGE"
+			set_sysctl /proc/sys/vm/dirty_expire_centisecs    "$AGE"
+			set_sysctl /proc/sys/vm/dirty_ratio		  "$LM_DIRTY_RATIO"
+			set_sysctl /proc/sys/vm/dirty_background_ratio    "$LM_DIRTY_BACKGROUND_RATIO"
+			;;
+	esac
+	if [ $CONTROL_MOUNT_OPTIONS -eq 1 ]; then
+		echo "Remounting filesystems." >> $OUTPUT
+		cat /etc/mtab | while read DEV MP FST OPTS DUMP PASS ; do
+			DO=0
+			if ( echo " $PARTITIONS " | grep " $DEV " > /dev/null ) ; then
+				DO=1
+				echo "$DEV found in PARTITIONS." >> $OUTPUT
+			else
+				echo "$DEV not found in PARTITIONS." >> $OUTPUT
+			fi
+			if ( echo " $PARTITIONS " | grep " $MP " > /dev/null ) ; then
+				DO=1
+				echo "$MP found in PARTITIONS." >> $OUTPUT
+			else
+				echo "$MP not found in PARTITIONS." >> $OUTPUT
+			fi
+			if ( echo " $PARTITIONS " | grep " auto " > /dev/null ) ; then
+				echo "Checking $DEV against HD because PARTITIONS contains \"auto\"." >> $OUTPUT
+				for THISHD in $HD ; do
+					echo "   Considering $THISHD." >> $OUTPUT
+					if ( echo " $DEV" | grep "$THISHD" > /dev/null ) ; then
+						DO=1
+						echo "   $DEV contains $THISHD, which is in HD, so we will remount it." >> $OUTPUT
+					fi
+				done
+			fi
+			if [ "$DO" -ne 0 ] ; then
+				echo "Original options: $OPTS" >> $OUTPUT
+				if [ "$WAS_ACTIVE" -eq 0 ] ; then
+					# Coming from inactive state: save last known mount options for the device.
+					echo Updating /var/run/laptop-mode-nolm-mountopts.  >> $OUTPUT
+					if [ -f /var/run/laptop-mode-nolm-mountopts ] ; then 
+						sed -i "s|^$DEV .*$||" /var/run/laptop-mode-nolm-mountopts
+					fi
+					echo $DEV $OPTS >> /var/run/laptop-mode-nolm-mountopts
+				else
+					echo Not updating /var/run/laptop-mode-nolm-mountopts because laptop mode was already active. >> $OUTPUT
+				fi
+				if [ "$FST" = 'unknown' ]; then
+					echo "Deducing fstype for $MP." >> $OUTPUT
+					FST=$(deduce_fstype $MP)
+					echo "Deduced fstype for $MP as $FST." >> $OUTPUT
+				fi
+				# Strip stuff like ext3,ext2 into just ext3.
+				echo Reducing file system type.  >> $OUTPUT
+				FST=`echo $FST | sed s/,.*//`
+				case "$FST" in
+					"ext3"|"reiserfs")
+						echo Removing commit mount option from original options.  >> $OUTPUT
+						PARSEDOPTS="$(remove_numeric_mount_option commit "$OPTS")"
+						echo "Executing: mount $DEV -t $FST $MP -o remount,$PARSEDOPTS,commit=$MAX_LOST_WORK_SECONDS$NOATIME_OPT" >> $OUTPUT
+						if (! mount $DEV -t $FST $MP -o remount,$PARSEDOPTS,commit=$MAX_LOST_WORK_SECONDS$NOATIME_OPT) ; then
+							if [ "$FST" == "ext3" -a "$MP" == "/" ] ; then
+								echo "BIG FAT WARNING: Your root filesystem mounted as ext3 seems to lack support for"
+								echo "the commit mount option. This usually means that your root filesystem is"
+								echo "mounted as ext2 because there is no ext3 support in the kernel at boot time,"
+								echo "usually because you compiled ext3 as a module and don't load it in an initrd."
+								echo "Note that on recent 2.6 kernels, /proc/mounts shows the correct fs type for"
+								echo "the device /dev/root. You can check your actual root filesystem mount type"
+								echo "there. To fix the problem, either make ext3 available at boot time by compiling"
+								echo "it statically into the kernel, or configure the correct filesystem type in"
+								echo "/etc/fstab."
+							fi
+						fi
+						;;
+					*)
+						echo "Executing: mount $DEV -t $FST $MP -o remount,$OPTS$NOATIME_OPT" >> $OUTPUT
+						mount $DEV -t $FST $MP -o remount,$OPTS$NOATIME_OPT
+						;;
+				esac
+				if [ -b $DEV -a "$CONTROL_READAHEAD" -ne 0 ] ; then
+					echo "Executing: /sbin/blockdev --setra $(($LM_READAHEAD * 2)) $DEV" >> $OUTPUT
+					/sbin/blockdev --setra $(($LM_READAHEAD * 2)) $DEV >> $OUTPUT 2>&1
+				fi
+			fi
+		done
+	fi
+else
+	# DEACTIVATE w.r.t. kernel options and mount point settings
+	U_AGE=$((100*$DEF_UPDATE))
+	B_AGE=$((100*$DEF_MAX_AGE))
+	set_sysctl /proc/sys/vm/laptop_mode 0
+	if [ -f /proc/sys/fs/xfs/age_buffer -a ! -f /proc/sys/fs/xfs/lm_age_buffer ] ; then
+		# These need to be restored, if there are no lm_*.
+		echo "Restoring default XFS settings (pre-centisecs version)." >> $OUTPUT
+		set_sysctl /proc/sys/fs/xfs/age_buffer    $(($XFS_HZ*$DEF_XFS_AGE_BUFFER))
+		set_sysctl /proc/sys/fs/xfs/sync_interval $(($XFS_HZ*$DEF_XFS_SYNC_INTERVAL))
+	elif [ -f /proc/sys/fs/xfs/age_buffer_centisecs ] ; then
+		# These need to be restored as well.
+		echo "Restoring default XFS settings." >> $OUTPUT
+		set_sysctl /proc/sys/fs/xfs/age_buffer_centisecs  $((100*$DEF_XFS_AGE_BUFFER))
+		set_sysctl /proc/sys/fs/xfs/xfssyncd_centisecs    $((100*$DEF_XFS_SYNC_INTERVAL))
+		set_sysctl /proc/sys/fs/xfs/xfsbufd_centisecs     $((100*$DEF_XFS_BUFD_INTERVAL))
+	fi
+	case "$KLEVEL" in
+		"2.4")
+			echo "Adjusting 2.4 kernel parameters to disable laptop mode." >> $OUTPUT
+			set_sysctl /proc/sys/vm/bdflush "30 500 0 0 $U_AGE $B_AGE 60 20 0"
+			;;
+		"2.6")
+			echo "Adjusting 2.6 kernel parameters to disable laptop mode." >> $OUTPUT
+			set_sysctl /proc/sys/vm/dirty_writeback_centisecs   "$U_AGE"
+			set_sysctl /proc/sys/vm/dirty_expire_centisecs      "$B_AGE"
+			set_sysctl /proc/sys/vm/dirty_ratio		    "$NOLM_DIRTY_RATIO"
+			set_sysctl /proc/sys/vm/dirty_background_ratio	    "$NOLM_DIRTY_BACKGROUND_RATIO"
+			;;
+	esac
+	if [ $CONTROL_MOUNT_OPTIONS -eq 1 ] ; then
+		echo "Remounting filesystems." >> $OUTPUT
+		cat /etc/mtab | while read DEV MP FST OPTS DUMP PASS ; do
+			DO=0
+			if ( echo " $PARTITIONS " | grep " $DEV " > /dev/null ) ; then
+				DO=1
+				echo "$DEV found in PARTITIONS." >> $OUTPUT
+			else
+				echo "$DEV not found in PARTITIONS." >> $OUTPUT
+			fi
+			if ( echo " $PARTITIONS " | grep " $MP " > /dev/null ) ; then
+				DO=1
+				echo "$MP found in PARTITIONS." >> $OUTPUT
+			else
+				echo "$MP not found in PARTITIONS." >> $OUTPUT
+			fi
+			if ( echo " $PARTITIONS " | grep " auto " > /dev/null ) ; then
+				echo "Checking $DEV against HD because PARTITIONS contains \"auto\"." >> $OUTPUT
+				for THISHD in $HD ; do
+					echo "   Considering $THISHD." >> $OUTPUT
+					if ( echo " $DEV" | grep "$THISHD" > /dev/null ) ; then
+						DO=1
+						echo "   $DEV contains $THISHD, which is in HD, so we will remount it." >> $OUTPUT
+					fi
+				done
+			fi
+			if [ "$DO" -ne 0 ] ; then
+				# Reset commit and atime options to defaults.
+				echo "Original options: $OPTS" >> $OUTPUT
+				if [ "$FST" = 'unknown' ]; then
+					echo "Deducing fstype for $MP." >> $OUTPUT
+					FST=$(deduce_fstype $MP)
+					echo "Deduced fstype for $MP as $FST." >> $OUTPUT
+				fi
+				
+				# Strip stuff like ext3,ext2 into just ext3.
+				echo Reducing file system type.  >> $OUTPUT
+				FST=`echo $FST | sed s/,.*//`
+				
+				# Retrieve original non-laptop mode mount options and restore them.
+				# If the file that stores them doesn't exist, then laptop mode
+				# has never been started.
+				if [ "$WAS_ACTIVE" -ne 0 -a -f /var/run/laptop-mode-nolm-mountopts ] ; then						
+					SAVED_OPTS=`grep "^$DEV " /var/run/laptop-mode-nolm-mountopts`
+					SAVED_OPTS=${SAVED_OPTS#* } # trim device name
+				
+					case "$FST" in
+						"ext3"|"reiserfs")								
+							PARSEDOPTS="$(replace_numeric_mount_option commit commit=0 $SAVED_OPTS $OPTS)"
+							PARSEDOPTS="$(replace_yesno_mount_option atime atime $SAVED_OPTS $PARSEDOPTS)"
+							echo Executing: mount $DEV -t $FST $MP -o remount,$PARSEDOPTS >> $OUTPUT
+							mount $DEV -t $FST $MP -o remount,$PARSEDOPTS
+							;;
+						*)
+							PARSEDOPTS="$(replace_yesno_mount_option atime atime $SAVED_OPTS $OPTS)"
+							echo Executing: mount $DEV -t $FST $MP -o remount,$PARSEDOPTS >> $OUTPUT
+							mount $DEV -t $FST $MP -o remount,$PARSEDOPTS
+							;;
+					esac
+				else
+					echo "No saved mount options, so apparently we never remounted this filesystem during this session." >> $OUTPUT
+					echo "Not remounting." >> $OUTPUT
+				fi
+				if [ -b $DEV -a "$CONTROL_READAHEAD" -ne 0 ] ; then
+					echo "Executing: /sbin/blockdev --setra $(($NOLM_READAHEAD * 2)) $DEV" >> $OUTPUT
+					/sbin/blockdev --setra $(($NOLM_READAHEAD * 2)) $DEV >> $OUTPUT 2>&1
+				fi
+			fi
+		done
+	fi
+fi
+
+
+
+# Adjust hard drive powermanagement
+
+# Function for drive capability check. This prevents ugly errors in
+# the kernel output about unsupported commands.
+#
+# $1 = drive name
+# $2 = capability (SDPARM/HDPARM or IDLE_TIMEOUT/POWERMGMT/WRITECACHE)
+is_capable() {
+	local dev=${1#/dev/}
+	local MEDIA=
+	local BUS=
+
+	HAVE_UDEVINFO=0
+	if [ -x "$(which udevinfo 2> /dev/null)" ] ; then
+		UDEVVERSION=$(udevinfo -V | awk '{ print $3; }')
+		if [ "$UDEVVERSION" -gt 70 ] ; then
+			HAVE_UDEVINFO=1
+		else
+			echo "udevinfo present but version not > 070, not using udev" >> $OUTPUT
+		fi
+	fi
+	
+	# If we are running udev, this is the most portable way
+	# It assumes more or less recent udev (> 070)
+	if [ $HAVE_UDEVINFO -ne 0 ] ; then
+		echo -n "Querying $1 media type using udevinfo: " >> $OUTPUT
+		eval "$(udevinfo -q env -n $1 2> $OUTPUT | egrep '(ID_TYPE=|ID_BUS=)' >> $OUTPUT 2>&1)"
+		if [ -n "$ID_TYPE" -a -n "$ID_BUS" ] ; then
+			echo "type '$ID_TYPE on bus '$ID_BUS' detected" >> $OUTPUT
+			MEDIA=$ID_TYPE
+			BUS=$ID_BUS
+		else
+			echo "failed - udev not active?" >> $OUTPUT
+		fi
+	fi
+
+	if [ -z "$MEDIA" ] ; then
+		echo -n "Querying $1 media type using device name: " >> $OUTPUT
+		case $dev in
+			hd*)	# IDE device
+				if [ -r /proc/ide/$dev/media ]; then
+					MEDIA="$(cat /proc/ide/$dev/media)"
+					BUS=ata
+					if [ "$MEDIA" = cdrom ] ; then
+						MEDIA=cd
+					fi
+				fi
+			;;
+			sd*)	# SCSI disk
+				# No need to check, sd is always SCSI disk
+				MEDIA=disk
+				BUS=scsi
+			;;
+			sr* | scd* )
+				# No need to check, sr or scd is always SCSI CD-ROM
+				MEDIA=cd
+				BUS=scsi
+			;;
+
+		esac
+		if [ -n "$MEDIA" ] ; then
+			echo "type '$MEDIA' on bus '$BUS' detected" >> $OUTPUT
+		else
+			echo "failed - unknown name" >> $OUTPUT
+		fi
+	fi
+
+	if [ -z "$MEDIA" ] ; then
+		if [ -x "$(which hdparm 2> /dev/null)" ]; then
+			echo -n "Querying $1 type using hdparm: " >> $OUTPUT
+			if hdparm -I $1 2> $OUTPUT | grep -q CD-ROM >> $OUTPUT 2>&1 ; then
+				MEDIA=cd
+			else
+				MEDIA=disk
+			fi
+			BUS=ata # or acts like it anyway, because hdparm supports it.
+			echo "type '$MEDIA' on bus '$BUS' detected" >> $OUTPUT
+		fi
+	fi
+
+	# Sanity check
+	if [ -z "$MEDIA" -o -z "$BUS" ] ; then
+		echo "Querying $1 type - unknown type or bus, disabling hdparm/sdparm" >> $OUTPUT
+		return 1
+	fi
+
+	if [ "$BUS" == "scsi" -a "$ASSUME_SCSI_IS_SATA" -ne 0 ] ;then
+		# Treat scsi disks as SATA devices. Unfortunately they are hard
+		# to recognize -- if anybody has a drive and cares to find out
+		# how to recognize them, please enlighten me!
+		BUS=ata
+	fi
+
+	# Now check what capabilities we support for the
+	# various media and bus types.
+	case "$MEDIA:$BUS:$2" in
+		# Although CD-ROM drives usually support
+		# idle timeout settings, they don't usually
+		# support very low values, and we don't want
+		# to mess with that. We simply ignore anything
+		# that is a CD player.
+		cd:*:* ) return 1;;
+
+		# ATA drives support the "hdparm" command but
+		# not normally the "sdparm" command.
+		*:ata:HDPARM ) return 0 ;;
+		*:ata:SDPARM ) return 1 ;;
+		
+		# SCSI drives support the "sdparm" command, but
+		# not normally the "hdparm" command.
+		*:scsi:SDPARM ) return 0 ;;
+		*:scsi:HDPARM ) return 1 ;;
+
+		# On ATA disks everything is supported.
+		disk:ata:* ) return 0 ;;
+
+		# For sdparm we only know how to set the idle
+		# timeout, nothing else at the moment.
+		*:scsi:IDLE_TIMEOUT ) return 0 ;;
+
+		# No other capabilities are supported.
+		* ) return 1 ;;
+	esac
+}
+
+if [ $CONTROL_HD_POWERMGMT -eq 1 ] ; then
+	if [ $ON_AC -eq 1 ] ; then
+		if [ "$ACTIVATE" -eq 1 ] ; then
+			HD_POWERMGMT=$LM_AC_HD_POWERMGMT
+		else
+			HD_POWERMGMT=$NOLM_AC_HD_POWERMGMT
+		fi
+	else
+		HD_POWERMGMT=$BATT_HD_POWERMGMT
+	fi
+
+	echo "Setting powermanagement on drives to $HD_POWERMGMT." >> $OUTPUT
+	for THISHD in $HD ; do
+		if is_capable $THISHD POWERMGMT ; then
+			if is_capable $THISHD HDPARM ; then
+				if [ ! -e `which hdparm 2> /dev/null` ] ; then
+					echo "ERROR: hdparm not installed."
+				else
+					echo "Executing: hdparm -B $HD_POWERMGMT $THISHD" >> $OUTPUT
+					hdparm -B $HD_POWERMGMT $THISHD >> $OUTPUT 2>&1
+				fi
+			else
+				echo "Skipping $THISHD: powermgmt only possible with hdparm but drive does not" >> $OUTPUT
+				echo "support hdparm." >> $OUTPUT
+			fi
+		else
+			echo "Skipping $THISHD: powermanagement control not supported." >> $OUTPUT
+		fi
+	done
+fi
+
+if [ $CONTROL_HD_IDLE_TIMEOUT -eq 1 ] ; then
+	# Spindown timeouts may only be set when data-loss sensitive
+	# features are active.
+	if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 1 ] ; then
+		if [ $ON_AC -eq 1 ] ; then
+			HD_IDLE_TIMEOUT=$LM_AC_HD_IDLE_TIMEOUT
+			HD_IDLE_TIMEOUT_SECONDS=$LM_AC_HD_IDLE_TIMEOUT_SECONDS
+		else
+			HD_IDLE_TIMEOUT=$LM_BATT_HD_IDLE_TIMEOUT
+			HD_IDLE_TIMEOUT_SECONDS=$LM_BATT_HD_IDLE_TIMEOUT_SECONDS
+		fi
+	else
+		HD_IDLE_TIMEOUT=$NOLM_HD_IDLE_TIMEOUT
+		HD_IDLE_TIMEOUT_SECONDS=$NOLM_HD_IDLE_TIMEOUT_SECONDS
+	fi
+	echo "Setting spindown timeout on drives to $HD_IDLE_TIMEOUT_SECONDS seconds." >> $OUTPUT
+	echo "(hdparm configuration value = $HD_IDLE_TIMEOUT.)" >> $OUTPUT
+	for THISHD in $HD ; do
+		if is_capable $THISHD IDLE_TIMEOUT ; then
+			if is_capable $THISHD HDPARM ; then
+				if [ ! -e `which hdparm 2> /dev/null` ] ; then
+					echo "ERROR: hdparm not installed."
+				else
+					echo "Executing: hdparm -S $HD_IDLE_TIMEOUT $THISHD" >> $OUTPUT
+					hdparm -S $HD_IDLE_TIMEOUT $THISHD >> $OUTPUT 2>&1
+				fi
+			elif is_capable $THISHD SDPARM ; then
+				if [ ! -e `which sdparm 2> /dev/null` ] ; then
+					echo "ERROR: sdparm not installed."
+				else
+					HD_IDLE_TIMEOUT_DECISECONDS=$(($HD_IDLE_TIMEOUT_SECONDS*10))
+					echo "Executing: sdparm -q -s SCT=$HD_IDLE_TIMEOUT_DECISECONDS $THISHD" >> $OUTPUT
+					sdparm -q -s SCT=$HD_IDLE_TIMEOUT_DECISECONDS $THISHD >> $OUTPUT 2>&1
+				fi
+			else
+				echo "Skipping $THISHD: drive supports neither hdparm nor sdparm." >> $OUTPUT
+			fi
+		else
+			echo "Skipping $THISHD: idle timeout control not supported." >> $OUTPUT
+		fi
+	done
+fi
+
+if [ $CONTROL_HD_WRITECACHE -eq 1 ] ; then
+	# The writecache may only be enabled when data-loss sensitive
+	# features are active.
+
+	if [ "$ACTIVATE" -eq 1 ] ; then
+		if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 0 ] ; then
+			HD_WRITECACHE=0
+		else
+			HD_WRITECACHE=$LM_HD_WRITECACHE
+		fi
+	else
+		if [ $ON_AC -eq 1 ] ; then
+			HD_WRITECACHE=$NOLM_AC_HD_WRITECACHE
+		else
+			HD_WRITECACHE=$NOLM_BATT_HD_WRITECACHE
+		fi
+	fi
+	echo "Setting write cache on drives to $HD_WRITECACHE." >> $OUTPUT
+	for THISHD in $HD ; do
+		if is_capable $THISHD WRITECACHE ; then
+			if is_capable $THISHD HDPARM ; then
+				if [ ! -e `which hdparm 2> /dev/null` ] ; then
+					echo "ERROR: hdparm not installed."
+				else
+					echo "Executing: hdparm -W $HD_WRITECACHE $THISHD" >> $OUTPUT
+					hdparm -W $HD_WRITECACHE $THISHD >> $OUTPUT 2>&1
+				fi
+			else
+				echo "Skipping $THISHD: writecache only possible with hdparm but drive does not" >> $OUTPUT
+				echo "support hdparm." >> $OUTPUT
+			fi
+		else
+			echo "Skipping $THISHD: writecache control not supported." >> $OUTPUT
+		fi
+	done
+fi
+
+if [ $CONTROL_SYSLOG_CONF -eq 1 ] ; then
+	echo "Adjusting syslog configuration." >> $OUTPUT
+	if [ "`readlink -f $SYSLOG_CONF`" != "$SYSLOG_CONF" ] ; then
+		echo "$SYSLOG_CONF is a symlink." >> $OUTPUT
+		if [ ! -f "$SYSLOG_CONF.no-lm" ] ; then
+			echo "But there is no $SYSLOG_CONF.no-lm. This must have been done by an earlier" >> $OUTPUT
+			echo "version of laptop-mode-tools." >> $OUTPUT
+			echo "Creating it now from $NOLM_AC_SYSLOG_CONF."
+			cp "$NOLM_AC_SYSLOG_CONF" "$SYSLOG_CONF.no-lm"
+		fi
+	else
+		echo "$SYSLOG_CONF is not a symlink." >> $OUTPUT
+		if [ "$STATE" == "enabled" ] ; then
+			echo "Saving it to $SYSLOG_CONF.no-lm." >> $OUTPUT
+			cp --backup=numbered "$SYSLOG_CONF" "$SYSLOG_CONF.no-lm"
+		fi
+	fi
+
+	if [ "$STATE" != "enabled" ] ; then
+		echo "Laptop mode is not enabled. Restoring $SYSLOG_CONF." >> $OUTPUT
+		if [ -f "$SYSLOG_CONF.no-lm" ] ; then
+			mv "$SYSLOG_CONF.no-lm" "$SYSLOG_CONF"
+		elif [ "`readlink -f $SYSLOG_CONF`" != "$SYSLOG_CONF" ] ; then
+			echo "ERROR: $SYSLOG_CONF is a symlink but $SYSLOG_CONF.no-lm is not present."
+		fi
+	elif [ $ON_AC -eq 1 ] ; then
+		if [ "$ACTIVATE" -eq 1 ] ; then
+			echo "Setting syslog config to $LM_AC_SYSLOG_CONF." >> $OUTPUT
+			ln -fs "$LM_AC_SYSLOG_CONF" "$SYSLOG_CONF"
+		else
+			echo "Setting syslog config to $NOLM_AC_SYSLOG_CONF." >> $OUTPUT
+			ln -fs "$NOLM_AC_SYSLOG_CONF" "$SYSLOG_CONF"
+		fi
+	else
+		echo "Setting syslog config to $BATT_SYSLOG_CONF." >> $OUTPUT
+		ln -fs "$BATT_SYSLOG_CONF" "$SYSLOG_CONF"
+	fi
+	# Notify syslogd of configuration change.
+	if [ "$SYSLOG_CONF_SIGNAL_PROGRAM" != "" ] ; then
+		echo "Sending SIGHUP to all $SYSLOG_CONF_SIGNAL_PROGRAM processes." >> $OUTPUT
+		killall -q -HUP $SYSLOG_CONF_SIGNAL_PROGRAM
+	fi
+fi
+
+# Setting X screen standby/suspend/powerdown timing
+if [ $CONTROL_DPMS_STANDBY -eq 1 ] ; then
+	if [ $ON_AC -eq 1 ]; then
+		if [ "$ACTIVATE" -eq 1 ]; then
+			STANDBY="$LM_AC_DPMS_STANDBY"
+			SUSPEND=$(($STANDBY+30))
+			OFF=$(($STANDBY+60))
+		else
+			STANDBY="$NOLM_AC_DPMS_STANDBY"
+			SUSPEND=$(($STANDBY+300))
+			OFF=$(($STANDBY+600))
+		fi
+	else
+		STANDBY="$BATT_DPMS_STANDBY"
+		SUSPEND=$(($STANDBY+30))
+		OFF=$(($STANDBY+60))
+	fi
+
+	who | while read -r DPMS_USER DPMS_SCREEN REMAINDER; do	        
+	        if su $DPMS_USER -c "xset -d $DPMS_SCREEN dpms $STANDBY $SUSPEND $OFF" 2>> $OUTPUT | grep -q display >> $OUTPUT 2>&1 ; then
+		        echo "Unable to set DPMS timeouts: X is not running on $DPMS_SCREEN" >> $OUTPUT
+	        else 
+		        echo "Set screen $DPMS_SCREEN for the user $DPMS_USER to standby in $STANDBY s, suspend in $SUSPEND s, powerdown in $OFF s" >> $OUTPUT
+		fi	
+        done
+else
+	echo "CONTROL_DPMS_STANDBY is disabled, skipping..." >> $OUTPUT
+fi
+
+# Set terminal blanking/powerdown timeouts
+if [ $CONTROL_TERMINAL -ne 0 ] ; then
+	if [ $ON_AC -eq 1 ]; then
+		if [ "$ACTIVATE" -eq 1 ]; then
+			BLANK_MINUTES="$LM_AC_TERMINAL_BLANK_MINUTES"
+			POWERDOWN_MINUTES="$LM_AC_TERMINAL_POWERDOWN_MINUTES"
+		else
+			BLANK_MINUTES="$NOLM_AC_TERMINAL_BLANK_MINUTES"
+			POWERDOWN_MINUTES="$NOLM_AC_TERMINAL_POWERDOWN_MINUTES"
+		fi
+	else
+		BLANK_MINUTES="$BATT_TERMINAL_BLANK_MINUTES"
+		POWERDOWN_MINUTES="$BATT_TERMINAL_POWERDOWN_MINUTES"
+	fi
+	echo "Set terminal blanking timeout to $BLANK_MINUTES min, powerdown timeout to $POWERDOWN_MINUTES min." >> $OUTPUT
+	for THISTERMINAL in $TERMINALS ; do
+		if [ -e $THISTERMINAL ] ; then
+			echo "Terminal $THISTERMINAL found, adjusting." >> $OUTPUT
+			TERM=linux setterm -blank "$BLANK_MINUTES" -powerdown "$POWERDOWN_MINUTES" > $THISTERMINAL
+		else
+			echo "Terminal $THISTERMINAL does not exist." >> $OUTPUT
+		fi
+	done
+else
+	echo "CONTROL_TERMINAL is disabled, skipping..." >> $OUTPUT
+fi
+
+
+# Control LCD brightness
+if [ $CONTROL_BRIGHTNESS -eq 1 ] ; then
+	if [ $ON_AC -eq 1 ]; then
+		if [ "$ACTIVATE" -eq 1 ]; then
+			BRIGHTNESS_COMMAND="$LM_AC_BRIGHTNESS_COMMAND"
+		else
+			BRIGHTNESS_COMMAND="$NOLM_AC_BRIGHTNESS_COMMAND"
+		fi
+	else
+		BRIGHTNESS_COMMAND="$BATT_BRIGHTNESS_COMMAND"
+	fi
+	
+	echo "Set LCD brightness using command $BRIGHTNESS_COMMAND \> $BRIGHTNESS_OUTPUT." >> $OUTPUT
+	if ( $BRIGHTNESS_COMMAND > $BRIGHTNESS_OUTPUT ) ; then
+		echo "Command succeeded." >> $OUTPUT
+	else
+		echo "Command failed." >> $OUTPUT
+	fi
+fi
+
+
+# Start/stop programs 
+if [ $CONTROL_START_STOP -eq 1 -a "$STATE" == "enabled" ]; then
+	# Empty undo file first. We write the actions we take
+	# into this file, so that we can undo them at the
+	# next state change. Note: we actually
+	# write the actions to the file in reverse order,
+	# so we can execute the commands easily afterwards.
+	echo > /var/run/laptop-mode-start-stop-undo-actions 
+		
+	   
+	if [ $ON_AC -eq 1 ] ; then
+		if [ "$ACTIVATE" -eq 1 ] ; then		
+			START_STOP_DIR_PREFIX=/etc/laptop-mode/lm-ac
+		else
+			START_STOP_DIR_PREFIX=/etc/laptop-mode/nolm-ac
+		fi
+	else
+		START_STOP_DIR_PREFIX=/etc/laptop-mode/batt
+	fi
+	START_DIR="$START_STOP_DIR_PREFIX"-start
+	STOP_DIR="$START_STOP_DIR_PREFIX"-stop
+	if [ -d "$STOP_DIR" ] ; then
+		for SCRIPT in "$STOP_DIR"/* ; do
+			if [ -e "$SCRIPT" ] ; then
+				"$SCRIPT" stop
+				# Dereference any links. When people configure
+				# the directories with links and then they remove
+				# links while laptop mode is active, the "undo"
+				# will fail if we don't dereference the links
+				# before storing them.
+				LINKTARGET=`readlink -f "$SCRIPT"`
+				sed -i "1i $LINKTARGET start" /var/run/laptop-mode-start-stop-undo-actions
+			fi
+		done
+	fi
+	if [ -d "$START_DIR" ] ; then
+		for SCRIPT in "$START_DIR"/* ; do
+			if [ -e "$SCRIPT" ] ; then
+				"$SCRIPT" start
+				LINKTARGET=`readlink -f "$SCRIPT"`
+				sed -i "1i $LINKTARGET stop" /var/run/laptop-mode-start-stop-undo-actions
+			fi
+		done
+	fi
+fi
+
+
+# Finally, call laptop-mode-tools modules. The modules can use the settings
+# from the INI files, but they may NOT assume the settings actually exist,
+# as no defaults have been given for them.
+for SCRIPT in /usr/lib/laptop-mode-tools/modules/* /usr/local/lib/laptop-mode-tools/modules/* /etc/laptop-mode/modules/*; do
+	if [ -e "$SCRIPT" ] ; then
+		"$SCRIPT" >> $OUTPUT
+	else
+		echo "Module $SCRIPT is not executable." >> $OUTPUT
+	fi
+done
+
+
+exit 0
+
+# This fi closes the if for "readconfig". If I would have indented this one
+# I would have indented the whole file. :)
+fi
