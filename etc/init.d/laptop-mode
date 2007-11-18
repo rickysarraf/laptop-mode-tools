@@ -30,7 +30,7 @@ case $1 in
     log_action_begin_msg "Enabling laptop mode"
     mkdir -p /var/run/laptop-mode-tools
     touch /var/run/laptop-mode-tools/enabled
-    /usr/sbin/laptop_mode auto > $TEMPFILE
+    /usr/sbin/laptop_mode init auto > $TEMPFILE
     log_action_end_msg $? "$( cat $TEMPFILE )"
     ;;
 
@@ -39,21 +39,21 @@ case $1 in
     log_action_begin_msg "Disabling laptop mode"
     mkdir -p /var/run/laptop-mode-tools
     rm -f /var/run/laptop-mode-tools/enabled
-    /usr/sbin/laptop_mode stop > $TEMPFILE
+    /usr/sbin/laptop_mode init stop > $TEMPFILE
     log_action_end_msg $? "$( cat $TEMPFILE )"
 
     # Now remove files containing stored status, re-enable, and start it up again.
     log_action_begin_msg "Enabling laptop mode"
     rm -f /var/run/laptop-mode-tools/*
     touch /var/run/laptop-mode-tools/enabled
-    /usr/sbin/laptop_mode auto force > $TEMPFILE
+    /usr/sbin/laptop_mode init auto force > $TEMPFILE
     log_action_end_msg $? "$( cat $TEMPFILE )"
     ;;
 
   stop)
     log_action_begin_msg "Disabling laptop mode"
     rm -f /var/run/laptop-mode-tools/enabled
-    /usr/sbin/laptop_mode stop > $TEMPFILE
+    /usr/sbin/laptop_mode init stop > $TEMPFILE
     log_action_end_msg $? "$( cat $TEMPFILE )"
     ;;
 
