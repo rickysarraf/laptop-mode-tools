@@ -1084,8 +1084,8 @@ if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 1 ] ; then
 						;;
 				esac
 				if [ -b $DEV -a "$CONTROL_READAHEAD" -ne 0 ] ; then
-					echo "Executing: /sbin/blockdev --setra $(($LM_READAHEAD * 2)) $DEV" >> $OUTPUT
-					/sbin/blockdev --setra $(($LM_READAHEAD * 2)) $DEV >> $OUTPUT 2>&1
+					echo "Executing: /sbin/blockdev --setfra $(($LM_READAHEAD * 2)) $DEV" >> $OUTPUT
+					/sbin/blockdev --setfra $(($LM_READAHEAD * 2)) $DEV >> $OUTPUT 2>&1
 				fi
 			fi
 		done
@@ -1184,8 +1184,8 @@ else
 					echo "Not remounting." >> $OUTPUT
 				fi
 				if [ -b $DEV -a "$CONTROL_READAHEAD" -ne 0 ] ; then
-					echo "Executing: /sbin/blockdev --setra $(($NOLM_READAHEAD * 2)) $DEV" >> $OUTPUT
-					/sbin/blockdev --setra $(($NOLM_READAHEAD * 2)) $DEV >> $OUTPUT 2>&1
+					echo "Executing: /sbin/blockdev --setfra $(($NOLM_READAHEAD * 2)) $DEV" >> $OUTPUT
+					/sbin/blockdev --setfra $(($NOLM_READAHEAD * 2)) $DEV >> $OUTPUT 2>&1
 				fi
 			fi
 		done
