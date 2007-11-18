@@ -7,7 +7,7 @@ Standards-Version: 3.6.2.1
 
 Package: laptop-mode-tools
 Architecture: all
-Depends: lsb-base (>= 3.0-10)
+Depends: lsb-base (>= 3.0-10), util-linux (>= 2.13)
 Recommends: acpid | apmd | pbbuttonsd | pmud, hdparm, sdparm
 Conflicts: noflushd
 Description: Scripts to spin down hard drive and save power
