@@ -10,6 +10,20 @@
 #
 # Original source: http://ubuntuforums.org/showthread.php?t=419772
 
+# Provide defaults for config file settings
+if [ x$IPW3945_AC_POWER = x ] ; then
+	IPW3945_AC_POWER=6
+fi
+if [ x$IPW3945_BATT_POWER = x ] ; then
+	IPW3945_BATT_POWER=7
+fi
+if [ x$IPW2100_AC_POWER = x ] ; then
+	IPW3945_AC_POWER=0
+fi
+if [ x$IPW2100_BATT_POWER = x ] ; then
+	IPW3945_BATT_POWER=5
+fi
+
 I3945_DRIVERNAME=ipw3945
 I2200_DRIVERNAME=ipw2200
 I2100_DRIVERNAME=ipw2100
@@ -17,16 +31,16 @@ I2100_DRIVERNAME=ipw2100
 IWPRIV=/sbin/iwpriv
 IWCONFIG=/sbin/iwconfig
 
-SET_I3945_AC_PARMS="set_power $(IPW3945_AC_POWER)"
-SET_I3945_BAT_PARMS="set_power $(IPW3945_BATT_POWER)"
+SET_I3945_AC_PARMS="set_power $IPW3945_AC_POWER"
+SET_I3945_BAT_PARMS="set_power $IPW3945_BATT_POWER"
 
 SET_I2200_AC_PARMS="power off"
 SET_I2200_BAT_PARMS="power on"
 
 SET_I2100_AC_PARMS_1="power off"
 SET_I2100_BAT_PARMS_1="power on"
-SET_I2100_AC_PARMS_2="set_power $(IPW2100_AC_POWER)"
-SET_I2100_BAT_PARMS_2="set_power $(IPW2100_BATT_POWER)"
+SET_I2100_AC_PARMS_2="set_power $IPW2100_AC_POWER"
+SET_I2100_BAT_PARMS_2="set_power $IPW2100_BATT_POWER"
 
 
 #
@@ -65,29 +79,29 @@ function findWifiIfsByDriver {
 # $3 - power command arguments
 #
 function setWifiPwrSave {
-    local DEVICE;
-    findWifiIfsByDriver $1;
+	local DEVICE;
+	findWifiIfsByDriver $1;
 
-    for DEVICE in $WIFI_IFNAMES; do
-#	echo "Would execute $2 $DEVICE $3"
-	$2 $DEVICE $3
-    done
+	for DEVICE in $WIFI_IFNAMES; do
+		echo "Wireless power saving: $2 $DEVICE $3" >> $OUTPUT
+		$2 $DEVICE $3
+	done
 }
 
 function intel3945_BatPwrSave {
-    setWifiPwrSave "$I3945_DRIVERNAME" "$IWPRIV" "$SET_I3945_BAT_PARMS"
+	setWifiPwrSave "$I3945_DRIVERNAME" "$IWPRIV" "$SET_I3945_BAT_PARMS"
 }
 
 function intel3945_AcPwrSave {
-    setWifiPwrSave "$I3945_DRIVERNAME" "$IWPRIV" "$SET_I3945_AC_PARMS"
+	setWifiPwrSave "$I3945_DRIVERNAME" "$IWPRIV" "$SET_I3945_AC_PARMS"
 }
 
 function intel2200_BatPwrSave {
-    setWifiPwrSave "$I2200_DRIVERNAME" "$IWCONFIG" "$SET_I2200_BAT_PARMS"
+	setWifiPwrSave "$I2200_DRIVERNAME" "$IWCONFIG" "$SET_I2200_BAT_PARMS"
 }
 
 function intel2200_AcPwrSave {
-    setWifiPwrSave "$I2200_DRIVERNAME" "$IWCONFIG" "$SET_I2200_AC_PARMS"
+	setWifiPwrSave "$I2200_DRIVERNAME" "$IWCONFIG" "$SET_I2200_AC_PARMS"
 }
 
 function intel2100_BatPwrSave {
@@ -112,5 +126,5 @@ if [ x$CONTROL_IPW_POWER == x1 ] ; then
 		intel2100_BatPwrSave
 	fi
 else
-	echo "Intel IPW Wireless power setting is disabled."
+	echo "Intel IPW Wireless power setting is disabled." >> $OUTPUT
 fi
