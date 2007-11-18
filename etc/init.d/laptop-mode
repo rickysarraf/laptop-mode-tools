@@ -21,44 +21,40 @@
 test -f /usr/sbin/laptop_mode || exit 0
 
 . /lib/lsb/init-functions
+TEMPFILE=`mktemp`
 
 # Enable laptop mode when the system is booted when running on battery.
-
-TEMPFILE=`mktemp`
-echo "Failed to start laptop mode" > $TEMPFILE
-
-
-trap "log_action_end_msg 10 $( cat $TEMPFILE ) ; rm $TEMPFILE; exit 10" HUP INT ABRT QUIT SEGV TERM
-set -e
 
 case $1 in
   start)
     log_action_begin_msg "Enabling laptop mode"
-    touch /var/run/laptop-mode-enabled
+    mkdir -p /var/run/laptop-mode-tools
+    touch /var/run/laptop-mode-tools/enabled
     /usr/sbin/laptop_mode auto > $TEMPFILE
-    log_action_end_msg 0 $( cat $TEMPFILE )
+    log_action_end_msg $? "$( cat $TEMPFILE )"
     ;;
 
   restart|reload|force-reload)
-    log_action_begin_msg "Disabling laptop mode"
     # Full restart: first stop laptop mode completely (to restore default mount options etc.)
-    rm -f /var/run/laptop-mode-enabled
+    log_action_begin_msg "Disabling laptop mode"
+    mkdir -p /var/run/laptop-mode-tools
+    rm -f /var/run/laptop-mode-tools/enabled
     /usr/sbin/laptop_mode stop > $TEMPFILE
-    log_action_end_msg 0 $( cat $TEMPFILE )
-    
-    log_action_begin_msg "Enabling laptop mode"
+    log_action_end_msg $? "$( cat $TEMPFILE )"
+
     # Now remove files containing stored status, re-enable, and start it up again.
-    rm -f /var/run/laptop-mode-*
-    touch /var/run/laptop-mode-enabled
+    log_action_begin_msg "Enabling laptop mode"
+    rm -f /var/run/laptop-mode-tools/*
+    touch /var/run/laptop-mode-tools/enabled
     /usr/sbin/laptop_mode auto force > $TEMPFILE
-    log_action_end_msg 0 $( cat $TEMPFILE )
+    log_action_end_msg $? "$( cat $TEMPFILE )"
     ;;
 
   stop)
     log_action_begin_msg "Disabling laptop mode"
-    rm -f /var/run/laptop-mode-enabled
+    rm -f /var/run/laptop-mode-tools/enabled
     /usr/sbin/laptop_mode stop > $TEMPFILE
-    log_action_end_msg 0 $( cat $TEMPFILE )    
+    log_action_end_msg $? "$( cat $TEMPFILE )"
     ;;
 
   status)
@@ -72,4 +68,9 @@ case $1 in
     exit 2
     ;;
 esac
+
+if [ -f $TEMPFILE ] ; then
+	rm $TEMPFILE
+fi
+
 exit 0

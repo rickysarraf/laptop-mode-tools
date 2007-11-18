@@ -61,7 +61,7 @@ ALREADY_EXISTED=0
 if [ -f /etc/laptop-mode/laptop-mode.conf ] ; then
 	echo "Not reinstalling configuration file: /etc/laptop-mode/laptop-mode.conf exists."
 	ALREADY_EXISTED=1
-elif ( ! $INSTALL -m 600 etc/laptop-mode/laptop-mode.conf /etc/laptop-mode ) ; then
+elif ( ! $INSTALL -m 644 etc/laptop-mode/laptop-mode.conf /etc/laptop-mode ) ; then
 	echo "$0: Failed to install configuration file in /etc/laptop-mode/laptop-mode.conf. Installation failed."
 	exit 12
 fi
