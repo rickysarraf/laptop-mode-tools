@@ -1,7 +1,7 @@
 #! /bin/bash
 # 
 # Laptop mode tools module, called from /usr/sbin/laptop_mode.
-# Configuration in /etc/laptop-mode/laptop-mode.conf.
+# Configuration in /etc/laptop-mode/conf.d/wireless-ipw-power.conf.
 #
 # PURPOSE: power saving for the Intel IPW3945, IPW2200 and IPW2100
 #          wireless adaptors.
@@ -17,16 +17,16 @@ I2100_DRIVERNAME=ipw2100
 IWPRIV=/sbin/iwpriv
 IWCONFIG=/sbin/iwconfig
 
-SET_I3945_AC_PARMS="set_power 6"
-SET_I3945_BAT_PARMS="set_power 7"
+SET_I3945_AC_PARMS="set_power $(IPW3945_AC_POWER)"
+SET_I3945_BAT_PARMS="set_power $(IPW3945_BATT_POWER)"
 
 SET_I2200_AC_PARMS="power off"
 SET_I2200_BAT_PARMS="power on"
 
 SET_I2100_AC_PARMS_1="power off"
 SET_I2100_BAT_PARMS_1="power on"
-SET_I2100_AC_PARMS_2="set_power 0"
-SET_I2100_BAT_PARMS_2="set_power 5"
+SET_I2100_AC_PARMS_2="set_power $(IPW2100_AC_POWER)"
+SET_I2100_BAT_PARMS_2="set_power $(IPW2100_BATT_POWER)"
 
 
 #
@@ -91,12 +91,13 @@ function intel2200_AcPwrSave {
 }
 
 function intel2100_BatPwrSave {
-setWifiPwrSave "$I2100_DRIVERNAME" "$IWCONFIG" "$SET_I2100_BAT_PARMS_1"
-setWifiPwrSave "$I2100_DRIVERNAME" "$IWPRIV" "$SET_I2100_BAT_PARMS_2"
+	setWifiPwrSave "$I2100_DRIVERNAME" "$IWCONFIG" "$SET_I2100_BAT_PARMS_1"
+	setWifiPwrSave "$I2100_DRIVERNAME" "$IWPRIV" "$SET_I2100_BAT_PARMS_2"
 }
 
 function intel2100_AcPwrSave {
-setWifiPwrSave "$I2100_DRIVERNAME" "$IWCONFIG" "$SET_I2100_AC_PARMS_1"
+	setWifiPwrSave "$I2100_DRIVERNAME" "$IWCONFIG" "$SET_I2100_AC_PARMS_1"
+	setWifiPwrSave "$I2100_DRIVERNAME" "$IWPRIV" "$SET_I2100_BAT_PARMS_2"
 }
 
 
