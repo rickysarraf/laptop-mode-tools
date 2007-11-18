@@ -3,7 +3,7 @@ Section: utils
 Priority: optional
 Maintainer: Bart Samwel <bart@samwel.tk>
 Build-Depends: debhelper (>= 4.0.0)
-Standards-Version: 3.6.2.1
+Standards-Version: 3.7.2
 
 Package: laptop-mode-tools
 Architecture: all
