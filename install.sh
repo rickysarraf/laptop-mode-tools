@@ -54,7 +54,7 @@ $RCPROG $INITSCRIPT stop
 
 INSTALL="install -o root -g root"
 
-mkdir -p /etc/laptop-mode /etc/laptop-mode/batt-start /etc/laptop-mode/batt-stop /etc/laptop-mode/lm-ac-start /etc/laptop-mode/lm-ac-stop /etc/laptop-mode/nolm-ac-start /etc/laptop-mode/nolm-ac-stop /usr/lib/laptop-mode-tools/modules /etc/laptop-mode/conf.d /etc/laptop-mode/modules
+mkdir -p /etc/laptop-mode /etc/laptop-mode/batt-start /etc/laptop-mode/batt-stop /etc/laptop-mode/lm-ac-start /etc/laptop-mode/lm-ac-stop /etc/laptop-mode/nolm-ac-start /etc/laptop-mode/nolm-ac-stop /usr/share/laptop-mode-tools/modules /etc/laptop-mode/conf.d /etc/laptop-mode/modules
 
 ALREADY_EXISTED=0
 
@@ -114,8 +114,8 @@ if ( ! $INSTALL -m 700 usr/sbin/lm-profiler /usr/sbin ) ; then
 	exit 11
 fi
 
-if ( ! $INSTALL -m 700 usr/lib/laptop-mode-tools/modules/* /usr/lib/laptop-mode-tools/modules ) ; then
-	echo "$0: Failed to install modules into /usr/lib/laptop-mode-tools/modules. Installation failed."
+if ( ! $INSTALL -m 700 usr/share/laptop-mode-tools/modules/* /usr/share/laptop-mode-tools/modules ) ; then
+	echo "$0: Failed to install modules into /usr/share/laptop-mode-tools/modules. Installation failed."
 	exit 26
 fi
 

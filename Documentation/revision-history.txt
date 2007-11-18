@@ -29,6 +29,10 @@
     * Disable power management correctly on IPW2100 when switching to AC mode.
     * Allow iwpriv and iwconfig in /usr/sbin instead of /sbin.
     * Add a module that enables AC97 power saving.
+    * Move modules to /usr/share from /usr/lib. According to the FHS 2.3
+      architecture-independent files should go into /usr/share. For backward
+      compatibility /usr/local/lib/... remains supported, but /usr/local/share
+      is added as an option.
 
 1.34 -- 28 May 2007
 
