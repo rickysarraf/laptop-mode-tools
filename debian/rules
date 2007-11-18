@@ -47,7 +47,7 @@ install: build
 	mkdir -p $(DESTDIR)/etc/acpi/events
 	mkdir -p $(DESTDIR)/etc/acpi/actions
 	mkdir -p $(DESTDIR)/usr/sbin
-	mkdir -p $(DESTDIR)/usr/lib/laptop-mode-tools/modules
+	mkdir -p $(DESTDIR)/usr/share/laptop-mode-tools/modules
 	mkdir -p $(DESTDIR)/etc/apm/event.d
 	mkdir -p $(DESTDIR)/etc/power/scripts.d
 	mkdir -p $(DESTDIR)/etc/power/event.d
@@ -69,7 +69,7 @@ install: build
 	install -m700 usr/sbin/laptop_mode $(DESTDIR)/usr/sbin
 	install -m700 usr/sbin/lm-syslog-setup $(DESTDIR)/usr/sbin
 	install -m700 usr/sbin/lm-profiler $(DESTDIR)/usr/sbin
-	install -m700 usr/lib/laptop-mode-tools/modules/* $(DESTDIR)/usr/lib/laptop-mode-tools/modules
+	install -m700 usr/share/laptop-mode-tools/modules/* $(DESTDIR)/usr/share/laptop-mode-tools/modules
 
 # Build architecture-independent files here.
 binary-arch: build install
