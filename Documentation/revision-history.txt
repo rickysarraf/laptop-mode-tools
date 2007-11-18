@@ -26,7 +26,8 @@
       strange situations.)
     * Make IPW3945 and IPW2100 power levels configurable in
       /etc/laptop-mode/conf.d/wireless-ipw-power.conf.
-    * Disable power management correctly on IPW2100 when switching to AC mode. 
+    * Disable power management correctly on IPW2100 when switching to AC mode.
+    * Add a module that enables AC97 power saving.
 
 1.34 -- 28 May 2007
 
