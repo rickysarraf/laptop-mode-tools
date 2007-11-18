@@ -1,17 +1,17 @@
 laptop-mode-tools (1.35-1) unstable; urgency=low
 
   * New upstream version 1.35.
-  * Listen to more ACPI events for AC adapters. Closes #448101.
+  * Listen to more ACPI events for AC adapters. Closes: #448101.
   * Better error messages when laptop_mode status is called by a non-root user.
-    Closes #428162.
+    Closes: #428162.
   * Clean up temp file from init script, and properly quote messages so that
-    they are displayed in full. Closes #442321, 427292.
-  * Set READAHEAD setting correctly on Linux 2.4. Closes #355492.
+    they are displayed in full. Closes: #442321, 427292.
+  * Set READAHEAD setting correctly on Linux 2.4. Closes: #355492.
   * Set HD power management default values to 254 instead of 255.
-    Closes #451589.
-  * Update homepage location in debian/copyright. Closes #445455.
-  * Fix bug in manual page for lm-profiler.conf. Closes #450431.
-  * Don't adjust LCD brightness to the same value as before. Closes #440115.
+    Closes: #451589.
+  * Update homepage location in debian/copyright. Closes: #445455.
+  * Fix bug in manual page for lm-profiler.conf. Closes: #450431.
+  * Don't adjust LCD brightness to the same value as before. Closes: #440115.
 
  -- Bart Samwel <bart@samwel.tk>  Sun, 18 Nov 2007 16:33:00 +0200
 
