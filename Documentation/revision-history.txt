@@ -1,6 +1,8 @@
 1.35 -- 18 Nov 2007
 
-    * 
+    * Set HD power management values to 254 instead of 255. Some hard drives
+      go into "no power management" mode only on 254, while 255 yields some
+      kind of default that you don't want.
 
 1.34 -- 28 May 2007
 
