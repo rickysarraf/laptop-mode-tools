@@ -1,7 +1,7 @@
 Laptop Mode Tools README
 ------------------------
 
-Author:  Bart Samwel (bart@samwel.tk, http://www.xs4all.nl/~bsamwel)
+Author:  Bart Samwel (bart@samwel.tk, http://www.samwel.tk/bart/)
 
 
 Installation
@@ -18,9 +18,9 @@ Notes
 
 * To configure the laptop mode scripts, edit /etc/laptop-mode/laptop-mode.conf.
 
-* The laptop mode FAQ is included in the Documentation directory.
+* The laptop mode FAQ can be found at http://samwel.tk/laptop_mode/faq.
 
-* The revision history is also included in the Documentation directory.
+* The revision history is included in the Documentation directory.
 
 * The original laptop mode documentation that was distributed with the Linux
   kernel is included in this package as Documentation/laptop-mode.txt. It
@@ -35,8 +35,5 @@ References
 
 The laptop mode tools website.
 
-  http://www.xs4all.nl/~bsamwel/laptop_mode/tools
+  http://samwel.tk/laptop_mode/
 
-The laptop mode website.
-
-  http://www.xs4all.nl/~bsamwel/laptop_mode
