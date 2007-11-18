@@ -13,6 +13,7 @@
     * Properly remove temporary file created in init script.
     * Properly log output in init script.
     * Fix error in lm-profiler.conf manual page.
+    * Move /var/run/laptop-mode-* to /var/run/laptop-mode-tools/*.
 
 1.34 -- 28 May 2007
 

@@ -15,7 +15,8 @@ TEMPFILE=`mktemp`
 
 case $1 in
   start)
-    touch /var/run/laptop-mode-enabled
+    mkdir -p /var/run/laptop-mode-tools
+    touch /var/run/laptop-mode-tools/enabled
     if (/usr/sbin/laptop_mode auto > $TEMPFILE) ; then
       log_success_msg "$( cat $TEMPFILE )"
     else
@@ -25,7 +26,8 @@ case $1 in
 
   restart|reload|force-reload)
     # Full restart: first stop laptop mode completely (to restore default mount options etc.)
-    rm -f /var/run/laptop-mode-enabled
+    mkdir -p /var/run/laptop-mode-tools
+    rm -f /var/run/laptop-mode-tools/enabled
     if (/usr/sbin/laptop_mode stop > $TEMPFILE) ; then
       log_success_msg "$( cat $TEMPFILE )"
     else
@@ -33,8 +35,8 @@ case $1 in
     fi
 
     # Now remove files containing stored status, re-enable, and start it up again.
-    rm -f /var/run/laptop-mode-*
-    touch /var/run/laptop-mode-enabled
+    rm -f /var/run/laptop-mode-tools/*
+    touch /var/run/laptop-mode-tools/enabled
     if (/usr/sbin/laptop_mode auto force > $TEMPFILE) ; then
       log_success_msg "$( cat $TEMPFILE )"
     else
@@ -43,7 +45,7 @@ case $1 in
     ;;
 
   stop)
-    rm -f /var/run/laptop-mode-enabled
+    rm -f /var/run/laptop-mode-tools/enabled
     if (/usr/sbin/laptop_mode stop > $TEMPFILE) ; then
       log_success_msg "$( cat $TEMPFILE )"
     else

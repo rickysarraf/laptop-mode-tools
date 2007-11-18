@@ -361,10 +361,10 @@ if [ "$1" == "status" ] ; then
 		fi
 	done
 	echo
-	if [ -e /var/run/laptop-mode-enabled ] ; then
-		echo Laptop Mode is allowed to run: /var/run/laptop-mode-enabled exists.
+	if [ -e /var/run/laptop-mode-tools/enabled ] ; then
+		echo Laptop Mode Tools is allowed to run: /var/run/laptop-mode-tools/enabled exists.
 	else
-		echo Laptop Mode is NOT allowed to run: /var/run/laptop-mode-enabled does not exist.
+		echo Laptop Mode Tools is NOT allowed to run: /var/run/laptop-mode-tools/enabled does not exist.
 	fi
 	echo
 	STATFILES="/proc/sys/vm/laptop_mode /proc/apm /proc/pmu/info /proc/sys/vm/bdflush /proc/sys/vm/dirty_ratio /proc/sys/fs/xfs/age_buffer /proc/sys/fs/xfs/sync_interval /proc/sys/fs/xfs/lm_age_buffer /proc/sys/fs/xfs/lm_sync_interval /proc/sys/vm/pagebuf/lm_flush_age /proc/sys/fs/xfs/xfsbufd_centisecs /proc/sys/fs/xfs/xfssyncd_centisecs /proc/sys/vm/dirty_background_ratio /proc/sys/vm/dirty_expire_centisecs /proc/sys/fs/xfs/age_buffer/centisecs /proc/sys/vm/dirty_writeback_centisecs /sys/devices/system/cpu/*/cpufreq/cpuinfo_*_freq /sys/devices/system/cpu/*/cpufreq/scaling_governor /proc/acpi/button/lid/*/state /proc/acpi/ac_adapter/*/state /proc/acpi/battery/*/state"
@@ -540,6 +540,8 @@ while [ "$1" != "" ] ; do
 	shift
 done
 
+mkdir -p /var/run/laptop-mode-tools
+
 # Used to display laptop mode state later on. This is the enabled/disabled 
 # state for laptop mode processing, it tells us nothing about whether laptop
 # mode is actually _active_.
@@ -624,8 +626,8 @@ fi
 
 # If the init script has not been run or has been run with the "stop"
 # argument, then we should never start laptop mode.
-if [ ! -f /var/run/laptop-mode-enabled ] ; then
-	echo "Laptop mode disabled because /var/run/laptop-mode-enabled is missing." >> $OUTPUT
+if [ ! -f /var/run/laptop-mode-tools/enabled ] ; then
+	echo "Laptop mode disabled because /var/run/laptop-mode-tools/enabled is missing." >> $OUTPUT
 	STATE=disabled
 fi
 
@@ -790,12 +792,12 @@ if [ "$INIT" -eq 0 ] ; then
 	echo -n "Laptop mode "
 fi
 
-# WAS_ACTIVE is used later on. If there is no /var/run/laptop-mode-state, then
+# WAS_ACTIVE is used later on. If there is no /var/run/laptop-mode-tools/state, then
 # we know that laptop mode wasn't active before.
 WAS_ACTIVE=0
 echo Checking if desired state is different from current state. >> $OUTPUT
-if [ -f /var/run/laptop-mode-state ] ; then
-	read WAS_ACTIVE WAS_ON_AC WAS_ACTIVATE_WITH_POSSIBLE_DATA_LOSS < /var/run/laptop-mode-state
+if [ -f /var/run/laptop-mode-tools/state ] ; then
+	read WAS_ACTIVE WAS_ON_AC WAS_ACTIVATE_WITH_POSSIBLE_DATA_LOSS < /var/run/laptop-mode-tools/state
 	if [ "$WAS_ON_AC" != "" ] ; then
 		if [ "$WAS_ACTIVE" -eq "$ACTIVATE" -a "$WAS_ON_AC" -eq "$ON_AC" -a "$WAS_ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -a "$FORCE" -eq 0 ] ; then
 			echo -n "$STATE, "
@@ -810,14 +812,11 @@ if [ -f /var/run/laptop-mode-state ] ; then
 			fi
 			exit 0
 		fi
-	else
-		echo "/var/run/laptop-mode-state in pre-1.20 format, ignoring previous state." >> $OUTPUT
-		WAS_ACTIVE=0
 	fi
 else
-	echo "/var/run/laptop-mode-state does not exist, no previous state." >> $OUTPUT
+	echo "/var/run/laptop-mode-tools/state does not exist, no previous state." >> $OUTPUT
 fi
-echo $ACTIVATE $ON_AC $ACTIVATE_WITH_POSSIBLE_DATA_LOSS > /var/run/laptop-mode-state
+echo $ACTIVATE $ON_AC $ACTIVATE_WITH_POSSIBLE_DATA_LOSS > /var/run/laptop-mode-tools/state
 
 if [ "$ACTIVATE" -eq 1 ] ; then
 	echo -n "$STATE, active."
@@ -946,8 +945,8 @@ if [ $CONTROL_CPU_THROTTLING -eq 1 ] ; then
 	done
 fi
 
-if [ "$CONTROL_START_STOP" -ne 0 -a -f /var/run/laptop-mode-start-stop-undo-actions ] ; then
-	cat /var/run/laptop-mode-start-stop-undo-actions | \
+if [ "$CONTROL_START_STOP" -ne 0 -a -f /var/run/laptop-mode-tools/start-stop-undo-actions ] ; then
+	cat /var/run/laptop-mode-tools/start-stop-undo-actions | \
 		while read SCRIPT STARTSTOPACTION ; do
 			$SCRIPT $STARTSTOPACTION
 		done
@@ -1044,13 +1043,13 @@ if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 1 ] ; then
 				echo "Original options: $OPTS" >> $OUTPUT
 				if [ "$WAS_ACTIVE" -eq 0 ] ; then
 					# Coming from inactive state: save last known mount options for the device.
-					echo Updating /var/run/laptop-mode-nolm-mountopts.  >> $OUTPUT
-					if [ -f /var/run/laptop-mode-nolm-mountopts ] ; then 
-						sed -i "s|^$DEV .*$||" /var/run/laptop-mode-nolm-mountopts
+					echo Updating /var/run/laptop-mode-tools/nolm-mountopts.  >> $OUTPUT
+					if [ -f /var/run/laptop-mode-tools/nolm-mountopts ] ; then 
+						sed -i "s|^$DEV .*$||" /var/run/laptop-mode-tools/nolm-mountopts
 					fi
-					echo $DEV $OPTS >> /var/run/laptop-mode-nolm-mountopts
+					echo $DEV $OPTS >> /var/run/laptop-mode-tools/nolm-mountopts
 				else
-					echo Not updating /var/run/laptop-mode-nolm-mountopts because laptop mode was already active. >> $OUTPUT
+					echo Not updating /var/run/laptop-mode-tools/nolm-mountopts because laptop mode was already active. >> $OUTPUT
 				fi
 				if [ "$FST" = 'unknown' ]; then
 					echo "Deducing fstype for $MP." >> $OUTPUT
@@ -1163,8 +1162,8 @@ else
 				# Retrieve original non-laptop mode mount options and restore them.
 				# If the file that stores them doesn't exist, then laptop mode
 				# has never been started.
-				if [ "$WAS_ACTIVE" -ne 0 -a -f /var/run/laptop-mode-nolm-mountopts ] ; then						
-					SAVED_OPTS=`grep "^$DEV " /var/run/laptop-mode-nolm-mountopts`
+				if [ "$WAS_ACTIVE" -ne 0 -a -f /var/run/laptop-mode-tools/nolm-mountopts ] ; then						
+					SAVED_OPTS=`grep "^$DEV " /var/run/laptop-mode-tools/nolm-mountopts`
 					SAVED_OPTS=${SAVED_OPTS#* } # trim device name
 				
 					case "$FST" in
@@ -1560,7 +1559,7 @@ if [ $CONTROL_START_STOP -eq 1 -a "$STATE" == "enabled" ]; then
 	# next state change. Note: we actually
 	# write the actions to the file in reverse order,
 	# so we can execute the commands easily afterwards.
-	echo > /var/run/laptop-mode-start-stop-undo-actions 
+	echo > /var/run/laptop-mode-tools/start-stop-undo-actions 
 		
 	   
 	if [ $ON_AC -eq 1 ] ; then
@@ -1584,7 +1583,7 @@ if [ $CONTROL_START_STOP -eq 1 -a "$STATE" == "enabled" ]; then
 				# will fail if we don't dereference the links
 				# before storing them.
 				LINKTARGET=`readlink -f "$SCRIPT"`
-				sed -i "1i $LINKTARGET start" /var/run/laptop-mode-start-stop-undo-actions
+				sed -i "1i $LINKTARGET start" /var/run/laptop-mode-tools/start-stop-undo-actions
 			fi
 		done
 	fi
@@ -1593,7 +1592,7 @@ if [ $CONTROL_START_STOP -eq 1 -a "$STATE" == "enabled" ]; then
 			if [ -e "$SCRIPT" ] ; then
 				"$SCRIPT" start
 				LINKTARGET=`readlink -f "$SCRIPT"`
-				sed -i "1i $LINKTARGET stop" /var/run/laptop-mode-start-stop-undo-actions
+				sed -i "1i $LINKTARGET stop" /var/run/laptop-mode-tools/start-stop-undo-actions
 			fi
 		done
 	fi
