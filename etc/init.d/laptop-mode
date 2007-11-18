@@ -6,6 +6,18 @@
 #
 # config:  /etc/laptop-mode/laptop-mode.conf
 
+### BEGIN INIT INFO
+# Provides:          laptop-mode
+# Should-Start:      $all
+# Required-Start:    $local_fs
+# Required-Stop:     $local_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Enable laptop-mode-tools power management functions
+# Description:       Enable laptop-mode-tools power management functions
+### END INIT INFO
+
+
 test -f /usr/sbin/laptop_mode || exit 0
 
 . /lib/lsb/init-functions
@@ -16,33 +28,37 @@ TEMPFILE=`mktemp`
 echo "Failed to start laptop mode" > $TEMPFILE
 
 
-trap "log_failure_msg $( cat $TEMPFILE ) ; rm $TEMPFILE; exit 10" HUP INT ABRT QUIT SEGV TERM
+trap "log_action_end_msg 10 $( cat $TEMPFILE ) ; rm $TEMPFILE; exit 10" HUP INT ABRT QUIT SEGV TERM
 set -e
 
 case $1 in
   start)
+    log_action_begin_msg "Enabling laptop mode"
     touch /var/run/laptop-mode-enabled
     /usr/sbin/laptop_mode auto > $TEMPFILE
-    log_success_msg $( cat $TEMPFILE )
+    log_action_end_msg 0 $( cat $TEMPFILE )
     ;;
 
   restart|reload|force-reload)
+    log_action_begin_msg "Disabling laptop mode"
     # Full restart: first stop laptop mode completely (to restore default mount options etc.)
     rm -f /var/run/laptop-mode-enabled
     /usr/sbin/laptop_mode stop > $TEMPFILE
-    log_success_msg $( cat $TEMPFILE )
+    log_action_end_msg 0 $( cat $TEMPFILE )
     
+    log_action_begin_msg "Enabling laptop mode"
     # Now remove files containing stored status, re-enable, and start it up again.
     rm -f /var/run/laptop-mode-*
     touch /var/run/laptop-mode-enabled
     /usr/sbin/laptop_mode auto force > $TEMPFILE
-    log_success_msg $( cat $TEMPFILE )
+    log_action_end_msg 0 $( cat $TEMPFILE )
     ;;
 
   stop)
+    log_action_begin_msg "Disabling laptop mode"
     rm -f /var/run/laptop-mode-enabled
     /usr/sbin/laptop_mode stop > $TEMPFILE
-    log_success_msg $( cat $TEMPFILE )    
+    log_action_end_msg 0 $( cat $TEMPFILE )    
     ;;
 
   status)

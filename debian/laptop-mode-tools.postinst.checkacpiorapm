@@ -1,0 +1,57 @@
+#! /bin/sh
+
+# Watch out: we also check for the nonexistence of /proc/pmu because
+# some kernel versions emulate /proc/apm for PMU hardware.
+if [ ! -f /proc/apm -o -d /proc/pmu ] ; then
+  APM_FOUND=0
+elif [ ! -f /usr/sbin/apmd] ; then
+  echo APM support found in the kernel but apmd is not installed. Laptop mode
+  echo will NOT be enabled automatically using APM.
+  APM_FOUND=1
+else
+  APM_FOUND=1
+fi
+
+if [ ! -d /proc/acpi/ac_adapter ] ; then
+  ACPI_FOUND=0
+elif [ ! -f /usr/sbin/acpid ] ; then
+  echo ACPI support found in the kernel, but acpid is not installed. Laptop mode
+  echo will NOT be enabled automatically using ACPI.
+  ACPI_FOUND=1
+else
+  ACPI_FOUND=1
+fi
+
+if [ ! -d /proc/pmu ] ; then
+  PMU_FOUND=0
+elif [ ! -f /sbin/pmud -a ! -f /sbin/pbbuttonsd ] ; then
+  echo PMU support found in the kernel, but neither pmud nor pbbuttonsd is
+  echo installed. Laptop mode will NOT be enabled automatically. If you want
+  echo to start laptop mode automatically, install either pmud or pbbuttonsd,
+  echo and then *manually* edit /etc/power/pwrctl-local to call
+  echo "/usr/sbin/laptop_mode auto".
+  PMU_FOUND=1
+else
+  PMU_FOUND=1
+fi
+
+if [ $PMU_FOUND -ne 0 -a -f /etc/apm/event.d/laptop-mode ] ; then
+  # This is a HACK. We install the apm thing always but simply remove
+  # it afterwards. I haven't found out how to make dpkg install these
+  # things conditionally (like the install.sh does) unless I take them
+  # out of the package and install them manually in the postinst. :(
+  rm /etc/apm/event.d/laptop-mode
+fi
+
+if [ $APM_FOUND -eq 0 -a $ACPI_FOUND -eq 0 -a $PMU_FOUND=0 ] ; then
+  echo Warning: No ACPI, APM or PMU support was found in the running kernel. To
+  echo be able to start laptop mode automatically when running on battery, you
+  echo must recompile your kernel with support for ACPI/APM/PMU (depending on
+  echo what your computer supports). It is possible that your computer supports
+  echo none of these. If this is the case, then you must control laptop mode
+  echo manually, using the laptop_mode command, or you can enable the 
+  echo ENABLE_LAPTOP_MODE_ON_AC option in the configuration file
+  echo /etc/laptop-mode/laptop-mode.conf. 
+fi
+
+exit 0
