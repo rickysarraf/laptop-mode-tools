@@ -10,6 +10,8 @@
     * Install laptop-mode.conf world-readable by default. It contains no
       sensitive information and it is required by "laptop_mode status" when
       it is run as a non-root user.
+    * Properly remove temporary file created in init script.
+    * Properly log output in init script.
 
 1.34 -- 28 May 2007
 
