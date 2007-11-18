@@ -12,6 +12,8 @@ laptop-mode-tools (1.35-1) unstable; urgency=low
   * Update homepage location in debian/copyright. Closes: #445455.
   * Fix bug in manual page for lm-profiler.conf. Closes: #450431.
   * Don't adjust LCD brightness to the same value as before. Closes: #440115.
+  * Modules moved to /usr/share/laptop-mode-tools/modules to improve FHS
+    compliance.
 
  -- Bart Samwel <bart@samwel.tk>  Sun, 18 Nov 2007 16:33:00 +0200
 
