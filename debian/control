@@ -18,6 +18,6 @@ Description: Scripts to spin down hard drive and save power
  enabling laptop mode when the computer is working on batteries. It also 
  supports various other power management features, such as starting and 
  stopping daemons depending on power mode, automatically hibernating if 
- battery levels are too low, and adjusting terminal blanking and X Windows
+ battery levels are too low, and adjusting terminal blanking and X11
  screen blanking.
 

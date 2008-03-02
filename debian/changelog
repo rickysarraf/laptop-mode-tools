@@ -4,6 +4,8 @@ laptop-mode-tools (1.36-1) unstable; urgency=low
   * Init script LSB header: depend on remote_fs instead of local_fs.
     Closes: #468657.
   * Remove ^M from /etc/init.d/laptop-mode. Closes: #459422.
+  * Change package description to say "X11" instead of "X Windows".
+    Closes: #464066.
 
  -- Bart Samwel <bart@samwel.tk>  Sun, 2 Mar 2008 16:00:00 +0200
 
