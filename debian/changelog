@@ -7,7 +7,7 @@ laptop-mode-tools (1.36-1) unstable; urgency=low
   * Change package description to say "X11" instead of "X Windows".
     Closes: #464066.
 
- -- Bart Samwel <bart@samwel.tk>  Sun, 2 Mar 2008 16:00:00 +0200
+ -- Bart Samwel <bart@samwel.tk>  Sun, 2 Mar 2008 17:15:00 +0200
 
 laptop-mode-tools (1.35-1) unstable; urgency=low
 

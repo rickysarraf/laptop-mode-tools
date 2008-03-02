@@ -34,7 +34,7 @@ set -a
 
 # The laptop mode tools version number. Extracted by the installer makefile
 # as well, so don't change the format!
-LMTVERSION=1.35
+LMTVERSION=1.36
 
 # This script is loaded from multiple scripts to set the config defaults
 # and to read the configuration on top of those. Only when the command is
@@ -84,7 +84,7 @@ LM_AC_CPU_GOVERNOR=ondemand
 LM_AC_CPU_IGNORE_NICE_LOAD=1
 NOLM_AC_CPU_MAXFREQ=fastest
 NOLM_AC_CPU_MINFREQ=slowest
-NOLM_AC_CPU_GOVERNOR=performance
+NOLM_AC_CPU_GOVERNOR=ondemand
 NOLM_AC_CPU_IGNORE_NICE_LOAD=0
 CONTROL_CPU_FREQUENCY=0
 HD="/dev/[hs]d[abcdefgh]"
@@ -553,7 +553,11 @@ fi
 # Determine the power state.
 ON_AC=1
 
-if [ -d /proc/acpi/ac_adapter ] ; then
+if [ -f /sys/class/power_supply/AC/online ] ; then
+	echo "Determining power state from /sys/class/power_supply/AC/online." >> $OUTPUT
+	ON_AC=$(cat /sys/class/power_supply/AC/online)
+elif [ -d /proc/acpi/ac_adapter ] ; then
+	echo "Determining power state from /proc/acpi/ac_adapter." >> $OUTPUT
 	ADAPTERS_FOUND=0
 	ON_AC=0
 	for ADAPTER in /proc/acpi/ac_adapter/* ; do
@@ -569,6 +573,7 @@ if [ -d /proc/acpi/ac_adapter ] ; then
 		ON_AC=1
 	fi
 elif [ -f /proc/apm ] ; then
+	echo "Determining power state from /proc/apm." >> $OUTPUT
 	read D1 D2 D3 APM_AC_STATE D0 </proc/apm
 	if [ "$APM_AC_STATE" = "0x00" ] ; then
 		ON_AC=0
@@ -576,6 +581,7 @@ elif [ -f /proc/apm ] ; then
 		ON_AC=1
 	fi
 elif [ -f /proc/pmu/info ] ; then
+	echo "Determining power state from /proc/pmu/info." >> $OUTPUT
 	if ( grep "^AC Power.*0$" /proc/pmu/info ) ; then
 		echo "/proc/pmu/info indicates absence of AC power." >> $OUTPUT
 		ON_AC=0
@@ -586,9 +592,8 @@ elif [ -f /proc/pmu/info ] ; then
 		echo "/proc/pmu/info indicates presence of AC power." >> $OUTPUT
 	fi
 else
-	echo "No ACPI, APM or PMU power management information found -- assuming AC power is present." >> $OUTPUT
+	echo "No /sys/class/power_supply, ACPI, APM or PMU power management information found -- assuming AC power is present." >> $OUTPUT
 fi
-
 
 
 # Determine whether to activate or deactivate laptop mode.
@@ -1220,7 +1225,7 @@ is_capable() {
 	# It assumes more or less recent udev (> 070)
 	if [ $HAVE_UDEVINFO -ne 0 ] ; then
 		echo -n "Querying $1 media type using udevinfo: " >> $OUTPUT
-		eval "$(udevinfo -q env -n $1 2> $OUTPUT | egrep '(ID_TYPE=|ID_BUS=)' >> $OUTPUT 2>&1)"
+		eval "$(udevinfo -q env -n $1 2>> $OUTPUT | egrep '(ID_TYPE=|ID_BUS=)' 2>&1 | tee -a $OUTPUT)"
 		if [ -n "$ID_TYPE" -a -n "$ID_BUS" ] ; then
 			echo "type '$ID_TYPE on bus '$ID_BUS' detected" >> $OUTPUT
 			MEDIA=$ID_TYPE
