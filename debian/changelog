@@ -6,6 +6,7 @@ laptop-mode-tools (1.36-1) unstable; urgency=low
   * Remove ^M from /etc/init.d/laptop-mode. Closes: #459422.
   * Change package description to say "X11" instead of "X Windows".
     Closes: #464066.
+  * Get rid of empty /usr/bin directory in package. (lintian warning)
 
  -- Bart Samwel <bart@samwel.tk>  Sun, 2 Mar 2008 17:15:00 +0200
 
