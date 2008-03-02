@@ -3,6 +3,9 @@
     * Support /sys/class/power_supply interface to determine power state.
     * Fix incorrect workaround description for DPMS settings in the config
       file. Replaced it by a reference to the manual page.
+    * Change default CPU frequency governor on AC power to "ondemand". It works
+      just as well as "performance" these days, setting the governor to
+      "performance" just wastes a lot of power.
 
 1.35 -- 18 November 2007
 
