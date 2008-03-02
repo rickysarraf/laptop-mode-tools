@@ -1,6 +1,8 @@
 1.36 -- 2 March 2008
 
     * Support /sys/class/power_supply interface to determine power state.
+    * Fix incorrect workaround description for DPMS settings in the config
+      file. Replaced it by a reference to the manual page.
 
 1.35 -- 18 November 2007
 
