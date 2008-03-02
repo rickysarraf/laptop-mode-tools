@@ -1225,7 +1225,7 @@ is_capable() {
 	# It assumes more or less recent udev (> 070)
 	if [ $HAVE_UDEVINFO -ne 0 ] ; then
 		echo -n "Querying $1 media type using udevinfo: " >> $OUTPUT
-		eval "$(udevinfo -q env -n $1 2> $OUTPUT | egrep '(ID_TYPE=|ID_BUS=)' >> $OUTPUT 2>&1)"
+		eval "$(udevinfo -q env -n $1 2>> $OUTPUT | egrep '(ID_TYPE=|ID_BUS=)' 2>&1 | tee -a $OUTPUT)"
 		if [ -n "$ID_TYPE" -a -n "$ID_BUS" ] ; then
 			echo "type '$ID_TYPE on bus '$ID_BUS' detected" >> $OUTPUT
 			MEDIA=$ID_TYPE

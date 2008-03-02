@@ -6,6 +6,8 @@
     * Change default CPU frequency governor on AC power to "ondemand". It works
       just as well as "performance" these days, setting the governor to
       "performance" just wastes a lot of power.
+    * Change some output redirection which was causing drive capability checking
+      to fail in some situations. Kudos go to Christoph Lange for the fix!
 
 1.35 -- 18 November 2007
 
