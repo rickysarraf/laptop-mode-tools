@@ -553,7 +553,11 @@ fi
 # Determine the power state.
 ON_AC=1
 
-if [ -d /proc/acpi/ac_adapter ] ; then
+if [ -f /sys/class/power_supply/AC/online ] ; then
+	echo "Determining power state from /sys/class/power_supply/AC/online." >> $OUTPUT
+	ON_AC=$(cat /sys/class/power_supply/AC/online)
+elif [ -d /proc/acpi/ac_adapter ] ; then
+	echo "Determining power state from /proc/acpi/ac_adapter." >> $OUTPUT
 	ADAPTERS_FOUND=0
 	ON_AC=0
 	for ADAPTER in /proc/acpi/ac_adapter/* ; do
@@ -569,6 +573,7 @@ if [ -d /proc/acpi/ac_adapter ] ; then
 		ON_AC=1
 	fi
 elif [ -f /proc/apm ] ; then
+	echo "Determining power state from /proc/apm." >> $OUTPUT
 	read D1 D2 D3 APM_AC_STATE D0 </proc/apm
 	if [ "$APM_AC_STATE" = "0x00" ] ; then
 		ON_AC=0
@@ -576,6 +581,7 @@ elif [ -f /proc/apm ] ; then
 		ON_AC=1
 	fi
 elif [ -f /proc/pmu/info ] ; then
+	echo "Determining power state from /proc/pmu/info." >> $OUTPUT
 	if ( grep "^AC Power.*0$" /proc/pmu/info ) ; then
 		echo "/proc/pmu/info indicates absence of AC power." >> $OUTPUT
 		ON_AC=0
@@ -586,9 +592,8 @@ elif [ -f /proc/pmu/info ] ; then
 		echo "/proc/pmu/info indicates presence of AC power." >> $OUTPUT
 	fi
 else
-	echo "No ACPI, APM or PMU power management information found -- assuming AC power is present." >> $OUTPUT
+	echo "No /sys/class/power_supply, ACPI, APM or PMU power management information found -- assuming AC power is present." >> $OUTPUT
 fi
-
 
 
 # Determine whether to activate or deactivate laptop mode.

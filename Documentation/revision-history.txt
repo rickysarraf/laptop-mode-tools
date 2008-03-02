@@ -1,4 +1,8 @@
-1.35 -- 18 Nov 2007
+1.36 -- 2 March 2008
+
+    * Support /sys/class/power_supply interface to determine power state.
+
+1.35 -- 18 November 2007
 
     * Set HD power management values to 254 instead of 255. Some hard drives
       go into "no power management" mode only on 254, while 255 yields some
