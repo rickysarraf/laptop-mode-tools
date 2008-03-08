@@ -1,3 +1,9 @@
+laptop-mode-tools (1.36-2) UNRELEASED; urgency=low
+
+  * Upgrade standards version to 3.7.3.
+
+ -- Bart Samwel <bart@samwel.tk>  Sat, 8 Mar 2008 16:40:00 +0200
+
 laptop-mode-tools (1.36-1) unstable; urgency=low
 
   * New upstream version 1.36.
