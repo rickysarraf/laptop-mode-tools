@@ -1,5 +1,8 @@
 #! /bin/sh
 
+# Laptop mode tools module, called from /usr/sbin/laptop_mode.
+# Configuration in /etc/laptop-mode/conf.d/configuration-file-control.conf.
+
 if [ ! -z "$CONTROL_CONFIG_FILES" ] && [ "$CONTROL_CONFIG_FILES" -eq 1 ] ; then
 	echo "Swapping out configuration files." >> $OUTPUT
 	for CONFFILE in $CONFIG_FILES ; do
@@ -30,7 +33,7 @@ if [ ! -z "$CONTROL_CONFIG_FILES" ] && [ "$CONTROL_CONFIG_FILES" -eq 1 ] ; then
 				fi
 			else
 				echo "$CONFFILE is not a symlink." >> $OUTPUT
-				if [ "$STATE" == "enabled" ] ; then
+				if [ "$STATE" = "enabled" ] ; then
 					echo "Saving it to $CONFFILE.lmbackup." >> $OUTPUT
 					cp --backup=numbered "$CONFFILE" "$CONFFILE.lmbackup"
 				fi

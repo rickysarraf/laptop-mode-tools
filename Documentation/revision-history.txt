@@ -9,11 +9,14 @@
     * Support /sys/class/power_supply interface to determine battery levels.
     * Added generic support for configuration file swapping, in the form of the
       module "configuration-file-control". The old syslog configuration control
-      feature is deprecated. By default the new module has settings for
+      feature is deprecated. By default the new module has settings to support
+      syslogd, syslog-ng and rsyslogd.
     * Laptop mode was not run when the enabled/disabled state changed, but none
       of the other states changed. This was incorrect, because esp. the config
       files should be restored to their non-laptop-mode-tools variants when
       laptop mode tools is stopped.
+    * Add the module "wireless-iwl-power" for setting the power levels for
+      Intel 3945 and 4965 wireless adapters when using the iwlwifi drivers.
 
 1.36 -- 2 March 2008
 

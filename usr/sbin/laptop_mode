@@ -1723,6 +1723,7 @@ fi
 export FORCE STATE ON_AC ACTIVATE
 for SCRIPT in /usr/share/laptop-mode-tools/modules/* /usr/local/lib/laptop-mode-tools/modules/* /usr/local/share/laptop-mode-tools/modules/* /etc/laptop-mode/modules/*; do
 	if [ -x "$SCRIPT" ] ; then
+		echo "Invoking module $SCRIPT." >> $OUTPUT
 		"$SCRIPT" >> $OUTPUT
 	else
 		echo "Module $SCRIPT is not executable." >> $OUTPUT
