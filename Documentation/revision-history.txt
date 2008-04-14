@@ -1,11 +1,19 @@
 1.37 -- 14 April 2008
 
-    * Add support for getting lid button state from HAL.
+    * Add support for getting lid button state from HAL instead of from
+      /proc/acpi.
     * Sanity check -- battery levels of 0 are interpreted as errors and do not
       cause auto-hibernation.
     * Improved checking for presence of ACPI batteries, so that absent batteries
       do not cause auto-hibernation.
     * Support /sys/class/power_supply interface to determine battery levels.
+    * Added generic support for configuration file swapping, in the form of the
+      module "configuration-file-control". The old syslog configuration control
+      feature is deprecated. By default the new module has settings for
+    * Laptop mode was not run when the enabled/disabled state changed, but none
+      of the other states changed. This was incorrect, because esp. the config
+      files should be restored to their non-laptop-mode-tools variants when
+      laptop mode tools is stopped.
 
 1.36 -- 2 March 2008
 

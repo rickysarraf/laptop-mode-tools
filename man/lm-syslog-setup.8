@@ -9,10 +9,16 @@ This manual page documents briefly the
 command. 
 .B /usr/sbin/lm-syslog-setup
 is a command that sets up the necessary things to enable
-laptop mode to switch between different syslog.conf files
-based on the power state. If your system runs syslogd, you can
+laptop mode to switch between different configuration files
+based on the power state. The configuration files are specified in
+
+
+
+
+
+You can
 simply run this command and you will have three syslog.conf
-files, /etc/syslog-on-ac-with-lm.conf (used when AC power is
+files: /etc/syslog-on-ac-with-lm.conf (used when AC power is
 present and laptop mode is enabled, i.e. LAPTOP_MODE_ALWAYS_ON=1
 in laptop-mode.conf), /etc/syslog-on-ac-without-lm.conf (used
 when AC power is present and laptop mode is disabled) and
@@ -23,6 +29,7 @@ logging daemon, you must modify
 settings (configuration file name, executable name, etcetera)
 for your daemon. Please note that your daemon MUST support the 
 SIGHUP signal to re-read its configuration files.
+.B 
 .SH "SEE ALSO"
 .PP
 laptop-mode.conf(8).

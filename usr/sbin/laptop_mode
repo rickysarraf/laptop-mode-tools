@@ -407,7 +407,6 @@ case "$KLEVEL" in
 esac
 
 
-
 # Stop exporting everything -- what we do from here is private.
 set +a
 
@@ -907,9 +906,9 @@ fi
 WAS_ACTIVE=0
 echo Checking if desired state is different from current state. >> $OUTPUT
 if [ -f /var/run/laptop-mode-tools/state ] ; then
-	read WAS_ACTIVE WAS_ON_AC WAS_ACTIVATE_WITH_POSSIBLE_DATA_LOSS < /var/run/laptop-mode-tools/state
-	if [ "$WAS_ON_AC" != "" ] ; then
-		if [ "$WAS_ACTIVE" -eq "$ACTIVATE" -a "$WAS_ON_AC" -eq "$ON_AC" -a "$WAS_ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -a "$FORCE" -eq 0 ] ; then
+	read WAS_ACTIVE WAS_ON_AC WAS_ACTIVATE_WITH_POSSIBLE_DATA_LOSS WAS_STATE < /var/run/laptop-mode-tools/state
+	if [ "$WAS_STATE" != "" ] ; then
+		if [ "$WAS_ACTIVE" -eq "$ACTIVATE" -a "$WAS_ON_AC" -eq "$ON_AC" -a "$WAS_ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -a "$WAS_STATE" = "$STATE" -a "$FORCE" -eq 0 ] ; then
 			echo -n "$STATE, "
 			if [ "$WAS_ACTIVE" -eq 1 ] ; then
 				echo -n "active [unchanged]"
@@ -926,7 +925,7 @@ if [ -f /var/run/laptop-mode-tools/state ] ; then
 else
 	echo "/var/run/laptop-mode-tools/state does not exist, no previous state." >> $OUTPUT
 fi
-echo $ACTIVATE $ON_AC $ACTIVATE_WITH_POSSIBLE_DATA_LOSS > /var/run/laptop-mode-tools/state
+echo $ACTIVATE $ON_AC $ACTIVATE_WITH_POSSIBLE_DATA_LOSS $STATE > /var/run/laptop-mode-tools/state
 
 if [ "$ACTIVATE" -eq 1 ] ; then
 	echo -n "$STATE, active."
