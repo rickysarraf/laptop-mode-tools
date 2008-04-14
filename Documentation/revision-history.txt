@@ -1,3 +1,12 @@
+1.37 -- 14 April 2008
+
+    * Add support for getting lid button state from HAL.
+    * Sanity check -- battery levels of 0 are interpreted as errors and do not
+      cause auto-hibernation.
+    * Improved checking for presence of ACPI batteries, so that absent batteries
+      do not cause auto-hibernation.
+    * Support /sys/class/power_supply interface to determine battery levels.
+
 1.36 -- 2 March 2008
 
     * Support /sys/class/power_supply interface to determine power state.

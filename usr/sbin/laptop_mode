@@ -13,8 +13,8 @@
 # Please consult the manual pages laptop-mode.conf(8) and laptop_mode(8) for
 # additional information.
 #
-# Maintainer:       Bart Samwel (bart@samwel.tk)
-# Project homepage: http://samwel.tk/laptop_mode
+# Maintainer:        Bart Samwel (bart@samwel.tk)
+# Project home page: http://samwel.tk/laptop_mode
 #
 # Contributors to this script:   Bart Samwel
 #				 Kiko Piris
@@ -34,7 +34,7 @@ set -a
 
 # The laptop mode tools version number. Extracted by the installer makefile
 # as well, so don't change the format!
-LMTVERSION=1.36
+LMTVERSION=1.37
 
 # This script is loaded from multiple scripts to set the config defaults
 # and to read the configuration on top of those. Only when the command is
@@ -367,7 +367,7 @@ if [ "$1" == "status" ] ; then
 		echo Laptop Mode Tools is NOT allowed to run: /var/run/laptop-mode-tools/enabled does not exist.
 	fi
 	echo
-	STATFILES="/proc/sys/vm/laptop_mode /proc/apm /proc/pmu/info /proc/sys/vm/bdflush /proc/sys/vm/dirty_ratio /proc/sys/fs/xfs/age_buffer /proc/sys/fs/xfs/sync_interval /proc/sys/fs/xfs/lm_age_buffer /proc/sys/fs/xfs/lm_sync_interval /proc/sys/vm/pagebuf/lm_flush_age /proc/sys/fs/xfs/xfsbufd_centisecs /proc/sys/fs/xfs/xfssyncd_centisecs /proc/sys/vm/dirty_background_ratio /proc/sys/vm/dirty_expire_centisecs /proc/sys/fs/xfs/age_buffer/centisecs /proc/sys/vm/dirty_writeback_centisecs /sys/devices/system/cpu/*/cpufreq/cpuinfo_*_freq /sys/devices/system/cpu/*/cpufreq/scaling_governor /proc/acpi/button/lid/*/state /proc/acpi/ac_adapter/*/state /proc/acpi/battery/*/state"
+	STATFILES="/proc/sys/vm/laptop_mode /proc/apm /proc/pmu/info /proc/sys/vm/bdflush /proc/sys/vm/dirty_ratio /proc/sys/fs/xfs/age_buffer /proc/sys/fs/xfs/sync_interval /proc/sys/fs/xfs/lm_age_buffer /proc/sys/fs/xfs/lm_sync_interval /proc/sys/vm/pagebuf/lm_flush_age /proc/sys/fs/xfs/xfsbufd_centisecs /proc/sys/fs/xfs/xfssyncd_centisecs /proc/sys/vm/dirty_background_ratio /proc/sys/vm/dirty_expire_centisecs /proc/sys/fs/xfs/age_buffer/centisecs /proc/sys/vm/dirty_writeback_centisecs /sys/devices/system/cpu/*/cpufreq/cpuinfo_*_freq /sys/devices/system/cpu/*/cpufreq/scaling_governor /proc/acpi/button/lid/*/state /proc/acpi/ac_adapter/*/state /proc/acpi/battery/*/state /sys/class/power_supply/AC/online /sys/class/power_supply/*/state"
 	for THISFILE in $STATFILES ; do
 		if [ -e $THISFILE ] ; then
 			echo $THISFILE:
@@ -617,15 +617,24 @@ else
 	fi
 fi
 
-if [ "$ENABLE_LAPTOP_MODE_WHEN_LID_CLOSED" -ne 0 ] ; then
-	if [ -f /proc/acpi/button/lid/*/state ] ; then
+if [ "$ENABLE_LAPTOP_MODE_WHEN_LID_CLOSED" -ne 0 -a "$ACTIVATE" -eq 0 ] ; then
+	if [ -x "`which hal-find-by-property`" ] ; then
+		HAL_LID_BUTTON=$(hal-find-by-property --key "button.type" --string "lid")
+	fi
+	if [ "$HAL_LID_BUTTON" != "" ] ; then
+		HAL_LID_BUTTON_STATE=$(hal-get-property --udi $(hal-find-by-property --key "button.type" --string "lid") --key "button.state.value")
+		if [ "$HAL_LID_BUTTON_STATE" = "true" ] ; then
+			echo "Setting action to \"start\" because the lid is closed (says HAL)." >> $OUTPUT
+			ACTIVATE=1			
+		fi
+	elif [ -f /proc/acpi/button/lid/*/state ] ; then
 		if ( cat /proc/acpi/button/lid/*/state | grep "closed" ) ; then
-			echo "Setting action to \"start\" because the lid is closed." >> $OUTPUT
+			echo 'Setting action to "start" because the lid is closed (says /proc/acpi/button/lid/*/state).' >> $OUTPUT
 			ACTIVATE=1
 		fi
 	else
 		echo "Warning: ENABLE_LAPTOP_MODE_WHEN_LID_CLOSED is set, but there is no file"
-		echo "/proc/acpi/button/lid/.../state!"
+		echo "/proc/acpi/button/lid/.../state, and hal information is not available either!"
 	fi
 fi
 
@@ -654,14 +663,103 @@ fi
 
 if [ "$ACTIVATE" -eq 0 ] ; then
 	ACTIVATE_WITH_POSSIBLE_DATA_LOSS=0
+elif [ "$ON_AC" = 1 ] ; then
+	echo "On AC, not checking minimum battery charge." >> $OUTPUT
 else
 	ACTIVATE_WITH_POSSIBLE_DATA_LOSS=1
-	if [ ! -d /proc/acpi ] ; then
-		echo "Not ACPI -> no support for minimum battery charge checking." >> $OUTPUT
-	elif [ "$ON_AC" -eq 0 ] ; then
-		echo "On ACPI and not on AC -- checking minimum battery charge." >> $OUTPUT
-		ENOUGH_CHARGE=0
-		ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=0
+	ENOUGH_CHARGE=0
+	ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=0
+
+	# Weird way of checking that /proc/acpi/battery is not empty -- but it works.
+	if [ "$(echo /sys/class/power_supply/*)" != '/sys/class/power_supply/*' ] ; then
+		echo 'Not on AC and we have battery information in /sys/class/power_supply/BAT* -- checking minimum battery charge.' >> $OUTPUT
+		for BATT in /sys/class/power_supply/* ; do
+			BATT_TYPE=$(cat $BATT/type)
+			echo "$BATT is of type $BATT_TYPE." >> $OUTPUT
+			if [ "$BATT_TYPE" != "Battery" ] ; then
+				echo "Not of type \"Battery\", skipping." >> $OUTPUT
+			else
+				PREV_ENOUGH_CHARGE=$ENOUGH_CHARGE
+				PREV_ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=$ENOUGH_CHARGE_TO_PREVENT_HIBERNATION
+
+				echo "Checking levels for $BATT." >> $OUTPUT
+				PRESENT=$(cat $BATT/present)
+				echo "Present: $PRESENT." >> $OUTPUT
+
+				# Only do if the battery is present
+				if [ "$PRESENT" -eq 1 ] ; then
+					FOUND_AN_ENABLED_CHECK=0
+					FOUND_AN_ENABLED_HIBERNATION_CHECK=0
+			
+					# Get the remaining capacity.
+					REMAINING=$(cat $BATT/charge_now)
+					if [ -z "$REMAINING" -o "$REMAINING" -eq 0 ] ; then
+						echo "Battery does not report remaining charge. Perhaps it is not present?" >> $OUTPUT
+						REMAINING=0
+					fi
+					echo "Remaining charge: $REMAINING" >> $OUTPUT
+
+					CAPACITY=$(cat $BATT/charge_full_design)
+					if [ -z "$CAPACITY" -o "$CAPACITY" -eq 0 ] ; then
+						echo "Battery does not report design full charge, using non-design full charge." >> $OUTPUT					
+						CAPACITY=$(cat $BATT/charge_full)
+						if [ -z "$CAPACITY" -o "$CAPACITY" -eq 0] ; then
+							echo "Battery does not report non-design full charge." >> $OUTPUT					
+							CAPACITY=0
+						fi
+					fi
+					echo "Full capacity: $CAPACITY" >> $OUTPUT
+
+					# Check the charge percentage
+					if [ "$MINIMUM_BATTERY_CHARGE_PERCENT" -ne 0 ] ; then
+						FOUND_AN_ENABLED_CHECK=1
+						if [ "$CAPACITY" -eq 0 ] ; then
+							echo "WARNING: Battery does not report a capacity. Minimum battery"
+							echo "charge checking does not work without a design capacity."
+							ENOUGH_CHARGE=1
+						elif [ "$(($REMAINING * 100 / $CAPACITY))" -ge "$MINIMUM_BATTERY_CHARGE_PERCENT" ] ; then
+							ENOUGH_CHARGE=1
+						fi
+					fi
+					if [ "$AUTO_HIBERNATION_BATTERY_CHARGE_PERCENT" -ne 0 ] ; then
+						FOUND_AN_ENABLED_HIBERNATION_CHECK=1
+						if [ "$CAPACITY" -eq 0 ] ; then
+							echo "WARNING: Battery does not report a design capacity. Auto hibernation"
+							echo "does not work without a design capacity."
+							ENOUGH_CHARGE=1
+						elif [ "$(($REMAINING * 100 / $CAPACITY))" -ge "$AUTO_HIBERNATION_BATTERY_CHARGE_PERCENT" ] ; then
+							ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=1
+						fi
+					fi
+
+					ALARM_LEVEL=$(cat $BATT/alarm)
+					if [ "$ALARM_LEVEL" -ne 0 ] ; then
+						if [ "$REMAINING" -le "$ALARM_LEVEL" ] ; then				
+							# Restore the state we had before checking this battery, so that
+							# this battery does not count as having enough charge.
+							ENOUGH_CHARGE=$PREV_ENOUGH_CHARGE
+						elif [ "$FOUND_AN_ENABLED_CHECK" -eq 0 ] ; then
+							# This is the only check that is enabled. In that case a non-critical
+							# battery level counts as "enough". (If we would count non-critical
+							# battery levels as enough *always*, then the other settings would
+							# have no effect; this is only a final fallback.)
+							ENOUGH_CHARGE=1
+						fi
+					fi
+					if [ "$AUTO_HIBERNATION_ON_CRITICAL_BATTERY_LEVEL" -ne 0 ] ; then
+						if [ "$REMAINING" -le "$ALARM_LEVEL" ] ; then				
+							ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=$PREV_ENOUGH_CHARGE_TO_PREVENT_HIBERNATION
+						elif [ "$FOUND_AN_ENABLED_HIBERNATION_CHECK" -eq 0 ] ; then
+							ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=1
+						fi
+					fi
+				else
+					echo "Battery is not present." >> $OUTPUT
+				fi
+			fi
+		done		
+	elif [ "$(echo /proc/acpi/battery/*)" != '/proc/acpi/battery/*' ] ; then
+		echo "Not on AC and we have batteries in /proc/acpi/battery -- checking minimum battery charge." >> $OUTPUT
 		for BATT in /proc/acpi/battery/* ; do
 			PREV_ENOUGH_CHARGE=$ENOUGH_CHARGE
 			PREV_ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=$ENOUGH_CHARGE_TO_PREVENT_HIBERNATION
@@ -674,27 +772,29 @@ else
 			if ( cat $BATT_INFO | grep "present:.*yes" > /dev/null ) ; then
 				FOUND_AN_ENABLED_CHECK=0
 				FOUND_AN_ENABLED_HIBERNATION_CHECK=0
-				
+			
 				# Get the remaining capacity.
 				REMAINING=`cat $BATT_STATE | grep "remaining capacity:" | sed  "s/.* \([0-9][0-9]* \).*/\1/" `
 				if [ -z "$REMAINING" ] ; then
-					echo "Battery does not report remaining capacity. Perhaps it is not present?" >> $OUTPUT
+					echo "Battery does not report remaining charte. Perhaps it is not present?" >> $OUTPUT
 					REMAINING=0
 				fi
 				echo "Remaining charge: $REMAINING" >> $OUTPUT
-	
+
 				CAPACITY=`cat $BATT_INFO | grep "design capacity:" | sed  "s/.* \([0-9][0-9]* \).*/\1/" `
 				if [ -z "$CAPACITY" ] ; then
+					echo "Battery does not report capacity. Perhaps it is not present?" >> $OUTPUT
 					CAPACITY=0
 				fi
 				echo "Design capacity: $CAPACITY" >> $OUTPUT
-	
+
 				# Check the charge percentage
 				if [ "$MINIMUM_BATTERY_CHARGE_PERCENT" -ne 0 ] ; then
 					FOUND_AN_ENABLED_CHECK=1
 					if [ "$CAPACITY" -eq 0 ] ; then
 						echo "WARNING: Battery does not report a design capacity. Minimum battery"
 						echo "charge checking does not work without a design capacity."
+						ENOUGH_CHARGE=1
 					elif [ "$(($REMAINING * 100 / $CAPACITY))" -ge "$MINIMUM_BATTERY_CHARGE_PERCENT" ] ; then
 						ENOUGH_CHARGE=1
 					fi
@@ -704,11 +804,12 @@ else
 					if [ "$CAPACITY" -eq 0 ] ; then
 						echo "WARNING: Battery does not report a design capacity. Auto hibernation"
 						echo "does not work without a design capacity."
+						ENOUGH_CHARGE=1
 					elif [ "$(($REMAINING * 100 / $CAPACITY))" -ge "$AUTO_HIBERNATION_BATTERY_CHARGE_PERCENT" ] ; then
 						ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=1
 					fi
 				fi
-	
+
 				#
 				# Fallback: hard values.
 				#
@@ -720,7 +821,7 @@ else
 				elif ( cat $BATT_INFO | grep mAh > /dev/null ) ; then
 					IN_MAH=1
 				fi
-				
+			
 				if [ "$IN_MAH" -ne 0 ] ; then
 					if [ "$MINIMUM_BATTERY_CHARGE_MAH" -ne 0 ] ; then
 						FOUND_AN_ENABLED_CHECK=1
@@ -751,7 +852,7 @@ else
 					echo "Failed to determine battery charge. Battery charge units are not in"
 					echo "mWh or mAh."
 				fi
-				
+			
 				CAP_STATE=`cat "$BATT_STATE" | sed -r 's/^capacity state:\s*(.*)\s*$/\1/;t;d'`
 				if [ "$DISABLE_LAPTOP_MODE_ON_CRITICAL_BATTERY_LEVEL" -ne 0 ] ; then
 					if [ "$CAP_STATE" == "critical" ] ; then				
@@ -777,19 +878,23 @@ else
 				echo "Battery is not present." >> $OUTPUT
 			fi
 		done
-		if [ "$ENABLE_AUTO_HIBERNATION" -ne 0 -a "$ENOUGH_CHARGE_TO_PREVENT_HIBERNATION" -eq 0 ] ; then
-			echo "None of the batteries have a charge above the auto-hibernation level." >> $OUTPUT
-			echo "Starting hibernation." >> $OUTPUT
-			$HIBERNATE_COMMAND
-			# Don't continue -- if things are configured correctly, then we
-			# will be called on resume.
-			exit 0			
-		fi
-		if [ "$ENOUGH_CHARGE" -eq 0 ] ; then
-			echo "None of the batteries have a charge above the minimum level." >> $OUTPUT
-			echo "Deactivating data loss sensitive features." >> $OUTPUT
-			ACTIVATE_WITH_POSSIBLE_DATA_LOSS=0
-		fi
+	else
+		ENOUGH_CHARGE=1
+		ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=1
+		echo "Not on AC and could not check battery state -- data loss sensitive features stay enabled and auto-hibernation will not work." >> $OUTPUT
+	fi
+	if [ "$ENABLE_AUTO_HIBERNATION" -ne 0 -a "$ENOUGH_CHARGE_TO_PREVENT_HIBERNATION" -eq 0 ] ; then
+		echo "None of the batteries have a charge above the auto-hibernation level." >> $OUTPUT
+		echo "Starting hibernation." >> $OUTPUT
+		$HIBERNATE_COMMAND
+		# Don't continue -- if things are configured correctly, then we
+		# will be called on resume.
+		exit 0			
+	fi
+	if [ "$ENOUGH_CHARGE" -eq 0 ] ; then
+		echo "None of the batteries have a charge above the minimum level." >> $OUTPUT
+		echo "Deactivating data loss sensitive features." >> $OUTPUT
+		ACTIVATE_WITH_POSSIBLE_DATA_LOSS=0
 	fi
 fi
 
