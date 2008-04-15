@@ -30,17 +30,24 @@ if [ x$CONTROL_START_STOP = x1 ] ; then
 	if [ $ON_AC -eq 1 ] ; then
 		if [ "$ACTIVATE" -eq 1 ] ; then		
 			START_STOP_DIR_PREFIX=/etc/laptop-mode/lm-ac
+			START_SERVICES="$LM_AC_START"
+			STOP_SERVICES="$LM_AC_STOP"			
 		else
 			START_STOP_DIR_PREFIX=/etc/laptop-mode/nolm-ac
+			START_SERVICES="$NOLM_AC_START"
+			STOP_SERVICES="$NOLM_AC_STOP"			
 		fi
 	else
 		START_STOP_DIR_PREFIX=/etc/laptop-mode/batt
+		START_SERVICES="$BATT_START"
+		STOP_SERVICES="$BATT_STOP"
 	fi
 	START_DIR="$START_STOP_DIR_PREFIX"-start
 	STOP_DIR="$START_STOP_DIR_PREFIX"-stop
 	if [ -d "$STOP_DIR" ] ; then
 		for SCRIPT in "$STOP_DIR"/* ; do
 			if [ -e "$SCRIPT" ] ; then
+				echo "Stopping $SCRIPT" >> $OUTPUT
 				"$SCRIPT" stop
 				# Dereference any links. When people configure
 				# the directories with links and then they remove
@@ -55,10 +62,63 @@ if [ x$CONTROL_START_STOP = x1 ] ; then
 	if [ -d "$START_DIR" ] ; then
 		for SCRIPT in "$START_DIR"/* ; do
 			if [ -e "$SCRIPT" ] ; then
+				echo "Starting $SCRIPT" >> $OUTPUT
 				"$SCRIPT" start
 				LINKTARGET=`readlink -f "$SCRIPT"`
 				sed -i "1i $LINKTARGET stop" /var/run/laptop-mode-tools/start-stop-undo-actions
 			fi
+		done
+	fi
+
+
+	echo "START_SERVICES = $START_SERVICES" >> $OUTPUT
+	echo "STOP_SERVICES = $STOP_SERVICES" >> $OUTPUT
+	if [ "$START_SERVICES" != "" -o "$STOP_SERVICES" != "" ] ; then
+		echo "Starting/stopping services" >> $OUTPUT
+	
+		# Determine how we can start/restart services.
+		if ( which invoke-rc.d > /dev/null ) ; then
+			# Debian uses invoke-rc.d
+			RCPROG="invoke-rc.d "
+			INITSCRIPT=laptop-mode
+		elif ( which service > /dev/null ) ; then
+			# RedHat uses service
+			RCPROG="service "
+			INITSCRIPT=laptop-mode
+		else
+			# Any other -- we start the init script it ourselves.
+
+			# Try non-link directories first, then try links. This helps if one of
+			# the locations is linked to another, which is the case on some distros.
+			if [ -d /etc/rc.d/init.d -a ! -L /etc/rc.d/init.d ] ; then
+				INIT_D=/etc/rc.d/init.d
+			elif [ -d /etc/rc.d -a ! -L /etc/rc.d -a ! -d /etc/rc.d/init.d ] ; then
+				INIT_D=/etc/rc.d
+			elif [ -d /etc/init.d -a ! -L /etc/init.d ] ; then
+				INIT_D=/etc/init.d
+			elif [ -d /etc/rc.d/init.d ] ; then
+				INIT_D=/etc/rc.d/init.d
+			elif [ -d /etc/rc.d ] ; then
+				INIT_D=/etc/rc.d
+			elif [ -d /etc/init.d ] ; then
+				INIT_D=/etc/init.d
+			else
+				echo "Cannot determine location of init scripts." >> $OUTPUT
+				exit 1
+			fi
+
+			RCPROG="$INIT_D/"
+		fi
+
+		for SERVICE in $STOP_SERVICES ; do
+			echo "Stopping service $SERVICE." >> $OUTPUT
+			$RCPROG$SERVICE stop
+			sed -i "1i $RCPROG$SERVICE start" /var/run/laptop-mode-tools/start-stop-undo-actions
+		done
+		for SERVICE in $START_SERVICES ; do
+			echo "Starting service $SERVICE." >> $OUTPUT
+			$RCPROG$SERVICE start
+			sed -i "1i $RCPROG$SERVICE stop" /var/run/laptop-mode-tools/start-stop-undo-actions
 		done
 	fi
    fi

@@ -51,6 +51,7 @@ LM_READAHEAD=3072
 NOLM_READAHEAD=128
 CONTROL_READAHEAD=1	
 CONTROL_NOATIME=0
+USE_RELATIME=1
 CONTROL_HD_IDLE_TIMEOUT=1
 LM_AC_HD_IDLE_TIMEOUT=4    # 20 seconds
 LM_BATT_HD_IDLE_TIMEOUT=4  # 20 seconds
@@ -851,7 +852,7 @@ fi
 # as no defaults have been given for them.
 
 # Note that the /usr/local/lib path is deprecated.
-export FORCE STATE ON_AC ACTIVATE ACTIVATE_WITH_POSSIBLE_DATA_LOSS KLEVEL WAS_ACTIVE
+export FORCE STATE ON_AC ACTIVATE ACTIVATE_WITH_POSSIBLE_DATA_LOSS KLEVEL KMINOR WAS_ACTIVE
 for SCRIPT in /usr/share/laptop-mode-tools/modules/* /usr/local/lib/laptop-mode-tools/modules/* /usr/local/share/laptop-mode-tools/modules/* /etc/laptop-mode/modules/*; do
 	if [ -x "$SCRIPT" ] ; then
 		echo "Invoking module $SCRIPT." >> $OUTPUT

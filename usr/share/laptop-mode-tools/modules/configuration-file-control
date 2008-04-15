@@ -107,7 +107,7 @@ if [ x$CONTROL_CONFIG_FILES = x1 ] ; then
 
 		for SERVICE in $CONFIG_FILE_RELOAD_SERVICES ; do
 			echo "Reloading service $SERVICE." >> $OUTPUT
-			$RCPROG$INITSCRIPT reload
+			$RCPROG$SERVICE reload
 		done
 	fi
 fi

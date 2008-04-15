@@ -1,4 +1,4 @@
-1.40 -- 14 April 2008
+1.40 -- 15 April 2008
 
     * Add support for getting lid button state from HAL instead of from
       /proc/acpi.
@@ -41,6 +41,13 @@
     * Converted all scripts to use /bin/sh instead of /bin/bash. This should
       yield performance improvements on systems that use a non-bash shell.
       Tested using dash on Ubuntu.
+    * Added support for starting/stopping services by service name to the
+      start-stop-programs module. That's a lot more user friendly than having to
+      create symlinks in directories.
+    * Added the USE_RELATIME option, which causes laptop mode tools to remount
+      file systems using "relatime" instead of "noatime".
+    * Changed default maximum CPU frequency on battery to "fastest", to satisfy
+      the "race to idle" principle.
 
 1.36 -- 2 March 2008
 

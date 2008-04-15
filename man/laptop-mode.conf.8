@@ -117,7 +117,15 @@ high, because the readahead applies to all files that are read!
 When this option is enabled, laptop mode tools places the "noatime" option in the mount options
 of your filesystems when laptop mode is active. This option has the effect of disabling 
 access time logging on files, which may save some disk activity. If you use programs that depend
-on access times (e.g., mutt), then you should disable this option. 
+on access times (e.g., mutt), then you should disable this option, or enable the \fBUSE_RELATIME\fP
+option.
+
+.IP "\fBUSE_RELATIME\fP" 10 
+When this option is enabled together with the \fBCONTROL_NOATIME\fP option, laptop
+mode tools will use the relatime option instead of the noatime option. This option
+works for more applications, and still causes relatively low levels of disk writes.
+Note that this functionality is only available in recent kernel versions, and laptop
+mode tools will ignore this setting for kernels before 2.6.23.
 
 .IP "\fBCONTROL_HD_IDLE_TIMEOUT\fP" 10 
 When this option is enabled, laptop mode tools adjusts your hard drives' idle timeouts, i.e.,
@@ -424,6 +432,20 @@ commonalities between modes at this point, i.e., if the mode you're coming
 from and the mode you're going to both specify that a daemon "X" should be
 stopped, then the daemon will be un-stopped (that is, started) while leaving
 the previous mode, and then stopped again.
+
+
+.IP "\fBBATT_STOP\fP" 10
+.IP "\fBBATT_START\fP" 10
+.IP "\fBLM_AC_STOP\fP" 10
+.IP "\fBLM_AC_START\fP" 10
+.IP "\fBNOLM_AC_STOP\fP" 10
+.IP "\fBNOLM_AC_START\fP" 10
+These options allow you to stop services (through their init scripts) in certain
+power states. Specify a space-separated list of service names in these options.
+These services are started/stopped together with the files from the directories
+mentioned above. 
+
+
 
 
 .SS "\fI/etc/laptop-mode/conf.d/ac97-powersave.conf\fP"

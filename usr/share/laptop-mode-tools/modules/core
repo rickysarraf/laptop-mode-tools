@@ -20,7 +20,7 @@ remove_numeric_mount_option () {
 
 # Remove an option (the first parameter) without any arguments from
 # a mount option string (the rest of the parameters).
-remove_yesno_mount_option () {
+remove_fixed_mount_option () {
 	OPT="$1"
 	shift
 	echo ",$*," | sed		\
@@ -30,28 +30,30 @@ remove_yesno_mount_option () {
 	 -e 's/,$//'
 }
 
-# Find out the state of a yes/no option (e.g. "atime"/"noatime") in
-# a set of mount options, and use this state to replace the
-# value of the option in another mount options string.
+# Find out the state of an atime option ("atime"/"noatime"/"relatime"/"norelatime")
+# in a set of mount options, and use this state to replace the value of the
+# option in another mount options string.
 #
 # Example:
-# replace_yesno_mount_option atime atime defaults,user=1000,atime defaults,noatime
+# replace_atime_mount_option defaults,user=1000,atime defaults,noatime
 #
 # This yields "defaults,atime".
-replace_yesno_mount_option () {
-	OPT="$1"
-	DEF_OPT="$2"
-	REPLACEMENT_OPTS="$3"
-	OPTS="$4"
-	PARSEDOPTS="$(remove_yesno_mount_option $OPT $OPTS)"
-	PARSEDOPTS="$(remove_yesno_mount_option no$OPT $PARSEDOPTS)"
+replace_atime_mount_option () {
+	REPLACEMENT_OPTS="$1"
+	OPTS="$2"
+	PARSEDOPTS="$(remove_fixed_mount_option atime $OPTS)"
+	PARSEDOPTS="$(remove_fixed_mount_option noatime $PARSEDOPTS)"
+	PARSEDOPTS="$(remove_fixed_mount_option relatime $PARSEDOPTS)"	
+	PARSEDOPTS="$(remove_fixed_mount_option norelatime $PARSEDOPTS)"	
 
-	if echo ",$REPLACEMENT_OPTS," | grep ",no$OPT," > /dev/null ; then
-		echo "$PARSEDOPTS,no$OPT"
-	elif echo ",$REPLACEMENT_OPTS," | grep ",$OPT," > /dev/null ; then
-		echo "$PARSEDOPTS,$OPT"
+	if echo ",$REPLACEMENT_OPTS," | grep ",relatime," > /dev/null ; then
+		echo "$PARSEDOPTS,relatime"
+	elif echo ",$REPLACEMENT_OPTS," | grep ",noatime," > /dev/null ; then
+		echo "$PARSEDOPTS,noatime"
 	else
-		echo "$PARSEDOPTS,$DEF_OPT"
+		# Kind of strange: to go from relatime to atime, we have to
+		# explicitly specify norelatime.
+	 	echo "$PARSEDOPTS,atime,norelatime"
 	fi
 }
 
@@ -117,7 +119,18 @@ set_sysctl() {
 
 
 if [ $CONTROL_NOATIME -eq 1 ] ; then
-	NOATIME_OPT=",noatime"
+	if [ "$KLEVEL" = "2.4" ] ; then
+		echo "Relatime is not supported on 2.4 kernels. Using noatime instead" >> $OUTPUT 
+		USE_RELATIME=0
+	elif [ "$KLEVEL" = "2.6" -a "$KMINOR" -lt 23 ] ; then
+		echo "Relatime is not supported on kernels before 2.6.23. Using noatime instead." >> $OUTPUT
+		USE_RELATIME=0
+	fi
+	if [ "$USE_RELATIME" = 1 ] ; then
+		NOATIME_OPT=",relatime"
+	else
+		NOATIME_OPT=",noatime"
+	fi
 fi
 
 
@@ -335,12 +348,12 @@ else
 					case "$FST" in
 						"ext3"|"reiserfs")								
 							PARSEDOPTS="$(replace_numeric_mount_option commit commit=0 $SAVED_OPTS $OPTS)"
-							PARSEDOPTS="$(replace_yesno_mount_option atime atime $SAVED_OPTS $PARSEDOPTS)"
+							PARSEDOPTS="$(replace_atime_mount_option $SAVED_OPTS $PARSEDOPTS)"
 							echo Executing: mount $DEV -t $FST $MP -o remount,$PARSEDOPTS >> $OUTPUT
 							mount $DEV -t $FST $MP -o remount,$PARSEDOPTS
 							;;
 						*)
-							PARSEDOPTS="$(replace_yesno_mount_option atime atime $SAVED_OPTS $OPTS)"
+							PARSEDOPTS="$(replace_atime_mount_option $SAVED_OPTS $OPTS)"
 							echo Executing: mount $DEV -t $FST $MP -o remount,$PARSEDOPTS >> $OUTPUT
 							mount $DEV -t $FST $MP -o remount,$PARSEDOPTS
 							;;
