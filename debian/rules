@@ -29,8 +29,8 @@ build-stamp: configure-stamp
 clean:
 	dh_testdir
 	dh_testroot
-	-rm debian/laptop-mode-tools.laptop-mode.init
-	-rm -f build-stamp configure-stamp
+	rm -f debian/laptop-mode-tools.laptop-mode.init
+	rm -f build-stamp configure-stamp
 	dh_clean 
 
 DESTDIR=$(CURDIR)/debian/laptop-mode-tools
