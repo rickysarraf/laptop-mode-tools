@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /bin/sh
 
 set -e
 
@@ -7,78 +7,8 @@ if [ ! -f /etc/laptop-mode/laptop-mode.conf -o ! -f /usr/sbin/laptop_mode ] ; th
   exit 1
 fi
 
-. /usr/sbin/laptop_mode readconfig
+echo "lm-syslog-setup is no longer supported. Please use the module"
+echo "configuration-file-control, which provides similar funcionality. It is"
+echo "configured using the file:"
+echo "    /etc/laptop-mode/conf.d/configuration-file-control.conf."
 
-if [ ! -f $SYSLOG_CONF ] ; then
-  echo Syslog configuration file \"$SYSLOG_CONF\" not found. 
-  echo Please configure the correct path in /etc/laptop-mode/laptop-mode.conf.
-  exit 1
-fi
-
-echo This script helps you to set up separate syslog.conf files for the
-echo various modes a laptop can be in. Switching between the configurations
-echo is managed by the Laptop Mode Tools. While laptop mode is enabled, your
-echo original syslog.conf will be saved with with the .no-lm extension, i.e.
-echo it will be called $SYSLOG_CONF.no-lm. While laptop mode is NOT enabled,
-echo your syslog.conf will be as normal.
-echo
-
-if [ "`readlink $SYSLOG_CONF`" != "" ] ; then
-  echo $SYSLOG_CONF already seems to be symlinked. Either lm-syslog-setup
-  echo has already been called, or some other program manages the syslog.conf
-  echo symlink. This script will not continue, for safety reasons.
-  exit 1
-fi
-
-echo Creating config files:
-echo
-echo -n AC power, laptop mode off: $NOLM_AC_SYSLOG_CONF
-if [ -f "$NOLM_AC_SYSLOG_CONF" ] ; then
-  echo " (exists)"
-else
-  if ( cp -a "$SYSLOG_CONF" "$NOLM_AC_SYSLOG_CONF" ) ; then
-    echo " (created)"
-  else
-    echo " (creation failed, exiting)"
-    exit 1
-  fi
-fi
-echo -n AC power, laptop mode on: $LM_AC_SYSLOG_CONF
-if [ -f "$LM_AC_SYSLOG_CONF" ] ; then
-  echo " (exists)"
-else
-  if ( cp -a "$SYSLOG_CONF" "$LM_AC_SYSLOG_CONF" ) ; then
-    echo " (created)"
-  else
-    echo " (creation failed, exiting)"
-    exit 1
-  fi
-fi
-echo -n Battery power: $BATT_SYSLOG_CONF
-if [ -f "$BATT_SYSLOG_CONF" ] ; then
-  echo " (exists)"
-else
-  if ( cp -a "$SYSLOG_CONF" "$BATT_SYSLOG_CONF" ) ; then
-    echo " (created)"
-  else
-    echo " (creation failed, exiting)"
-    exit 1
-  fi
-fi
-echo
-while [ "$DO_ENABLE" != "y" -a "$DO_ENABLE" != "n" ] ; do
-  echo -n "Do you wish to enable the split configuration now? (y/n) "
-  read DO_ENABLE
-done
-if [ "$DO_ENABLE" == "y" ] ; then
-  sed -i /etc/laptop-mode/laptop-mode.conf -e "s/DO_SYSLOG=0/DO_SYSLOG=1/"
-  sed -i /etc/laptop-mode/laptop-mode.conf -e "s/CONTROL_SYSLOG_CONF=0/CONTROL_SYSLOG_CONF=1/"
-  if ( ! grep DO_SYSLOG=1 /etc/laptop-mode/laptop-mode.conf ) && ( ! grep CONTROL_SYSLOG_CONF=1 /etc/laptop-mode/laptop-mode.conf ) ; then
-    echo Enabling the split configuration failed.
-    exit 1
-  else
-    echo Enabling the split configuration succeeded.
-    echo Restarting laptop mode to activate changes.
-    /usr/sbin/laptop_mode auto force
-  fi
-fi

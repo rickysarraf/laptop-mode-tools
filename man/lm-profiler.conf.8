@@ -1,18 +1,20 @@
 .TH "LM-PROFILER.CONF" "8" 
 .SH "NAME" 
-lm-profiler.conf \- Configuration file for \fBlm-profiler\fR, a profiler
-for laptop-mode-tools.
+.I /etc/laptop-mode/lm-profiler.conf
+\- Configuration file for \fIlm-profiler\fP, a profiler for laptop-mode-tools.
 .SH "DESCRIPTION" 
 .PP 
-This manual page documents the options that can be set in the lm-profiler.conf configuration file. 
-For a description of what lm-profiler does, see the lm-profiler(8) manpage.
+This manual page documents the options that can be set in the 
+.I /etc/laptop-mode/lm-profiler.conf
+configuration file.  For a description of what lm-profiler does, see the
+lm-profiler(8) manpage.
 
 .SH "SETTINGS" 
 .PP 
-The syntax of options is OPTION=value. 
+The syntax of options is \fBOPTION=value\fP. 
 
 .PP
-The following settings are available in lm-profiler.conf: 
+The following settings are available in \fIlm-profiler.conf\fP: 
 
 .IP "\fBVERBOSE_OUTPUT\fP" 10
 Set this to 1 if you want to see a lot of output when you run lm-profiler, 
@@ -37,14 +39,14 @@ respectively, in seconds.
 
 .IP "\fBRECOMMEND_DEFAULT_SERVICES\fP" 10 
 .IP "\fBDEFAULT_SERVICES\fP" 10
-If RECOMMEND_DEFAULT_SERVICES is set to 1 (enabled), then lm-profiler will always
-suggest turning off the services listed in DEFAULT_SERVICES (separated by
+If \fBRECOMMEND_DEFAULT_SERVICES\fP is set to 1 (enabled), then lm-profiler will always
+suggest turning off the services listed in \fBDEFAULT_SERVICES\fP (separated by
 spaces).
  
 .IP "\fBIGNORE_PROGRAMS\fP" 10 
 Programs listed in this option, separated by spaces, will be ignored for
 disk activity profiling. The default settings (which can be referenced
-as $DEF_IGNORE_PROGRAMS) include common utility programs and all programs
+as \fB$DEF_IGNORE_PROGRAMS\fP) include common utility programs and all programs
 used by lm-profiler itself.
 
 .IP "\fBRECOMMEND_NETWORK_SERVICES\fP" 10 
@@ -55,12 +57,16 @@ them.
 .IP "\fBIGNORE_NETWORK_SERVICES\fP" 10 
 Services listed in this configuration option (separated by spaces) are not
 suggested as a network service by lm-profiler. The default values can be
-accessed as $DEF_IGNORE_NETWORK_SERVICES.
+accessed as \fB$DEF_IGNORE_NETWORK_SERVICES\fP.
  
 
 .SH "SEE ALSO" 
 .PP 
 lm-profiler(8).
+.PP
+laptop_mode(8).
+.PP
+laptop-mode.conf(8).
 .SH "AUTHOR" 
 .PP 
 This manual page was written by Bart Samwel (bart@samwel.tk). Permission is 

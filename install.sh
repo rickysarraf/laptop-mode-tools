@@ -1,11 +1,11 @@
-#! /bin/bash
+#! /bin/sh
 
 # If your distribution puts this in other locations, please adjust the values of
 # these variables before installing!
 # INIT_D=/etc/init.d
 MAN_D=/usr/local/man/man8
 
-if [ "$INIT_D" == "" ] ; then
+if [ "$INIT_D" = "" ] ; then
 	# Try non-link directories first, then try links. This helps if one of
 	# the locations is linked to another, which is the case on some distros.
 	if [ -d /etc/rc.d/init.d -a ! -L /etc/rc.d/init.d ] ; then
@@ -180,7 +180,7 @@ if [ -d /proc/pmu -a -d /etc/power ] ; then
 		fi
 		touch /etc/power/pwrctl-local
 		if ( ! grep laptop_mode /etc/power/pwrctl-local ) ; then
-			(echo "#! /bin/bash" ; echo "/usr/sbin/laptop_mode auto" ; cat /etc/power/pwrctl-local) > /etc/power/pwrctl-local-tmp
+			(echo "#! /bin/sh" ; echo "/usr/sbin/laptop_mode auto" ; cat /etc/power/pwrctl-local) > /etc/power/pwrctl-local-tmp
 			cat /etc/power/pwrctl-local-tmp /etc/power/pwrctl-local
 			rm /etc/power/pwrctl-local-tmp
 		else

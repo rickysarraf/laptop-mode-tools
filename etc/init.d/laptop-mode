@@ -1,4 +1,4 @@
-#!/bin/sh
+#! /bin/sh
 #
 # chkconfig: - 20 90
 # description: Starts and stops "laptop-mode" - tweaks system behavior

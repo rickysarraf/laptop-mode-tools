@@ -1,3 +1,54 @@
+1.40 -- 15 April 2008
+
+    * Add support for getting lid button state from HAL instead of from
+      /proc/acpi.
+    * Sanity check -- battery levels of 0 are interpreted as errors and do not
+      cause auto-hibernation.
+    * Improved checking for presence of ACPI batteries, so that absent batteries
+      do not cause auto-hibernation.
+    * Support /sys/class/power_supply interface to determine battery levels.
+    * Added generic support for configuration file swapping, in the form of the
+      module "configuration-file-control". The old syslog configuration control
+      feature is deprecated, removed from the default config file, and removed
+      from the manual page (except for a section mentioning that it is
+      deprecated). By default the new module has settings to support syslogd,
+      syslog-ng and rsyslogd.
+    * Laptop mode was not run when the enabled/disabled state changed, but none
+      of the other states changed. This was incorrect, because esp. the config
+      files should be restored to their non-laptop-mode-tools variants when
+      laptop mode tools is stopped.
+    * Add the module "wireless-iwl-power" for setting the power levels for
+      Intel 3945 and 4965 wireless adapters when using the iwlwifi drivers.
+    * Moved CONTROL_START_STOP to start-stop-programs.conf, and the code into
+      a separate module.
+    * Moved auto-hibernation settings to auto-hibernate.conf.
+    * Moved terminal blanking settings into terminal-blanking.conf, and the code
+      into a separate module.
+    * Moved CPU frequency settings to cpufreq.conf, and the code into a separate
+      module.
+    * Moved LCD brightness settings to lcd-brightness.conf, and the code into a
+      separate module.
+    * Moved DPMS standby settings to dpms-standby.conf, and the code into a
+      separate module.
+    * Moved hdparm functionality to hdparm module (config remains in main
+      config file).
+    * Moved core laptop_mode functionality to core module (config remains in
+      config file).
+    * laptop-mode.conf(8) manual page split up by module; updated to include all
+      modules (because some modules were not documented yet).
+    * All manual pages updated to correct standards: file names in italics,
+      config values in bold.
+    * Converted all scripts to use /bin/sh instead of /bin/bash. This should
+      yield performance improvements on systems that use a non-bash shell.
+      Tested using dash on Ubuntu.
+    * Added support for starting/stopping services by service name to the
+      start-stop-programs module. That's a lot more user friendly than having to
+      create symlinks in directories.
+    * Added the USE_RELATIME option, which causes laptop mode tools to remount
+      file systems using "relatime" instead of "noatime".
+    * Changed default maximum CPU frequency on battery to "fastest", to satisfy
+      the "race to idle" principle.
+
 1.36 -- 2 March 2008
 
     * Support /sys/class/power_supply interface to determine power state.

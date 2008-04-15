@@ -1,0 +1,244 @@
+#! /bin/sh
+#
+# Laptop mode tools module: adjust hard drive powermanagement settings
+#
+# This is a core module that takes its configuration from the main config
+# file.
+#
+
+
+#
+# Function for drive capability check. This prevents ugly errors in
+# the kernel output about unsupported commands.
+#
+# $1 = drive name
+# $2 = capability (SDPARM/HDPARM or IDLE_TIMEOUT/POWERMGMT/WRITECACHE)
+is_capable() {
+	local dev=${1#/dev/}
+	local MEDIA=
+	local BUS=
+
+	HAVE_UDEVINFO=0
+	if [ -x "$(which udevinfo 2> /dev/null)" ] ; then
+		UDEVVERSION=$(udevinfo -V | awk '{ print $3; }')
+		if [ "$UDEVVERSION" -gt 70 ] ; then
+			HAVE_UDEVINFO=1
+		else
+			echo "udevinfo present but version not > 070, not using udev" >> $OUTPUT
+		fi
+	fi
+	
+	# If we are running udev, this is the most portable way
+	# It assumes more or less recent udev (> 070)
+	if [ $HAVE_UDEVINFO -ne 0 ] ; then
+		echo -n "Querying $1 media type using udevinfo: " >> $OUTPUT
+		eval "$(udevinfo -q env -n $1 2>> $OUTPUT | egrep '(ID_TYPE=|ID_BUS=)' 2>&1 | tee -a $OUTPUT)"
+		if [ -n "$ID_TYPE" -a -n "$ID_BUS" ] ; then
+			echo "type '$ID_TYPE on bus '$ID_BUS' detected" >> $OUTPUT
+			MEDIA=$ID_TYPE
+			BUS=$ID_BUS
+		else
+			echo "failed - udev not active?" >> $OUTPUT
+		fi
+	fi
+
+	if [ -z "$MEDIA" ] ; then
+		echo -n "Querying $1 media type using device name: " >> $OUTPUT
+		case $dev in
+			hd*)	# IDE device
+				if [ -r /proc/ide/$dev/media ]; then
+					MEDIA="$(cat /proc/ide/$dev/media)"
+					BUS=ata
+					if [ "$MEDIA" = cdrom ] ; then
+						MEDIA=cd
+					fi
+				fi
+			;;
+			sd*)	# SCSI disk
+				# No need to check, sd is always SCSI disk
+				MEDIA=disk
+				BUS=scsi
+			;;
+			sr* | scd* )
+				# No need to check, sr or scd is always SCSI CD-ROM
+				MEDIA=cd
+				BUS=scsi
+			;;
+
+		esac
+		if [ -n "$MEDIA" ] ; then
+			echo "type '$MEDIA' on bus '$BUS' detected" >> $OUTPUT
+		else
+			echo "failed - unknown name" >> $OUTPUT
+		fi
+	fi
+
+	if [ -z "$MEDIA" ] ; then
+		if [ -x "$(which hdparm 2> /dev/null)" ]; then
+			echo -n "Querying $1 type using hdparm: " >> $OUTPUT
+			if hdparm -I $1 2> $OUTPUT | grep -q CD-ROM >> $OUTPUT 2>&1 ; then
+				MEDIA=cd
+			else
+				MEDIA=disk
+			fi
+			BUS=ata # or acts like it anyway, because hdparm supports it.
+			echo "type '$MEDIA' on bus '$BUS' detected" >> $OUTPUT
+		fi
+	fi
+
+	# Sanity check
+	if [ -z "$MEDIA" -o -z "$BUS" ] ; then
+		echo "Querying $1 type - unknown type or bus, disabling hdparm/sdparm" >> $OUTPUT
+		return 1
+	fi
+
+	if [ "$BUS" = "scsi" -a "$ASSUME_SCSI_IS_SATA" -ne 0 ] ;then
+		# Treat scsi disks as SATA devices. Unfortunately they are hard
+		# to recognize -- if anybody has a drive and cares to find out
+		# how to recognize them, please enlighten me!
+		BUS=ata
+	fi
+
+	# Now check what capabilities we support for the
+	# various media and bus types.
+	case "$MEDIA:$BUS:$2" in
+		# Although CD-ROM drives usually support
+		# idle timeout settings, they don't usually
+		# support very low values, and we don't want
+		# to mess with that. We simply ignore anything
+		# that is a CD player.
+		cd:*:* ) return 1;;
+
+		# ATA drives support the "hdparm" command but
+		# not normally the "sdparm" command.
+		*:ata:HDPARM ) return 0 ;;
+		*:ata:SDPARM ) return 1 ;;
+		
+		# SCSI drives support the "sdparm" command, but
+		# not normally the "hdparm" command.
+		*:scsi:SDPARM ) return 0 ;;
+		*:scsi:HDPARM ) return 1 ;;
+
+		# On ATA disks everything is supported.
+		disk:ata:* ) return 0 ;;
+
+		# For sdparm we only know how to set the idle
+		# timeout, nothing else at the moment.
+		*:scsi:IDLE_TIMEOUT ) return 0 ;;
+
+		# No other capabilities are supported.
+		* ) return 1 ;;
+	esac
+}
+
+if [ x$CONTROL_HD_POWERMGMT = x1 ] ; then
+	if [ $ON_AC -eq 1 ] ; then
+		if [ "$ACTIVATE" -eq 1 ] ; then
+			HD_POWERMGMT=$LM_AC_HD_POWERMGMT
+		else
+			HD_POWERMGMT=$NOLM_AC_HD_POWERMGMT
+		fi
+	else
+		HD_POWERMGMT=$BATT_HD_POWERMGMT
+	fi
+
+	echo "Setting powermanagement on drives to $HD_POWERMGMT." >> $OUTPUT
+	for THISHD in $HD ; do
+		if is_capable $THISHD POWERMGMT ; then
+			if is_capable $THISHD HDPARM ; then
+				if [ ! -e `which hdparm 2> /dev/null` ] ; then
+					echo "ERROR: hdparm not installed."
+				else
+					echo "Executing: hdparm -B $HD_POWERMGMT $THISHD" >> $OUTPUT
+					hdparm -B $HD_POWERMGMT $THISHD >> $OUTPUT 2>&1
+				fi
+			else
+				echo "Skipping $THISHD: powermgmt only possible with hdparm but drive does not" >> $OUTPUT
+				echo "support hdparm." >> $OUTPUT
+			fi
+		else
+			echo "Skipping $THISHD: powermanagement control not supported." >> $OUTPUT
+		fi
+	done
+fi
+
+if [ x$CONTROL_HD_IDLE_TIMEOUT = x1 ] ; then
+	# Spindown timeouts may only be set when data-loss sensitive
+	# features are active.
+	if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 1 ] ; then
+		if [ $ON_AC -eq 1 ] ; then
+			HD_IDLE_TIMEOUT=$LM_AC_HD_IDLE_TIMEOUT
+			HD_IDLE_TIMEOUT_SECONDS=$LM_AC_HD_IDLE_TIMEOUT_SECONDS
+		else
+			HD_IDLE_TIMEOUT=$LM_BATT_HD_IDLE_TIMEOUT
+			HD_IDLE_TIMEOUT_SECONDS=$LM_BATT_HD_IDLE_TIMEOUT_SECONDS
+		fi
+	else
+		HD_IDLE_TIMEOUT=$NOLM_HD_IDLE_TIMEOUT
+		HD_IDLE_TIMEOUT_SECONDS=$NOLM_HD_IDLE_TIMEOUT_SECONDS
+	fi
+	echo "Setting spindown timeout on drives to $HD_IDLE_TIMEOUT_SECONDS seconds." >> $OUTPUT
+	echo "(hdparm configuration value = $HD_IDLE_TIMEOUT.)" >> $OUTPUT
+	for THISHD in $HD ; do
+		if is_capable $THISHD IDLE_TIMEOUT ; then
+			if is_capable $THISHD HDPARM ; then
+				if [ ! -e `which hdparm 2> /dev/null` ] ; then
+					echo "ERROR: hdparm not installed."
+				else
+					echo "Executing: hdparm -S $HD_IDLE_TIMEOUT $THISHD" >> $OUTPUT
+					hdparm -S $HD_IDLE_TIMEOUT $THISHD >> $OUTPUT 2>&1
+				fi
+			elif is_capable $THISHD SDPARM ; then
+				if [ ! -e `which sdparm 2> /dev/null` ] ; then
+					echo "ERROR: sdparm not installed."
+				else
+					HD_IDLE_TIMEOUT_DECISECONDS=$(($HD_IDLE_TIMEOUT_SECONDS*10))
+					echo "Executing: sdparm -q -s SCT=$HD_IDLE_TIMEOUT_DECISECONDS $THISHD" >> $OUTPUT
+					sdparm -q -s SCT=$HD_IDLE_TIMEOUT_DECISECONDS $THISHD >> $OUTPUT 2>&1
+				fi
+			else
+				echo "Skipping $THISHD: drive supports neither hdparm nor sdparm." >> $OUTPUT
+			fi
+		else
+			echo "Skipping $THISHD: idle timeout control not supported." >> $OUTPUT
+		fi
+	done
+fi
+
+if [ x$CONTROL_HD_WRITECACHE = x1 ] ; then
+	# The writecache may only be enabled when data-loss sensitive
+	# features are active.
+
+	if [ "$ACTIVATE" -eq 1 ] ; then
+		if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 0 ] ; then
+			HD_WRITECACHE=0
+		else
+			HD_WRITECACHE=$LM_HD_WRITECACHE
+		fi
+	else
+		if [ $ON_AC -eq 1 ] ; then
+			HD_WRITECACHE=$NOLM_AC_HD_WRITECACHE
+		else
+			HD_WRITECACHE=$NOLM_BATT_HD_WRITECACHE
+		fi
+	fi
+	echo "Setting write cache on drives to $HD_WRITECACHE." >> $OUTPUT
+	for THISHD in $HD ; do
+		if is_capable $THISHD WRITECACHE ; then
+			if is_capable $THISHD HDPARM ; then
+				if [ ! -e `which hdparm 2> /dev/null` ] ; then
+					echo "ERROR: hdparm not installed."
+				else
+					echo "Executing: hdparm -W $HD_WRITECACHE $THISHD" >> $OUTPUT
+					hdparm -W $HD_WRITECACHE $THISHD >> $OUTPUT 2>&1
+				fi
+			else
+				echo "Skipping $THISHD: writecache only possible with hdparm but drive does not" >> $OUTPUT
+				echo "support hdparm." >> $OUTPUT
+			fi
+		else
+			echo "Skipping $THISHD: writecache control not supported." >> $OUTPUT
+		fi
+	done
+fi
+

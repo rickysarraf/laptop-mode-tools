@@ -1,40 +1,48 @@
 .TH "LAPTOP_MODE" "8" 
 .SH "NAME" 
-/usr/sbin/laptop_mode \- start and stop laptop mode 
+.I /usr/sbin/laptop_mode
+\- apply laptop mode settings
 .SH "SYNOPSIS" 
 .B /usr/sbin/laptop_mode [
 .I cmd
 .B ] [ force ]
 .SH "DESCRIPTION" 
 This manual page documents briefly the 
-.B /usr/sbin/laptop_mode
-command. 
-.B /usr/sbin/laptop_mode
-is a program that enables and 
-disables laptop mode. Laptop mode is a feature included in Linux 
-kernels with versions 2.6.6 and higher, and 2.4.23 and higher. The 
-intent of laptop mode is to increase battery life by letting your 
+.I /usr/sbin/laptop_mode
+command. laptop_mode is a program that applies the settings given in the
+.I /etc/laptop-mode/laptop-mode.conf
+configuration file. The primary use is to control the laptop mode feature
+included in Linux kernels with versions 2.6.6 and higher, and 2.4.23 and higher.
+This feature increases battery life by letting your 
 hard drive spin down. This is achieved by grouping disk write 
 activity into "chunks" that are spaced at larger intervals than 
-they normally would be. 
+they normally would be. In addition to supporting the Linux kernel's laptop mode
+feature,
+.I /usr/sbin/laptop_mode
+also supports various power saving modules which are configured through
+configuration files in the
+.I /etc/laptop-mode/conf.d
+directory. 
+.PP
+It is not recommended to call
+.I /usr/sbin/laptop_mode
+directly to start or stop laptop mode, except in hardware event handlers. To
+apply new configuration settings from \fIlaptop-mode.conf\fP, call the
+laptop-mode service init script with the reload parameter.
 .SH "COMMANDS" 
-Specify \fBforce\fP as the second parameter to force laptop_mode to re-apply a state even if the computer is already in that state. These are the values that are allowed for
-.B cmd
+Specify \fBforce\fP as the second parameter to force laptop_mode to re-apply
+a state even if the computer is already in that state. These are the values that
+are allowed for
+.I cmd
 : 
-.IP "\fBstart" 
-Enable laptop mode. Note: if the service  
-.B /etc/init.d/laptop-mode
-has not been started, laptop mode will never be enabled. 
-.IP "\fBstop" 
-Disable laptop mode. 
-.IP "\fBauto" 
-Enable or disable laptop mode based on the current power state. This only works for ACPI or APM laptops. Note: if the service  
-.B /etc/init.d/laptop-mode
-has not been started, laptop mode will never be enabled.
-.IP "\fBstatus"
+.IP "\fBauto\fP" 10
+Enable or disable laptop mode based on the current power state. Note that
+this will not do anything if the laptop-mode service has not been
+started!
+.IP "\fBstatus\fP" 10
 Display a status report about everything that laptop_mode affects.
 .SH "SEE ALSO" 
-laptop-mode.conf(8). 
+laptop-mode.conf(8).
 .SH "AUTHOR" 
 This manual page was written by Bart Samwel (bart@samwel.tk) for 
 the 

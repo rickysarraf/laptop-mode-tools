@@ -1,7 +1,8 @@
 #!/usr/bin/make -f
 # -*- makefile -*-
-# Sample debian/rules that uses debhelper.
+# Based on a sample debian/rules that uses debhelper.
 # GNU copyright 1997 to 1999 by Joey Hess.
+# Modifications Copyright 2008 by Bart Samwel
 
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1

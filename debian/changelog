@@ -1,8 +1,16 @@
-laptop-mode-tools (1.36-2) UNRELEASED; urgency=low
+laptop-mode-tools (1.40-1) UNRELEASED; urgency=high
 
   * Upgrade standards version to 3.7.3.
+  * Add hal to recommends due to upstream changes.
+  * New upstream version 1.40:
+    * Add support for getting lid button state from HAL instead of from
+      /proc/acpi. 
+    * Support /sys/class/power_supply interface to determine battery levels.
+      Closes: #475926
+    * Add generic support for config file swapping. Closes: #475304
+    * Add module for iwlwifi power management. Closes: #475407
 
- -- Bart Samwel <bart@samwel.tk>  Sat, 8 Mar 2008 16:40:00 +0200
+ -- Bart Samwel <bart@samwel.tk>  Tue, 15 Apr 2008 17:20:00 +0200
 
 laptop-mode-tools (1.36-1) unstable; urgency=low
 

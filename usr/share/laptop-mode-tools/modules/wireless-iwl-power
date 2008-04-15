@@ -1,0 +1,68 @@
+#! /bin/sh
+# 
+# Laptop mode tools module, called from /usr/sbin/laptop_mode.
+# Configuration in /etc/laptop-mode/conf.d/wireless-ipw-power.conf.
+#
+# PURPOSE: power saving for the Intel 3945 and 4965 adapters when using the
+#          iwlwifi drivers.
+#
+# This script relies upon the name of the driver.
+#
+
+#
+# Find all the wireless devices using the supplied driver names.
+# Place the interface names on the list WIFI_IFNAMES.
+#
+findWifiIfsByDriver () {
+    local DEVICE;
+    local LINK_TARGET;
+
+    for DEVICE in /sys/class/net/*; do
+	if [ -d $DEVICE/wireless ]; then
+		# See if the driver for $DEVICE matches the supplied one by checking the link to
+		# the driver.
+	    	if [ -h $DEVICE/device/driver ]; then
+			LINK_TARGET=`readlink $DEVICE/device/driver | sed 's/.*\///'`
+
+			if [ $LINK_TARGET = $1 ] ; then
+
+				# add the interface name to the list
+		    		WIFI_IFNAMES=$WIFI_IFNAMES" "`echo -n $DEVICE | sed 's/.*\///'`
+			fi
+	    	fi
+	fi
+    done
+}
+
+if [ $CONTROL_IWL_POWER -eq 1 ] ; then
+	echo "Setting power levels for iwlwifi wireless interfaces." >> $OUTPUT
+
+	# Provide defaults for config file settings
+	if [ x$IWL_AC_POWER = x ] ; then
+		IWL_AC_POWER=6
+	fi
+	if [ x$IWL_BATT_POWER = x ] ; then
+		IWL_BATT_POWER=7
+	fi
+
+
+
+	WIFI_IFNAMES=""
+	findWifiIfsByDriver iwl3945
+	findWifiIfsByDriver iwl4965
+	for IF in $WIFI_IFNAMES ; do
+		if [ $ON_AC -eq 1 ] ; then
+			echo "On AC power: setting power level for $IF to $IWL_AC_POWER." >> $OUTPUT
+			if ( ! echo $IWL_AC_POWER > /sys/class/net/$IF/device/power_level ) ; then
+				echo "Failed." >> $OUTPUT
+			fi
+		else
+			echo "On battery: setting power level for $IF to $IWL_BATT_POWER." >> $OUTPUT
+			if ( ! echo $IWL_BATT_POWER > /sys/class/net/$IF/device/power_level ) ; then
+				echo "Failed." >> $OUTPUT
+			fi
+		fi
+	done
+else
+	echo "Intel IWL Wireless power setting is disabled." >> $OUTPUT
+fi
