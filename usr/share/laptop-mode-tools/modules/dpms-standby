@@ -1,0 +1,34 @@
+#! /bin/sh
+#
+# Laptop mode tools module: control X display standby / suspend / off using DPMS
+#
+
+
+# Set X screen standby/suspend/powerdown timing
+if [ $CONTROL_DPMS_STANDBY -eq 1 ] ; then
+	if [ $ON_AC -eq 1 ]; then
+		if [ "$ACTIVATE" -eq 1 ]; then
+			STANDBY="$LM_AC_DPMS_STANDBY"
+			SUSPEND=$(($STANDBY+30))
+			OFF=$(($STANDBY+60))
+		else
+			STANDBY="$NOLM_AC_DPMS_STANDBY"
+			SUSPEND=$(($STANDBY+300))
+			OFF=$(($STANDBY+600))
+		fi
+	else
+		STANDBY="$BATT_DPMS_STANDBY"
+		SUSPEND=$(($STANDBY+30))
+		OFF=$(($STANDBY+60))
+	fi
+
+	who | while read -r DPMS_USER DPMS_SCREEN REMAINDER; do	        
+	        if su $DPMS_USER -c "xset -d $DPMS_SCREEN dpms $STANDBY $SUSPEND $OFF" 2>> $OUTPUT | grep -q display >> $OUTPUT 2>&1 ; then
+		        echo "Unable to set DPMS timeouts: X is not running on $DPMS_SCREEN" >> $OUTPUT
+	        else 
+		        echo "Set screen $DPMS_SCREEN for the user $DPMS_USER to standby in $STANDBY s, suspend in $SUSPEND s, powerdown in $OFF s" >> $OUTPUT
+		fi	
+        done
+else
+	echo "CONTROL_DPMS_STANDBY is disabled, skipping..." >> $OUTPUT
+fi

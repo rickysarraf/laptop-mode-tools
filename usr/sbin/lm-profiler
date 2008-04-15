@@ -1,4 +1,4 @@
-#!/bin/bash
+#! /bin/sh
 
 # This script assists you in achieving very high power savings on laptops.
 # It can detect programs that perform regular, non-bursty disk operations,
@@ -222,7 +222,7 @@ if [ "$RECOMMEND_DEFAULT_SERVICES" -ne 0 ] ; then
 		echo "Program:     \"$SERVICE\""
 		echo "Reason:      standard recommendation (program may not be running)"
 		INIT=`findinit $SERVICE`
-		if [ "$INIT" == "" ] ; then
+		if [ "$INIT" = "" ] ; then
 			echo "Init script: none"
 			echo "If you want to disable this program, you should do so manually."
 		else
@@ -248,7 +248,7 @@ if [ "$RECOMMEND_NETWORK_SERVICES" -ne 0 ] ; then
 			echo "Program:     \"$SERVICE\""
 			echo "Reason:      listens on network, may not be needed offline."
 			INIT=`findinit $SERVICE`
-			if [ "$INIT" == "" ] ; then
+			if [ "$INIT" = "" ] ; then
 				echo "Init script: none"
 				echo "If you want to disable this program, you should do so manually."
 			else
@@ -277,7 +277,7 @@ while [ $SECONDS_LEFT -gt 0 ] ; do
 						echo "Program:     \"$SERVICE\""
 						echo "Reason:      disk access."
 						INIT=`findinit $SERVICE`
-						if [ "$INIT" == "" ] ; then
+						if [ "$INIT" = "" ] ; then
 							echo "Init script: none"
 							echo "If you want to disable this program, you should do so manually."
 						else

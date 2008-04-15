@@ -1,9 +1,9 @@
 #! /bin/sh
+#
+# Laptop mode tools module: switch config files based on power state.
+#
 
-# Laptop mode tools module, called from /usr/sbin/laptop_mode.
-# Configuration in /etc/laptop-mode/conf.d/configuration-file-control.conf.
-
-if [ ! -z "$CONTROL_CONFIG_FILES" ] && [ "$CONTROL_CONFIG_FILES" -eq 1 ] ; then
+if [ x$CONTROL_CONFIG_FILES = x1 ] ; then
 	echo "Swapping out configuration files." >> $OUTPUT
 	for CONFFILE in $CONFIG_FILES ; do
 		if [ -e $CONFFILE ] ; then

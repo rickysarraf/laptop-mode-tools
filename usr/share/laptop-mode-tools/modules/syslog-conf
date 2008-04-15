@@ -1,0 +1,55 @@
+#! /bin/sh
+#
+# Laptop mode tools module: syslog.conf switching functionality (DEPRECATED)
+#
+#
+# This module implements the old syslog.conf functionality -- deprecated but
+# still supported for backward compatibility.
+# 
+
+
+
+if [ $CONTROL_SYSLOG_CONF -eq 1 ] ; then
+	echo "Adjusting syslog configuration." >> $OUTPUT
+	if [ "`readlink -f $SYSLOG_CONF`" != "$SYSLOG_CONF" ] ; then
+		echo "$SYSLOG_CONF is a symlink." >> $OUTPUT
+		if [ ! -f "$SYSLOG_CONF.no-lm" ] ; then
+			echo "But there is no $SYSLOG_CONF.no-lm. This must have been done by an earlier" >> $OUTPUT
+			echo "version of laptop-mode-tools." >> $OUTPUT
+			echo "Creating it now from $NOLM_AC_SYSLOG_CONF."
+			cp "$NOLM_AC_SYSLOG_CONF" "$SYSLOG_CONF.no-lm"
+		fi
+	else
+		echo "$SYSLOG_CONF is not a symlink." >> $OUTPUT
+		if [ "$STATE" = "enabled" ] ; then
+			echo "Saving it to $SYSLOG_CONF.no-lm." >> $OUTPUT
+			cp --backup=numbered "$SYSLOG_CONF" "$SYSLOG_CONF.no-lm"
+		fi
+	fi
+
+	if [ "$STATE" != "enabled" ] ; then
+		echo "Laptop mode is not enabled. Restoring $SYSLOG_CONF." >> $OUTPUT
+		if [ -f "$SYSLOG_CONF.no-lm" ] ; then
+			mv "$SYSLOG_CONF.no-lm" "$SYSLOG_CONF"
+		elif [ "`readlink -f $SYSLOG_CONF`" != "$SYSLOG_CONF" ] ; then
+			echo "ERROR: $SYSLOG_CONF is a symlink but $SYSLOG_CONF.no-lm is not present."
+		fi
+	elif [ $ON_AC -eq 1 ] ; then
+		if [ "$ACTIVATE" -eq 1 ] ; then
+			echo "Setting syslog config to $LM_AC_SYSLOG_CONF." >> $OUTPUT
+			ln -fs "$LM_AC_SYSLOG_CONF" "$SYSLOG_CONF"
+		else
+			echo "Setting syslog config to $NOLM_AC_SYSLOG_CONF." >> $OUTPUT
+			ln -fs "$NOLM_AC_SYSLOG_CONF" "$SYSLOG_CONF"
+		fi
+	else
+		echo "Setting syslog config to $BATT_SYSLOG_CONF." >> $OUTPUT
+		ln -fs "$BATT_SYSLOG_CONF" "$SYSLOG_CONF"
+	fi
+	# Notify syslogd of configuration change.
+	if [ "$SYSLOG_CONF_SIGNAL_PROGRAM" != "" ] ; then
+		echo "Sending SIGHUP to all $SYSLOG_CONF_SIGNAL_PROGRAM processes." >> $OUTPUT
+		killall -q -HUP $SYSLOG_CONF_SIGNAL_PROGRAM
+	fi
+fi
+

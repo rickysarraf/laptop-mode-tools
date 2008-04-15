@@ -1,4 +1,4 @@
-1.37 -- 14 April 2008
+1.40 -- 14 April 2008
 
     * Add support for getting lid button state from HAL instead of from
       /proc/acpi.
@@ -9,14 +9,34 @@
     * Support /sys/class/power_supply interface to determine battery levels.
     * Added generic support for configuration file swapping, in the form of the
       module "configuration-file-control". The old syslog configuration control
-      feature is deprecated. By default the new module has settings to support
-      syslogd, syslog-ng and rsyslogd.
+      feature is deprecated, removed from the default config file, and removed
+      from the manual page (except for a section mentioning that it is
+      deprecated). By default the new module has settings to support syslogd,
+      syslog-ng and rsyslogd.
     * Laptop mode was not run when the enabled/disabled state changed, but none
       of the other states changed. This was incorrect, because esp. the config
       files should be restored to their non-laptop-mode-tools variants when
       laptop mode tools is stopped.
     * Add the module "wireless-iwl-power" for setting the power levels for
       Intel 3945 and 4965 wireless adapters when using the iwlwifi drivers.
+    * Moved CONTROL_START_STOP to start-stop-programs.conf, and the code into
+      a separate module.
+    * Moved auto-hibernation settings to auto-hibernate.conf.
+    * Moved terminal blanking settings into terminal-blanking.conf, and the code
+      into a separate module.
+    * Moved CPU frequency settings to cpufreq.conf, and the code into a separate
+      module.
+    * Moved LCD brightness settings to lcd-brightness.conf, and the code into a
+      separate module.
+    * Moved DPMS standby settings to dpms-standby.conf, and the code into a
+      separate module.
+    * Moved hdparm functionality to hdparm module (config remains in main
+      config file).
+    * Moved core laptop_mode functionality to core module (config remains in
+      config file).
+    * Converted all scripts to use /bin/sh instead of /bin/bash. This should
+      yield performance improvements on systems that use a non-bash shell.
+      Tested using dash on Ubuntu.
 
 1.36 -- 2 March 2008
 

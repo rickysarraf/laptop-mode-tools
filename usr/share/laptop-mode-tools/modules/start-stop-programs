@@ -1,0 +1,65 @@
+#! /bin/sh
+#
+# Laptop mode tools module: start and stop programs
+#
+
+
+if [ x$CONTROL_START_STOP = x1 ] ; then
+   #
+   # Undo the previous state.
+   #
+   if [ -f /var/run/laptop-mode-tools/start-stop-undo-actions ] ; then
+	cat /var/run/laptop-mode-tools/start-stop-undo-actions | \
+		while read SCRIPT STARTSTOPACTION ; do
+			$SCRIPT $STARTSTOPACTION
+		done
+   fi
+
+   #
+   # Apply the new state, if LMT is enabled.
+   #
+   if [ "$STATE" = "enabled" ]; then
+	# Empty undo file first. We write the actions we take
+	# into this file, so that we can undo them at the
+	# next state change. Note: we actually
+	# write the actions to the file in reverse order,
+	# so we can execute the commands easily afterwards.
+	echo > /var/run/laptop-mode-tools/start-stop-undo-actions 
+		
+	   
+	if [ $ON_AC -eq 1 ] ; then
+		if [ "$ACTIVATE" -eq 1 ] ; then		
+			START_STOP_DIR_PREFIX=/etc/laptop-mode/lm-ac
+		else
+			START_STOP_DIR_PREFIX=/etc/laptop-mode/nolm-ac
+		fi
+	else
+		START_STOP_DIR_PREFIX=/etc/laptop-mode/batt
+	fi
+	START_DIR="$START_STOP_DIR_PREFIX"-start
+	STOP_DIR="$START_STOP_DIR_PREFIX"-stop
+	if [ -d "$STOP_DIR" ] ; then
+		for SCRIPT in "$STOP_DIR"/* ; do
+			if [ -e "$SCRIPT" ] ; then
+				"$SCRIPT" stop
+				# Dereference any links. When people configure
+				# the directories with links and then they remove
+				# links while laptop mode is active, the "undo"
+				# will fail if we don't dereference the links
+				# before storing them.
+				LINKTARGET=`readlink -f "$SCRIPT"`
+				sed -i "1i $LINKTARGET start" /var/run/laptop-mode-tools/start-stop-undo-actions
+			fi
+		done
+	fi
+	if [ -d "$START_DIR" ] ; then
+		for SCRIPT in "$START_DIR"/* ; do
+			if [ -e "$SCRIPT" ] ; then
+				"$SCRIPT" start
+				LINKTARGET=`readlink -f "$SCRIPT"`
+				sed -i "1i $LINKTARGET stop" /var/run/laptop-mode-tools/start-stop-undo-actions
+			fi
+		done
+	fi
+   fi
+fi

@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /bin/sh
 
 test -f /usr/sbin/laptop_mode || exit 0
 

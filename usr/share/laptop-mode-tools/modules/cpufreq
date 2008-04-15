@@ -1,0 +1,119 @@
+#! /bin/sh
+#
+# Laptop mode tools module to handle CPU frequency settings.
+#
+
+
+
+# Set kernel setting, showing an error if this fails.
+# Parameter 1: sysctl/proc path
+# Parameter 2: the value
+set_sysctl() {
+	echo "Executing: echo $2 > $1" >> $OUTPUT
+	if ! echo "$2" > "$1" ; then
+		echo "SETTING OF KERNEL PARAMETER FAILED: echo $2 \> $1"
+	fi
+}
+
+
+#
+# get_medium_value
+#
+#   Get the medium value from a list of numerical values.
+#   $1 = file containing the list of values
+#
+get_medium_value() {
+	cat "$1" | sed 's/ /\n/g' | sort -n | awk -v RS="" '{n=split($0,a); print a[int((n+1)/2)]}'
+}
+
+
+if [ x$CONTROL_CPU_FREQUENCY = x1 ] ; then
+	if [ $ON_AC -eq 1 ] ; then
+		if [ "$ACTIVATE" -eq 1 ] ; then
+			CPU_MAXFREQ="$LM_AC_CPU_MAXFREQ"
+			CPU_MINFREQ="$LM_AC_CPU_MINFREQ"
+			CPU_GOVERNOR="$LM_AC_CPU_GOVERNOR"
+			CPU_IGNORE_NICE_LOAD="$LM_AC_CPU_IGNORE_NICE_LOAD"
+		else
+			CPU_MAXFREQ="$NOLM_AC_CPU_MAXFREQ"
+			CPU_MINFREQ="$NOLM_AC_CPU_MINFREQ"
+			CPU_GOVERNOR="$NOLM_AC_CPU_GOVERNOR"
+			CPU_IGNORE_NICE_LOAD="$NOLM_AC_CPU_IGNORE_NICE_LOAD"
+		fi
+	else
+		CPU_MAXFREQ="$BATT_CPU_MAXFREQ"
+		CPU_MINFREQ="$BATT_CPU_MINFREQ"
+		CPU_GOVERNOR="$BATT_CPU_GOVERNOR"
+		CPU_IGNORE_NICE_LOAD="$BATT_CPU_IGNORE_NICE_LOAD"
+	fi
+	for THISCPU in /sys/devices/system/cpu/* ; do
+		if [ -e $THISCPU/cpufreq/cpuinfo_min_freq ]; then
+			THIS_CPU_MAXFREQ="$CPU_MAXFREQ"
+			THIS_CPU_MINFREQ="$CPU_MINFREQ"
+			THIS_CPU_GOVERNOR="$CPU_GOVERNOR"
+			THIS_CPU_IGNORE_NICE_LOAD="$CPU_IGNORE_NICE_LOAD"
+			if [ "$CPU_MAXFREQ" = "slowest" ]; then
+				THIS_CPU_MAXFREQ=`cat $THISCPU/cpufreq/cpuinfo_min_freq`
+			fi
+			if [ "$CPU_MINFREQ" = 'slowest' ]; then
+				THIS_CPU_MINFREQ=`cat $THISCPU/cpufreq/cpuinfo_min_freq`
+			fi
+			if [ "$CPU_MAXFREQ" = "medium" ] ; then
+				THIS_CPU_MAXFREQ=$(get_medium_value $THISCPU/cpufreq/scaling_available_frequencies)
+			fi
+			if [ "$CPU_MINFREQ" = "medium" ] ; then
+				THIS_CPU_MINFREQ=$(get_medium_value $THISCPU/cpufreq/scaling_available_frequencies)
+			fi
+			if [ "$CPU_MAXFREQ" = "fastest" ] ; then
+				THIS_CPU_MAXFREQ=`cat $THISCPU/cpufreq/cpuinfo_max_freq`
+			fi
+			if [ "$CPU_MINFREQ" = "fastest" ] ; then
+				THIS_CPU_MINFREQ=`cat $THISCPU/cpufreq/cpuinfo_max_freq`
+			fi
+			echo "Setting CPU maximum frequency for cpu $THISCPU to $THIS_CPU_MAXFREQ." >> $OUTPUT
+			set_sysctl $THISCPU/cpufreq/scaling_max_freq $THIS_CPU_MAXFREQ
+			echo "Setting CPU minimum frequency for cpu $THISCPU to $THIS_CPU_MINFREQ." >> $OUTPUT
+			set_sysctl $THISCPU/cpufreq/scaling_min_freq $THIS_CPU_MINFREQ
+			echo "Setting CPU frequency governor for cpu $THISCPU to $THIS_CPU_GOVERNOR." >> $OUTPUT
+			/sbin/modprobe -q cpufreq_$THIS_CPU_GOVERNOR >> $OUTPUT 2>&1
+			set_sysctl $THISCPU/cpufreq/scaling_governor $THIS_CPU_GOVERNOR
+			if [ -f "$THISCPU/cpufreq/$THIS_CPU_GOVERNOR/ignore_nice_load" ] ; then
+				echo "Setting CPU ignore_nice_load for cpu $THISCPU to $THIS_CPU_IGNORE_NICE_LOAD." >> $OUTPUT
+				set_sysctl $THISCPU/cpufreq/$THIS_CPU_GOVERNOR/ignore_nice_load $THIS_CPU_IGNORE_NICE_LOAD
+			else
+				echo "Not setting CPU ignore_nice_load for cpu $THISCPU." >> $OUTPUT
+				echo "File $THISCPU/cpufreq/$THIS_CPU_GOVERNOR/ignore_nice_load does not exist." >> $OUTPUT
+			fi
+		fi
+	done
+fi
+
+if [ $CONTROL_CPU_THROTTLING -eq 1 ] ; then
+	if [ $ON_AC -eq 1 ] ; then
+		if [ "$ACTIVATE" -eq 1 ] ; then
+			CPU_THROTTLING="$LM_AC_CPU_THROTTLING"
+		else
+			CPU_THROTTLING="$NOLM_AC_CPU_THROTTLING"
+		fi
+	else
+		CPU_THROTTLING="$BATT_CPU_THROTTLING"
+	fi
+	for THISCPU in /proc/acpi/processor/* ; do
+		if [ -e $THISCPU/throttling ]; then
+			NUM_LEVELS=`cat $THISCPU/throttling | grep "T[0123456789]*\:" | wc -l`
+			if [ "$CPU_THROTTLING" = "minimum" ]; then
+				THIS_CPU_THROTTLING=0
+			elif [ "$CPU_THROTTLING" = "maximum" ] ; then				
+				THIS_CPU_THROTTLING=$(($NUM_LEVELS - 1))
+			elif [ "$CPU_THROTTLING" = "medium" ] ; then
+				# Divide but round up: that way, "medium" on a two-level system will
+				# lead to full throttling -- which is 50% on my system, quite reasonable.
+				THIS_CPU_THROTTLING=$(( ($NUM_LEVELS / 2 ) ))
+			else
+				THIS_CPU_THROTTLING="$CPU_THROTTLING"
+			fi
+			echo "Setting throttling level for cpu $THISCPU to $THIS_CPU_THROTTLING." >> $OUTPUT
+			set_sysctl $THISCPU/throttling $THIS_CPU_THROTTLING
+		fi
+	done
+fi

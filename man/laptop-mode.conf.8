@@ -179,28 +179,16 @@ the number!). In addition, you can use "maximum" (which is the slowest option), 
 (full speed) and "medium" (about halfway).
 
 .IP "\fBCONTROL_SYSLOG_CONF\fP" 10 
-When this option is enabled, laptop mode tools controls /etc/syslog.conf as a
-symlink. It will point /etc/syslog.conf (or the path specified by the
-SYSLOG_CONF configuration option) to the appropriate configuration file. Please
-use \fBlm-syslog-setup(8)\fP to set up the filesystem, and read the
-\fBlm-syslog-setup(8)\fP manual page for more information.
- 
 .IP "\fBLM_AC_SYSLOG_CONF\fP" 10 
 .IP "\fBNOLM_AC_SYSLOG_CONF\fP" 10 
 .IP "\fBBATT_SYSLOG_CONF\fP" 10 
-These options specify the path to the configuration file for syslogd which is
-to be used. 
- 
 .IP "\fBSYSLOG_CONF_SIGNAL_PROGRAM\fP" 10 
-This option specifies the program that is to be signalled when
-the syslog.conf has been modified. By default this is set to
-"syslogd". Please note: the signal sent to the process is SIGHUP,
-which works for syslogd but not necessarily for replacement 
-logging packages.
- 
 .IP "\fBSYSLOG_CONF\fP" 10 
-This option specifies the path to the syslog.conf config file which is to be
-controlled as a symlink by laptop mode tools.
+When this option is enabled, laptop mode tools controls /etc/syslog.conf as a
+symlink. This option is deprecated. Use the configuration-file-control module
+instead, which is configured in the
+.B /etc/laptop-mode/conf.d/configuration-file-control.conf
+module configuration file.
 
 .IP "\fBCONTROL_DPMS_STANDBY\fP" 10
 When this option is enabled, laptop mode will control the DPMS
