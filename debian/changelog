@@ -1,4 +1,4 @@
-laptop-mode-tools (1.40-1) UNRELEASED; urgency=high
+laptop-mode-tools (1.40-1) unstable; urgency=high
 
   * Upgrade standards version to 3.7.3.
   * Add hal to recommends due to upstream changes.
@@ -9,8 +9,9 @@ laptop-mode-tools (1.40-1) UNRELEASED; urgency=high
       Closes: #475926
     * Add generic support for config file swapping. Closes: #475304
     * Add module for iwlwifi power management. Closes: #475407
+    * Fully modularized configuration.
 
- -- Bart Samwel <bart@samwel.tk>  Tue, 15 Apr 2008 17:20:00 +0200
+ -- Bart Samwel <bart@samwel.tk>  Tue, 15 Apr 2008 18:35:00 +0200
 
 laptop-mode-tools (1.36-1) unstable; urgency=low
 
