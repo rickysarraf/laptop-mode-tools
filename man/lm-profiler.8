@@ -1,14 +1,14 @@
 .TH "LM-PROFILER" "8" 
 .SH "NAME" 
-/usr/sbin/lm-profiler \- laptop mode profiler 
+.I /usr/sbin/lm-profiler
+\- laptop mode profiler 
 .SH "SYNOPSIS" 
 .B /usr/sbin/lm-profiler
 .SH "DESCRIPTION" 
 This manual page documents briefly the 
-.B /usr/sbin/lm-profiler
-command. 
-.B /usr/sbin/lm-profiler
-is a tool for profiling disk operations. It is a part of laptop mode tools and
+.I /usr/sbin/lm-profiler
+command. lm-profiler is a tool for profiling disk operations. It is a part of
+laptop mode tools and
 is useful only in relation to rest of laptop mode tools. It helps you to
 detect programs and services that use up system resources and that cause
 disk activity, and it allows you to disable them when laptop mode is active.
@@ -28,17 +28,22 @@ working on battery. It does this by placing a link to the init script in
 /etc/laptop-mode/batt-stop. Any programs that lm-profiler cannot find an
 init script for is simply reported, so that you can stop the
 program manually if you want to.
-
+.PP
 .B WARNING ABOUT DISABLING PROGRAMS:
 It may not be safe to disable some programs. They may be needed for proper
 operation of your system. Disable services only if you know what they do
 and why you don't need them.
 .SH "FILES"
-.IP "\fB/etc/lm-profiler.conf" 
+.IP "\fI/etc/lm-profiler.conf\fP" 
 lm-profiler retrieves its profiling rules from this file.
 
 .SH "SEE ALSO" 
-lm-profiler.conf(8) laptop-mode.conf(8) daemons.conf(8). 
+.PP
+lm-profiler.conf(8).
+.PP
+laptop-mode.conf(8).
+.PP
+daemons.conf(8). 
 .SH "AUTHOR" 
 This manual page was written by Bart Samwel (bart@samwel.tk) and
 Jan Polacek (jerome@ucw.cz) for the 

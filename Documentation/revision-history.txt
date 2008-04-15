@@ -34,6 +34,10 @@
       config file).
     * Moved core laptop_mode functionality to core module (config remains in
       config file).
+    * laptop-mode.conf(8) manual page split up by module; updated to include all
+      modules (because some modules were not documented yet).
+    * All manual pages updated to correct standards: file names in italics,
+      config values in bold.
     * Converted all scripts to use /bin/sh instead of /bin/bash. This should
       yield performance improvements on systems that use a non-bash shell.
       Tested using dash on Ubuntu.

@@ -1,30 +1,55 @@
 .TH "LAPTOP-MODE.CONF" "8" 
 .SH "NAME" 
-laptop-mode.conf \- Configuration file for the laptop-mode-tools and the  
-\fBlaptop_mode\fR control script. 
+.I /etc/init.d/laptop-mode.conf
+\- Configuration file for laptop-mode-tools. 
 .SH "DESCRIPTION" 
 .PP 
-This manual page documents the options that can be set in the laptop-mode.conf configuration file. 
-For a description of what laptop mode does, see the laptop_mode(8) manpage.
+This manual page documents the options that can be set in the
+.I /etc/laptop-mode/laptop-mode.conf
+configuration file and in the modular configuration files in the
+.I /etc/laptop-mode/conf.d
+directory. For a description of what laptop mode does, see the laptop_mode(8)
+manual page.
 
 .SH "SETTINGS" 
 .PP 
-The syntax of options is OPTION=value. There are some groups of options that specify values depending
-on power state and laptop mode is enabled. These use the prefix "LM_" to indicate that a value is
-used only when laptop mode is enabled, "NOLM_" to indicate the opposite, "AC_" to indicate that a value
-is used only when the system is running on AC power, and "BATT_" to indicate that a value is used
-only when the system is running on batteries. Settings are prefixed with a combination of an optional
-LM_/NOLM_ prefix and an optional AC_/BATT_. For instance, the combination LM_AC_ means "when the system
-is in laptop mode and on AC power". (Note that this situation happens only if ENABLE_LAPTOP_MODE_ALWAYS is
-enabled!) If one of the prefixes (either LM_/NOLM_ or AC_/BATT_)
-is missing, then the value is used independently of the state of laptop mode or AC power,
-respectively. Options that start with "CONTROL_" are boolean settings that determine whether laptop
-mode tools is allowed to control a certain aspect of your system. Boolean settings always expect "0"
-to indicate the false (negative/no/disabled) value, and "1" to indicate the true (positive/yes/enabled)
-value.
+The syntax of options is \fBOPTION=value\fP. There are some groups of options that
+specify values depending on power state and laptop mode is enabled. These use
+the prefix "LM_" to indicate that a value is used only when laptop mode is
+enabled, "NOLM_" to indicate the opposite, "AC_" to indicate that a value
+is used only when the system is running on AC power, and "BATT_" to indicate
+that a value is used only when the system is running on batteries. Settings are
+prefixed with a combination of an optional LM_/NOLM_ prefix and an optional
+AC_/BATT_. For instance, the combination LM_AC_ means "when the system is in
+laptop mode and on AC power". (Note that this situation happens only if
+.B ENABLE_LAPTOP_MODE_ALWAYS
+is enabled!) If one of the prefixes (either LM_/NOLM_ or AC_/BATT_) is missing,
+then the value is used independently of the state of laptop mode or AC power,
+respectively. Options that start with "CONTROL_" are boolean settings that
+determine whether laptop mode tools is allowed to control a certain aspect of
+your system. Boolean settings always expect "0" to indicate the false
+(negative/no/disabled) value, and "1" to indicate the true
+(positive/yes/enabled) value.
 
 .PP
-The following settings are available in laptop-mode.conf: 
+The following sections list the settings that are available in laptop-mode.conf
+and in the modular configuration files.
+.PP
+.B Note:
+Many settings were moved from the main configuration file to the modular
+configuration files. The settings here are split out by modular configuration 
+file, but in installations upgraded from version 1.36 or earlier they may appear
+in both. In such cases, the configuration settings in the main configuration
+file override those in the modular configuration files. To avoid confusion,
+it is advised to move the settings from the main configuration files to the
+modular configuration files when this situation is detected.
+
+.SS "\fI/etc/laptop-mode/laptop-mode.conf\fP"
+
+.PP
+This is the main configuration file. It contains the settings for enabling and
+disabling, plus the core features: the Linux kernel laptop mode feature and
+related settings.
 
 .IP "\fBVERBOSE_OUTPUT\fP" 10
 Set this to 1 if you want to see a lot of output when you start/stop laptop mode, and to 0 if you
@@ -68,11 +93,6 @@ operate upon. Separate the partitions or mount points by spaces. You can
 include the entry "auto" to stand for the partitions on the hard drives
 specified in the HD option.
  
-.IP "\fBASSUME_SCSI_IS_SATA\fP" 10
-This option, enabled by default, tells laptop mode tools to assume that a
-device /dev/sdX is a SATA device, and that it should be controlled using
-hdparm. If your /dev/sdX drives are really SCSI drives, disable this option.
-
 .IP "\fBLM_BATT_MAX_LOST_WORK_SECONDS\fP" 10 
 .IP "\fBLM_AC_MAX_LOST_WORK_SECONDS\fP" 10 
 The maximum number of seconds worth of data that you can lose when power runs out or when the
@@ -128,6 +148,25 @@ When this option is enabled, laptop mode tools controls your hard drives' write 
 .IP "\fBLM_HD_WRITECACHE\fP" 10
 These options specify whether the write caches should be enabled for your hard drives.
 
+.IP "\fBCONTROL_SYSLOG_CONF\fP (deprecated)" 10 
+When this option is enabled, laptop mode tools controls 
+.I /etc/syslog.conf
+as a
+symlink. This option is deprecated. Use the configuration-file-control module
+instead, which is configured in the
+.I /etc/laptop-mode/conf.d/configuration-file-control.conf
+module configuration file.
+
+.SS "Advanced laptop-mode.conf options"
+
+These options normally do not need to be modified from their default values. Do
+not tweak these settings unless you know what you are doing.
+
+.IP "\fBASSUME_SCSI_IS_SATA\fP" 10
+This option, enabled by default, tells laptop mode tools to assume that a
+device /dev/sdX is a SATA device, and that it should be controlled using
+hdparm. If your /dev/sdX drives are really SCSI drives, disable this option.
+
 .IP "\fBACPI_WITHOUT_AC_EVENTS\fP" 10 
 Enable this option if you have a laptop with a buggy ACPI implementation 
 that doesn't send out AC adapter events. Enabling this option will 
@@ -135,179 +174,11 @@ make laptop mode check the AC adapter state whenever the battery
 state changes, which achieves just about the same effect as responding 
 to AC adapter events.
 
-.IP "\fBCONTROL_CPU_FREQUENCY\fP" 10 
-When this option is enabled, laptop mode tools controls your CPU's frequency
-scaling bounds and the scaling governor. This option is currently only supported
-on 2.6 kernels. 
- 
-.IP "\fBBATT_CPU_MAXFREQ\fP" 10
-.IP "\fBBATT_CPU_INFREQ\fP" 10
-.IP "\fBBATT_CPU_GOVERNOR\fP" 10
-.IP "\fBBATT_CPU_IGNORE_NICE_LOAD\fP" 10
-.IP "\fBLM_AC_CPU_MAXFREQ\fP" 10
-.IP "\fBLM_AC_CPU_MINFREQ\fP" 10
-.IP "\fBLM_AC_CPU_GOVERNOR\fP" 10
-.IP "\fBLM_AC_CPU_IGNORE_NICE_LOAD\fP" 10
-.IP "\fBNOLM_AC_CPU_MAXFREQ\fP" 10
-.IP "\fBNOLM_AC_CPU_MINFREQ\fP" 10
-.IP "\fBNOLM_AC_CPU_GOVERNOR\fP" 10
-.IP "\fBNOLM_AC_CPU_IGNORE_NICE_LOAD\fP" 10
-These options specify the CPU frequency bounds and scaling governor in the
-various power states. You can change the MAXFREQ and MINFREQ values to any
-value listed in
-/sys/devices/system/cpu/cpu0/cpufreq/scaling_available_frequencies. In
-addition, you can use "fastest" and "slowest". The GOVERNOR option controls
-the setting for /sys/devices/system/cpu/cpufreq/scaling_governor. The
-available options are dependent on the installed kernel. The most
-common ones are "conservative", "performance" and "ondemand". The IGNORE_NICE_LOAD
-option controls a setting that is available for the "conservative" and "ondemand"
-governors. Set this option to 1 if you want the frequency scaling governor to
-not increase the CPU frequency for the sake of low-priority ("nice") background
-processes.
-
-.IP "\fBCONTROL_CPU_THROTTLING\fP" 10 
-When this option is enabled, laptop mode tools controls your CPU's throttling level.
-It is only useful if your CPU doesn't support frequency scaling.
-This option is only supported on some ACPI hardware.
- 
-.IP "\fBBATT_CPU_THROTTLING\fP" 10
-.IP "\fBLM_AC_CPU_THROTTLING\fP" 10
-.IP "\fBNOLM_AC_CPU_THROTTLING\fP" 10
-These options specify the throttling level for the CPU in the various power states.
-You can change it to any level listed in /proc/acpi/processor/CPU0/throttling (use only
-the number!). In addition, you can use "maximum" (which is the slowest option), "minimum"
-(full speed) and "medium" (about halfway).
-
-.IP "\fBCONTROL_SYSLOG_CONF\fP" 10 
-.IP "\fBLM_AC_SYSLOG_CONF\fP" 10 
-.IP "\fBNOLM_AC_SYSLOG_CONF\fP" 10 
-.IP "\fBBATT_SYSLOG_CONF\fP" 10 
-.IP "\fBSYSLOG_CONF_SIGNAL_PROGRAM\fP" 10 
-.IP "\fBSYSLOG_CONF\fP" 10 
-When this option is enabled, laptop mode tools controls /etc/syslog.conf as a
-symlink. This option is deprecated. Use the configuration-file-control module
-instead, which is configured in the
-.B /etc/laptop-mode/conf.d/configuration-file-control.conf
-module configuration file.
-
-.IP "\fBCONTROL_DPMS_STANDBY\fP" 10
-When this option is enabled, laptop mode will control the DPMS
-standby timeout for all X displays on the machine that users have logged on to.
-In short, this allows laptop mode to control the time after which your screen
-is blanked.
-
-There is one limitation to this feature: the settings are not automatically
-applied to new X logons. This can be fixed by configuring the display
-manager. For the gdm display manager, configure a PostLogin directory
-(usually /etc/gdm/PostLogin or /etc/X11/gdm/PostLogin), and in that directory
-create a shell script called Default. In that file, include the command:
-
-.IP "  ( sleep 60 ; /usr/sbin/laptop_mode force ) &"
-
-Similar configurations are possible for other window managers. Please consult
-your window manager documentation for more information.
-
-.IP "\fBBATT_DPMS_STANDBY\fP" 10
-.IP "\fBLM_AC_DPMS_STANDBY\fP" 10
-.IP "\fBNOLM_AC_DPMS_STANDBY\fP" 10
-These options specify the display standby timeouts for the X displays, in
-seconds.
-
-.IP "\fBCONTROL_TERMINAL\fP" 10
-When this option is enabled, laptop mode will control the terminal blanking
-settings for Linux's virtual consoles.
-
-.IP "\fBTERMINALS\fP" 10
-This option should contain a space-separated list of console device files that
-should be affected by the terminal blanking settings. Only
-one console device file needs to be included, because the settings are shared
-between all virtual consoles. By default this setting is set to /dev/tty1.
-
-.IP "\fBBATT_TERMINAL_BLANK_MINUTES\fP" 10
-.IP "\fBLM_AC_TERMINAL_BLANK_MINUTES\fP" 10
-.IP "\fBNOLM_AC_TERMINAL_BLANK_MINUTES\fP" 10
-.IP "\fBBATT_TERMINAL_POWERDOWN_MINUTES\fP" 10
-.IP "\fBLM_AC_TERMINAL_POWERDOWN_MINUTES\fP" 10
-.IP "\fBNOLM_AC_TERMINAL_POWERDOWN_MINUTES\fP" 10
-These options specify the terminal blanking and powerdown timeouts, in
-minutes. The allowed ranges are 1-60 minutes, or 0 to disable blanking
-or powerdown. The values are cumulative: the powerdown value is counted
-from the moment of screen blanking, not from the start of inactivity.
-
-.IP "\fBCONTROL_BRIGHTNESS\fP" 10
-When this option is enabled, laptop mode will adjust your LCD screen's
-brightness settings, if possible. You must configure the following settings
-for this to work.
-
-.IP "\fBBATT_BRIGHTNESS_COMMAND\fP" 10
-.IP "\fBLM_AC_BRIGHTNESS_COMMAND\fP" 10
-.IP "\fBNOLM_AC_BRIGHTNESS_COMMAND\fP" 10
-.IP "\fBBRIGHTNESS_OUTPUT\fP" 10
-The BRIGHTNESS_COMMAND settings specify commands that should be executed
-in order to set the brightness of your LCD. The BRIGHTNESS_OUTPUT setting
-specifies where the output of the command will be written. For instance,
-if your LCD's brightness is adjusted by writing a numeric value 3 to a file
-called /proc/brightness, you should set the command to "echo 3" and the
-output file to "/proc/brightness". If your LCD's brightness is adjusted
-using a utility like "toshset", you should include the entire toshset
-command line as the command, and set the output file to "/dev/null".
-
-
-.IP "\fBENABLE_AUTO_HIBERNATION\fP" 10
-When this option is enabled, laptop mode will automatically hibernate your
-computer when the battery level reaches a certain configurable threshold. This
-feature is only available when ACPI is enabled.
-
-.IP "\fBHIBERNATE_COMMAND\fP" 10
-This option specifies the command that laptop mode should execute when
-auto-hibernation is triggered. Normally, this is set to something like
-"/usr/sbin/hibernate".
-
-.IP "\fBAUTO_HIBERNATION_BATTERY_CHARGE_PERCENT\fP" 10
-The battery level threshold for auto-hibernation, as a percentage of total
-battery capacity.
-
-.IP "\fBAUTO_HIBERNATION_ON_CRITICAL_BATTERY_LEVEL\fP" 10
-When this option is enabled, auto-hibernation will kick in when the battery
-reports its state as "critical".
-
-.IP "\fBCONTROL_START_STOP\fP" 10
-If this option is enabled, laptop mode tools will automatically start and stop
-daemons or other programs for you. The actual configuration of which daemons
-are to be stopped/started is done by placing links to the daemons' init scripts
-in the following directories:
-.IP "       /etc/laptop-mode/batt-start"
-.IP "       /etc/laptop-mode/batt-stop"
-.IP "       /etc/laptop-mode/lm-ac-start"
-.IP "       /etc/laptop-mode/lm-ac-stop"
-.IP "       /etc/laptop-mode/nolm-ac-start"
-.IP "       /etc/laptop-mode/nolm-ac-stop"
-As you have probably guessed, the directories of the form "X-stop-daemons"
-should contain init scripts of daemons that you want stopped in mode X, while
-the directories of the form "X-start-daemons" should contain init scripts of
-daemons that you want started in mode X. Of course, it is possible to put in
-your own handling of modes as well: the only requirement on the scripts in the
-directories is that they handle the "start" and "stop" commands, like init
-scripts usually do.
-
-The ordering of the script handling is as follows. When a mode is entered, the
-actions of the previous mode are undone, in reverse order. This means that if
-the previous mode had done "daemon1 stop", "daemon2 stop" and "daemon3 start",
-then the undoing actions will be "daemon3 stop", "daemon2 start", "daemon1
-start". After that, the stop-scripts for the new mode are called, and then the
-start-scripts are called. Please note that there is no detection of
-commonalities between modes at this point, i.e., if the mode you're coming
-from and the mode you're going to both specify that a daemon "X" should be
-stopped, then the daemon will be un-stopped (that is, started) while leaving
-the previous mode, and then stopped again.
-
-
 .IP "\fBCONTROL_MOUNT_OPTIONS\fP" 10 
 When this option is enabled, laptop mode tools is allowed to control the mount
-options for your filesystems. Disabling this will break CONTROL_NOATIME, but it
+options for your filesystems. Disabling this will break \fBCONTROL_NOATIME\fP, but it
 will most probably also break laptop mode itself, as changes to the mount
 options are crucial for achieving spun-down hard drives.
-
 
 .IP "\fBLM_DIRTY_RATIO\fP" 10 
 .IP "\fBNOLM_DIRTY_RATIO\fP" 10 
@@ -339,9 +210,10 @@ which is the kernel variable HZ. Unfortunately this is not exposed anywhere, so
 you'll have to specify it manually.
 
 .IP "\fBLM_SECONDS_BEFORE_SYNC\fP         " 10 
-The number of seconds that laptop mode waits after the disk goes idle before it starts 
-a full sync. This should always be less than your hard disk idle timeout, because otherwise you'll have a sync
-directly after your drive spins down. Two seconds is usually a good value for this option.
+The number of seconds that laptop mode waits after the disk goes idle before it
+starts a full sync. This should always be less than your hard disk idle timeout,
+because otherwise you'll have a sync directly after your drive spins down. Two
+seconds is usually a good value for this option.
  
 .IP "\fBXFS_HZ\fP         " 10 
 This option expresses the unit of the XFS tuning parameters. The 
@@ -353,11 +225,347 @@ kernels the value of HZ is 100 for the most common architectures, so
 you need only change this value if you use a less common architecture. 
 
 
+.SS "\fI/etc/laptop-mode/conf.d/cpufreq.conf\fP"
+
+The cpufreq module allows you to control the Linux kernel's CPU frequency
+scaling settings.
+
+.IP "\fBCONTROL_CPU_FREQUENCY\fP" 10 
+When this option is enabled, laptop mode tools controls your CPU's frequency
+scaling bounds and the scaling governor. This option is currently only supported
+on 2.6 kernels. 
+ 
+.IP "\fBBATT_CPU_MAXFREQ\fP" 10
+.IP "\fBBATT_CPU_INFREQ\fP" 10
+.IP "\fBBATT_CPU_GOVERNOR\fP" 10
+.IP "\fBBATT_CPU_IGNORE_NICE_LOAD\fP" 10
+.IP "\fBLM_AC_CPU_MAXFREQ\fP" 10
+.IP "\fBLM_AC_CPU_MINFREQ\fP" 10
+.IP "\fBLM_AC_CPU_GOVERNOR\fP" 10
+.IP "\fBLM_AC_CPU_IGNORE_NICE_LOAD\fP" 10
+.IP "\fBNOLM_AC_CPU_MAXFREQ\fP" 10
+.IP "\fBNOLM_AC_CPU_MINFREQ\fP" 10
+.IP "\fBNOLM_AC_CPU_GOVERNOR\fP" 10
+.IP "\fBNOLM_AC_CPU_IGNORE_NICE_LOAD\fP" 10
+These options specify the CPU frequency bounds and scaling governor in the
+various power states. You can change the \fBMAXFREQ\fP and \fBMINFREQ\fP values to any
+value listed in
+\fI/sys/devices/system/cpu/cpu0/cpufreq/scaling_available_frequencies\fP. In
+addition, you can use "fastest" and "slowest". The GOVERNOR option controls
+the setting for \fI/sys/devices/system/cpu/cpufreq/scaling_governor\fP. The
+available options are dependent on the installed kernel. The most
+common ones are "conservative", "performance" and "ondemand". The
+\fBIGNORE_NICE_LOAD\fP
+option controls a setting that is available for the "conservative" and "ondemand"
+governors. Set this option to 1 if you want the frequency scaling governor to
+not increase the CPU frequency for the sake of low-priority ("nice") background
+processes.
+
+.IP "\fBCONTROL_CPU_THROTTLING\fP" 10 
+When this option is enabled, laptop mode tools controls your CPU's throttling level.
+It is only useful if your CPU doesn't support frequency scaling.
+This option is only supported on some ACPI hardware.
+ 
+.IP "\fBBATT_CPU_THROTTLING\fP" 10
+.IP "\fBLM_AC_CPU_THROTTLING\fP" 10
+.IP "\fBNOLM_AC_CPU_THROTTLING\fP" 10
+These options specify the throttling level for the CPU in the various power states.
+You can change it to any level listed in 
+.I /proc/acpi/processor/CPU0/throttling
+(use only the number!). In addition, you can use "maximum" (which is the slowest
+option), "minimum" (full speed) and "medium" (about halfway).
+
+
+
+.SS "\fI/etc/laptop-mode/conf.d/dpms-standby.conf\fP"
+
+The dpms-standby module allows you to control the DPMS standby timeouts for
+X displays.
+
+.IP "\fBCONTROL_DPMS_STANDBY\fP" 10
+When this option is enabled, laptop mode will control the DPMS
+standby timeout for all X displays on the machine that users have logged on to.
+In short, this allows laptop mode to control the time after which your screen
+is blanked.
+
+There is one limitation to this feature: the settings are not automatically
+applied to new X logons. This can be fixed by configuring the display
+manager. For the gdm display manager, configure a PostLogin directory
+(usually \fI/etc/gdm/PostLogin\fP or \fI/etc/X11/gdm/PostLogin\fP), and in that directory
+create a shell script called Default. In that file, include the command:
+
+.IP "" 15
+( sleep 60 ; /usr/sbin/laptop_mode force ) &
+
+Similar configurations are possible for other window managers. Please consult
+your window manager documentation for more information.
+
+.IP "\fBBATT_DPMS_STANDBY\fP" 10
+.IP "\fBLM_AC_DPMS_STANDBY\fP" 10
+.IP "\fBNOLM_AC_DPMS_STANDBY\fP" 10
+These options specify the display standby timeouts for the X displays, in
+seconds.
+
+
+
+
+.SS "\fI/etc/laptop-mode/conf.d/terminal-blanking.conf\fP"
+
+The terminal-blanking module allows you to control the terminal blanking
+timeouts for the Linux text console.
+
+.IP "\fBCONTROL_TERMINAL\fP" 10
+When this option is enabled, laptop mode will control the terminal blanking
+settings for Linux's virtual consoles.
+
+.IP "\fBTERMINALS\fP" 10
+This option should contain a space-separated list of console device files that
+should be affected by the terminal blanking settings. Only
+one console device file needs to be included, because the settings are shared
+between all virtual consoles. By default this setting is set to \fI/dev/tty1\fP.
+
+.IP "\fBBATT_TERMINAL_BLANK_MINUTES\fP" 10
+.IP "\fBLM_AC_TERMINAL_BLANK_MINUTES\fP" 10
+.IP "\fBNOLM_AC_TERMINAL_BLANK_MINUTES\fP" 10
+.IP "\fBBATT_TERMINAL_POWERDOWN_MINUTES\fP" 10
+.IP "\fBLM_AC_TERMINAL_POWERDOWN_MINUTES\fP" 10
+.IP "\fBNOLM_AC_TERMINAL_POWERDOWN_MINUTES\fP" 10
+These options specify the terminal blanking and powerdown timeouts, in
+minutes. The allowed ranges are 1-60 minutes, or 0 to disable blanking
+or powerdown. The values are cumulative: the powerdown value is counted
+from the moment of screen blanking, not from the start of inactivity.
+
+
+
+
+.SS "\fI/etc/laptop-mode/conf.d/lcd-brightness.conf\fP"
+
+The lcd-brightness module allows you to control the brightness of your LCD
+screen.
+
+.IP "\fBCONTROL_BRIGHTNESS\fP" 10
+When this option is enabled, laptop mode will adjust your LCD screen's
+brightness settings, if possible. You must configure the following settings
+for this to work.
+
+.IP "\fBBATT_BRIGHTNESS_COMMAND\fP" 10
+.IP "\fBLM_AC_BRIGHTNESS_COMMAND\fP" 10
+.IP "\fBNOLM_AC_BRIGHTNESS_COMMAND\fP" 10
+.IP "\fBBRIGHTNESS_OUTPUT\fP" 10
+The \fBBRIGHTNESS_COMMAND\fP settings specify commands that should be executed
+in order to set the brightness of your LCD. The \fBBRIGHTNESS_OUTPUT\fP setting
+specifies where the output of the command will be written. For instance,
+if your LCD's brightness is adjusted by writing a numeric value 3 to a file
+called \fI/proc/brightness\fP, you should set the command to "echo 3" and the
+output file to "/proc/brightness". If your LCD's brightness is adjusted
+using a utility like "toshset", you should include the entire toshset
+command line as the command, and set the output file to "/dev/null".
+
+
+
+
+.SS "\fI/etc/laptop-mode/conf.d/auto-hibernate.conf\fP"
+
+The auto-hibernate module allows you to automatically hibernate your computer
+when the battery goes critical or when the battery level goes below a certain
+threshold.
+
+.IP "\fBENABLE_AUTO_HIBERNATION\fP" 10
+When this option is enabled, laptop mode will automatically hibernate your
+computer when the battery level reaches a certain configurable threshold. This
+feature is only available when ACPI is enabled.
+
+.IP "\fBHIBERNATE_COMMAND\fP" 10
+This option specifies the command that laptop mode should execute when
+auto-hibernation is triggered. Normally, this is set to something like
+"/usr/sbin/hibernate".
+
+.IP "\fBAUTO_HIBERNATION_BATTERY_CHARGE_PERCENT\fP" 10
+The battery level threshold for auto-hibernation, as a percentage of total
+battery capacity.
+
+.IP "\fBAUTO_HIBERNATION_ON_CRITICAL_BATTERY_LEVEL\fP" 10
+When this option is enabled, auto-hibernation will kick in when the battery
+reports its state as "critical".
+
+
+
+.SS "\fI/etc/laptop-mode/conf.d/start-stop-programs.conf\fP"
+
+The start-stop-programs module allows you to start or stop programs when the
+computer switches to a different power state.
+
+.IP "\fBCONTROL_START_STOP\fP" 10
+If this option is enabled, laptop mode tools will automatically start and stop
+daemons or other programs for you. The actual configuration of which daemons
+are to be stopped/started is done by placing links to the daemons' init scripts
+in the following directories:
+.IP "             \fI/etc/laptop-mode/batt-start\fP"
+.IP "             \fI/etc/laptop-mode/batt-stop\fP"
+.IP "             \fI/etc/laptop-mode/lm-ac-start\fP"
+.IP "             \fI/etc/laptop-mode/lm-ac-stop\fP"
+.IP "             \fI/etc/laptop-mode/nolm-ac-start\fP"
+.IP "             \fI/etc/laptop-mode/nolm-ac-stop\fP"
+As you have probably guessed, the directories of the form "X-stop-daemons"
+should contain init scripts of daemons that you want stopped in mode X, while
+the directories of the form "X-start-daemons" should contain init scripts of
+daemons that you want started in mode X. Of course, it is possible to put in
+your own handling of modes as well: the only requirement on the scripts in the
+directories is that they handle the "start" and "stop" commands, like init
+scripts usually do.
+
+The ordering of the script handling is as follows. When a mode is entered, the
+actions of the previous mode are undone, in reverse order. This means that if
+the previous mode had done "daemon1 stop", "daemon2 stop" and "daemon3 start",
+then the undoing actions will be "daemon3 stop", "daemon2 start", "daemon1
+start". After that, the stop-scripts for the new mode are called, and then the
+start-scripts are called. Please note that there is no detection of
+commonalities between modes at this point, i.e., if the mode you're coming
+from and the mode you're going to both specify that a daemon "X" should be
+stopped, then the daemon will be un-stopped (that is, started) while leaving
+the previous mode, and then stopped again.
+
+
+.SS "\fI/etc/laptop-mode/conf.d/ac97-powersave.conf\fP"
+
+The ac97-powersave module allows you to enable the Intel AC97 integrated audio
+power saving mode.
+
+.IP "\fBCONTROL_AC97_POWER\fP" 10
+If this option is enabled, laptop mode tools will automatically enable the
+AC97 power saving settings. The power saving settings are always enabled, not
+only on battery power.
+
+
+
+.SS "\fI/etc/laptop-mode/conf.d/configuration-file-control.conf\fP"
+
+The configuration-file-control module allows you to switch between different
+configuration files when the computer is in different power states.
+.PP
+The primary use for this feature is for controlling the configuration files
+of syslog daemons. Syslog daemons have a tendency to sync their log files when
+entries are written to them. This causes disks to spin up, which is not very
+nice when you're trying to save power. The \fIsyslog.conf\fP configuration file
+can be tweaked so that syslogd will \fInot\fP sync a given file, by prepending
+the log file name with a dash, like this:
+
+.IP "" 5
+mail.*      -/var/log/mail/mail.log
+
+.PP
+.B "Note:"
+This feature will NOT work if \fBCONTROL_SYSLOG_CONF\fP is set in laptop-mode.conf.
+To start using this feature, remove the \fBCONTROL_SYSLOG_CONF\fP section in
+laptop-mode.conf, and then restart the laptop-mode-tools service. The new config
+files have different names than the old ones, and settings are NOT
+migrated. You will have to do this manually.
+
+
+.IP "\fBCONTROL_CONFIG_FILES\fP" 10
+If this option is enabled, laptop mode tools will use the following options to
+switch configuration files depending on the power state.
+
+.IP "\fBCONFIG_FILES\fP" 10
+This option should contain a space-separated list of configuration files that
+should be switched around depending on the power state.
+.IP "" 10
+For each configuration file, the specific configuration files will be named as follows:
+
+.IP "" 15
+\.I <conffile>-nolm-ac
+
+.IP "" 15
+.I <conffile>-lm-ac
+
+.IP "" 15
+.I <conffile>-batt
+
+.IP "" 10
+The first file will be used when the system is on AC power and laptop mode
+is not active. The second file will be used when the system is on AC power and
+laptop mode is active. The third file will be used when the system is on
+battery power.
+
+.IP "" 10
+When the laptop mode tools service is enabled, it will replace the
+configuration files with a symlink to one of the three state-based
+configuration files. The original configuration file will be saved as
+<config file>.lmbackup, and it will be restored when the laptop mode tools
+service is disabled.
+
+.IP "" 10
+When you add files to this list, make sure to also add the appropriate
+programs and services to the configuration settings below.
+
+.IP "" 10
+You can create the alternate configuration files yourself. If you don't, they
+will be created by laptop mode tools the next time it is restarted. To force
+the files to be created, run the laptop-mode service init script with the
+"restart" parameter.
+
+.IP "\fBCONFIG_FILE_SIGNAL_PROGRAMS\fP" 10
+This option should contain a space-separated list of programs that should be
+signalled after the config files have been switched around. This only works for
+programs that respond to the SIGHUP signal by reloading their configuration
+files.
+
+.IP "\fBCONFIG_FILE_RELOAD_SERVICES\fP" 10
+This option should contain a space-separated list of services which should be
+reloaded after the config files have been switched around.
+
+
+
+.SS "\fI/etc/laptop-mode/conf.d/wireless-ipw-power.conf\fP"
+
+The wireless-ipw-power module allows you to alter the power management settings
+for Intel PRO/Wireless 3945, 2100 and 2200 wireless network adapters. This
+module is intended for use with the ipw3945, ipw2100, ipw2200 drivers, not with
+the iwlwifi drivers.
+
+.IP "\fBCONTROL_IPW_POWER\fP" 10
+If this option is enabled, laptop mode tools will set the wireless power
+management settings based on the power state.
+
+.IP "\fBIPW3945_AC_POWER\fP" 10
+.IP "\fBIPW3945_BATT_POWER\fP" 10
+These settings define the power management levels for the ipw3945 driver. The
+defaults are 6 for AC, and 7 for battery mode. The allowed values are 1 (highest
+power) to 5 (lowest power), 6 (AC mode, full power) and 7 (battery mode, lowest
+power).
+
+.IP "\fBIPW2100_AC_POWER\fP" 10
+.IP "\fBIPW2100_BATT_POWER\fP" 10
+These settings define the power management levels for the ipw2100 driver. The
+defaults are 0 for AC mode and 5 for battery mode.
+
+
+
+
+.SS "\fI/etc/laptop-mode/conf.d/wireless-iwl-power.conf\fP"
+
+The wireless-iwl-power module allows you to alter the power management settings
+for Intel PRO/Wireless 3945 and Intel WiFi Link 4965 wireless network adapters.
+This module is intended for use with the iwlwifi drivers, not with the old ipw
+drivers.
+
+.IP "\fBCONTROL_IWL_POWER\fP" 10
+If this option is enabled, laptop mode tools will set the wireless power
+management settings based on the power state.
+
+.IP "\fBIWL_AC_POWER\fP" 10
+.IP "\fBIWL_BATT_POWER\fP" 10
+These settings define the power management levels on AC and on battery. The
+defaults are 6 for AC, and 7 for battery mode. The allowed values are 1 (highest
+power) to 5 (lowest power), 6 (AC mode, full power) and 7 (battery mode, lowest
+power).
+
+
+
+
 .SH "SEE ALSO" 
 .PP 
 laptop_mode(8).
-.PP
-lm-syslog-setup(8).
 .PP
 lm-profiler(8).
 .PP 

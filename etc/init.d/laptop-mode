@@ -7,7 +7,7 @@
 # config:  /etc/laptop-mode/laptop-mode.conf
 
 test -f /usr/sbin/laptop_mode || exit 0
-z
+
 if [ -f /lib/lsb/init-functions ] ; then
   . /lib/lsb/init-functions
 else

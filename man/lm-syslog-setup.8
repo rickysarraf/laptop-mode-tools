@@ -1,40 +1,24 @@
 .TH "LM-SYSLOG-SETUP" "8" 
 .SH "NAME" 
-/usr/sbin/lm-syslog-setup \- configure laptop mode to switch syslog.conf based on power state
+.I /usr/sbin/lm-syslog-setup
+\- configure laptop mode tools to switch syslog.conf based on power state
 .SH "SYNOPSIS" 
 .B /usr/sbin/lm-syslog-setup
 .SH "DESCRIPTION" 
 This manual page documents briefly the 
-.B /usr/sbin/lm-syslog-setup
-command. 
-.B /usr/sbin/lm-syslog-setup
-is a command that sets up the necessary things to enable
+.I /usr/sbin/lm-syslog-setup
+command. lm-syslog-setup was a command to set up the necessary things to enable
 laptop mode to switch between different configuration files
-based on the power state. The configuration files are specified in
-
-
-
-
-
-You can
-simply run this command and you will have three syslog.conf
-files: /etc/syslog-on-ac-with-lm.conf (used when AC power is
-present and laptop mode is enabled, i.e. LAPTOP_MODE_ALWAYS_ON=1
-in laptop-mode.conf), /etc/syslog-on-ac-without-lm.conf (used
-when AC power is present and laptop mode is disabled) and
-/etc/syslog-on-battery.conf (used when AC power is not present).
-If your system does NOT run syslogd but some alternative
-logging daemon, you must modify
-/etc/laptop-mode/laptop-mode.conf and specify the correct
-settings (configuration file name, executable name, etcetera)
-for your daemon. Please note that your daemon MUST support the 
-SIGHUP signal to re-read its configuration files.
-.B 
+based on the power state. This feature and this command has been deprecated
+in favor of the configuration-file-control module, which is configured in the
+.I /etc/laptop-mode/conf.d/configuration-file-control.conf
+configuration file. This new module does not require any manual setup.
+Existing configurations using the old feature are still supported, however,
+new usages of the old feature are not allowed, and lm-syslog-setup
+has been disabled accordingly.
 .SH "SEE ALSO"
 .PP
 laptop-mode.conf(8).
-.PP
-laptop_mode(8).
 .SH "AUTHOR" 
 This manual page was written by Bart Samwel (bart@samwel.tk)
 Permission is granted to copy, distribute and/or modify this
