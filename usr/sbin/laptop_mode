@@ -598,17 +598,39 @@ else
 					FOUND_AN_ENABLED_HIBERNATION_CHECK=0
 			
 					# Get the remaining capacity.
-					REMAINING=$(cat $BATT/charge_now)
+					IN_UAH=0
+					IN_UWH=0
+					if [ -f $BATT/charge_now ] ; then					
+						REMAINING=$(cat $BATT/charge_now)
+						IN_UAH=1 # charge_* is in microAmpere-hours
+					elif [ -f $BATT/energy_now ] ; then
+						REMAINING=$(cat $BATT/energy_now)
+						IN_UWH=1 # energy_* is in microWatt-hours
+					else
+						REMAINING=0
+					fi
 					if [ -z "$REMAINING" -o "$REMAINING" -eq 0 ] ; then
 						echo "Battery does not report remaining charge. Perhaps it is not present?" >> $OUTPUT
 						REMAINING=0
 					fi
 					echo "Remaining charge: $REMAINING" >> $OUTPUT
 
-					CAPACITY=$(cat $BATT/charge_full_design)
+					if [ -f $BATT/charge_full_design ] ; then
+						CAPACITY=$(cat $BATT/charge_full_design)
+					elif [ -f $BATT/energy_full_design ] ; then
+						CAPACITY=$(cat $BATT/energy_full_design)
+					else
+						CAPACITY=0
+					fi
 					if [ -z "$CAPACITY" -o "$CAPACITY" -eq 0 ] ; then
 						echo "Battery does not report design full charge, using non-design full charge." >> $OUTPUT					
-						CAPACITY=$(cat $BATT/charge_full)
+						if [ -f $BATT/charge_full ] ; then
+							CAPACITY=$(cat $BATT/charge_full)
+						elif [ -f $BATT/energy_full_design ] ; then
+							CAPACITY=$(cat $BATT/energy_full)
+						else
+							CAPACITY=0
+						fi
 						if [ -z "$CAPACITY" -o "$CAPACITY" -eq 0] ; then
 							echo "Battery does not report non-design full charge." >> $OUTPUT					
 							CAPACITY=0
@@ -659,6 +681,41 @@ else
 							ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=1
 						fi
 					fi
+					
+					#
+					# Fallback: hard values
+					#
+					if [ "$IN_UAH" -ne 0 ] ; then
+						if [ "$MINIMUM_BATTERY_CHARGE_MAH" -ne 0 ] ; then
+							FOUND_AN_ENABLED_CHECK=1
+							if [ "$REMAINING" -ge $((1000*"$MINIMUM_BATTERY_CHARGE_MAH")) ] ; then
+								ENOUGH_CHARGE=1
+							fi
+						fi
+						if [ "$AUTO_HIBERNATION_BATTERY_CHARGE_MAH" -ne 0 ] ; then
+							FOUND_AN_ENABLED_HIBERNATION_CHECK=1
+							if [ "$REMAINING" -ge $((1000*"$AUTO_HIBERNATION_BATTERY_CHARGE_MAH")) ] ; then
+								ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=1
+							fi
+						fi
+					elif [ "$IN_UWH" -ne 0 ] ; then
+						if [ "$MINIMUM_BATTERY_CHARGE_MWH" -ne 0 ] ; then
+							FOUND_AN_ENABLED_CHECK=1
+							if [ "$REMAINING" -ge $((1000*"$MINIMUM_BATTERY_CHARGE_MWH")) ] ; then
+								ENOUGH_CHARGE=1
+							fi
+						fi
+						if [ "$AUTO_HIBERNATION_BATTERY_CHARGE_MWH" -ne 0 ] ; then
+							FOUND_AN_ENABLED_HIBERNATION_CHECK=1
+							if [ "$REMAINING" -ge $((1000*"$AUTO_HIBERNATION_BATTERY_CHARGE_MWH")) ] ; then
+								ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=1
+							fi
+						fi
+					else
+						echo "Failed to determine battery charge. Battery charge units are not in"
+						echo "mWh, uWh, mAh or uAh."
+					fi
+										
 				else
 					echo "Battery is not present." >> $OUTPUT
 				fi

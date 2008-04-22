@@ -5,6 +5,9 @@
       dh_clean.
     * Add missing assignment to ACTIVATE_WITH_POSSIBLE_DATA_LOSS in the path
       where ENABLE_LAPTOP_MODE_ON_AC was set and the computer was on AC power.
+    * Add support for energy_* in sysfs battery interface. This adds support for
+      batteries which report their energies in mWh instead of mAh (which was
+      already supported through the charge_* interface).
 
 1.40 -- 15 April 2008
 
