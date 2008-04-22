@@ -1,3 +1,9 @@
+1.41 -- 22 April 2008
+
+    * Rename core module to laptop-mode. Files with the name "core" were cleaned
+      up a bit too diligently by package manager helper scripts such as
+      dh_clean.
+
 1.40 -- 15 April 2008
 
     * Add support for getting lid button state from HAL instead of from
