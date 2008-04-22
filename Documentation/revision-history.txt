@@ -3,6 +3,8 @@
     * Rename core module to laptop-mode. Files with the name "core" were cleaned
       up a bit too diligently by package manager helper scripts such as
       dh_clean.
+    * Add missing assignment to ACTIVATE_WITH_POSSIBLE_DATA_LOSS in the path
+      where ENABLE_LAPTOP_MODE_ON_AC was set and the computer was on AC power.
 
 1.40 -- 15 April 2008
 

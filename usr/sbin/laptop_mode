@@ -570,6 +570,7 @@ if [ "$ACTIVATE" -eq 0 ] ; then
 	ACTIVATE_WITH_POSSIBLE_DATA_LOSS=0
 elif [ "$ON_AC" = 1 ] ; then
 	echo "On AC, not checking minimum battery charge." >> $OUTPUT
+	ACTIVATE_WITH_POSSIBLE_DATA_LOSS=1
 else
 	ACTIVATE_WITH_POSSIBLE_DATA_LOSS=1
 	ENOUGH_CHARGE=0
