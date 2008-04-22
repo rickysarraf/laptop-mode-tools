@@ -114,6 +114,13 @@ if ( ! $INSTALL -m 700 usr/sbin/lm-profiler /usr/sbin ) ; then
 	exit 11
 fi
 
+if [ -f /usr/share/laptop-mode-tools/modules/core ] ; then
+	if ( ! rm /usr/share/laptop-mode-tools/modules/core ) ; then
+		echo "$0: Failed to install modules into /usr/share/laptop-mode-tools/modules. Installation failed."
+		exit 35
+	fi
+fi		
+
 if ( ! $INSTALL -m 700 usr/share/laptop-mode-tools/modules/* /usr/share/laptop-mode-tools/modules ) ; then
 	echo "$0: Failed to install modules into /usr/share/laptop-mode-tools/modules. Installation failed."
 	exit 26

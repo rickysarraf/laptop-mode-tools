@@ -1,3 +1,13 @@
+laptop-mode-tools (1.41-1) unstable; urgency=high
+
+  * New upstream version 1.41:
+    * Support energy_* in /sys/class/power_supply interface. Closes: #477118.
+    * Rename module "core" to "laptop-mode". Closes: #477310.
+    * Add missing assignment to ACTIVATE_WITH_POSSIBLE_DATA_LOSS.
+      Closes: #477172.
+
+ -- Bart Samwel <bart@samwel.tk>  Tue, 22 Apr 2008 22:10:00 +0200
+
 laptop-mode-tools (1.40-1) unstable; urgency=high
 
   * Upgrade standards version to 3.7.3.
