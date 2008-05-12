@@ -219,7 +219,8 @@ if [ -d $INIT_D ] ; then
     rm $RCS_D/S99laptop-mode
   fi
   if ( which update-rc.d > /dev/null ) ; then
-    if ( ! update-rc.d laptop-mode defaults ) ; then
+    update-rc.d -f laptop-mode remove
+    if ( ! update-rc.d laptop-mode defaults 99 ) ; then
       echo "$0: update-rc.d failed, laptop mode will not be initialized at bootup."
       exit 17
     fi

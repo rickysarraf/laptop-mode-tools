@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# chkconfig: - 20 90
+# chkconfig: - 90 90
 # description: Starts and stops "laptop-mode" - tweaks system behavior
 #              to extend battery life.
 #
