@@ -583,6 +583,47 @@ power) to 5 (lowest power), 6 (AC mode, full power) and 7 (battery mode, lowest
 power).
 
 
+.SS "\fI/etc/laptop-mode/conf.d/hal-polling.conf\fP"
+
+The hal-polling module allows you to control the polling of CD/DVD drives
+by HAL. The polling is needed for some drives to detect inserted CDs, but it
+uses a considerable amount of power. Enable this module to disable the polling,
+but only if our drive doesn't need it, or if you are willing to mount CDs
+manually in exchange for the power saving.
+
+.IP "\fBCONTROL_HAL_POLLING\fP" 10
+If this option is enabled, laptop mode tools will control the HAL polling
+behaviour.
+
+.IP "\fBBATT_ENABLE_HAL_POLLING\fP" 10
+.IP "\fBAC_ENABLE_HAL_POLLING\fP" 10
+These settings define the polling behaviour on AC and on battery. To disable
+polling, set the options to 0, to enable, set them to 1.
+
+.IP "\fBHAL_POLLING_DEVICES\fP" 10
+This setting defines for which devices the polling behaviour will be altered.
+It should contain a space separated list of devices.
+
+
+.SS "\fI/etc/laptop-mode/conf.d/bluetooth.conf\fP"
+
+The bluetooth module allows you to enable/disable bluetooth depending on the
+power state.
+
+.IP "\fBCONTROL_BLUETOOTH\fP" 10
+If this option is enabled, laptop mode tools will enable/disable bluetooth
+when the power state changes.
+
+.IP "\fBBATT_ENABLE_BLUETOOTH\fP" 10
+.IP "\fBAC_ENABLE_BLUETOOTH\fP" 10
+These settings define whether bluetooth is enabled on AC and on battery. To
+disable bluetooth, set the options to 0, to enable, set them to 1.
+
+.IP "\fBBLUETOOTH_INTERFACES\fP" 10
+This setting defines the interfaces the bluetooth module will control. It
+should contain a space separated list of interfaces. (Note that you probably
+have only one bluetooth interface, and it will probably be named "hci0".)
+
 
 
 .SH "SEE ALSO" 

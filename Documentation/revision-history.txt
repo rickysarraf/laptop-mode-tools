@@ -1,6 +1,10 @@
 1.42 -- 12 May 2008
 
     * Remove "echo -e" bashism in lm-profiler.
+    * Add "hal-polling" module to control HAL polling of CD/DVD drives. (Taken
+      from powertop tips.)
+    * Add "bluetooth" module to disable bluetooth in battery mode.  (Taken from
+      powertop tips.)
 
 1.41 -- 22 April 2008
 
