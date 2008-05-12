@@ -2,8 +2,10 @@ laptop-mode-tools (1.42-1) unstable; urgency=low
 
   * New upstream version 1.42:
     * Remove "echo -e" bashism in lm-profiler. Closes: #480606.
+    * Allow different names for AC adapter in /sys/class/power_supply.
+      Closes: #478937.
     * Add "hal-polling" module to control HAL polling of CD/DVD drives. (Taken
-      from powertop tips.)
+      from powertop tips.) Closes: #438782.
     * Add "bluetooth" module to disable bluetooth in battery mode.  (Taken from
       powertop tips.)
 

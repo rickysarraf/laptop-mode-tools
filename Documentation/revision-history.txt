@@ -1,6 +1,7 @@
 1.42 -- 12 May 2008
 
     * Remove "echo -e" bashism in lm-profiler.
+    * Allow different names for AC adapter in /sys/class/power_supply.
     * Add "hal-polling" module to control HAL polling of CD/DVD drives. (Taken
       from powertop tips.)
     * Add "bluetooth" module to disable bluetooth in battery mode.  (Taken from
