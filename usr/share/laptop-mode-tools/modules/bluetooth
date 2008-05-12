@@ -1,0 +1,26 @@
+#! /bin/sh
+#
+# Laptop mode tools module: bluetooth
+#
+
+
+if [ x$CONTROL_BLUETOOTH = x1 ] ; then
+	ENABLE_BLUETOOTH=$BATT_ENABLE_BLUETOOTH
+	if [ $ON_AC -eq 1 ] ; then
+		ENABLE_BLUETOOTH=$AC_ENABLE_BLUETOOTH
+	fi
+	if [ x$ENABLE_BLUETOOTH = x1 ] ; then
+		modprobe -q hci_usb
+		for INTF in $BLUETOOTH_INTERFACES ; do
+			hciconfig $INTF up
+		done
+	else
+		for INTF in $BLUETOOTH_INTERFACES ; do
+			hciconfig $INTF down
+		done
+		# This may take a while to work because the module may be
+		# temporarily in use; we try three times. We don't use rmmod
+		# --wait, because that might hang!
+		modprobe -rq hci_usb || (sleep 1 ; modprobe -rq hci_usb) || (sleep 1 ; modprobe -rq hci_usb)		
+	fi
+fi
