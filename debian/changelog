@@ -1,3 +1,14 @@
+laptop-mode-tools (1.42-1) unstable; urgency=low
+
+  * New upstream version 1.42:
+    * Remove "echo -e" bashism in lm-profiler. Closes: #480606.
+    * Add "hal-polling" module to control HAL polling of CD/DVD drives. (Taken
+      from powertop tips.)
+    * Add "bluetooth" module to disable bluetooth in battery mode.  (Taken from
+      powertop tips.)
+
+ -- Bart Samwel <bart@samwel.tk>  Mon, 12 May 2008 15:05:00 +0200
+
 laptop-mode-tools (1.41-1) unstable; urgency=high
 
   * New upstream version 1.41:
