@@ -1,3 +1,9 @@
+laptop-mode-tools (1.42-2) unstable; urgency=low
+
+  * Set DM-Upload-Allowed field to yes.
+
+ -- Bart Samwel <bart@samwel.tk>  Sun, 25 May 2008 18:20:25 +0200
+
 laptop-mode-tools (1.42-1) unstable; urgency=low
 
   * New upstream version 1.42:
