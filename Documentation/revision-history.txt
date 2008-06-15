@@ -18,6 +18,7 @@
     * Add intel-sata-powermgmt module for enabling Aggressive Link Power
       Management on Intel AHCI compliant SATA controllers.
     * Add ethernet module to optimize ethernet power usage.
+    * Performance optimizatons for laptop-mode module.
 
 1.42 -- 12 May 2008
 

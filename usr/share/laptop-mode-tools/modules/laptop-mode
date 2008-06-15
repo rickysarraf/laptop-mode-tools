@@ -196,29 +196,38 @@ if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 1 ] ; then
 		echo "Remounting filesystems." >> $OUTPUT
 		cat /etc/mtab | while read DEV MP FST OPTS DUMP PASS ; do
 			DO=0
-			if ( echo " $PARTITIONS " | grep " $DEV " > /dev/null ) ; then
-				DO=1
-				echo "$DEV found in PARTITIONS." >> $OUTPUT
-			else
-				echo "$DEV not found in PARTITIONS." >> $OUTPUT
-			fi
-			if ( echo " $PARTITIONS " | grep " $MP " > /dev/null ) ; then
-				DO=1
-				echo "$MP found in PARTITIONS." >> $OUTPUT
-			else
-				echo "$MP not found in PARTITIONS." >> $OUTPUT
-			fi
-			if ( echo " $PARTITIONS " | grep " auto " > /dev/null ) ; then
-				echo "Checking $DEV against HD because PARTITIONS contains \"auto\"." >> $OUTPUT
-				for THISHD in $HD ; do
-					echo "   Considering $THISHD." >> $OUTPUT
-					if ( echo " $DEV" | grep "$THISHD" > /dev/null ) ; then
-						DO=1
-						echo "   $DEV contains $THISHD, which is in HD, so we will remount it." >> $OUTPUT
-						break
-					fi
-				done
-			fi
+			
+			case " $PARTITIONS " in
+				*" $DEV "*)
+					DO=1
+					echo "$DEV found in PARTITIONS." >> $OUTPUT
+					;;
+				*)
+					echo "$DEV not found in PARTITIONS." >> $OUTPUT
+					;;
+			esac
+			case " $PARTITIONS " in
+				*" $MP "*)
+					DO=1
+					echo "$MP found in PARTITIONS." >> $OUTPUT
+					;;
+				*)
+					echo "$MP not found in PARTITIONS." >> $OUTPUT
+			esac
+			case " $PARTITIONS " in
+				*" auto "*)
+					echo "Checking $DEV against HD because PARTITIONS contains \"auto\"." >> $OUTPUT
+					for THISHD in $HD ; do
+						echo "   Considering $THISHD." >> $OUTPUT
+						case " $DEV" in *"$THISHD"*)
+							DO=1
+							echo "   $DEV contains $THISHD, which is in HD, so we will remount it." >> $OUTPUT
+							break
+							;;
+						esac
+					done
+					;;
+			esac
 			if [ "$DO" -ne 0 ] ; then
 				echo "Original options: $OPTS" >> $OUTPUT
 				if [ "$WAS_ACTIVE" -eq 0 ] ; then
@@ -304,29 +313,38 @@ else
 		echo "Remounting filesystems." >> $OUTPUT
 		cat /etc/mtab | while read DEV MP FST OPTS DUMP PASS ; do
 			DO=0
-			if ( echo " $PARTITIONS " | grep " $DEV " > /dev/null ) ; then
-				DO=1
-				echo "$DEV found in PARTITIONS." >> $OUTPUT
-			else
-				echo "$DEV not found in PARTITIONS." >> $OUTPUT
-			fi
-			if ( echo " $PARTITIONS " | grep " $MP " > /dev/null ) ; then
-				DO=1
-				echo "$MP found in PARTITIONS." >> $OUTPUT
-			else
-				echo "$MP not found in PARTITIONS." >> $OUTPUT
-			fi
-			if ( echo " $PARTITIONS " | grep " auto " > /dev/null ) ; then
-				echo "Checking $DEV against HD because PARTITIONS contains \"auto\"." >> $OUTPUT
-				for THISHD in $HD ; do
-					echo "   Considering $THISHD." >> $OUTPUT
-					if ( echo " $DEV" | grep "$THISHD" > /dev/null ) ; then
-						DO=1
-						echo "   $DEV contains $THISHD, which is in HD, so we will remount it." >> $OUTPUT
-						break
-					fi
-				done
-			fi
+			case " $PARTITIONS " in
+				*" $DEV "*)
+					DO=1
+					echo "$DEV found in PARTITIONS." >> $OUTPUT
+					;;
+				*)
+					echo "$DEV not found in PARTITIONS." >> $OUTPUT
+					;;
+			esac
+			case " $PARTITIONS " in
+				*" $MP "*)
+					DO=1
+					echo "$MP found in PARTITIONS." >> $OUTPUT
+					;;
+				*)
+					echo "$MP not found in PARTITIONS." >> $OUTPUT
+					;;
+			esac
+			case " $PARTITIONS " in
+				*" auto "*)
+					echo "Checking $DEV against HD because PARTITIONS contains \"auto\"." >> $OUTPUT
+					for THISHD in $HD ; do
+						echo "   Considering $THISHD." >> $OUTPUT
+						case " $DEV" in *"$THISHD"*)
+							DO=1
+							echo "   $DEV contains $THISHD, which is in HD, so we will remount it." >> $OUTPUT
+							break
+							;;
+						esac
+					done
+					;;
+			esac
 			if [ "$DO" -ne 0 ] ; then
 				# Reset commit and atime options to defaults.
 				echo "Original options: $OPTS" >> $OUTPUT
