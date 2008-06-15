@@ -47,7 +47,7 @@ if [ x$CONTROL_START_STOP = x1 ] ; then
 	if [ -d "$STOP_DIR" ] ; then
 		for SCRIPT in "$STOP_DIR"/* ; do
 			if [ -e "$SCRIPT" ] ; then
-				echo "Stopping $SCRIPT" >> $OUTPUT
+				$LM_VERBOSE && echo "Stopping $SCRIPT" >> $OUTPUT
 				"$SCRIPT" stop
 				# Dereference any links. When people configure
 				# the directories with links and then they remove
@@ -62,7 +62,7 @@ if [ x$CONTROL_START_STOP = x1 ] ; then
 	if [ -d "$START_DIR" ] ; then
 		for SCRIPT in "$START_DIR"/* ; do
 			if [ -e "$SCRIPT" ] ; then
-				echo "Starting $SCRIPT" >> $OUTPUT
+				$LM_VERBOSE && echo "Starting $SCRIPT" >> $OUTPUT
 				"$SCRIPT" start
 				LINKTARGET=`readlink -f "$SCRIPT"`
 				sed -i "1i $LINKTARGET stop" /var/run/laptop-mode-tools/start-stop-undo-actions
@@ -103,7 +103,7 @@ if [ x$CONTROL_START_STOP = x1 ] ; then
 			elif [ -d /etc/init.d ] ; then
 				INIT_D=/etc/init.d
 			else
-				echo "Cannot determine location of init scripts." >> $OUTPUT
+				$LM_VERBOSE && echo "Cannot determine location of init scripts." >> $OUTPUT
 				exit 1
 			fi
 
@@ -111,12 +111,12 @@ if [ x$CONTROL_START_STOP = x1 ] ; then
 		fi
 
 		for SERVICE in $STOP_SERVICES ; do
-			echo "Stopping service $SERVICE." >> $OUTPUT
+			$LM_VERBOSE && echo "Stopping service $SERVICE." >> $OUTPUT
 			$RCPROG$SERVICE stop
 			sed -i "1i $RCPROG$SERVICE start" /var/run/laptop-mode-tools/start-stop-undo-actions
 		done
 		for SERVICE in $START_SERVICES ; do
-			echo "Starting service $SERVICE." >> $OUTPUT
+			$LM_VERBOSE && echo "Starting service $SERVICE." >> $OUTPUT
 			$RCPROG$SERVICE start
 			sed -i "1i $RCPROG$SERVICE stop" /var/run/laptop-mode-tools/start-stop-undo-actions
 		done

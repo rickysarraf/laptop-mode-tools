@@ -9,7 +9,7 @@
 # Parameter 1: sysctl/proc path
 # Parameter 2: the value
 set_sysctl() {
-	echo "Executing: echo $2 > $1" >> $OUTPUT
+	$LM_VERBOSE && echo "Executing: echo $2 > $1" >> $OUTPUT
 	if ! echo "$2" > "$1" ; then
 		echo "SETTING OF KERNEL PARAMETER FAILED: echo $2 \> $1"
 	fi
@@ -70,19 +70,19 @@ if [ x$CONTROL_CPU_FREQUENCY = x1 ] ; then
 			if [ "$CPU_MINFREQ" = "fastest" ] ; then
 				THIS_CPU_MINFREQ=`cat $THISCPU/cpufreq/cpuinfo_max_freq`
 			fi
-			echo "Setting CPU maximum frequency for cpu $THISCPU to $THIS_CPU_MAXFREQ." >> $OUTPUT
+			$LM_VERBOSE && echo "Setting CPU maximum frequency for cpu $THISCPU to $THIS_CPU_MAXFREQ." >> $OUTPUT
 			set_sysctl $THISCPU/cpufreq/scaling_max_freq $THIS_CPU_MAXFREQ
-			echo "Setting CPU minimum frequency for cpu $THISCPU to $THIS_CPU_MINFREQ." >> $OUTPUT
+			$LM_VERBOSE && echo "Setting CPU minimum frequency for cpu $THISCPU to $THIS_CPU_MINFREQ." >> $OUTPUT
 			set_sysctl $THISCPU/cpufreq/scaling_min_freq $THIS_CPU_MINFREQ
-			echo "Setting CPU frequency governor for cpu $THISCPU to $THIS_CPU_GOVERNOR." >> $OUTPUT
+			$LM_VERBOSE && echo "Setting CPU frequency governor for cpu $THISCPU to $THIS_CPU_GOVERNOR." >> $OUTPUT
 			/sbin/modprobe -q cpufreq_$THIS_CPU_GOVERNOR >> $OUTPUT 2>&1
 			set_sysctl $THISCPU/cpufreq/scaling_governor $THIS_CPU_GOVERNOR
 			if [ -f "$THISCPU/cpufreq/$THIS_CPU_GOVERNOR/ignore_nice_load" ] ; then
-				echo "Setting CPU ignore_nice_load for cpu $THISCPU to $THIS_CPU_IGNORE_NICE_LOAD." >> $OUTPUT
+				$LM_VERBOSE && echo "Setting CPU ignore_nice_load for cpu $THISCPU to $THIS_CPU_IGNORE_NICE_LOAD." >> $OUTPUT
 				set_sysctl $THISCPU/cpufreq/$THIS_CPU_GOVERNOR/ignore_nice_load $THIS_CPU_IGNORE_NICE_LOAD
 			else
-				echo "Not setting CPU ignore_nice_load for cpu $THISCPU." >> $OUTPUT
-				echo "File $THISCPU/cpufreq/$THIS_CPU_GOVERNOR/ignore_nice_load does not exist." >> $OUTPUT
+				$LM_VERBOSE && echo "Not setting CPU ignore_nice_load for cpu $THISCPU." >> $OUTPUT
+				$LM_VERBOSE && echo "File $THISCPU/cpufreq/$THIS_CPU_GOVERNOR/ignore_nice_load does not exist." >> $OUTPUT
 			fi
 		fi
 	done
@@ -112,7 +112,7 @@ if [ $CONTROL_CPU_THROTTLING -eq 1 ] ; then
 			else
 				THIS_CPU_THROTTLING="$CPU_THROTTLING"
 			fi
-			echo "Setting throttling level for cpu $THISCPU to $THIS_CPU_THROTTLING." >> $OUTPUT
+			$LM_VERBOSE && echo "Setting throttling level for cpu $THISCPU to $THIS_CPU_THROTTLING." >> $OUTPUT
 			set_sysctl $THISCPU/throttling $THIS_CPU_THROTTLING
 		fi
 	done

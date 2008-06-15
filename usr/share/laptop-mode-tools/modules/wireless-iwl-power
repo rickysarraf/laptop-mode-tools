@@ -35,7 +35,7 @@ findWifiIfsByDriver () {
 }
 
 if [ $CONTROL_IWL_POWER -eq 1 ] ; then
-	echo "Setting power levels for iwlwifi wireless interfaces." >> $OUTPUT
+	$LM_VERBOSE && echo "Setting power levels for iwlwifi wireless interfaces." >> $OUTPUT
 
 	# Provide defaults for config file settings
 	if [ x$IWL_AC_POWER = x ] ; then
@@ -52,17 +52,17 @@ if [ $CONTROL_IWL_POWER -eq 1 ] ; then
 	findWifiIfsByDriver iwl4965
 	for IF in $WIFI_IFNAMES ; do
 		if [ $ON_AC -eq 1 ] ; then
-			echo "On AC power: setting power level for $IF to $IWL_AC_POWER." >> $OUTPUT
+			$LM_VERBOSE && echo "On AC power: setting power level for $IF to $IWL_AC_POWER." >> $OUTPUT
 			if ( ! echo $IWL_AC_POWER > /sys/class/net/$IF/device/power_level ) ; then
 				echo "Failed." >> $OUTPUT
 			fi
 		else
-			echo "On battery: setting power level for $IF to $IWL_BATT_POWER." >> $OUTPUT
+			$LM_VERBOSE && echo "On battery: setting power level for $IF to $IWL_BATT_POWER." >> $OUTPUT
 			if ( ! echo $IWL_BATT_POWER > /sys/class/net/$IF/device/power_level ) ; then
 				echo "Failed." >> $OUTPUT
 			fi
 		fi
 	done
 else
-	echo "Intel IWL Wireless power setting is disabled." >> $OUTPUT
+	$LM_VERBOSE && echo "Intel IWL Wireless power setting is disabled." >> $OUTPUT
 fi

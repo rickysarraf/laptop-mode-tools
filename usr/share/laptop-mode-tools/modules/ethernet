@@ -9,9 +9,9 @@ if [ x$CONTROL_ETHERNET = x1 ] ; then
 		# Wakeup-on-LAN handling
 		if [ x$DISABLE_WAKEUP_ON_LAN = x1 ] ; then
 			if ethtool -s $DEVICE wol d >> $OUTPUT 2>&1 ; then			
-				echo "Disabled wakeup-on-LAN for $DEVICE"
+				$LM_VERBOSE && echo "Disabled wakeup-on-LAN for $DEVICE" >> $OUTPUT
 			else
-				echo "Could not disable wakeup-on-LAN for $DEVICE"
+				$LM_VERBOSE && echo "Could not disable wakeup-on-LAN for $DEVICE" >> $OUTPUT
 			fi
 		fi
 		
@@ -28,9 +28,9 @@ if [ x$CONTROL_ETHERNET = x1 ] ; then
 		
 		if [ x$THROTTLE_ETHERNET = x1 ] ; then
 			if  ethtool -s $DEVICE autoneg off speed 100  >> $OUTPUT 2>&1 ; then			
-				echo "Throttled speed to 100 Mbit for $DEVICE"
+				$LM_VERBOSE && echo "Throttled speed to 100 Mbit for $DEVICE" >> $OUTPUT
 			else
-				echo "Could not throttle ethernet device $DEVICE"
+				$LM_VERBOSE && echo "Could not throttle ethernet device $DEVICE" >> $OUTPUT
 			fi		
 		fi				
 	done
