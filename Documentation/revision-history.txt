@@ -10,6 +10,7 @@
       The backward compatibility layer *fixes that* because it was a bug, so
       behaviour will change for 1.42 installations as well. (See Debian BTS
       #482307.)
+    * Get rid of bashism in laptop-mode module.
 
 1.42 -- 12 May 2008
 
