@@ -22,7 +22,6 @@ else
     echo "$*"
   }
 fi
-TEMPFILE=`mktemp`
 
 # Enable laptop mode when the system is booted when running on battery.
 
@@ -30,39 +29,39 @@ case $1 in
   start)
     mkdir -p /var/run/laptop-mode-tools
     touch /var/run/laptop-mode-tools/enabled
-    if (/usr/sbin/laptop_mode auto > $TEMPFILE) ; then
-      log_success_msg "$( cat $TEMPFILE )"
+    if RESULT=`/usr/sbin/laptop_mode auto` ; then
+      log_success_msg "$RESULT"
     else
-      log_failure_msg "$( cat $TEMPFILE )"
+      log_failure_msg "$RESULT"
     fi
     ;;
 
   restart|reload|force-reload)
     # Full restart: first stop laptop mode completely (to restore default mount options etc.)
     mkdir -p /var/run/laptop-mode-tools
-    rm -f /var/run/laptop-mode-tools/enabled
-    if (/usr/sbin/laptop_mode stop > $TEMPFILE) ; then
-      log_success_msg "$( cat $TEMPFILE )"
+    rm -f /var/run/laptop-mode-tools/enabled    
+    if RESULT=`/usr/sbin/laptop_mode stop` ; then
+      log_success_msg "$RESULT"
     else
-      log_failure_msg "$( cat $TEMPFILE )"
+      log_failure_msg "$RESULT"
     fi
 
     # Now remove files containing stored status, re-enable, and start it up again.
     rm -f /var/run/laptop-mode-tools/*
     touch /var/run/laptop-mode-tools/enabled
-    if (/usr/sbin/laptop_mode auto force > $TEMPFILE) ; then
-      log_success_msg "$( cat $TEMPFILE )"
+    if RESULT=`/usr/sbin/laptop_mode auto force` ; then
+      log_success_msg "$RESULT"
     else
-      log_failure_msg "$( cat $TEMPFILE )"
+      log_failure_msg "$RESULT"
     fi
     ;;
 
   stop)
     rm -f /var/run/laptop-mode-tools/enabled
-    if (/usr/sbin/laptop_mode stop > $TEMPFILE) ; then
-      log_success_msg "$( cat $TEMPFILE )"
+    if RESULT=`/usr/sbin/laptop_mode stop` ; then
+      log_success_msg "$RESULT"
     else
-      log_failure_msg "$( cat $TEMPFILE )"
+      log_failure_msg "$RESULT"
     fi
     ;;
 
@@ -77,9 +76,5 @@ case $1 in
     exit 2
     ;;
 esac
-
-if [ -f $TEMPFILE ] ; then
-	rm $TEMPFILE
-fi
 
 exit 0
