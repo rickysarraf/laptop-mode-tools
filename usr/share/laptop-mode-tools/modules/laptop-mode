@@ -215,6 +215,7 @@ if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 1 ] ; then
 					if ( echo " $DEV" | grep "$THISHD" > /dev/null ) ; then
 						DO=1
 						echo "   $DEV contains $THISHD, which is in HD, so we will remount it." >> $OUTPUT
+						break
 					fi
 				done
 			fi
@@ -322,6 +323,7 @@ else
 					if ( echo " $DEV" | grep "$THISHD" > /dev/null ) ; then
 						DO=1
 						echo "   $DEV contains $THISHD, which is in HD, so we will remount it." >> $OUTPUT
+						break
 					fi
 				done
 			fi

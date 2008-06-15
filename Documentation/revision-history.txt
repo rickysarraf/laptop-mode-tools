@@ -13,6 +13,7 @@
     * Get rid of bashism in laptop-mode module.
     * Write all output to $OUTPUT in ac97-powersave module.
     * Remove spurious output in main laptop_mode script.
+    * Minor optimization of inner loop in main laptop_mode script.
 
 1.42 -- 12 May 2008
 
