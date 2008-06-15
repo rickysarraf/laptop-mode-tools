@@ -625,6 +625,18 @@ should contain a space separated list of interfaces. (Note that you probably
 have only one bluetooth interface, and it will probably be named "hci0".)
 
 
+.SS "\fI/etc/laptop-mode/conf.d/intel-sata-powermgmt.conf\fP"
+
+The intel-sata-powermgmt module allows you to enable the power saving mode for
+Intel AHCI compliant SATA controllers. This power saving mode is also known as
+Aggressive Link Power Management (ALPM).
+
+.IP "\fBCONTROL_INTEL_SATA_POWER\fP" 10
+If this option is enabled, laptop mode tools will automatically enable the
+Intel SATA controller power saving settings. The power saving settings are
+always enabled, not only on battery power.
+
+
 
 .SH "SEE ALSO" 
 .PP 

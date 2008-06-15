@@ -1,0 +1,17 @@
+#! /bin/sh
+# 
+# Laptop mode tools module: Power management for Intel SATA controllers
+#
+
+if [ x$CONTROL_INTEL_SATA_POWER = x1 ] ; then
+	for POLICYFILE in /sys/class/scsi_host/*/link_power_management_policy ; do
+		if [ -f $POLICYFILE ] ; then
+			echo "Intel SATA link power saving enabled." >> $OUTPUT
+			echo min_power > $POLICYFILE
+		else
+			echo "Intel SATA link power saving enabled but not supported by system." >> $OUTPUT
+		fi 
+	done
+else
+	echo "Intel SATA link power saving disabled." >> $OUTPUT
+fi
