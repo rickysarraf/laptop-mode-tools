@@ -11,6 +11,8 @@
       behaviour will change for 1.42 installations as well. (See Debian BTS
       #482307.)
     * Get rid of bashism in laptop-mode module.
+    * Write all output to $OUTPUT in ac97-powersave module.
+    * Remove spurious output in main laptop_mode script.
 
 1.42 -- 12 May 2008
 

@@ -8,7 +8,7 @@ if [ x$CONTROL_AC97_POWER = x1 ] ; then
 		echo 1 > /sys/module/snd_ac97_codec/parameters/power_save
 		echo "AC97 power save mode enabled." >> $OUTPUT
 	else
-		echo "AC97 power saving is not available. Perhaps CONFIG_SND_AC97_POWER_SAVE option"
+		echo "AC97 power saving is not available. Perhaps CONFIG_SND_AC97_POWER_SAVE option" >> $OUTPUT
 		echo "is not set in the kernel config, or the snd_ac97_codec module is not loaded." >> $OUTPUT
 	fi
 else

@@ -461,7 +461,7 @@ fi
 FOUND_SYS_CLASS_POWER_SUPPLY_AC=0
 ON_AC=0
 for POWER_SUPPLY in /sys/class/power_supply/* ; do
-	if [ "$(cat $POWER_SUPPLY/type)" = "Mains" ] ;then
+	if [ -f $POWER_SUPPLY/type -a "$(cat $POWER_SUPPLY/type)" = "Mains" ] ;then
 		echo "Determining power state from $POWER_SUPPLY/online." >> $OUTPUT
 		FOUND_SYS_CLASS_POWER_SUPPLY_AC=1
 		if [ "$(cat $POWER_SUPPLY/online)" = 1 ] ; then
