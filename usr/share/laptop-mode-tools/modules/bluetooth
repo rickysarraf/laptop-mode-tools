@@ -12,11 +12,11 @@ if [ x$CONTROL_BLUETOOTH = x1 ] ; then
 	if [ x$ENABLE_BLUETOOTH = x1 ] ; then
 		modprobe -q hci_usb
 		for INTF in $BLUETOOTH_INTERFACES ; do
-			hciconfig $INTF up
+			hciconfig $INTF up 2>&1 >> $OUTPUT
 		done
 	else
 		for INTF in $BLUETOOTH_INTERFACES ; do
-			hciconfig $INTF down
+			hciconfig $INTF down 2>&1 >> $OUTPUT
 		done
 		# This may take a while to work because the module may be
 		# temporarily in use; we try three times. We don't use rmmod

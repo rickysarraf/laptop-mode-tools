@@ -1,0 +1,39 @@
+#! /bin/sh
+# 
+# Laptop mode tools module: Ethernet power saving tweaks.
+#
+
+if [ x$CONTROL_ETHERNET = x1 ] ; then
+	for DEVICE in $ETHERNET_DEVICES ; do
+
+		# Wakeup-on-LAN handling
+		if [ x$DISABLE_WAKEUP_ON_LAN = x1 ] ; then
+			if ethtool -s $DEVICE wol d >> $OUTPUT 2>&1 ; then			
+				echo "Disabled wakeup-on-LAN for $DEVICE"
+			else
+				echo "Could not disable wakeup-on-LAN for $DEVICE"
+			fi
+		fi
+		
+		# Handle throttling to 100 Mbit
+		if [ $ON_AC -eq 1 ]; then
+			if [ "$ACTIVATE" -eq 1 ]; then
+				THROTTLE_ETHERNET="$LM_AC_THROTTLE_ETHERNET"
+			else
+				THROTTLE_ETHERNET="$NOLM_AC_THROTTLE_ETHERNET"
+			fi
+		else
+			THROTTLE_ETHERNET="$BATT_THROTTLE_ETHERNET"
+		fi
+		
+		if [ x$THROTTLE_ETHERNET = x1 ] ; then
+			if  ethtool -s $DEVICE autoneg off speed 100  >> $OUTPUT 2>&1 ; then			
+				echo "Throttled speed to 100 Mbit for $DEVICE"
+			else
+				echo "Could not throttle ethernet device $DEVICE"
+			fi		
+		fi				
+	done
+else
+	echo "Ethernet module is disabled." >> $OUTPUT
+fi
