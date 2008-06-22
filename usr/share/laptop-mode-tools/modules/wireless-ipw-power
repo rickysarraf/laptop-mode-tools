@@ -50,7 +50,12 @@ if [ x$CONTROL_IPW_POWER = x1 ] ; then
 	SET_I2200_AC_PARMS="power off"
 	SET_I2200_BAT_PARMS="power on"
 
-	SET_I2100_AC_PARMS_1="power off"
+	# Note the fact that we're setting "power on" on both AC and battery.
+	# This is due to the fact that the second statement will have no effect
+	# if we turn power management off completely, and some laptops will
+	# reportedly get very hot if you turn off power management on the
+	# IPW2100.
+	SET_I2100_AC_PARMS_1="power on"
 	SET_I2100_BAT_PARMS_1="power on"
 	SET_I2100_AC_PARMS_2="set_power $IPW2100_AC_POWER"
 	SET_I2100_BAT_PARMS_2="set_power $IPW2100_BATT_POWER"

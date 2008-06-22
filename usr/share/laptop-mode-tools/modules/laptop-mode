@@ -244,7 +244,7 @@ if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 1 ] ; then
 						PARSEDOPTS="$(remove_numeric_mount_option commit "$OPTS")"
 						echo "Executing: mount $DEV -t $FST $MP -o remount,$PARSEDOPTS,commit=$MAX_LOST_WORK_SECONDS$NOATIME_OPT" >> $OUTPUT
 						if (! mount $DEV -t $FST $MP -o remount,$PARSEDOPTS,commit=$MAX_LOST_WORK_SECONDS$NOATIME_OPT) ; then
-							if [ "$FST" == "ext3" -a "$MP" == "/" ] ; then
+							if [ "$FST" = "ext3" -a "$MP" = "/" ] ; then
 								echo "BIG FAT WARNING: Your root filesystem mounted as ext3 seems to lack support for"
 								echo "the commit mount option. This usually means that your root filesystem is"
 								echo "mounted as ext2 because there is no ext3 support in the kernel at boot time,"
