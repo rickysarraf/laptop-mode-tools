@@ -22,6 +22,7 @@
       instead of throwing it away. (Thanks to Omair Eshkenazi for suggestions.)
     * Coding style improvements throughout. (Thanks to Omair Eshkenazi for
       patches.)
+    * Remove bashism in lm-profiler (See Debian BTS #480606.)
 
 1.42 -- 12 May 2008
 

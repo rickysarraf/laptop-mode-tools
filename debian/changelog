@@ -15,8 +15,9 @@ laptop-mode-tools (1.43-1) hardy; urgency=low
     * Get rid of bashism in laptop-mode module.
   * Put URL on separate line in README. Closes: #486467.
   * Set DM-Upload-Allowed field to yes.
+  * Fix bashism in lm-profiler script. Closes: #480606
 
- -- Bart Samwel <bart@samwel.tk>  Sun, 22 Jun 2008 16:15:58 +0200
+ -- Bart Samwel <bart@samwel.tk>  Sun, 22 Jun 2008 16:34:17 +0200
 
 laptop-mode-tools (1.42-1) unstable; urgency=low
 
