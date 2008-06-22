@@ -65,7 +65,7 @@ if [ x$CONTROL_CONFIG_FILES = x1 ] ; then
 	done
 	# Notify daemons of configuration change.
 	for PROGRAM in $CONFIG_FILE_SIGNAL_PROGRAMS ; do	
-		echo "Sending SIGHUP to all $PROGRAM processes." >> $OUTPUT
+		$LM_VERBOSE && echo "Sending SIGHUP to all $PROGRAM processes." >> $OUTPUT
 		killall -q -HUP $PROGRAM
 	done
 
@@ -98,7 +98,7 @@ if [ x$CONTROL_CONFIG_FILES = x1 ] ; then
 			elif [ -d /etc/init.d ] ; then
 				INIT_D=/etc/init.d
 			else
-				echo "Cannot determine location of init scripts." >> $OUTPUT
+				$LM_VERBOSE && echo "Cannot determine location of init scripts." >> $OUTPUT
 				exit 1
 			fi
 
@@ -106,7 +106,7 @@ if [ x$CONTROL_CONFIG_FILES = x1 ] ; then
 		fi
 
 		for SERVICE in $CONFIG_FILE_RELOAD_SERVICES ; do
-			echo "Reloading service $SERVICE." >> $OUTPUT
+			$LM_VERBOSE && echo "Reloading service $SERVICE." >> $OUTPUT
 			$RCPROG$SERVICE reload
 		done
 	fi

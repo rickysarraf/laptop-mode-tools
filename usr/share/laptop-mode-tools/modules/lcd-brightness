@@ -6,7 +6,7 @@
 
 
 # Control LCD brightness
-if [ $CONTROL_BRIGHTNESS -eq 1 ] ; then
+if [ x$CONTROL_BRIGHTNESS = x1 ] ; then
 	if [ $ON_AC -eq 1 ]; then
 		if [ "$ACTIVATE" -eq 1 ]; then
 			BRIGHTNESS_COMMAND="$LM_AC_BRIGHTNESS_COMMAND"
@@ -21,7 +21,7 @@ if [ $CONTROL_BRIGHTNESS -eq 1 ] ; then
 	fi
 	
 	if [ "$FORCE" -ne 0 -o "$BRIGHTNESS_COMMAND" != "$OLD_BRIGHTNESS_COMMAND" ] ; then
-		echo "Set LCD brightness using command $BRIGHTNESS_COMMAND \> $BRIGHTNESS_OUTPUT." >> $OUTPUT
+		$LM_VERBOSE && echo "Set LCD brightness using command $BRIGHTNESS_COMMAND \> $BRIGHTNESS_OUTPUT." >> $OUTPUT
 		if ( $BRIGHTNESS_COMMAND > $BRIGHTNESS_OUTPUT ) ; then
 			echo "Command succeeded." >> $OUTPUT
 		else
@@ -29,7 +29,7 @@ if [ $CONTROL_BRIGHTNESS -eq 1 ] ; then
 		fi
 		echo -n $BRIGHTNESS_COMMAND > /var/run/laptop-mode-tools/state-brightness-command
 	else
-		echo "Not setting LCD brightness -- command was the same as last time." >> $OUTPUT
+		$LM_VERBOSE && echo "Not setting LCD brightness -- command was the same as last time." >> $OUTPUT
 	fi
 fi
 

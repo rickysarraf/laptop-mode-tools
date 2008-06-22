@@ -11,18 +11,10 @@
 if [ x$CONTROL_IPW_POWER = x1 ] ; then
 
 	# Provide defaults for config file settings
-	if [ x$IPW3945_AC_POWER = x ] ; then
-		IPW3945_AC_POWER=6
-	fi
-	if [ x$IPW3945_BATT_POWER = x ] ; then
-		IPW3945_BATT_POWER=7
-	fi
-	if [ x$IPW2100_AC_POWER = x ] ; then
-		IPW3945_AC_POWER=0
-	fi
-	if [ x$IPW2100_BATT_POWER = x ] ; then
-		IPW3945_BATT_POWER=5
-	fi
+	[ "$IPW3945_AC_POWER" ]   || IPW3945_AC_POWER=6
+	[ "$IPW3945_BATT_POWER" ] || IPW3945_BATT_POWER=7
+	[ "$IPW2100_AC_POWER" ]   || IPW3945_AC_POWER=0
+	[ "$IPW2100_BATT_POWER" ] || IPW3945_BATT_POWER=5
 
 	I3945_DRIVERNAME=ipw3945
 	I2200_DRIVERNAME=ipw2200
@@ -34,14 +26,14 @@ if [ x$CONTROL_IPW_POWER = x1 ] ; then
 	elif [ -x /usr/sbin/iwpriv ] ; then
 		IWPRIV=/usr/sbin/iwpriv
 	else
-		echo "iwpriv is not installed" >> $OUTPUT
+		$LM_VERBOSE && echo "iwpriv is not installed" >> $OUTPUT
 	fi
 	if [ -x /sbin/iwconfig ] ; then
 		IWCONFIG=/sbin/iwconfig
 	elif [ -x /usr/sbin/iwconfig ] ; then
 		IWCONFIG=/usr/sbin/iwconfig
 	else
-		echo "iwconfig is not installed" >> $OUTPUT
+		$LM_VERBOSE && echo "iwconfig is not installed" >> $OUTPUT
 	fi
 
 	SET_I3945_AC_PARMS="set_power $IPW3945_AC_POWER"
@@ -66,25 +58,24 @@ if [ x$CONTROL_IPW_POWER = x1 ] ; then
 	# Place the interface names on the list WIFI_IFNAMES.
 	#
 	findWifiIfsByDriver() {
-	    local DEVICE;
-	    local LINK_TARGET;
-	    WIFI_IFNAMES=""
+		local DEVICE;
+		local LINK_TARGET;
+		WIFI_IFNAMES=""
 
-	    for DEVICE in /sys/class/net/*; do
-		if [ -d $DEVICE/wireless ]; then
-	# See if the driver for $DEVICE matches the supplied one by checking the link to
-	# the driver.
-		    if [ -h $DEVICE/device/driver ]; then
-			LINK_TARGET=`readlink $DEVICE/device/driver | sed 's/.*\///'`
+		for DEVICE in /sys/class/net/*; do
+			if [ -d $DEVICE/wireless -a -h $DEVICE/device/driver ]; then
+				# See if the driver for $DEVICE matches the supplied one by checking the link to
+				# the driver.
+				LINK_TARGET=`readlink $DEVICE/device/driver`
+				LINK_TARGET=${LINK_TARGET##*/}
 
-			if [ $LINK_TARGET = $1 ]; then
+				if [ "$LINK_TARGET" = "$1" ]; then
 
-	# add the interface name to the list
-			    WIFI_IFNAMES=$WIFI_IFNAMES" "`echo -n $DEVICE | sed 's/.*\///'`
+					# add the interface name to the list
+		    			WIFI_IFNAMES="$WIFI_IFNAMES ${DEVICE##*/}"
+				fi
 			fi
-		    fi
-		fi
-	    done
+		done
 	}
 
 
@@ -101,7 +92,7 @@ if [ x$CONTROL_IPW_POWER = x1 ] ; then
 		findWifiIfsByDriver $1;
 
 		for DEVICE in $WIFI_IFNAMES; do
-			echo "Wireless power saving: $2 $DEVICE $3" >> $OUTPUT
+			$LM_VERBOSE && echo "Wireless power saving: $2 $DEVICE $3" >> $OUTPUT
 			$2 $DEVICE $3
 		done
 	}
@@ -134,14 +125,14 @@ if [ x$CONTROL_IPW_POWER = x1 ] ; then
 
 
 	if [ $ON_AC -eq 1 ] ; then
-		intel3945_AcPwrSave
-		intel2200_AcPwrSave
-		intel2100_AcPwrSave
+		[ -d /sys/module/$I3945_DRIVERNAME ] && intel3945_AcPwrSave
+		[ -d /sys/module/$I2200_DRIVERNAME ] && intel2200_AcPwrSave
+		[ -d /sys/module/$I2100_DRIVERNAME ] && intel2100_AcPwrSave
 	else
-		intel3945_BatPwrSave
-		intel2200_BatPwrSave
-		intel2100_BatPwrSave
+		[ -d /sys/module/$I3945_DRIVERNAME ] && intel3945_BatPwrSave
+		[ -d /sys/module/$I2200_DRIVERNAME ] && intel2200_BatPwrSave
+		[ -d /sys/module/$I2100_DRIVERNAME ] && intel2100_BatPwrSave
 	fi
 else
-	echo "Intel IPW Wireless power setting is disabled." >> $OUTPUT
+	$LM_VERBOSE && echo "Intel IPW Wireless power setting is disabled." >> $OUTPUT
 fi

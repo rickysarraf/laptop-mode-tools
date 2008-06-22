@@ -19,16 +19,16 @@ if [ x$CONTROL_TERMINAL = x1 ] ; then
 		BLANK_MINUTES="$BATT_TERMINAL_BLANK_MINUTES"
 		POWERDOWN_MINUTES="$BATT_TERMINAL_POWERDOWN_MINUTES"
 	fi
-	echo "Set terminal blanking timeout to $BLANK_MINUTES min, powerdown timeout to $POWERDOWN_MINUTES min." >> $OUTPUT
+	$LM_VERBOSE && echo "Set terminal blanking timeout to $BLANK_MINUTES min, powerdown timeout to $POWERDOWN_MINUTES min." >> $OUTPUT
 	for THISTERMINAL in $TERMINALS ; do
 		if [ -e $THISTERMINAL ] ; then
-			echo "Terminal $THISTERMINAL found, adjusting." >> $OUTPUT
+			$LM_VERBOSE && echo "Terminal $THISTERMINAL found, adjusting." >> $OUTPUT
 			TERM=linux setterm -blank "$BLANK_MINUTES" -powerdown "$POWERDOWN_MINUTES" > $THISTERMINAL
 		else
-			echo "Terminal $THISTERMINAL does not exist." >> $OUTPUT
+			$LM_VERBOSE && echo "Terminal $THISTERMINAL does not exist." >> $OUTPUT
 		fi
 	done
 else
-	echo "CONTROL_TERMINAL is disabled, skipping..." >> $OUTPUT
+	$LM_VERBOSE && echo "CONTROL_TERMINAL is disabled, skipping..." >> $OUTPUT
 fi
 

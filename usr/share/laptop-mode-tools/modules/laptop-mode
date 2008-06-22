@@ -46,15 +46,19 @@ replace_atime_mount_option () {
 	PARSEDOPTS="$(remove_fixed_mount_option relatime $PARSEDOPTS)"	
 	PARSEDOPTS="$(remove_fixed_mount_option norelatime $PARSEDOPTS)"	
 
-	if echo ",$REPLACEMENT_OPTS," | grep ",relatime," > /dev/null ; then
+	case ",$REPLACEMENT_OPTS," in
+	*",relatime,"*)
 		echo "$PARSEDOPTS,relatime"
-	elif echo ",$REPLACEMENT_OPTS," | grep ",noatime," > /dev/null ; then
+		;;
+	*",noatime,"*)
 		echo "$PARSEDOPTS,noatime"
-	else
+		;;
+	*)
 		# Kind of strange: to go from relatime to atime, we have to
 		# explicitly specify norelatime.
 	 	echo "$PARSEDOPTS,atime,norelatime"
-	fi
+	 	;;
+	esac
 }
 
 # Find out the state of a numbered option (e.g. "commit=NNN") in
@@ -89,11 +93,10 @@ deduce_fstype () {
 	# /etc/mtab. If we encounter "unknown", we try to get the
 	# type from fstab. This still might be wrong, in which
 	# case the code further down will issue a big warning.
-	cat /etc/fstab |
-	sed 's/[[:space:]]*#.*$//' |
+	sed 's/[[:space:]]*#.*$//' /etc/fstab |
 	while read FSTAB_DEV FSTAB_MP FSTAB_FST FSTAB_OPTS FSTAB_DUMP FSTAB_DUMP ; do
 		if [ "$FSTAB_MP" = "$MP" ]; then
-			echo $FSTAB_FST
+			echo "$FSTAB_FST"
 			exit 0
 		fi
 	done
@@ -107,23 +110,33 @@ deduce_fstype () {
 # Parameter 2: the value
 #
 set_sysctl() {
-	echo "Executing: echo $2 > $1" >> $OUTPUT
+	$LM_VERBOSE && echo "Executing: echo $2 > $1" >> $OUTPUT
 	if ! echo "$2" > "$1" ; then
 		echo "SETTING OF KERNEL PARAMETER FAILED: echo $2 \> $1"
 	fi
 }
 
 
-
+if [ "$CONTROL_READAHEAD" -ne 0 ] ; then
+	if /sbin/blockdev --help 2>&1 | grep -Fq -- '--setfra' ; then
+		READAHEAD_OPTION=--setfra					
+	else
+		READAHEAD_OPTION=--setra
+		if [ "$KLEVEL" = "2.4" ] ; then
+			echo "Warning: Running a 2.4 kernel with blockdev that does not support --setfra."
+			echo "File system readahead will not function properly."
+		fi
+	fi
+fi
 
 
 
 if [ $CONTROL_NOATIME -eq 1 ] ; then
 	if [ "$KLEVEL" = "2.4" ] ; then
-		echo "Relatime is not supported on 2.4 kernels. Using noatime instead" >> $OUTPUT 
+		$LM_VERBOSE && echo "Relatime is not supported on 2.4 kernels. Using noatime instead" >> $OUTPUT 
 		USE_RELATIME=0
 	elif [ "$KLEVEL" = "2.6" -a "$KMINOR" -lt 23 ] ; then
-		echo "Relatime is not supported on kernels before 2.6.23. Using noatime instead." >> $OUTPUT
+		$LM_VERBOSE && echo "Relatime is not supported on kernels before 2.6.23. Using noatime instead." >> $OUTPUT
 		USE_RELATIME=0
 	fi
 	if [ "$USE_RELATIME" = 1 ] ; then
@@ -150,28 +163,28 @@ if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 1 ] ; then
 		# (For 2.4 and early 2.6.)
 		# This only needs to be set, not reset -- it is only used when
 		# laptop mode is enabled.
-		echo "Adjusting XFS kernel parameters for 2.4 and early 2.6 kernels." >> $OUTPUT
+		$LM_VERBOSE && echo "Adjusting XFS kernel parameters for 2.4 and early 2.6 kernels." >> $OUTPUT
 		set_sysctl /proc/sys/vm/pagebuf/lm_flush_age  $XFS_AGE
 		set_sysctl /proc/sys/fs/xfs/lm_sync_interval  $XFS_AGE
 	elif [ -f /proc/sys/fs/xfs/lm_age_buffer ] ; then
 		# (A couple of early 2.6 laptop mode patches had these.)
 		# This only needs to be set, not reset -- it is only used when
 		# laptop mode is enabled.
-		echo "Adjusting XFS kernel parameters for early patched 2.6 kernels." >> $OUTPUT
+		$LM_VERBOSE && echo "Adjusting XFS kernel parameters for early patched 2.6 kernels." >> $OUTPUT
 		set_sysctl /proc/sys/fs/xfs/lm_age_buffer    $XFS_AGE
 		set_sysctl /proc/sys/fs/xfs/lm_sync_interval $XFS_AGE
 	elif [ -f /proc/sys/fs/xfs/age_buffer ] ; then
 		# (2.6.6)
 		# But not for these -- they are also used in normal
 		# operation.
-		echo "Adjusting XFS kernel parameters for 2.6.6 kernel." >> $OUTPUT
+		$LM_VERBOSE && echo "Adjusting XFS kernel parameters for 2.6.6 kernel." >> $OUTPUT
 		set_sysctl /proc/sys/fs/xfs/age_buffer       $XFS_AGE 
 		set_sysctl /proc/sys/fs/xfs/sync_interval    $XFS_AGE
 	elif [ -f /proc/sys/fs/xfs/age_buffer_centisecs ] ; then
 		# (2.6.7 upwards)
 		# And not for these either. These are in centisecs,
 		# not USER_HZ, so we have to use $AGE, not $XFS_AGE.
-		echo "Adjusting XFS kernel parameters for >2.6.7 kernel." >> $OUTPUT
+		$LM_VERBOSE && echo "Adjusting XFS kernel parameters for >2.6.7 kernel." >> $OUTPUT
 		set_sysctl /proc/sys/fs/xfs/age_buffer_centisecs  $AGE
 		set_sysctl /proc/sys/fs/xfs/xfssyncd_centisecs    $AGE
 		set_sysctl /proc/sys/fs/xfs/xfsbufd_centisecs     3000
@@ -179,12 +192,12 @@ if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 1 ] ; then
 
 	case "$KLEVEL" in
 		"2.4")
-			echo "Adjusting 2.4 kernel parameters to enable laptop mode." >> $OUTPUT
+			$LM_VERBOSE && echo "Adjusting 2.4 kernel parameters to enable laptop mode." >> $OUTPUT
 			set_sysctl /proc/sys/vm/laptop_mode   1
 			set_sysctl /proc/sys/vm/bdflush       "30 500 0 0 $AGE $AGE 60 20 0"
 			;;
 		"2.6")
-			echo "Adjusting 2.6 kernel parameters to enable laptop mode." >> $OUTPUT
+			$LM_VERBOSE && echo "Adjusting 2.6 kernel parameters to enable laptop mode." >> $OUTPUT
 			set_sysctl /proc/sys/vm/laptop_mode		  "$LM_SECONDS_BEFORE_SYNC"
 			set_sysctl /proc/sys/vm/dirty_writeback_centisecs "$AGE"
 			set_sysctl /proc/sys/vm/dirty_expire_centisecs    "$AGE"
@@ -193,57 +206,73 @@ if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 1 ] ; then
 			;;
 	esac
 	if [ $CONTROL_MOUNT_OPTIONS -eq 1 ]; then
-		echo "Remounting filesystems." >> $OUTPUT
+		$LM_VERBOSE && echo "Remounting filesystems." >> $OUTPUT
 		cat /etc/mtab | while read DEV MP FST OPTS DUMP PASS ; do
+			case "$FST" in 
+				rootfs|unionfs|tmpfs|squashfs|sysfs|usbfs|proc|devpts)
+				  	continue
+					;;
+			esac
+					
 			DO=0
-			if ( echo " $PARTITIONS " | grep " $DEV " > /dev/null ) ; then
-				DO=1
-				echo "$DEV found in PARTITIONS." >> $OUTPUT
-			else
-				echo "$DEV not found in PARTITIONS." >> $OUTPUT
-			fi
-			if ( echo " $PARTITIONS " | grep " $MP " > /dev/null ) ; then
-				DO=1
-				echo "$MP found in PARTITIONS." >> $OUTPUT
-			else
-				echo "$MP not found in PARTITIONS." >> $OUTPUT
-			fi
-			if ( echo " $PARTITIONS " | grep " auto " > /dev/null ) ; then
-				echo "Checking $DEV against HD because PARTITIONS contains \"auto\"." >> $OUTPUT
-				for THISHD in $HD ; do
-					echo "   Considering $THISHD." >> $OUTPUT
-					if ( echo " $DEV" | grep "$THISHD" > /dev/null ) ; then
-						DO=1
-						echo "   $DEV contains $THISHD, which is in HD, so we will remount it." >> $OUTPUT
-					fi
-				done
-			fi
+			
+			case " $PARTITIONS " in
+				*" $DEV "*)
+					DO=1
+					$LM_VERBOSE && echo "$DEV found in PARTITIONS." >> $OUTPUT
+					;;
+				*)
+					$LM_VERBOSE && echo "$DEV not found in PARTITIONS." >> $OUTPUT
+					;;
+			esac
+			case " $PARTITIONS " in
+				*" $MP "*)
+					DO=1
+					$LM_VERBOSE && echo "$MP found in PARTITIONS." >> $OUTPUT
+					;;
+				*)
+					$LM_VERBOSE && echo "$MP not found in PARTITIONS." >> $OUTPUT
+			esac
+			case " $PARTITIONS " in
+				*" auto "*)
+					$LM_VERBOSE && echo "Checking $DEV against HD because PARTITIONS contains \"auto\"." >> $OUTPUT
+					for THISHD in $HD ; do
+						$LM_VERBOSE && echo "   Considering $THISHD." >> $OUTPUT
+						case " $DEV" in *"$THISHD"*)
+							DO=1
+							$LM_VERBOSE && echo "   $DEV contains $THISHD, which is in HD, so we will remount it." >> $OUTPUT
+							break
+							;;
+						esac
+					done
+					;;
+			esac
 			if [ "$DO" -ne 0 ] ; then
-				echo "Original options: $OPTS" >> $OUTPUT
+				$LM_VERBOSE && echo "Original options: $OPTS" >> $OUTPUT
 				if [ "$WAS_ACTIVE" -eq 0 ] ; then
 					# Coming from inactive state: save last known mount options for the device.
-					echo Updating /var/run/laptop-mode-tools/nolm-mountopts.  >> $OUTPUT
+					$LM_VERBOSE && echo "Updating /var/run/laptop-mode-tools/nolm-mountopts."  >> $OUTPUT
 					if [ -f /var/run/laptop-mode-tools/nolm-mountopts ] ; then 
 						sed -i "s|^$DEV .*$||" /var/run/laptop-mode-tools/nolm-mountopts
 					fi
 					echo $DEV $OPTS >> /var/run/laptop-mode-tools/nolm-mountopts
 				else
-					echo Not updating /var/run/laptop-mode-tools/nolm-mountopts because laptop mode was already active. >> $OUTPUT
+					$LM_VERBOSE && echo "Not updating /var/run/laptop-mode-tools/nolm-mountopts because laptop mode was already active." >> $OUTPUT
 				fi
 				if [ "$FST" = 'unknown' ]; then
-					echo "Deducing fstype for $MP." >> $OUTPUT
+					$LM_VERBOSE && echo "Deducing fstype for $MP." >> $OUTPUT
 					FST=$(deduce_fstype $MP)
-					echo "Deduced fstype for $MP as $FST." >> $OUTPUT
+					$LM_VERBOSE && echo "Deduced fstype for $MP as $FST." >> $OUTPUT
 				fi
 				# Strip stuff like ext3,ext2 into just ext3.
-				echo Reducing file system type.  >> $OUTPUT
-				FST=`echo $FST | sed s/,.*//`
+				$LM_VERBOSE && echo "Reducing file system type."  >> $OUTPUT
+				FST=${FST%%,*}
 				case "$FST" in
 					"ext3"|"reiserfs")
-						echo Removing commit mount option from original options.  >> $OUTPUT
+						$LM_VERBOSE && echo "Removing commit mount option from original options."  >> $OUTPUT
 						PARSEDOPTS="$(remove_numeric_mount_option commit "$OPTS")"
-						echo "Executing: mount $DEV -t $FST $MP -o remount,$PARSEDOPTS,commit=$MAX_LOST_WORK_SECONDS$NOATIME_OPT" >> $OUTPUT
-						if (! mount $DEV -t $FST $MP -o remount,$PARSEDOPTS,commit=$MAX_LOST_WORK_SECONDS$NOATIME_OPT) ; then
+						$LM_VERBOSE && echo "Executing: mount $DEV $MP -t $FST -o remount,$PARSEDOPTS,commit=$MAX_LOST_WORK_SECONDS$NOATIME_OPT" >> $OUTPUT
+						if (! mount $DEV $MP -t $FST -o remount,$PARSEDOPTS,commit=$MAX_LOST_WORK_SECONDS$NOATIME_OPT) ; then
 							if [ "$FST" = "ext3" -a "$MP" = "/" ] ; then
 								echo "BIG FAT WARNING: Your root filesystem mounted as ext3 seems to lack support for"
 								echo "the commit mount option. This usually means that your root filesystem is"
@@ -258,13 +287,13 @@ if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 1 ] ; then
 						fi
 						;;
 					*)
-						echo "Executing: mount $DEV -t $FST $MP -o remount,$OPTS$NOATIME_OPT" >> $OUTPUT
-						mount $DEV -t $FST $MP -o remount,$OPTS$NOATIME_OPT
+						$LM_VERBOSE && echo "Executing: mount $DEV $MP -t $FST -o remount,$OPTS$NOATIME_OPT" >> $OUTPUT
+						mount $DEV $MP -t $FST -o remount,$OPTS$NOATIME_OPT
 						;;
 				esac
 				if [ -b $DEV -a "$CONTROL_READAHEAD" -ne 0 ] ; then
-					echo "Executing: /sbin/blockdev --setfra $(($LM_READAHEAD * 2)) $DEV" >> $OUTPUT
-					/sbin/blockdev --setfra $(($LM_READAHEAD * 2)) $DEV >> $OUTPUT 2>&1
+					$LM_VERBOSE && echo "Executing: /sbin/blockdev $READAHEAD_OPTION $(($LM_READAHEAD * 2)) $DEV" >> $OUTPUT
+					/sbin/blockdev $READAHEAD_OPTION $(($LM_READAHEAD * 2)) $DEV >> $OUTPUT 2>&1
 				fi
 			fi
 		done
@@ -276,23 +305,23 @@ else
 	set_sysctl /proc/sys/vm/laptop_mode 0
 	if [ -f /proc/sys/fs/xfs/age_buffer -a ! -f /proc/sys/fs/xfs/lm_age_buffer ] ; then
 		# These need to be restored, if there are no lm_*.
-		echo "Restoring default XFS settings (pre-centisecs version)." >> $OUTPUT
+		$LM_VERBOSE && echo "Restoring default XFS settings (pre-centisecs version)." >> $OUTPUT
 		set_sysctl /proc/sys/fs/xfs/age_buffer    $(($XFS_HZ*$DEF_XFS_AGE_BUFFER))
 		set_sysctl /proc/sys/fs/xfs/sync_interval $(($XFS_HZ*$DEF_XFS_SYNC_INTERVAL))
 	elif [ -f /proc/sys/fs/xfs/age_buffer_centisecs ] ; then
 		# These need to be restored as well.
-		echo "Restoring default XFS settings." >> $OUTPUT
+		$LM_VERBOSE && echo "Restoring default XFS settings." >> $OUTPUT
 		set_sysctl /proc/sys/fs/xfs/age_buffer_centisecs  $((100*$DEF_XFS_AGE_BUFFER))
 		set_sysctl /proc/sys/fs/xfs/xfssyncd_centisecs    $((100*$DEF_XFS_SYNC_INTERVAL))
 		set_sysctl /proc/sys/fs/xfs/xfsbufd_centisecs     $((100*$DEF_XFS_BUFD_INTERVAL))
 	fi
 	case "$KLEVEL" in
 		"2.4")
-			echo "Adjusting 2.4 kernel parameters to disable laptop mode." >> $OUTPUT
+			$LM_VERBOSE && echo "Adjusting 2.4 kernel parameters to disable laptop mode." >> $OUTPUT
 			set_sysctl /proc/sys/vm/bdflush "30 500 0 0 $U_AGE $B_AGE 60 20 0"
 			;;
 		"2.6")
-			echo "Adjusting 2.6 kernel parameters to disable laptop mode." >> $OUTPUT
+			$LM_VERBOSE && echo "Adjusting 2.6 kernel parameters to disable laptop mode." >> $OUTPUT
 			set_sysctl /proc/sys/vm/dirty_writeback_centisecs   "$U_AGE"
 			set_sysctl /proc/sys/vm/dirty_expire_centisecs      "$B_AGE"
 			set_sysctl /proc/sys/vm/dirty_ratio		    "$NOLM_DIRTY_RATIO"
@@ -300,43 +329,53 @@ else
 			;;
 	esac
 	if [ $CONTROL_MOUNT_OPTIONS -eq 1 ] ; then
-		echo "Remounting filesystems." >> $OUTPUT
+		$LM_VERBOSE && echo "Remounting filesystems." >> $OUTPUT
 		cat /etc/mtab | while read DEV MP FST OPTS DUMP PASS ; do
 			DO=0
-			if ( echo " $PARTITIONS " | grep " $DEV " > /dev/null ) ; then
-				DO=1
-				echo "$DEV found in PARTITIONS." >> $OUTPUT
-			else
-				echo "$DEV not found in PARTITIONS." >> $OUTPUT
-			fi
-			if ( echo " $PARTITIONS " | grep " $MP " > /dev/null ) ; then
-				DO=1
-				echo "$MP found in PARTITIONS." >> $OUTPUT
-			else
-				echo "$MP not found in PARTITIONS." >> $OUTPUT
-			fi
-			if ( echo " $PARTITIONS " | grep " auto " > /dev/null ) ; then
-				echo "Checking $DEV against HD because PARTITIONS contains \"auto\"." >> $OUTPUT
-				for THISHD in $HD ; do
-					echo "   Considering $THISHD." >> $OUTPUT
-					if ( echo " $DEV" | grep "$THISHD" > /dev/null ) ; then
-						DO=1
-						echo "   $DEV contains $THISHD, which is in HD, so we will remount it." >> $OUTPUT
-					fi
-				done
-			fi
+			case " $PARTITIONS " in
+				*" $DEV "*)
+					DO=1
+					$LM_VERBOSE && echo "$DEV found in PARTITIONS." >> $OUTPUT
+					;;
+				*)
+					$LM_VERBOSE && echo "$DEV not found in PARTITIONS." >> $OUTPUT
+					;;
+			esac
+			case " $PARTITIONS " in
+				*" $MP "*)
+					DO=1
+					$LM_VERBOSE && echo "$MP found in PARTITIONS." >> $OUTPUT
+					;;
+				*)
+					$LM_VERBOSE && echo "$MP not found in PARTITIONS." >> $OUTPUT
+					;;
+			esac
+			case " $PARTITIONS " in
+				*" auto "*)
+					$LM_VERBOSE && echo "Checking $DEV against HD because PARTITIONS contains \"auto\"." >> $OUTPUT
+					for THISHD in $HD ; do
+						$LM_VERBOSE && echo "   Considering $THISHD." >> $OUTPUT
+						case " $DEV" in *"$THISHD"*)
+							DO=1
+							$LM_VERBOSE && echo "   $DEV contains $THISHD, which is in HD, so we will remount it." >> $OUTPUT
+							break
+							;;
+						esac
+					done
+					;;
+			esac
 			if [ "$DO" -ne 0 ] ; then
 				# Reset commit and atime options to defaults.
-				echo "Original options: $OPTS" >> $OUTPUT
+				$LM_VERBOSE && echo "Original options: $OPTS" >> $OUTPUT
 				if [ "$FST" = 'unknown' ]; then
-					echo "Deducing fstype for $MP." >> $OUTPUT
+					$LM_VERBOSE && echo "Deducing fstype for $MP." >> $OUTPUT
 					FST=$(deduce_fstype $MP)
-					echo "Deduced fstype for $MP as $FST." >> $OUTPUT
+					$LM_VERBOSE && echo "Deduced fstype for $MP as $FST." >> $OUTPUT
 				fi
 				
 				# Strip stuff like ext3,ext2 into just ext3.
-				echo Reducing file system type.  >> $OUTPUT
-				FST=`echo $FST | sed s/,.*//`
+				$LM_VERBOSE && echo "Reducing file system type." >> $OUTPUT
+				FST=${FST%%,*}
 				
 				# Retrieve original non-laptop mode mount options and restore them.
 				# If the file that stores them doesn't exist, then laptop mode
@@ -349,22 +388,22 @@ else
 						"ext3"|"reiserfs")								
 							PARSEDOPTS="$(replace_numeric_mount_option commit commit=0 $SAVED_OPTS $OPTS)"
 							PARSEDOPTS="$(replace_atime_mount_option $SAVED_OPTS $PARSEDOPTS)"
-							echo Executing: mount $DEV -t $FST $MP -o remount,$PARSEDOPTS >> $OUTPUT
-							mount $DEV -t $FST $MP -o remount,$PARSEDOPTS
+							$LM_VERBOSE && echo "Executing: mount $DEV $MP -t $FST -o remount,$PARSEDOPTS" >> $OUTPUT
+							mount $DEV $MP -t $FST -o remount,$PARSEDOPTS
 							;;
 						*)
 							PARSEDOPTS="$(replace_atime_mount_option $SAVED_OPTS $OPTS)"
-							echo Executing: mount $DEV -t $FST $MP -o remount,$PARSEDOPTS >> $OUTPUT
-							mount $DEV -t $FST $MP -o remount,$PARSEDOPTS
+							$LM_VERBOSE && echo "Executing: mount $DEV $MP -t $FST -o remount,$PARSEDOPTS" >> $OUTPUT
+							mount $DEV $MP -t $FST -o remount,$PARSEDOPTS
 							;;
 					esac
 				else
-					echo "No saved mount options, so apparently we never remounted this filesystem during this session." >> $OUTPUT
-					echo "Not remounting." >> $OUTPUT
+					$LM_VERBOSE && echo "No saved mount options, so apparently we never remounted this filesystem during this session." >> $OUTPUT
+					$LM_VERBOSE && echo "Not remounting." >> $OUTPUT
 				fi
 				if [ -b $DEV -a "$CONTROL_READAHEAD" -ne 0 ] ; then
-					echo "Executing: /sbin/blockdev --setfra $(($NOLM_READAHEAD * 2)) $DEV" >> $OUTPUT
-					/sbin/blockdev --setfra $(($NOLM_READAHEAD * 2)) $DEV >> $OUTPUT 2>&1
+					$LM_VERBOSE && echo "Executing: /sbin/blockdev $READAHEAD_OPTION $(($NOLM_READAHEAD * 2)) $DEV" >> $OUTPUT
+					/sbin/blockdev $READAHEAD_OPTION $(($NOLM_READAHEAD * 2)) $DEV >> $OUTPUT 2>&1
 				fi
 			fi
 		done

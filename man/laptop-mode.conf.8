@@ -595,10 +595,10 @@ manually in exchange for the power saving.
 If this option is enabled, laptop mode tools will control the HAL polling
 behaviour.
 
-.IP "\fBBATT_ENABLE_HAL_POLLING\fP" 10
-.IP "\fBAC_ENABLE_HAL_POLLING\fP" 10
+.IP "\fBBATT_DISABLE_HAL_POLLING\fP" 10
+.IP "\fBAC_DISABLE_HAL_POLLING\fP" 10
 These settings define the polling behaviour on AC and on battery. To disable
-polling, set the options to 0, to enable, set them to 1.
+polling, set the options to 1, to enable, set them to 0.
 
 .IP "\fBHAL_POLLING_DEVICES\fP" 10
 This setting defines for which devices the polling behaviour will be altered.
@@ -623,6 +623,18 @@ disable bluetooth, set the options to 0, to enable, set them to 1.
 This setting defines the interfaces the bluetooth module will control. It
 should contain a space separated list of interfaces. (Note that you probably
 have only one bluetooth interface, and it will probably be named "hci0".)
+
+
+.SS "\fI/etc/laptop-mode/conf.d/intel-sata-powermgmt.conf\fP"
+
+The intel-sata-powermgmt module allows you to enable the power saving mode for
+Intel AHCI compliant SATA controllers. This power saving mode is also known as
+Aggressive Link Power Management (ALPM).
+
+.IP "\fBCONTROL_INTEL_SATA_POWER\fP" 10
+If this option is enabled, laptop mode tools will automatically enable the
+Intel SATA controller power saving settings. The power saving settings are
+always enabled, not only on battery power.
 
 
 
