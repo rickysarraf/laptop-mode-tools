@@ -13,11 +13,13 @@ if [ x$CONTROL_BLUETOOTH = x1 ] ; then
 		$LM_VERBOSE && echo "Enabling bluetooth." >> $OUTPUT
 		modprobe -q hci_usb
 		for INTF in $BLUETOOTH_INTERFACES ; do
+			[ -d /sys/class/bluetooth/$INTF ] || continue
 			hciconfig $INTF up 2>&1 >> $OUTPUT
 		done
 	else
 		$LM_VERBOSE && echo "Disabling bluetooth." >> $OUTPUT
 		for INTF in $BLUETOOTH_INTERFACES ; do
+			[ -d /sys/class/bluetooth/$INTF ] || continue
 			hciconfig $INTF down 2>&1 >> $OUTPUT
 		done
 		# This may take a while to work because the module may be

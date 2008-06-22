@@ -5,7 +5,7 @@
 
 
 # Set X screen standby/suspend/powerdown timing
-if [ $CONTROL_DPMS_STANDBY -eq 1 ] ; then
+if [ x$CONTROL_DPMS_STANDBY = x1 ] ; then
 	if [ $ON_AC -eq 1 ]; then
 		if [ "$ACTIVATE" -eq 1 ]; then
 			STANDBY="$LM_AC_DPMS_STANDBY"

@@ -46,15 +46,19 @@ replace_atime_mount_option () {
 	PARSEDOPTS="$(remove_fixed_mount_option relatime $PARSEDOPTS)"	
 	PARSEDOPTS="$(remove_fixed_mount_option norelatime $PARSEDOPTS)"	
 
-	if echo ",$REPLACEMENT_OPTS," | grep ",relatime," > /dev/null ; then
+	case ",$REPLACEMENT_OPTS," in
+	*",relatime,"*)
 		echo "$PARSEDOPTS,relatime"
-	elif echo ",$REPLACEMENT_OPTS," | grep ",noatime," > /dev/null ; then
+		;;
+	*",noatime,"*)
 		echo "$PARSEDOPTS,noatime"
-	else
+		;;
+	*)
 		# Kind of strange: to go from relatime to atime, we have to
 		# explicitly specify norelatime.
 	 	echo "$PARSEDOPTS,atime,norelatime"
-	fi
+	 	;;
+	esac
 }
 
 # Find out the state of a numbered option (e.g. "commit=NNN") in
@@ -89,11 +93,10 @@ deduce_fstype () {
 	# /etc/mtab. If we encounter "unknown", we try to get the
 	# type from fstab. This still might be wrong, in which
 	# case the code further down will issue a big warning.
-	cat /etc/fstab |
-	sed 's/[[:space:]]*#.*$//' |
+	sed 's/[[:space:]]*#.*$//' /etc/fstab |
 	while read FSTAB_DEV FSTAB_MP FSTAB_FST FSTAB_OPTS FSTAB_DUMP FSTAB_DUMP ; do
 		if [ "$FSTAB_MP" = "$MP" ]; then
-			echo $FSTAB_FST
+			echo "$FSTAB_FST"
 			exit 0
 		fi
 	done
@@ -114,7 +117,17 @@ set_sysctl() {
 }
 
 
-
+if [ "$CONTROL_READAHEAD" -ne 0 ] ; then
+	if /sbin/blockdev --help 2>&1 | grep -Fq -- '--setfra' ; then
+		READAHEAD_OPTION=--setfra					
+	else
+		READAHEAD_OPTION=--setra
+		if [ "$KLEVEL" = "2.4" ] ; then
+			echo "Warning: Running a 2.4 kernel with blockdev that does not support --setfra."
+			echo "File system readahead will not function properly."
+		fi
+	fi
+fi
 
 
 
@@ -195,6 +208,12 @@ if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 1 ] ; then
 	if [ $CONTROL_MOUNT_OPTIONS -eq 1 ]; then
 		$LM_VERBOSE && echo "Remounting filesystems." >> $OUTPUT
 		cat /etc/mtab | while read DEV MP FST OPTS DUMP PASS ; do
+			case "$FST" in 
+				rootfs|unionfs|tmpfs|squashfs|sysfs|usbfs|proc|devpts)
+				  	continue
+					;;
+			esac
+					
 			DO=0
 			
 			case " $PARTITIONS " in
@@ -247,13 +266,13 @@ if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 1 ] ; then
 				fi
 				# Strip stuff like ext3,ext2 into just ext3.
 				$LM_VERBOSE && echo "Reducing file system type."  >> $OUTPUT
-				FST=`echo $FST | sed s/,.*//`
+				FST=${FST%%,*}
 				case "$FST" in
 					"ext3"|"reiserfs")
 						$LM_VERBOSE && echo "Removing commit mount option from original options."  >> $OUTPUT
 						PARSEDOPTS="$(remove_numeric_mount_option commit "$OPTS")"
-						$LM_VERBOSE && echo "Executing: mount $DEV -t $FST $MP -o remount,$PARSEDOPTS,commit=$MAX_LOST_WORK_SECONDS$NOATIME_OPT" >> $OUTPUT
-						if (! mount $DEV -t $FST $MP -o remount,$PARSEDOPTS,commit=$MAX_LOST_WORK_SECONDS$NOATIME_OPT) ; then
+						$LM_VERBOSE && echo "Executing: mount $DEV $MP -t $FST -o remount,$PARSEDOPTS,commit=$MAX_LOST_WORK_SECONDS$NOATIME_OPT" >> $OUTPUT
+						if (! mount $DEV $MP -t $FST -o remount,$PARSEDOPTS,commit=$MAX_LOST_WORK_SECONDS$NOATIME_OPT) ; then
 							if [ "$FST" = "ext3" -a "$MP" = "/" ] ; then
 								echo "BIG FAT WARNING: Your root filesystem mounted as ext3 seems to lack support for"
 								echo "the commit mount option. This usually means that your root filesystem is"
@@ -268,13 +287,13 @@ if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 1 ] ; then
 						fi
 						;;
 					*)
-						$LM_VERBOSE && echo "Executing: mount $DEV -t $FST $MP -o remount,$OPTS$NOATIME_OPT" >> $OUTPUT
-						mount $DEV -t $FST $MP -o remount,$OPTS$NOATIME_OPT
+						$LM_VERBOSE && echo "Executing: mount $DEV $MP -t $FST -o remount,$OPTS$NOATIME_OPT" >> $OUTPUT
+						mount $DEV $MP -t $FST -o remount,$OPTS$NOATIME_OPT
 						;;
 				esac
 				if [ -b $DEV -a "$CONTROL_READAHEAD" -ne 0 ] ; then
-					$LM_VERBOSE && echo "Executing: /sbin/blockdev --setfra $(($LM_READAHEAD * 2)) $DEV" >> $OUTPUT
-					/sbin/blockdev --setfra $(($LM_READAHEAD * 2)) $DEV >> $OUTPUT 2>&1
+					$LM_VERBOSE && echo "Executing: /sbin/blockdev $READAHEAD_OPTION $(($LM_READAHEAD * 2)) $DEV" >> $OUTPUT
+					/sbin/blockdev $READAHEAD_OPTION $(($LM_READAHEAD * 2)) $DEV >> $OUTPUT 2>&1
 				fi
 			fi
 		done
@@ -355,8 +374,8 @@ else
 				fi
 				
 				# Strip stuff like ext3,ext2 into just ext3.
-				$LM_VERBOSE && echo Reducing file system type.  >> $OUTPUT
-				FST=`echo $FST | sed s/,.*//`
+				$LM_VERBOSE && echo "Reducing file system type." >> $OUTPUT
+				FST=${FST%%,*}
 				
 				# Retrieve original non-laptop mode mount options and restore them.
 				# If the file that stores them doesn't exist, then laptop mode
@@ -369,13 +388,13 @@ else
 						"ext3"|"reiserfs")								
 							PARSEDOPTS="$(replace_numeric_mount_option commit commit=0 $SAVED_OPTS $OPTS)"
 							PARSEDOPTS="$(replace_atime_mount_option $SAVED_OPTS $PARSEDOPTS)"
-							$LM_VERBOSE && echo "Executing: mount $DEV -t $FST $MP -o remount,$PARSEDOPTS" >> $OUTPUT
-							mount $DEV -t $FST $MP -o remount,$PARSEDOPTS
+							$LM_VERBOSE && echo "Executing: mount $DEV $MP -t $FST -o remount,$PARSEDOPTS" >> $OUTPUT
+							mount $DEV $MP -t $FST -o remount,$PARSEDOPTS
 							;;
 						*)
 							PARSEDOPTS="$(replace_atime_mount_option $SAVED_OPTS $OPTS)"
-							$LM_VERBOSE && echo "Executing: mount $DEV -t $FST $MP -o remount,$PARSEDOPTS" >> $OUTPUT
-							mount $DEV -t $FST $MP -o remount,$PARSEDOPTS
+							$LM_VERBOSE && echo "Executing: mount $DEV $MP -t $FST -o remount,$PARSEDOPTS" >> $OUTPUT
+							mount $DEV $MP -t $FST -o remount,$PARSEDOPTS
 							;;
 					esac
 				else
@@ -383,8 +402,8 @@ else
 					$LM_VERBOSE && echo "Not remounting." >> $OUTPUT
 				fi
 				if [ -b $DEV -a "$CONTROL_READAHEAD" -ne 0 ] ; then
-					$LM_VERBOSE && echo "Executing: /sbin/blockdev --setfra $(($NOLM_READAHEAD * 2)) $DEV" >> $OUTPUT
-					/sbin/blockdev --setfra $(($NOLM_READAHEAD * 2)) $DEV >> $OUTPUT 2>&1
+					$LM_VERBOSE && echo "Executing: /sbin/blockdev $READAHEAD_OPTION $(($NOLM_READAHEAD * 2)) $DEV" >> $OUTPUT
+					/sbin/blockdev $READAHEAD_OPTION $(($NOLM_READAHEAD * 2)) $DEV >> $OUTPUT 2>&1
 				fi
 			fi
 		done

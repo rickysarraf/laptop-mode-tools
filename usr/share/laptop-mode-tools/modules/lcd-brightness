@@ -6,7 +6,7 @@
 
 
 # Control LCD brightness
-if [ $CONTROL_BRIGHTNESS -eq 1 ] ; then
+if [ x$CONTROL_BRIGHTNESS = x1 ] ; then
 	if [ $ON_AC -eq 1 ]; then
 		if [ "$ACTIVATE" -eq 1 ]; then
 			BRIGHTNESS_COMMAND="$LM_AC_BRIGHTNESS_COMMAND"

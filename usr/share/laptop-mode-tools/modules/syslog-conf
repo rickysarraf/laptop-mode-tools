@@ -9,7 +9,7 @@
 
 
 
-if [ $CONTROL_SYSLOG_CONF -eq 1 ] ; then
+if [ x$CONTROL_SYSLOG_CONF = x1 ] ; then
 	$LM_VERBOSE && echo "Adjusting syslog configuration." >> $OUTPUT
 	if [ "`readlink -f $SYSLOG_CONF`" != "$SYSLOG_CONF" ] ; then
 		echo "$SYSLOG_CONF is a symlink." >> $OUTPUT

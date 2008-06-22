@@ -340,10 +340,10 @@ fi
 
 if [ "$1" = "status" ] ; then
 	# Display a status report.
-	echo Mounts:
+	echo "Mounts:"
 	mount | sed "s/^/   /"
 	echo
-	echo Drive power status:
+	echo "Drive power status:"
 	for disk in $HD; do
 		if [ -r $disk ]; then
 			hdparm -C $disk 2>/dev/null | sed "s/^/   /"
@@ -354,8 +354,13 @@ if [ "$1" = "status" ] ; then
 	echo
 	echo "(NOTE: drive settings affected by Laptop Mode cannot be retrieved.)"
 	echo
-	echo Readahead states:
+	echo "Readahead states:"
 	cat /etc/mtab | while read DEV MP FST OPTS DUMP PASS ; do
+		# skip funny stuff
+		case "$FST" in 
+		  rootfs|unionfs|tmpfs|squashfs|sysfs|usbfs|proc|devpts) continue
+		  ;;
+		esac
 		if [ -b $DEV ] ; then
 			if [ -r $DEV ] ; then
 				echo "   $DEV: $((`blockdev --getra $DEV` / 2)) kB"
@@ -366,17 +371,17 @@ if [ "$1" = "status" ] ; then
 	done
 	echo
 	if [ -e /var/run/laptop-mode-tools/enabled ] ; then
-		echo Laptop Mode Tools is allowed to run: /var/run/laptop-mode-tools/enabled exists.
+		echo "Laptop Mode Tools is allowed to run: /var/run/laptop-mode-tools/enabled exists."
 	else
-		echo Laptop Mode Tools is NOT allowed to run: /var/run/laptop-mode-tools/enabled does not exist.
+		echo "Laptop Mode Tools is NOT allowed to run: /var/run/laptop-mode-tools/enabled does not exist."
 	fi
 	echo
 	STATFILES="/proc/sys/vm/laptop_mode /proc/apm /proc/pmu/info /proc/sys/vm/bdflush /proc/sys/vm/dirty_ratio /proc/sys/fs/xfs/age_buffer /proc/sys/fs/xfs/sync_interval /proc/sys/fs/xfs/lm_age_buffer /proc/sys/fs/xfs/lm_sync_interval /proc/sys/vm/pagebuf/lm_flush_age /proc/sys/fs/xfs/xfsbufd_centisecs /proc/sys/fs/xfs/xfssyncd_centisecs /proc/sys/vm/dirty_background_ratio /proc/sys/vm/dirty_expire_centisecs /proc/sys/fs/xfs/age_buffer/centisecs /proc/sys/vm/dirty_writeback_centisecs /sys/devices/system/cpu/*/cpufreq/cpuinfo_*_freq /sys/devices/system/cpu/*/cpufreq/scaling_governor /proc/acpi/button/lid/*/state /proc/acpi/ac_adapter/*/state /proc/acpi/battery/*/state /sys/class/power_supply/*/online /sys/class/power_supply/*/state"
 	for THISFILE in $STATFILES ; do
-		if [ -e $THISFILE ] ; then
-			echo $THISFILE:
-			if [ -r $THISFILE ] ; then
-				cat $THISFILE | sed "s/^/   /"
+		if [ -e "$THISFILE" ] ; then
+			echo "$THISFILE:"
+			if [ -r "$THISFILE" ] ; then
+				cat "$THISFILE" | sed "s/^/   /"
 			else
 				echo "   Not accessible, permission denied - $0 needs to be run as root."
 			fi
@@ -501,7 +506,7 @@ elif [ -f /proc/apm ] ; then
 	fi
 elif [ -f /proc/pmu/info ] ; then
 	$LM_VERBOSE && echo "Determining power state from /proc/pmu/info." >> $OUTPUT
-	if ( grep "^AC Power.*0$" /proc/pmu/info ) ; then
+	if ( grep -q "^AC Power.*0$" /proc/pmu/info ) ; then
 		$LM_VERBOSE && echo "/proc/pmu/info indicates absence of AC power." >> $OUTPUT
 		ON_AC=0
 	else
@@ -548,7 +553,7 @@ if [ "$ENABLE_LAPTOP_MODE_WHEN_LID_CLOSED" -ne 0 -a "$ACTIVATE" -eq 0 ] ; then
 			ACTIVATE=1			
 		fi
 	elif [ -f /proc/acpi/button/lid/*/state ] ; then
-		if ( cat /proc/acpi/button/lid/*/state | grep "closed" ) ; then
+		if ( grep -q "closed" /proc/acpi/button/lid/*/state ) ; then
 			$LM_VERBOSE && echo 'Setting action to "start" because the lid is closed (says /proc/acpi/button/lid/*/state).' >> $OUTPUT
 			ACTIVATE=1
 		fi
@@ -747,19 +752,19 @@ else
 			$LM_VERBOSE && echo "Checking info and state for $BATT." >> $OUTPUT
 
 			# Only do if the battery is present
-			if ( cat $BATT_INFO | grep "present:.*yes" > /dev/null ) ; then
+			if ( grep -q 'present:.*yes' $BATT_INFO ) ; then
 				FOUND_AN_ENABLED_CHECK=0
 				FOUND_AN_ENABLED_HIBERNATION_CHECK=0
 			
 				# Get the remaining capacity.
-				REMAINING=`cat $BATT_STATE | grep "remaining capacity:" | sed  "s/.* \([0-9][0-9]* \).*/\1/" `
+				REMAINING=`grep "remaining capacity:" $BATT_STATE | sed  "s/.* \([0-9][0-9]* \).*/\1/" `
 				if [ -z "$REMAINING" ] ; then
 					$LM_VERBOSE && echo "Battery does not report remaining charte. Perhaps it is not present?" >> $OUTPUT
 					REMAINING=0
 				fi
 				$LM_VERBOSE && echo "Remaining charge: $REMAINING" >> $OUTPUT
 
-				CAPACITY=`cat $BATT_INFO | grep "design capacity:" | sed  "s/.* \([0-9][0-9]* \).*/\1/" `
+				CAPACITY=`grep "design capacity:" $BATT_INFO | sed  "s/.* \([0-9][0-9]* \).*/\1/" `
 				if [ -z "$CAPACITY" ] ; then
 					$LM_VERBOSE && echo "Battery does not report capacity. Perhaps it is not present?" >> $OUTPUT
 					CAPACITY=0
@@ -794,9 +799,9 @@ else
 				# Determine the reporting unit.
 				IN_MAH=0
 				IN_MWH=0
-				if ( cat $BATT_INFO | grep mWh > /dev/null ) ; then
+				if ( grep -q mWh $BATT_INFO ) ; then
 					IN_MWH=1
-				elif ( cat $BATT_INFO | grep mAh > /dev/null ) ; then
+				elif ( grep -q mAh $BATT_INFO ) ; then
 					IN_MAH=1
 				fi
 			
@@ -831,7 +836,7 @@ else
 					echo "mWh or mAh."
 				fi
 			
-				CAP_STATE=`cat "$BATT_STATE" | sed -r 's/^capacity state:\s*(.*)\s*$/\1/;t;d'`
+				CAP_STATE=`sed -r 's/^capacity state:\s*(.*)\s*$/\1/;t;d' "$BATT_STATE"`
 				if [ "$DISABLE_LAPTOP_MODE_ON_CRITICAL_BATTERY_LEVEL" -ne 0 ] ; then
 					if [ "$CAP_STATE" = "critical" ] ; then				
 						# Restore the state we had before checking this battery, so that
@@ -892,7 +897,7 @@ if [ -f /var/run/laptop-mode-tools/state ] ; then
 			if [ "$WAS_ACTIVE" -eq 1 ] ; then
 				echo -n "active [unchanged]"
 				if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 0 ] ; then
-					echo -n ' (Data-loss sensitive features disabled.)'
+					echo -n " (Data-loss sensitive features disabled.)"
 				fi
 				echo
 			else
@@ -904,12 +909,12 @@ if [ -f /var/run/laptop-mode-tools/state ] ; then
 else
 	$LM_VERBOSE && echo "/var/run/laptop-mode-tools/state does not exist, no previous state." >> $OUTPUT
 fi
-echo $ACTIVATE $ON_AC $ACTIVATE_WITH_POSSIBLE_DATA_LOSS $STATE > /var/run/laptop-mode-tools/state
+echo "$ACTIVATE $ON_AC $ACTIVATE_WITH_POSSIBLE_DATA_LOSS $STATE" > /var/run/laptop-mode-tools/state
 
 if [ "$ACTIVATE" -eq 1 ] ; then
 	echo -n "$STATE, active."
 	if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 0 ] ; then
-		echo -n ' (Data-loss sensitive features disabled.)'
+		echo -n " (Data-loss sensitive features disabled.)"
 	fi
 	echo
 else

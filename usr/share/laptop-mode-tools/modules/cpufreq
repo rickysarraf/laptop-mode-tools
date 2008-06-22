@@ -23,7 +23,7 @@ set_sysctl() {
 #   $1 = file containing the list of values
 #
 get_medium_value() {
-	cat "$1" | sed 's/ /\n/g' | sort -n | awk -v RS="" '{n=split($0,a); print a[int((n+1)/2)]}'
+	cat "$1" | tr ' ' '\n' | sort -n | awk -v RS="" '{n=split($0,a); print a[int((n+1)/2)]}'
 }
 
 
@@ -52,24 +52,31 @@ if [ x$CONTROL_CPU_FREQUENCY = x1 ] ; then
 			THIS_CPU_MINFREQ="$CPU_MINFREQ"
 			THIS_CPU_GOVERNOR="$CPU_GOVERNOR"
 			THIS_CPU_IGNORE_NICE_LOAD="$CPU_IGNORE_NICE_LOAD"
-			if [ "$CPU_MAXFREQ" = "slowest" ]; then
+			
+			case "$CPU_MAXFREQ" in
+			"slowest")
 				THIS_CPU_MAXFREQ=`cat $THISCPU/cpufreq/cpuinfo_min_freq`
-			fi
-			if [ "$CPU_MINFREQ" = 'slowest' ]; then
-				THIS_CPU_MINFREQ=`cat $THISCPU/cpufreq/cpuinfo_min_freq`
-			fi
-			if [ "$CPU_MAXFREQ" = "medium" ] ; then
+				;;
+			"medium")
 				THIS_CPU_MAXFREQ=$(get_medium_value $THISCPU/cpufreq/scaling_available_frequencies)
-			fi
-			if [ "$CPU_MINFREQ" = "medium" ] ; then
-				THIS_CPU_MINFREQ=$(get_medium_value $THISCPU/cpufreq/scaling_available_frequencies)
-			fi
-			if [ "$CPU_MAXFREQ" = "fastest" ] ; then
+				;;
+			"fastest")
 				THIS_CPU_MAXFREQ=`cat $THISCPU/cpufreq/cpuinfo_max_freq`
-			fi
-			if [ "$CPU_MINFREQ" = "fastest" ] ; then
+				;;
+			esac
+			
+			case "$CPU_MINFREQ" in
+			"slowest")
+				THIS_CPU_MINFREQ=`cat $THISCPU/cpufreq/cpuinfo_min_freq`
+				;;
+			"medium")
+				THIS_CPU_MINFREQ=$(get_medium_value $THISCPU/cpufreq/scaling_available_frequencies)
+				;;
+			"fastest")
 				THIS_CPU_MINFREQ=`cat $THISCPU/cpufreq/cpuinfo_max_freq`
-			fi
+				;;
+			esac
+
 			$LM_VERBOSE && echo "Setting CPU maximum frequency for cpu $THISCPU to $THIS_CPU_MAXFREQ." >> $OUTPUT
 			set_sysctl $THISCPU/cpufreq/scaling_max_freq $THIS_CPU_MAXFREQ
 			$LM_VERBOSE && echo "Setting CPU minimum frequency for cpu $THISCPU to $THIS_CPU_MINFREQ." >> $OUTPUT
@@ -88,7 +95,7 @@ if [ x$CONTROL_CPU_FREQUENCY = x1 ] ; then
 	done
 fi
 
-if [ $CONTROL_CPU_THROTTLING -eq 1 ] ; then
+if [ x$CONTROL_CPU_THROTTLING = x1 ] ; then
 	if [ $ON_AC -eq 1 ] ; then
 		if [ "$ACTIVATE" -eq 1 ] ; then
 			CPU_THROTTLING="$LM_AC_CPU_THROTTLING"
@@ -101,17 +108,22 @@ if [ $CONTROL_CPU_THROTTLING -eq 1 ] ; then
 	for THISCPU in /proc/acpi/processor/* ; do
 		if [ -e $THISCPU/throttling ]; then
 			NUM_LEVELS=`cat $THISCPU/throttling | grep "T[0123456789]*\:" | wc -l`
-			if [ "$CPU_THROTTLING" = "minimum" ]; then
+			case "$CPU_THROTTLING" in
+			"minimum")
 				THIS_CPU_THROTTLING=0
-			elif [ "$CPU_THROTTLING" = "maximum" ] ; then				
-				THIS_CPU_THROTTLING=$(($NUM_LEVELS - 1))
-			elif [ "$CPU_THROTTLING" = "medium" ] ; then
+				;;
+			"medium")
 				# Divide but round up: that way, "medium" on a two-level system will
 				# lead to full throttling -- which is 50% on my system, quite reasonable.
 				THIS_CPU_THROTTLING=$(( ($NUM_LEVELS / 2 ) ))
-			else
+				;;
+			"maximum")
+				THIS_CPU_THROTTLING=$(($NUM_LEVELS - 1))
+				;;
+			*)
 				THIS_CPU_THROTTLING="$CPU_THROTTLING"
-			fi
+			esac
+			
 			$LM_VERBOSE && echo "Setting throttling level for cpu $THISCPU to $THIS_CPU_THROTTLING." >> $OUTPUT
 			set_sysctl $THISCPU/throttling $THIS_CPU_THROTTLING
 		fi

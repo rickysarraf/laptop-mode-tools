@@ -19,7 +19,9 @@
       Management on Intel AHCI compliant SATA controllers.
     * Add ethernet module to optimize ethernet power usage.
     * Performance optimizatons throughout: remove subshells, avoid output
-      instead of throwing it away.
+      instead of throwing it away. (Thanks to Omair Eshkenazi for suggestions.)
+    * Coding style improvements throughout. (Thanks to Omair Eshkenazi for
+      patches.)
 
 1.42 -- 12 May 2008
 

@@ -18,23 +18,13 @@ is_capable() {
 	local MEDIA=
 	local BUS=
 
-	HAVE_UDEVINFO=0
-	if [ -x "$(which udevinfo 2> /dev/null)" ] ; then
-		UDEVVERSION=$(udevinfo -V | awk '{ print $3; }')
-		if [ "$UDEVVERSION" -gt 70 ] ; then
-			HAVE_UDEVINFO=1
-		else
-			$LM_VERBOSE && echo "udevinfo present but version not > 070, not using udev" >> $OUTPUT
-		fi
-	fi
-	
 	# If we are running udev, this is the most portable way
 	# It assumes more or less recent udev (> 070)
 	if [ $HAVE_UDEVINFO -ne 0 ] ; then
 		$LM_VERBOSE && echo -n "Querying $1 media type using udevinfo: " >> $OUTPUT
 		eval "$(udevinfo -q env -n $1 2>> $OUTPUT | egrep '(ID_TYPE=|ID_BUS=)' 2>&1 | tee -a $OUTPUT)"
 		if [ -n "$ID_TYPE" -a -n "$ID_BUS" ] ; then
-			$LM_VERBOSE && echo "type '$ID_TYPE on bus '$ID_BUS' detected" >> $OUTPUT
+			$LM_VERBOSE && echo "type '$ID_TYPE' on bus '$ID_BUS' detected" >> $OUTPUT
 			MEDIA=$ID_TYPE
 			BUS=$ID_BUS
 		else
@@ -74,7 +64,7 @@ is_capable() {
 	fi
 
 	if [ -z "$MEDIA" ] ; then
-		if [ -x "$(which hdparm 2> /dev/null)" ]; then
+		if [ "$HDPARM_AVAILABLE" = "1" ]; then
 			$LM_VERBOSE && echo -n "Querying $1 type using hdparm: " >> $OUTPUT
 			if hdparm -I $1 2> $OUTPUT | grep -q CD-ROM >> $OUTPUT 2>&1 ; then
 				MEDIA=cd
@@ -131,6 +121,25 @@ is_capable() {
 	esac
 }
 
+
+# Preparation: determine the tools we have available.
+if [ -x "$(which hdparm 2> /dev/null)" ]; then
+  HDPARM_AVAILABLE=1
+fi
+if [ -x "$(which sdparm 2> /dev/null)" ]; then
+  SDPARM_AVAILABLE=1
+fi
+HAVE_UDEVINFO=0
+if [ -x "$(which udevinfo 2> /dev/null)" ] ; then
+	UDEVVERSION=$(udevinfo -V | awk '{ print $3; }')
+	if [ "$UDEVVERSION" -gt 70 ] ; then
+		HAVE_UDEVINFO=1
+	else
+		$LM_VERBOSE && echo "udevinfo present but version not > 070, not using udev" >> $OUTPUT
+	fi
+fi
+
+
 if [ x$CONTROL_HD_POWERMGMT = x1 ] ; then
 	if [ $ON_AC -eq 1 ] ; then
 		if [ "$ACTIVATE" -eq 1 ] ; then
@@ -146,11 +155,11 @@ if [ x$CONTROL_HD_POWERMGMT = x1 ] ; then
 	for THISHD in $HD ; do
 		if is_capable $THISHD POWERMGMT ; then
 			if is_capable $THISHD HDPARM ; then
-				if [ ! -e `which hdparm 2> /dev/null` ] ; then
-					echo "ERROR: hdparm not installed."
-				else
+				if [ "$HDPARM_AVAILABLE" = "1" ]; then
 					$LM_VERBOSE && echo "Executing: hdparm -B $HD_POWERMGMT $THISHD" >> $OUTPUT
 					hdparm -B $HD_POWERMGMT $THISHD >> $OUTPUT 2>&1
+				else
+					echo "ERROR: hdparm not installed."				
 				fi
 			else
 				$LM_VERBOSE && echo "Skipping $THISHD: powermgmt only possible with hdparm but drive does not" >> $OUTPUT
@@ -182,19 +191,19 @@ if [ x$CONTROL_HD_IDLE_TIMEOUT = x1 ] ; then
 	for THISHD in $HD ; do
 		if is_capable $THISHD IDLE_TIMEOUT ; then
 			if is_capable $THISHD HDPARM ; then
-				if [ ! -e `which hdparm 2> /dev/null` ] ; then
-					echo "ERROR: hdparm not installed."
-				else
+				if [ "$HDPARM_AVAILABLE" = "1" ]; then
 					$LM_VERBOSE && echo "Executing: hdparm -S $HD_IDLE_TIMEOUT $THISHD" >> $OUTPUT
 					hdparm -S $HD_IDLE_TIMEOUT $THISHD >> $OUTPUT 2>&1
+				else
+					echo "ERROR: hdparm not installed."
 				fi
 			elif is_capable $THISHD SDPARM ; then
-				if [ ! -e `which sdparm 2> /dev/null` ] ; then
-					echo "ERROR: sdparm not installed."
-				else
+				if [ "$SDPARM_AVAILABLE" = "1" ]; then
 					HD_IDLE_TIMEOUT_DECISECONDS=$(($HD_IDLE_TIMEOUT_SECONDS*10))
 					$LM_VERBOSE && echo "Executing: sdparm -q -s SCT=$HD_IDLE_TIMEOUT_DECISECONDS $THISHD" >> $OUTPUT
 					sdparm -q -s SCT=$HD_IDLE_TIMEOUT_DECISECONDS $THISHD >> $OUTPUT 2>&1
+				else
+					echo "ERROR: sdparm not installed."
 				fi
 			else
 				$LM_VERBOSE && echo "Skipping $THISHD: drive supports neither hdparm nor sdparm." >> $OUTPUT
@@ -226,11 +235,11 @@ if [ x$CONTROL_HD_WRITECACHE = x1 ] ; then
 	for THISHD in $HD ; do
 		if is_capable $THISHD WRITECACHE ; then
 			if is_capable $THISHD HDPARM ; then
-				if [ ! -e `which hdparm 2> /dev/null` ] ; then
-					echo "ERROR: hdparm not installed."
-				else
+				if [ "$HDPARM_AVAILABLE" = "1" ]; then
 					$LM_VERBOSE && echo "Executing: hdparm -W $HD_WRITECACHE $THISHD" >> $OUTPUT
 					hdparm -W $HD_WRITECACHE $THISHD >> $OUTPUT 2>&1
+				else
+					echo "ERROR: hdparm not installed."
 				fi
 			else
 				$LM_VERBOSE && echo "Skipping $THISHD: writecache only possible with hdparm but drive does not" >> $OUTPUT
