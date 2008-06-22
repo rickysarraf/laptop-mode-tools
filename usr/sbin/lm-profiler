@@ -133,7 +133,7 @@ process_dmesg_diff(){
 		WRITE_ACCESSES_FOUND=0
 		for ACCESS in $(cat $WORKDIR/write_accesses_$1) ; do
 			if [ $WRITE_ACCESSES_FOUND -eq 0 ] ; then
-				echo -n "\r                                                                            \rWrite accesses at $1/$PROFILE_RUN_LENGTH in lm-profiler run:"
+				printf '\r                                                                            \rWrite accesses at %d/%d in lm-profiler run:' "$1" "$PROFILE_RUN_LENGTH"
 				WRITE_ACCESSES_FOUND=1
 			fi
 			echo -n " $ACCESS"
@@ -145,7 +145,7 @@ process_dmesg_diff(){
 		READ_ACCESSES_FOUND=0
 		for ACCESS in $(cat $WORKDIR/read_accesses_$1) ; do
 			if [ $READ_ACCESSES_FOUND -eq 0 ] ; then
-				echo -n "\r                                                                            \rRead accesses at $1/$PROFILE_RUN_LENGTH in lm-profiler run:"
+				printf '\r                                                                            \rRead accesses at %d/%d in lm-profiler run:' "$1" "$PROFILE_RUN_LENGTH"
 				READ_ACCESSES_FOUND=1
 			fi
 			echo -n " $ACCESS"
@@ -202,12 +202,12 @@ echo > $WORKDIR/write_accesses_$SECONDS_DONE
 echo > $WORKDIR/read_accesses_$SECONDS_DONE
 SECONDS_DONE=0
 while [ $SECONDS_DONE -le $PROFILE_RUN_LENGTH ] ; do
-	echo -n "\r$SECONDS_DONE seconds elapsed, $(($PROFILE_RUN_LENGTH - $SECONDS_DONE)) remaining.         \b\b\b\b\b\b\b\b\b"
+	printf '\r%d seconds elapsed, %d remaining.         \b\b\b\b\b\b\b\b\b' "$SECONDS_DONE" "$(($PROFILE_RUN_LENGTH - $SECONDS_DONE))"
 	sleep 1
 	SECONDS_DONE=$(($SECONDS_DONE + 1))
 	process_dmesg_diff $SECONDS_DONE
 done
-echo -n "\r                                                    \r"
+printf '\r                                                    \r'
 stop_profiling
 NETPROFILE=`profilenet`
 echo "Profiling run completed."
