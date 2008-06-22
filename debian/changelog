@@ -2,7 +2,7 @@ laptop-mode-tools (1.43-1) hardy; urgency=low
 
   * New upstream version 1.43:
     * Don't use temp file in init script, that doesn't work if /tmp is
-      mounted readonly. Closes: #480496.
+      mounted readonly. Closes: #480946.
     * Fix IPW2100 power management so that power management mode stays
       enabled even on AC. If we don't do this, we can't control the
       transmit power at all because we let the chipset handle it.
