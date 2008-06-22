@@ -1,4 +1,4 @@
-1.43 -- 15 June 2008
+1.43 -- 22 June 2008
 
     * Don't use temp file in init script, that doesn't work if /tmp is mounted
       readonly. (See Debian BTS #480946.)
