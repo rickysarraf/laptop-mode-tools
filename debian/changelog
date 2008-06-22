@@ -1,8 +1,22 @@
-laptop-mode-tools (1.42-2) unstable; urgency=low
+laptop-mode-tools (1.43-1) hardy; urgency=low
 
+  * New upstream version 1.43:
+    * Don't use temp file in init script, that doesn't work if /tmp is
+      mounted readonly. Closes: #480496.
+    * Fix IPW2100 power management so that power management mode stays
+      enabled even on AC. If we don't do this, we can't control the
+      transmit power at all because we let the chipset handle it.
+      Closes: #481180.
+    * Replace *_ENABLE_HAL_POLLING settings by *_DISABLE_HAL_POLLING.
+      More intuitive that way. The old settings were also interpreted
+      in reverse. The backward compatibility layer actually *fixes that*
+      because it was a bug, so behaviour will change for 1.42
+      installations. Closes: #482307.
+    * Get rid of bashism in laptop-mode module.
+  * Put URL on separate line in README. Closes: #486467.
   * Set DM-Upload-Allowed field to yes.
 
- -- Bart Samwel <bart@samwel.tk>  Sun, 25 May 2008 18:20:25 +0200
+ -- Bart Samwel <bart@samwel.tk>  Sun, 22 Jun 2008 16:15:58 +0200
 
 laptop-mode-tools (1.42-1) unstable; urgency=low
 
