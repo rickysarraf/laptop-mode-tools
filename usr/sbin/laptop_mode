@@ -402,7 +402,8 @@ KLEVEL="$(uname -r |
 KMINOR="$(uname -r |
 			{
 				IFS='.-' read a b c d
-				echo $c
+				# Strip any stuff from the end -- only the initial digits are part of the KMINOR.
+				echo $c | sed -e 's/\([[:digit:]]*\).*/\1/'
 			}
 )"
 
