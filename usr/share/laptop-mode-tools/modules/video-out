@@ -1,0 +1,44 @@
+#! /bin/sh
+# 
+# Laptop mode tools module: selectively disable video outputs
+#
+
+do_xrandr () {
+  	w -hs | while read -r USER TTY DISPLAY REMAINDER; do	
+	  	if [ "${DISPLAY#:}" != "$DISPLAY" ] ; then
+	  		# It's an X display.
+		  	if su $USER -c "xrandr --output $1 --$2" 2>> $OUTPUT | grep -q display >> $OUTPUT 2>&1 ; then
+				$LM_VERBOSE && echo "Unable to set video output $1 to $2." >> $OUTPUT
+			else 
+				$LM_VERBOSE && echo "Set video output $1 to $2" >> $OUTPUT
+			fi
+		fi
+        done
+}
+
+if [ x$CONTROL_VIDEO_OUTPUTS = x1 ] ; then
+	if [ $ON_AC -eq 1 ]; then
+		if [ "$ACTIVATE" -eq 1 ]; then
+			DISABLE_VIDEO_OUTPUTS="$LM_AC_THROTTLE_ETHERNET"
+		else
+			DISABLE_VIDEO_OUTPUTS="$NOLM_AC_THROTTLE_ETHERNET"
+		fi
+	else
+		DISABLE_VIDEO_OUTPUTS="$BATT_THROTTLE_ETHERNET"
+	fi
+
+	cat /var/run/laptop-mode-tools/disabled-video-outputs |
+		while read VIDEO_OUTPUT REMAINDER ; do
+			do_xrandr $VIDEO_OUTPUT auto
+		done
+		
+	rm -f /var/run/laptop-mode-tools/disabled-video-outputs
+	
+	for VIDEO_OUTPUT in $DISABLE_VIDEO_OUTPUTS ; do
+		echo $VIDEO_OUTPUT >> /var/run/laptop-mode-tools/disabled-video-outputs
+		
+		do_xrandr $VIDEO_OUTPUT off
+	done
+else
+	$LM_VERBOSE && echo "video-out module is disabled." >> $OUTPUT
+fi

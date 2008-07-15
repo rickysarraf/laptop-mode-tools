@@ -1,6 +1,6 @@
 .TH "LAPTOP-MODE.CONF" "8" 
 .SH "NAME" 
-.I /etc/init.d/laptop-mode.conf
+.I /etc/laptop-mode/laptop-mode.conf
 \- Configuration file for laptop-mode-tools. 
 .SH "DESCRIPTION" 
 .PP 
@@ -636,6 +636,37 @@ If this option is enabled, laptop mode tools will automatically enable the
 Intel SATA controller power saving settings. The power saving settings are
 always enabled, not only on battery power.
 
+
+.SS "\fI/etc/laptop-mode/conf.d/sched-mc-power-savings.conf\fP"
+
+The sched-mc-power-savings module allows you to tune the Linux kernel process
+scheduler to optimize for power usage on multi-core and multi-processor
+computers.
+
+.IP "\fBCONTROL_SCHED_MC_POWER_SAVINGS\fP" 10
+If this option is enabled, laptop mode tools will automatically configure the
+kernel process scheduler to optimize for power usage on multi-core and
+multi-processor computers. The optimizations will only be enabled in battery
+mode.
+
+
+
+.SS "\fI/etc/laptop-mode/conf.d/video-out.conf\fP"
+
+The video-out module allows you to selectively disable video outputs depending
+on the power status. This works only for video hardware that supports xrandr.
+
+.IP "\fBCONTROL_VIDEO_OUTPUTS\fP" 10
+If this option is enabled, laptop mode tools will automatically disable
+the configured video outputs.
+
+.IP "\fBBATT_DISABLE_VIDEO_OUTPUTS\fP" 10
+.IP "\fBLM_AC_DISABLE_VIDEO_OUTPUTS\fP" 10
+.IP "\fBNOLM_AC_DISABLE_VIDEO_OUTPUTS\fP" 10
+These settings define which video outputs are to be disabled in which power
+state. The format is a space-separated list of outputs. The allowed names of the
+outputs depend on what the video hardware supports, they can be found by running
+the "xrandr" command.
 
 
 .SH "SEE ALSO" 
