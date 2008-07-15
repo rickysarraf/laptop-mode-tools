@@ -12,6 +12,9 @@
     * Add sched-mc-power-savings module, to control the Linux kernel process
       scheduler's multi-core power saving mode. Contributed by Ritesh Raj
       Sarraf, see Debian BTS #490587.
+    * Add video-out module to selectively disable video outputs depending on
+      the power mode.
+    * Fix dpms-standby module so that it actually detects the displays.
 
 1.43 -- 22 June 2008
 

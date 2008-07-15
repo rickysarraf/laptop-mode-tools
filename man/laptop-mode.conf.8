@@ -651,6 +651,24 @@ mode.
 
 
 
+.SS "\fI/etc/laptop-mode/conf.d/video-out.conf\fP"
+
+The video-out module allows you to selectively disable video outputs depending
+on the power status. This works only for video hardware that supports xrandr.
+
+.IP "\fBCONTROL_VIDEO_OUTPUTS\fP" 10
+If this option is enabled, laptop mode tools will automatically disable
+the configured video outputs.
+
+.IP "\fBBATT_DISABLE_VIDEO_OUTPUTS\fP" 10
+.IP "\fBLM_AC_DISABLE_VIDEO_OUTPUTS\fP" 10
+.IP "\fBNOLM_AC_DISABLE_VIDEO_OUTPUTS\fP" 10
+These settings define which video outputs are to be disabled in which power
+state. The format is a space-separated list of outputs. The allowed names of the
+outputs depend on what the video hardware supports, they can be found by running
+the "xrandr" command.
+
+
 .SH "SEE ALSO" 
 .PP 
 laptop_mode(8).

@@ -22,7 +22,7 @@ if [ x$CONTROL_DPMS_STANDBY = x1 ] ; then
 		OFF=$(($STANDBY+60))
 	fi
 
-	who | while read -r DPMS_USER DPMS_SCREEN REMAINDER; do	        
+	w -hs | while read -r DPMS_USER TTY DPMS_SCREEN REMAINDER; do	        
 	        if su $DPMS_USER -c "xset -d $DPMS_SCREEN dpms $STANDBY $SUSPEND $OFF" 2>> $OUTPUT | grep -q display >> $OUTPUT 2>&1 ; then
 		        $LM_VERBOSE && echo "Unable to set DPMS timeouts: X is not running on $DPMS_SCREEN" >> $OUTPUT
 	        else 
