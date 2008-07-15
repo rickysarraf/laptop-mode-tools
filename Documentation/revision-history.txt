@@ -5,6 +5,8 @@
       package managers can use this installer.
     * Strip non-numeric suffixes from kernel minor version number. (See Debian
       BTS #488950.)
+    * Remove spurious error message on machines that don't have
+      /sys/class/power_supply. See Debian BTS #490167.
 
 1.43 -- 22 June 2008
 
