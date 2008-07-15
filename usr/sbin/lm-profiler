@@ -168,9 +168,9 @@ findinit(){
 		INITDIR=/etc/rc.d/init.d
 	fi
 	if [ "$INITDIR" != "" ] ; then
-		INIT=`ls $INITDIR/ |grep ^$1$ |head -1`
+		INIT=`ls $INITDIR/ |grep ^$1$ |head -n 1`
 		if [ -z "$INIT" ]; then
-			INIT=`grep $1 $INITDIR/* |sed s/:.*// |head -1`
+			INIT=`grep $1 $INITDIR/* |sed s/:.*// |head -n 1`
 		else
 			INIT="$INITDIR/$INIT"
 		fi
