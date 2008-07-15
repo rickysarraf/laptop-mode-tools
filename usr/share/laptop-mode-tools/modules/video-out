@@ -27,11 +27,13 @@ if [ x$CONTROL_VIDEO_OUTPUTS = x1 ] ; then
 		DISABLE_VIDEO_OUTPUTS="$BATT_THROTTLE_ETHERNET"
 	fi
 
-	cat /var/run/laptop-mode-tools/disabled-video-outputs |
-		while read VIDEO_OUTPUT REMAINDER ; do
-			do_xrandr $VIDEO_OUTPUT auto
-		done
-		
+	if [ -f /var/run/laptop-mode-tools/disabled-video-outputs ] ; then
+		cat /var/run/laptop-mode-tools/disabled-video-outputs |
+			while read VIDEO_OUTPUT REMAINDER ; do
+				do_xrandr $VIDEO_OUTPUT auto
+			done
+	fi
+			
 	rm -f /var/run/laptop-mode-tools/disabled-video-outputs
 	
 	for VIDEO_OUTPUT in $DISABLE_VIDEO_OUTPUTS ; do
