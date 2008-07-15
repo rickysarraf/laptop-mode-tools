@@ -1,5 +1,6 @@
-laptop-mode-tools (1.44-1) hardy; urgency=low
+laptop-mode-tools (1.45-1) unstable; urgency=low
 
+  * New upstream version 1.45.
   * New upstream version 1.44:
     * Strip non-numeric suffixes from kernel minor version number.
       Closes: #488950.
@@ -11,7 +12,7 @@ laptop-mode-tools (1.44-1) hardy; urgency=low
 
  -- Bart Samwel <bart@samwel.tk>  Tue, 15 Jul 2008 12:47:01 +0200
 
-laptop-mode-tools (1.43-1) hardy; urgency=low
+laptop-mode-tools (1.43-1) unstable; urgency=low
 
   * New upstream version 1.43:
     * Don't use temp file in init script, that doesn't work if /tmp is
