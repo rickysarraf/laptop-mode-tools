@@ -9,6 +9,9 @@
       /sys/class/power_supply. See Debian BTS #490167.
     * Fix incorrect path to laptop-mode.conf in the laptop-mode.conf(8) manual
       page. See Debian BTS #488261.
+    * Add sched-mc-power-savings module, to control the Linux kernel process
+      scheduler's multi-core power saving mode. Contributed by Ritesh Raj
+      Sarraf, see Debian BTS #490587.
 
 1.43 -- 22 June 2008
 

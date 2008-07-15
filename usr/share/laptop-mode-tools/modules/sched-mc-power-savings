@@ -1,0 +1,27 @@
+#! /bin/sh
+# 
+# Laptop mode tools module: Scheduler tunables for multi-socket/multi-core systems.
+#
+
+if [ x$CONTROL_SCHED_MC_POWER_SAVINGS = x1 ] ; then
+	if [ $ON_AC -eq 1 ]; then
+		$LM_VERBOSE && echo "On AC power: setting scheduler power saving to 0." >> $OUTPUT
+		if [ -w /sys/devices/system/cpu/sched_mc_power_savings ]; then
+			echo 0 > /sys/devices/system/cpu/sched_mc_power_savings 
+			$LM_VERBOSE && echo "Scheduler power save mode disabled." >> $OUTPUT
+		else
+			$LM_VERBOSE && echo "Scheduler power saving is not available." >> $OUTPUT
+		fi
+	else
+		$LM_VERBOSE && echo "On battery: setting scheduler power saving to 1." >> $OUTPUT
+		if [ -w /sys/devices/system/cpu/sched_mc_power_savings ]; then
+			echo 1 > /sys/devices/system/cpu/sched_mc_power_savings 
+			$LM_VERBOSE && echo "Scheduler power save mode enabled." >> $OUTPUT
+		else
+			$LM_VERBOSE && echo "Scheduler power saving is not available." >> $OUTPUT
+		fi
+
+	fi
+else
+	$LM_VERBOSE && echo "Scheduler power setting is disabled." >> $OUTPUT
+fi

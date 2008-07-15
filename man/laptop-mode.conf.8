@@ -637,6 +637,19 @@ Intel SATA controller power saving settings. The power saving settings are
 always enabled, not only on battery power.
 
 
+.SS "\fI/etc/laptop-mode/conf.d/sched-mc-power-savings.conf\fP"
+
+The sched-mc-power-savings module allows you to tune the Linux kernel process
+scheduler to optimize for power usage on multi-core and multi-processor
+computers.
+
+.IP "\fBCONTROL_SCHED_MC_POWER_SAVINGS\fP" 10
+If this option is enabled, laptop mode tools will automatically configure the
+kernel process scheduler to optimize for power usage on multi-core and
+multi-processor computers. The optimizations will only be enabled in battery
+mode.
+
+
 
 .SH "SEE ALSO" 
 .PP 
