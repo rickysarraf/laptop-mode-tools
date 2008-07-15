@@ -7,6 +7,8 @@
       BTS #488950.)
     * Remove spurious error message on machines that don't have
       /sys/class/power_supply. See Debian BTS #490167.
+    * Fix incorrect path to laptop-mode.conf in the laptop-mode.conf(8) manual
+      page. See Debian BTS #488261.
 
 1.43 -- 22 June 2008
 
