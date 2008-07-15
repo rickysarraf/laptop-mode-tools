@@ -12,6 +12,8 @@
 # installation of init scripts.
 # MAN_D = directory in which the manual pages are to be installed. This should
 # be the base directory, e.g. /usr/local/man.
+# INSTALL = command line for install program. By default, this is set to
+# "install -o root -g root".
 #
 # These settings enable / disable support for power management hardware and
 # daemons:
@@ -25,47 +27,40 @@
 # and "auto" means: autodetect if this power management method is supported.
 #
 
-if [ "$MAN_D" = "" ] ; then
-	MAN_D=$DESTDIR/usr/man
-fi
-if [ "$ACPI" = "" ] ; then
+[ -z "$MAN_D" ] && MAN_D="/usr/man"
+
+if [ -z "$ACPI" ] ; then
 	ACPI=auto
-	if [ "$DESTDIR" != "" ] ; then
-		ACPI=force
-	fi
+	[ -n "$DESTDIR" ] && ACPI=force
 fi
-if [ "$APM" = "" ] ; then
+if [ -z "$APM" ] ; then
 	APM=auto
-	if [ "$DESTDIR" != "" ] ; then
-		APM=force
-	fi
+	[ -n "$DESTDIR" ] && APM=force
 fi
-if [ "$PMU" = "" ] ; then
+if [ -z "$PMU" ] ; then
 	PMU=auto
-	if [ "$DESTDIR" != "" ] ; then
-		PMU=force
-	fi
+	[ -n "$DESTDIR" ] && PMU=force
 fi
 
-if [ "$INIT_D" = "" ] ; then
+if [ -z "$INIT_D" ] ; then
 	# Try non-link directories first, then try links. This helps if one of
 	# the locations is linked to another, which is the case on some distros.
-	if [ -d $DESTDIR/etc/rc.d/init.d -a ! -L $DESTDIR/etc/rc.d/init.d ] ; then
-		INIT_D=$DESTDIR/etc/rc.d/init.d
-	elif [ -d $DESTDIR/etc/rc.d -a ! -L $DESTDIR/etc/rc.d -a ! -d $DESTDIR/etc/rc.d/init.d ] ; then
-		INIT_D=$DESTDIR/etc/rc.d
-	elif [ -d $DESTDIR/etc/init.d -a ! -L $DESTDIR/etc/init.d ] ; then
-		INIT_D=$DESTDIR/etc/init.d
-	elif [ -d $DESTDIR/etc/rc.d/init.d ] ; then
-		INIT_D=$DESTDIR/etc/rc.d/init.d
-	elif [ -d $DESTDIR/etc/rc.d ] ; then
-		INIT_D=$DESTDIR/etc/rc.d
-	elif [ -d $DESTDIR/etc/init.d ] ; then
-		INIT_D=$DESTDIR/etc/init.d
-	elif [ "$DESTDIR" != "" ] ; then
+	if [ -d "$DESTDIR/etc/rc.d/init.d" -a ! -L "$DESTDIR/etc/rc.d/init.d" ] ; then
+		INIT_D="$DESTDIR/etc/rc.d/init.d"
+	elif [ -d "$DESTDIR/etc/rc.d" -a ! -L "$DESTDIR/etc/rc.d" -a ! -d "$DESTDIR/etc/rc.d/init.d" ] ; then
+		INIT_D="$DESTDIR/etc/rc.d"
+	elif [ -d "$DESTDIR/etc/init.d" -a ! -L "$DESTDIR/etc/init.d" ] ; then
+		INIT_D="$DESTDIR/etc/init.d"
+	elif [ -d "$DESTDIR/etc/rc.d/init.d" ] ; then
+		INIT_D="$DESTDIR/etc/rc.d/init.d"
+	elif [ -d "$DESTDIR/etc/rc.d" ] ; then
+		INIT_D="$DESTDIR/etc/rc.d"
+	elif [ -d "$DESTDIR/etc/init.d" ] ; then
+		INIT_D="$DESTDIR/etc/init.d"
+	elif [ -n "$DESTDIR" ] ; then
 		# We're going the package manager route -- make a guess, they
 		# will adapt it if needed.
-		INIT_D=$DESTDIR/etc/init.d
+		INIT_D="$DESTDIR/etc/init.d"
 	else
 		echo "Cannot determine location of init scripts. Please modify install.sh."
 		exit 31
@@ -84,11 +79,11 @@ if [ "$INIT_D" != "none" ] ; then
 	else
 		# Any other -- we start it ourselves.
 		RCPROG=
-		INITSCRIPT=$INIT_D/laptop-mode
+		INITSCRIPT="$INIT_D/laptop-mode"
 	fi
 fi
 
-if [ "`whoami`" != "root" -a "$DESTDIR" = "" ] ; then
+if [ "`whoami`" != "root" -a -z "$DESTDIR" ] ; then
 	echo "You need to be root to install laptop mode tools."
 	exit 10
 fi
@@ -97,85 +92,84 @@ if [ ! -f /proc/sys/vm/laptop_mode ] ; then
 	echo "Warning: the kernel you are running does not support laptop mode."
 fi
 
-if [ "$INIT_D" != "none" -a "$DESTDIR" = "" ] ; then
+if [ "$INIT_D" != "none" -a -z "$DESTDIR" ] ; then
 	echo 'Stopping existing laptop mode service (if any).'
 	$RCPROG $INITSCRIPT stop
 fi
 
-INSTALL="install -o root -g root"
+if [ -z "$INSTALL" ]; then
+	INSTALL="install -o root -g root"
+fi
 
-mkdir -p $DESTDIR/etc/laptop-mode
-mkdir -p $DESTDIR/etc/laptop-mode/batt-start
-mkdir -p $DESTDIR/etc/laptop-mode/batt-stop
-mkdir -p $DESTDIR/etc/laptop-mode/lm-ac-start
-mkdir -p $DESTDIR/etc/laptop-mode/lm-ac-stop
-mkdir -p $DESTDIR/etc/laptop-mode/nolm-ac-start
-mkdir -p $DESTDIR/etc/laptop-mode/nolm-ac-stop
-mkdir -p $DESTDIR/usr/share/laptop-mode-tools/modules
-mkdir -p $DESTDIR/etc/laptop-mode/conf.d
-mkdir -p $DESTDIR/etc/laptop-mode/modules
+$INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode"
+$INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode/batt-start"
+$INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode/batt-stop"
+$INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode/lm-ac-start"
+$INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode/lm-ac-stop"
+$INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode/nolm-ac-start"
+$INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode/nolm-ac-stop"
+$INSTALL -d -m 755 "$DESTDIR/usr/share/laptop-mode-tools/modules"
+$INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode/conf.d"
+$INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode/modules"
+$INSTALL -d -m 755 "$DESTDIR/usr/sbin"
+$INSTALL -d -m 755 "$DESTDIR/$MAN_D/man8"
 
 ALREADY_EXISTED=0
 
-if [ -f $DESTDIR/etc/laptop-mode/laptop-mode.conf ] ; then
+if [ -f "$DESTDIR/etc/laptop-mode/laptop-mode.conf" ] ; then
 	echo "Not reinstalling configuration file: $DESTDIR/etc/laptop-mode/laptop-mode.conf exists."
 	ALREADY_EXISTED=1
-elif ( ! $INSTALL -m 644 etc/laptop-mode/laptop-mode.conf $DESTDIR/etc/laptop-mode ) ; then
+elif ( ! $INSTALL -m 644 etc/laptop-mode/laptop-mode.conf "$DESTDIR/etc/laptop-mode" ) ; then
 	echo "$0: Failed to install configuration file in $DESTDIR/etc/laptop-mode/laptop-mode.conf. Installation failed."
 	exit 12
 fi
 
 for CONF in etc/laptop-mode/conf.d/* ; do
-	if [ -f $DESTDIR/"$CONF" ] ; then
+	if [ -f "$DESTDIR/$CONF" ] ; then
 		echo "Not reinstalling configuration file $DESTDIR/$CONF."
-	elif ( ! $INSTALL -m 600 "$CONF" $DESTDIR/"$CONF" ) ; then
+	elif ( ! $INSTALL -m 600 "$CONF" "$DESTDIR/$CONF" ) ; then
 		echo "$0: Failed to install configuration file $DESTDIR/$CONF. Installation failed."
 		exit 12
 	fi
 done
 
 
-if [ -f $DESTDIR/etc/laptop-mode/lm-profiler.conf ] ; then
+if [ -f "$DESTDIR/etc/laptop-mode/lm-profiler.conf" ] ; then
 	echo "Configuration file $DESTDIR/etc/laptop-mode/lm-profiler.conf already exists."
-elif ( ! $INSTALL -m 600 etc/laptop-mode/lm-profiler.conf $DESTDIR/etc/laptop-mode ) ; then
+elif ( ! $INSTALL -m 600 etc/laptop-mode/lm-profiler.conf "$DESTDIR/etc/laptop-mode" ) ; then
 	echo "$0: Failed to install configuration file in $DESTDIR/etc/laptop-mode/lm-profiler.conf. Installation failed."
 	exit 12
 fi
 
-
-if ( ! $INSTALL -m 700 usr/sbin/laptop_mode $DESTDIR/usr/sbin ) ; then
+if ( ! $INSTALL -m 700 usr/sbin/laptop_mode "$DESTDIR/usr/sbin" ) ; then
 	echo "$0: Failed to install $DESTDIR/usr/sbin/laptop_mode. Installation failed."
 	exit 11
 fi
 
-if ( ! $INSTALL -m 700 usr/sbin/lm-syslog-setup $DESTDIR/usr/sbin ) ; then
+if ( ! $INSTALL -m 700 usr/sbin/lm-syslog-setup "$DESTDIR/usr/sbin" ) ; then
 	echo "$0: Failed to install $DESTDIR/usr/sbin/lm-syslog-setup. installation failed."
 	exit 25
 fi
 
-if ( ! $INSTALL -m 700 usr/sbin/lm-profiler $DESTDIR/usr/sbin ) ; then
+if ( ! $INSTALL -m 700 usr/sbin/lm-profiler "$DESTDIR/usr/sbin" ) ; then
 	echo "$0: Failed to install $DESTDIR/usr/sbin/lm-profiler. Installation failed."
 	exit 11
 fi
 
-if [ -f $DESTDIR/usr/share/laptop-mode-tools/modules/core ] ; then
-	if ( ! rm $DESTDIR/usr/share/laptop-mode-tools/modules/core ) ; then
+if [ -f "$DESTDIR/usr/share/laptop-mode-tools/modules/core" ] ; then
+	if ( ! rm "$DESTDIR/usr/share/laptop-mode-tools/modules/core" ) ; then
 		echo "$0: Failed to install modules into /usr/share/laptop-mode-tools/modules. Installation failed."
 		exit 35
 	fi
 fi		
 
-if ( ! $INSTALL -m 700 usr/share/laptop-mode-tools/modules/* $DESTDIR/usr/share/laptop-mode-tools/modules ) ; then
+if ( ! $INSTALL -m 700 usr/share/laptop-mode-tools/modules/* "$DESTDIR/usr/share/laptop-mode-tools/modules" ) ; then
 	echo "$0: Failed to install modules into /usr/share/laptop-mode-tools/modules. Installation failed."
 	exit 26
 fi
 
-if ( ! mkdir -p $MAN_D/man8 ) ; then
-  echo "$0: Could not create directory $MAN_D/man8. Installation failed."
-  exit 22
-fi
-if ( ! cp man/* $MAN_D/man8 ) ; then
-  echo "$0: Could not copy manual pages to $MAN_D/man8. Installation failed."
+if ( ! $INSTALL -m 744 man/* "$DESTDIR/$MAN_D/man8" ) ; then
+  echo "$0: Could not copy manual pages to $DESTDIR/$MAN_D/man8. Installation failed."
   exit 23
 fi
 
@@ -183,25 +177,25 @@ ACPI_DONE=0
 APM_DONE=0
 PMU_DONE=0
 
-if [ "$ACPI" = "force" ] || [ "$ACPI" = "enabled" -a ! -d /proc/pmu -a -d $DESTDIR/etc/acpi ] ; then
-	mkdir -p $DESTDIR/etc/acpi/actions
-	mkdir -p $DESTDIR/etc/acpi/events
+if [ "$ACPI" = "force" ] || [ "$ACPI" = "enabled" -a ! -d /proc/pmu -a -d "$DESTDIR/etc/acpi" ] ; then
+	$INSTALL -d -m 755 "$DESTDIR/etc/acpi/actions"
+	$INSTALL -d -m 755 "$DESTDIR/etc/acpi/events"
 	
 	# Remove the old action scripts, but not the old event files. Apparently, Gentoo handles
 	# its speedfreq using /etc/acpi/events/battery, and we were using that too. Simply removing
 	# the scripts and leaving the event files will hopefully cause acpid to notice that the
 	# files don't exist and leave it at that.
-	rm -f $DESTDIR/etc/acpi/actions/battery.sh $DESTDIR/etc/acpi/actions/ac.sh
+	rm -f "$DESTDIR/etc/acpi/actions/battery.sh" "$DESTDIR/etc/acpi/actions/ac.sh"
 	
-	if ( ! $INSTALL -m 700 etc/acpi/actions/* $DESTDIR/etc/acpi/actions ) ; then
+	if ( ! $INSTALL -m 700 etc/acpi/actions/* "$DESTDIR/etc/acpi/actions" ) ; then
 		echo "$0: Failed to install ACPI action scripts in $DESTDIR/etc/acpi/actions. Installation failed."
 		exit 13
 	fi
-	if ( ! $INSTALL -m 600 etc/acpi/events/* $DESTDIR/etc/acpi/events ) ; then
+	if ( ! $INSTALL -m 600 etc/acpi/events/* "$DESTDIR/etc/acpi/events" ) ; then
 		echo "$0: Failed to install ACPI event file in $DESTDIR/etc/acpi/events. Installation failed."
 		exit 14
 	fi
-	if [ "$DESTDIR" = "" ] ; then
+	if [ -z "$DESTDIR" ] ; then
 		killall -HUP acpid
 	fi
 	echo "Installed ACPI support."
@@ -209,8 +203,8 @@ if [ "$ACPI" = "force" ] || [ "$ACPI" = "enabled" -a ! -d /proc/pmu -a -d $DESTD
 fi
 
 if [ "$APM" = "force" ] || [ "$APM" = "enabled" -a ! -d /proc/pmu -a -d /etc/apm ] ; then
-	mkdir -p $DESTDIR/etc/apm/event.d
-	if ( ! $INSTALL -m 700 etc/apm/event.d/* $DESTDIR/etc/apm/event.d ) ; then
+	$INSTALL -d -m 755 "$DESTDIR/etc/apm/event.d"
+	if ( ! $INSTALL -m 700 etc/apm/event.d/* "$DESTDIR/etc/apm/event.d" ) ; then
 		echo "$0: Failed to install APM event script in $DESTDIR/etc/apm/event.d. Installation failed."
 		exit 15
 	fi
@@ -219,40 +213,40 @@ if [ "$APM" = "force" ] || [ "$APM" = "enabled" -a ! -d /proc/pmu -a -d /etc/apm
 fi
 
 if [ "$PMU" = "force" ] || [ "$PMU" = "enabled" -a -d /proc/pmu -a -d /etc/power ] ; then
-	mkdir -p $DESTDIR/etc/power/event.d
-	mkdir -p $DESTDIR/etc/power/scripts.d
-	if ( ! $INSTALL -m 700 etc/power/scripts.d/laptop-mode $DESTDIR/etc/power/scripts.d ) ; then
+	$INSTALL -d -m 755 "$DESTDIR/etc/power/event.d"
+	$INSTALL -d -m 755 "$DESTDIR/etc/power/scripts.d"
+	if ( ! $INSTALL -m 700 etc/power/scripts.d/laptop-mode "$DESTDIR/etc/power/scripts.d" ) ; then
 		echo "$0: Failed to install pbbuttonsd event script in $DESTDIR/etc/power/scripts.d. Installation failed."
 		exit 33
 	fi
-	if ( ! ln -fs ../scripts.d/laptop-mode $DESTDIR/etc/power/event.d ) ; then
+	if ( ! ln -fs ../scripts.d/laptop-mode "$DESTDIR/etc/power/event.d" ) ; then
 		echo "$0: Failed to install pbbuttonsd event script in $DESTDIR/etc/power/event.d. Installation failed."
 		exit 34
 	fi
-	if [ -f $DESTDIR/etc/power/pwrctl ] ; then
-		if ( ! grep pwrctl-local $DESTDIR/etc/power/pwrctl ) ; then
-			echo "WARNING: $DESTDIR/etc/power/pwrctl does not call pwrctl-local. Laptop mode will not start automatically when you use pmud."
+	if [ -f "$DESTDIR/etc/power/pwrctl" ] ; then
+		if ( ! grep pwrctl-local "$DESTDIR/etc/power/pwrctl" ) ; then
+			echo "WARNING: "$DESTDIR/etc/power/pwrctl" does not call pwrctl-local. Laptop mode will not start automatically when you use pmud."
 		fi
-		if [ ! -f $DESTDIR/etc/power/pwrctl-local ] ; then
-			echo >> $DESTDIR/etc/power/pwrctl-local
+		if [ ! -f "$DESTDIR/etc/power/pwrctl-local" ] ; then
+			echo >> "$DESTDIR/etc/power/pwrctl-local"
 		fi
-		if ( ! grep laptop_mode $DESTDIR/etc/power/pwrctl-local ) ; then
-			if (! grep -q "#\!"  $DESTDIR/etc/power/pwrctl-local ); then
-				sed -i -e "1i\\#! /bin/sh" $DESTDIR/etc/power/pwrctl-local
+		if ( ! grep laptop_mode "$DESTDIR/etc/power/pwrctl-local" ) ; then
+			if (! grep -q "#\!"  "$DESTDIR/etc/power/pwrctl-local" ); then
+				sed -i -e "1i\\#! /bin/sh" "$DESTDIR/etc/power/pwrctl-local"
 			fi
-			sed -i -e "2i\\/usr/bin/laptop_mode auto" $DESTDIR/etc/power/pwrctl-local
+			sed -i -e "2i\\/usr/bin/laptop_mode auto" "$DESTDIR/etc/power/pwrctl-local"
 		else
 			echo "/etc/power/pwrctl-local already seems to contain a laptop mode call. Not adding an extra one."
 		fi
 	fi
-	if [ -f $DESTDIR/etc/apm/event.d/laptop-mode -a "$DESTDIR" = "" ] ; then
+	if [ -f "$DESTDIR/etc/apm/event.d/laptop-mode" -a -z "$DESTDIR" ] ; then
 		# This file interferes with the pbbuttonsd integration,
 		# because pbbuttonsd also emulates APM, so we have to
 		# remove it.
 		
 		# We don't do this when DESTDIR != "", because that means we're
 		# doing an install for a package manager.
-		rm $DESTDIR/etc/apm/event.d/laptop-mode
+		rm "$DESTDIR/etc/apm/event.d/laptop-mode"
 	fi
 	echo "Installed PMU (pmud/pbbuttonsd) support."
 	PMU_DONE=1
@@ -263,54 +257,47 @@ if [ $APM_DONE -eq 0 -a $ACPI_DONE -eq 0 -a $PMU_DONE -eq 0 ] ; then
 	echo "Install either acpid, apmd, pbbuttonsd or pmud (depending on what your laptop supports) and reinstall."
 fi
 
-if [ "$INIT_D" != "none" ] && [ -d $INIT_D -o "$DESTDIR" != "" ] ; then
-	mkdir -p "$INIT_D"
-	if ( ! $INSTALL -m 700 etc/init.d/laptop-mode $INIT_D ) ; then
-		echo "$0: failed to install init script in $INIT_D. Installation failed."
-		exit 16
-	fi
-	if [ -f $DESTDIR/etc/rcS.d/S99laptop_mode ] ; then    
-		# Old symlink.
-		rm $DESTDIR/etc/rcS.d/S99laptop-mode
-	fi
-	if [ "$DESTDIR" = "" ] ; then
-		if ( which update-rc.d > /dev/null ) ; then
-			update-rc.d -f laptop-mode remove
-			if ( ! update-rc.d laptop-mode defaults 99 ) ; then
-				echo "$0: update-rc.d failed, laptop mode will not be initialized at bootup."
-				exit 17
+if [ "$INIT_D" != "none" ] ; then
+	if [ -d "$INIT_D" -o -n "$DESTDIR" ] ; then
+		$INSTALL -d -m 755 "$INIT_D"
+		if ( ! $INSTALL -m 700 etc/init.d/laptop-mode "$INIT_D" ) ; then
+			echo "$0: failed to install init script in $INIT_D. Installation failed."
+			exit 16
+		fi
+		if [ -f "$DESTDIR/etc/rcS.d/S99laptop_mode" ] ; then
+			# Old symlink.
+			rm "$DESTDIR/etc/rcS.d/S99laptop-mode"
+		fi
+		if [ -z "$DESTDIR" ] ; then
+			if ( which update-rc.d > /dev/null ) ; then
+				update-rc.d -f laptop-mode remove
+				if ( ! update-rc.d laptop-mode defaults 99 ) ; then
+					echo "$0: update-rc.d failed, laptop mode will not be initialized at bootup."
+					exit 17
+				fi
+			elif ( which chkconfig > /dev/null ) ; then
+				if ( ! chkconfig laptop-mode on ) ; then
+					echo "$0: chkconfig failed, laptop mode will not be initialized at bootup."
+					exit 30
+				fi
 			fi
-		elif ( which chkconfig > /dev/null ) ; then
-			if ( ! chkconfig laptop-mode on ) ; then
-				echo "$0: chkconfig failed, laptop mode will not be initialized at bootup."
-				exit 30
-			fi
+		else
+			# Package manager's route: don't install the init script for
+			# any particular runlevels. Since we don't have chkconfig or
+			# update-rc.d available, we can't know for sure how this should
+			# be done.
+			/bin/true		
 		fi
 	else
-		# Package manager's route: don't install the init script for
-		# any particular runlevels. Since we don't have chkconfig or
-		# update-rc.d available, we can't know for sure how this should
-		# be done.
-		/bin/true		
+		echo "Directory $INIT_D not found: not installing script to initialize"
+		echo "laptop mode at boot time."
 	fi
-else
-  echo "Directory $INIT_D not found: not installing script to initialize"
-  echo "laptop mode at boot time."
-fi
 
-if ( ! mkdir -p $MAN_D/man8 ) ; then
-  echo "$0: Could not create directory $MAN_D/man8. Installation failed."
-  exit 22
-fi
-if ( ! cp man/* $MAN_D/man8 ) ; then
-  echo "$0: Could not copy manual pages to $MAN_D/man8. Installation failed."
-  exit 23
-fi
-
-if [ "$INIT_D" != "none" -a "$DESTDIR" = "" ] ;then
-	if ( ! $RCPROG $INITSCRIPT start ) ; then
-		echo "$0: Could not start laptop mode init script /etc/init.d/laptop-mode."
-		exit 24
+	if [ -z "$DESTDIR" ] ;then
+		if ( ! $RCPROG $INITSCRIPT start ) ; then
+			echo "$0: Could not start laptop mode init script /etc/init.d/laptop-mode."
+			exit 24
+		fi
 	fi
 fi
 
