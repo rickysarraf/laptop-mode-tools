@@ -1,6 +1,8 @@
 1.44 -- 15 July 2008
 
     * Use POSIX compliant call to "head" in lm-profiler.
+    * Support for DESTDIR and other configuration options in install.sh, so that
+      package managers can use this installer.
 
 1.43 -- 22 June 2008
 
