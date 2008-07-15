@@ -34,7 +34,7 @@ set -a
 
 # The laptop mode tools version number. Extracted by the installer makefile
 # as well, so don't change the format!
-LMTVERSION=1.43
+LMTVERSION=1.44
 
 # This script is loaded from multiple scripts to set the config defaults
 # and to read the configuration on top of those. Only when the command is
@@ -915,13 +915,13 @@ fi
 echo "$ACTIVATE $ON_AC $ACTIVATE_WITH_POSSIBLE_DATA_LOSS $STATE" > /var/run/laptop-mode-tools/state
 
 if [ "$ACTIVATE" -eq 1 ] ; then
-	echo -n "$STATE, active."
+	echo -n "$STATE, active"
 	if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 0 ] ; then
 		echo -n " (Data-loss sensitive features disabled.)"
 	fi
 	echo
 else
-	echo "$STATE, not active."
+	echo "$STATE, not active"
 fi
 
 
