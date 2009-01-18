@@ -3,7 +3,9 @@
     * iwl4965 driver has been replaced by iwlagn in Linux 2.6.27. Add support
       for this.
     * Prefer PMU over APM power information when available. (APM emulation adds
-      a delay, which causes incorrect actions.)    
+      a delay, which causes incorrect actions.)
+    * Add intel-hda-powersave module, to support Intel HDA audio chipset power
+      saving mode.    
 
 1.45 - 15 July 2008
 
