@@ -595,6 +595,18 @@ power) to 5 (lowest power), 6 (AC mode, full power) and 7 (battery mode, lowest
 power).
 
 
+.SS "\fI/etc/laptop-mode/conf.d/usb-autosuspend.conf\fP"
+
+The usb-autosuspend module allows you to automatically enable the Linux
+kernel's USB autosuspend feature for all USB devices.
+
+.IP "\fBCONTROL_USB_AUTOSUSPEND\fP" 10
+If this option is enabled, laptop mode tools will automatically enable the
+USB autosuspend feature for all devices. The USB autosuspend feature will always
+be enabled, not only on battery power.
+
+
+
 .SS "\fI/etc/laptop-mode/conf.d/hal-polling.conf\fP"
 
 The hal-polling module allows you to control the polling of CD/DVD drives
