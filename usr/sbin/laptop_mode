@@ -287,10 +287,10 @@ fi
 # Postprocessing
 if [ "$VERBOSE_OUTPUT" -ne 0 ] ; then
 	OUTPUT="/dev/stdout"
-	LM_VERBOSE="[ 1 = 0 ]"
+	LM_VERBOSE="[ 1 = 1 ]"
 else
 	OUTPUT="/dev/null"
-	LM_VERBOSE="[ 1 = 1 ]"
+	LM_VERBOSE="[ 1 = 0 ]"
 fi
 
 if [ "$PARTITIONS" = "" ] ; then
