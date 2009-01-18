@@ -10,7 +10,7 @@
       hal polling stays enabled on AC. See Debian BTS #495364.
     * Add module usb-autosuspend, based on a patch contributed by Ritesh Raj
       Sarraf. See Debian BTS #506839.
-    * Improved error reporting in lcd-brightness module.
+    * Improved error reporting in lcd-brightness module. See Debian BTS #507640.
 
 1.45 - 15 July 2008
 
