@@ -1,6 +1,7 @@
 1.46 - 18 January 2008
 
-    * 
+    * iwl4965 driver has been replaced by iwlagn in Linux 2.6.27. Add support
+      for this.    
 
 1.45 - 15 July 2008
 
