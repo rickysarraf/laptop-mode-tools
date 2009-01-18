@@ -1,3 +1,19 @@
+1.46 - 18 January 2008
+
+    * iwl4965 driver has been replaced by iwlagn in Linux 2.6.27. Add support
+      for this. See Debian BTS #502022.
+    * Prefer PMU over APM power information when available. (APM emulation adds
+      a delay, which causes incorrect actions.)
+    * Add intel-hda-powersave module, to support Intel HDA audio chipset power
+      saving mode.
+    * Improve comments in hal-polling.conf, and change default for AC so that
+      hal polling stays enabled on AC. See Debian BTS #495364.
+    * Add module usb-autosuspend, based on a patch contributed by Ritesh Raj
+      Sarraf. See Debian BTS #506839.
+    * Improved error reporting in lcd-brightness module. See Debian BTS #507640.
+    * Fixed verbose output mode. LM_VERBOSE was inverted, which caused a lot
+      of output to remain hidden. See Debian BTS #510294.
+
 1.45 - 15 July 2008
 
     * Cleanup of install.sh, contributed by Alon Bar-Lev. 

@@ -459,6 +459,18 @@ AC97 power saving settings. The power saving settings are always enabled, not
 only on battery power.
 
 
+.SS "\fI/etc/laptop-mode/conf.d/intel-hda-powersave.conf\fP"
+
+The intel-hda-powersave module allows you to enable the Intel HDA integrated
+audio power saving mode.
+
+.IP "\fBCONTROL_INTEL_HDA_POWER\fP" 10
+If this option is enabled, laptop mode tools will automatically enable the
+Intel HDA power saving settings. The power saving settings are always enabled,
+not only on battery power.
+
+
+
 
 .SS "\fI/etc/laptop-mode/conf.d/configuration-file-control.conf\fP"
 
@@ -581,6 +593,18 @@ These settings define the power management levels on AC and on battery. The
 defaults are 6 for AC, and 7 for battery mode. The allowed values are 1 (highest
 power) to 5 (lowest power), 6 (AC mode, full power) and 7 (battery mode, lowest
 power).
+
+
+.SS "\fI/etc/laptop-mode/conf.d/usb-autosuspend.conf\fP"
+
+The usb-autosuspend module allows you to automatically enable the Linux
+kernel's USB autosuspend feature for all USB devices.
+
+.IP "\fBCONTROL_USB_AUTOSUSPEND\fP" 10
+If this option is enabled, laptop mode tools will automatically enable the
+USB autosuspend feature for all devices. The USB autosuspend feature will always
+be enabled, not only on battery power.
+
 
 
 .SS "\fI/etc/laptop-mode/conf.d/hal-polling.conf\fP"

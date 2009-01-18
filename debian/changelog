@@ -1,3 +1,18 @@
+laptop-mode-tools (1.46-1) unstable; urgency=low
+
+  * New upstream version 1.46:
+    * Fix inverted LM_VERBOSE. Closes: #510294.
+    * Improve error handling in lcd-brightness module. Closes: #507640.
+    * Add usb-autosuspend module. Closes: #506839.
+    * Improve hal-polling defaults and comments. Closes: #495364.
+    * Add intel-hda-powersave module for Intel HDA audio chipsets.
+    * Prefer PMU over APM if available, to avoid the delay involved in 
+      the APM emulation layer.
+    * Support iwlagn driver which replaced iwl4965 in Linux 2.6.27.
+      Closes: #502022.
+
+ -- Bart Samwel <bart@samwel.tk>  Sun, 18 Jan 2009 19:24:49 +0100
+
 laptop-mode-tools (1.45-1) unstable; urgency=low
 
   * New upstream version 1.45.
