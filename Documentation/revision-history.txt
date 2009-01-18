@@ -1,3 +1,7 @@
+1.46 - 18 January 2008
+
+    * 
+
 1.45 - 15 July 2008
 
     * Cleanup of install.sh, contributed by Alon Bar-Lev. 
