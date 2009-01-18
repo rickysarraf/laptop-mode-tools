@@ -23,9 +23,11 @@ if [ x$CONTROL_BRIGHTNESS = x1 ] ; then
 	if [ "$FORCE" -ne 0 -o "$BRIGHTNESS_COMMAND" != "$OLD_BRIGHTNESS_COMMAND" ] ; then
 		$LM_VERBOSE && echo "Set LCD brightness using command $BRIGHTNESS_COMMAND \> $BRIGHTNESS_OUTPUT." >> $OUTPUT
 		if ( $BRIGHTNESS_COMMAND > $BRIGHTNESS_OUTPUT ) ; then
-			echo "Command succeeded." >> $OUTPUT
+			$LM_VERBOSE && echo "Command succeeded." >> $OUTPUT
 		else
-			echo "Command failed." >> $OUTPUT
+			echo "The configured LCD brightness command of the lcd-brightness module failed." >> /dev/stderr
+			echo "Please check your configuration in /etc/laptop-mode/conf.d/lcd-brightness.conf." >> /dev/stderr
+			$LM_VERBOSE && echo "Command failed."  >> $OUTPUT
 		fi
 		echo -n $BRIGHTNESS_COMMAND > /var/run/laptop-mode-tools/state-brightness-command
 	else
