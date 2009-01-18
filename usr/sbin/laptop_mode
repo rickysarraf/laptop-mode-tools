@@ -499,14 +499,6 @@ elif [ -d /proc/acpi/ac_adapter ] ; then
 	if [ "$ADAPTERS_FOUND" -eq 0 ] ; then
 		ON_AC=1
 	fi
-elif [ -f /proc/apm ] ; then
-	$LM_VERBOSE && echo "Determining power state from /proc/apm." >> $OUTPUT
-	read D1 D2 D3 APM_AC_STATE D0 </proc/apm
-	if [ "$APM_AC_STATE" = "0x00" ] ; then
-		ON_AC=0
-	else
-		ON_AC=1
-	fi
 elif [ -f /proc/pmu/info ] ; then
 	$LM_VERBOSE && echo "Determining power state from /proc/pmu/info." >> $OUTPUT
 	if ( grep -q "^AC Power.*0$" /proc/pmu/info ) ; then
@@ -517,6 +509,14 @@ elif [ -f /proc/pmu/info ] ; then
 		# but we always assume AC power when we're not sure.
 		ON_AC=1
 		$LM_VERBOSE && echo "/proc/pmu/info indicates presence of AC power." >> $OUTPUT
+	fi
+elif [ -f /proc/apm ] ; then
+	$LM_VERBOSE && echo "Determining power state from /proc/apm." >> $OUTPUT
+	read D1 D2 D3 APM_AC_STATE D0 </proc/apm
+	if [ "$APM_AC_STATE" = "0x00" ] ; then
+		ON_AC=0
+	else
+		ON_AC=1
 	fi
 else
 	$LM_VERBOSE && echo "No /sys/class/power_supply, ACPI, APM or PMU power management information found -- assuming AC power is present." >> $OUTPUT
