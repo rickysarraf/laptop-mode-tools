@@ -15,7 +15,7 @@ if [ x$CONTROL_SCHED_MC_POWER_SAVINGS = x1 ] ; then
 	else
 		$LM_VERBOSE && echo "On battery: setting scheduler power saving to 1." >> $OUTPUT
 		if [ -w /sys/devices/system/cpu/sched_mc_power_savings ]; then
-			echo 1 > /sys/devices/system/cpu/sched_mc_power_savings 
+			echo 2 > /sys/devices/system/cpu/sched_mc_power_savings 
 			$LM_VERBOSE && echo "Scheduler power save mode enabled." >> $OUTPUT
 		else
 			$LM_VERBOSE && echo "Scheduler power saving is not available." >> $OUTPUT

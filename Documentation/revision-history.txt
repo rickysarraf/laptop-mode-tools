@@ -1,4 +1,4 @@
-1.46 - 18 January 2008
+1.46 - 25 January 2008
 
     * iwl4965 driver has been replaced by iwlagn in Linux 2.6.27. Add support
       for this. See Debian BTS #502022.
@@ -13,6 +13,20 @@
     * Improved error reporting in lcd-brightness module. See Debian BTS #507640.
     * Fixed verbose output mode. LM_VERBOSE was inverted, which caused a lot
       of output to remain hidden. See Debian BTS #510294.
+    * Set sched_mc_power_savings to 2 instead of 1, for more power savings
+      (see http://lwn.net/Articles/312230). Contributed by Ritesh Raj Sarraf.
+    * Include integration with pm-utils so that hardware settings are re-applied
+      on resume from suspend/hibernate. See Debian BTS #481766.
+    * Use a different method to determine X displays and authorizations in the
+      dpms-standby module. The old method depended on w -hs output, which was
+      very unreliable.
+    * Add battery-level-polling module, which allows systems with unreliable
+      ACPI battery events to use battery level dependent features such as
+      auto-hibernate and the disabling of data loss sensitive features when the
+      battery runs low.
+    * Relax permissions on most files installed by install.sh. We now give
+      read/execute permissions to other users as well for the config files and
+      executables, since there's no sensitive info in the files.
 
 1.45 - 15 July 2008
 

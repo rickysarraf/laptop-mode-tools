@@ -1,0 +1,20 @@
+#!/bin/sh
+#
+# 99laptop-mode: Re-apply laptop mode tools settings
+
+case "$1" in
+	hibernate|suspend)
+		# Stopping is not required.
+		;;
+	thaw|resume)
+		# Make laptop mode tools forcibly re-apply the hardware settings
+		# that laptop mode tools applies.			
+		if [ -e /usr/sbin/laptop_mode ] ; then
+			/usr/sbin/laptop_mode auto force
+		fi
+		;;
+	*) exit $NA
+		;;
+esac
+
+
