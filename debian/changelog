@@ -10,8 +10,13 @@ laptop-mode-tools (1.46-1) unstable; urgency=low
       the APM emulation layer.
     * Support iwlagn driver which replaced iwl4965 in Linux 2.6.27.
       Closes: #502022.
+    * Set sched_mc_power_savings to 2 instead of 1, for more power savings.
+    * Integrate with pm-utils. Closes: #481766.
+    * Improve reliability of dpms-standby module display handling.
+    * Add battery-level-polling module, for systems without reliable ACPI
+      battery events.
 
- -- Bart Samwel <bart@samwel.tk>  Sun, 18 Jan 2009 19:24:49 +0100
+ -- Bart Samwel <bart@samwel.tk>  Sun, 25 Jan 2009 22:46:24 +0100
 
 laptop-mode-tools (1.45-1) unstable; urgency=low
 
