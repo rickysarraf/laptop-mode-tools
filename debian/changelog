@@ -15,6 +15,8 @@ laptop-mode-tools (1.46-1) unstable; urgency=low
     * Improve reliability of dpms-standby module display handling.
     * Add battery-level-polling module, for systems without reliable ACPI
       battery events.
+  * Recommend ethtool. Closes: #497343.
+  * Depend on psmisc. Closes: #497345.
 
  -- Bart Samwel <bart@samwel.tk>  Sun, 25 Jan 2009 22:46:24 +0100
 

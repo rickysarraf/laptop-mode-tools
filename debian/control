@@ -8,8 +8,8 @@ Standards-Version: 3.7.3
 
 Package: laptop-mode-tools
 Architecture: all
-Depends: lsb-base (>= 3.0-10), util-linux (>= 2.13)
-Recommends: acpid | apmd | pbbuttonsd | pmud, hdparm, sdparm, hal
+Depends: lsb-base (>= 3.0-10), util-linux (>= 2.13), psmisc
+Recommends: acpid | apmd | pbbuttonsd | pmud, hdparm, sdparm, hal, ethtool
 Conflicts: noflushd
 Description: Scripts to spin down hard drive and save power
  Laptop mode is a Linux kernel feature that allows your laptop to save 
