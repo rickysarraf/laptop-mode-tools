@@ -45,17 +45,20 @@ if [ x$CONTROL_DPMS_STANDBY = x1 ] ; then
 	# Loop through all X servers using their unix domain sockets.
 	# (Partly borrowed from the Debian acpi-support package.)
 	for x in /tmp/.X11-unix/*; do
-		displaynum=`echo $x | sed -r 's#/tmp/.X11-unix/X([0-9]*)$#\1#'`
-		getXuser;
-		if [ x"$XAUTHORITY" != x"" ]; then
-			export DISPLAY=":$displaynum"	    
-			if su $XUSER -c "xset dpms $STANDBY $SUSPEND $OFF" 2>> $OUTPUT | grep -q display >> $OUTPUT 2>&1 ; then
-		        	$LM_VERBOSE && echo "Unable to set DPMS timeouts: X is not running on $DISPLAY" >> $OUTPUT
-		        else 
-			        $LM_VERBOSE && echo "Set screen $DISPLAY for the user $XUSER to standby in $STANDBY s, suspend in $SUSPEND s, powerdown in $OFF s using Xauthority $XAUTHORITY" >> $OUTPUT
+		if [ -e "$x" ] ; then
+			displaynum=`echo $x | sed -r 's#/tmp/.X11-unix/X([0-9]*)$#\1#'`
+			$LM_VERBOSE && echo "Determining Xauthority for display $displaynum" >> $OUTPUT
+			getXuser;
+			if [ x"$XAUTHORITY" != x"" ]; then
+				export DISPLAY=":$displaynum"	    
+				if su $XUSER -c "xset dpms $STANDBY $SUSPEND $OFF" 2>> $OUTPUT | grep -q display >> $OUTPUT 2>&1 ; then
+					$LM_VERBOSE && echo "Unable to set DPMS timeouts: X is not running on $DISPLAY" >> $OUTPUT
+				else 
+					$LM_VERBOSE && echo "Set screen $DISPLAY for the user $XUSER to standby in $STANDBY s, suspend in $SUSPEND s, powerdown in $OFF s using Xauthority $XAUTHORITY" >> $OUTPUT
+				fi
+			else
+				$LM_VERBOSE && echo "Unable to determine Xauthority for display :$displaynum." >> $OUTPUT
 			fi
-		else
-			$LM_VERBOSE && echo "Unable to determine Xauthority for display :$displaynum." >> $OUTPUT
 		fi
 	done
 else
