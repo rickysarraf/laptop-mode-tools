@@ -45,7 +45,7 @@ if [ x$CONTROL_DPMS_STANDBY = x1 ] ; then
 	# Loop through all X servers using their unix domain sockets.
 	# (Partly borrowed from the Debian acpi-support package.)
 	for x in /tmp/.X11-unix/*; do
-		displaynum=`echo $x | sed -r 's#/tmp/.X11-unix/X([0-9]*).*$#\1#'`
+		displaynum=`echo $x | sed -r 's#/tmp/.X11-unix/X([0-9]*)$#\1#'`
 		getXuser;
 		if [ x"$XAUTHORITY" != x"" ]; then
 			export DISPLAY=":$displaynum"	    
