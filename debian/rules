@@ -49,9 +49,11 @@ install: build
 	mkdir -p $(DESTDIR)/etc/acpi/actions
 	mkdir -p $(DESTDIR)/usr/sbin
 	mkdir -p $(DESTDIR)/usr/share/laptop-mode-tools/modules
+	mkdir -p $(DESTDIR)/usr/share/laptop-mode-tools/module-helpers
 	mkdir -p $(DESTDIR)/etc/apm/event.d
 	mkdir -p $(DESTDIR)/etc/power/scripts.d
 	mkdir -p $(DESTDIR)/etc/power/event.d
+	mkdir -p $(DESTDIR)/etc/pm/sleep.d
 	mkdir -p $(DESTDIR)/etc/laptop-mode/batt-start
 	mkdir -p $(DESTDIR)/etc/laptop-mode/batt-stop
 	mkdir -p $(DESTDIR)/etc/laptop-mode/lm-ac-start
@@ -67,10 +69,12 @@ install: build
 	install -m700 etc/apm/event.d/* $(DESTDIR)/etc/apm/event.d
 	install -m700 etc/power/scripts.d/* $(DESTDIR)/etc/power/scripts.d
 	install -m700 etc/power/event.d/* $(DESTDIR)/etc/power/event.d
+	install -m700 etc/pm/sleep.d/* $(DESTDIR)/etc/pm/sleep.d
 	install -m700 usr/sbin/laptop_mode $(DESTDIR)/usr/sbin
 	install -m700 usr/sbin/lm-syslog-setup $(DESTDIR)/usr/sbin
 	install -m700 usr/sbin/lm-profiler $(DESTDIR)/usr/sbin
 	install -m700 usr/share/laptop-mode-tools/modules/* $(DESTDIR)/usr/share/laptop-mode-tools/modules
+	install -m700 usr/share/laptop-mode-tools/module-helpers/* $(DESTDIR)/usr/share/laptop-mode-tools/module-helpers
 
 # Build architecture-independent files here.
 binary-arch: build install
