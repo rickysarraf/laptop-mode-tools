@@ -173,6 +173,17 @@ if ( ! $INSTALL -m 744 man/* "$DESTDIR/$MAN_D/man8" ) ; then
   exit 23
 fi
 
+
+# Install pm-utils hook only if pm-utils config dir is present, or force the
+# install if we have a DESTDIR.
+if [ -n "$DESTDIR" -o -d "$DESTDIR/etc/pm/sleep.d" ] ; then
+	if ( ! $INSTALL -m 755 etc/pm/sleep.d/99laptop-mode "$DESTDIR/etc/pm/sleep.d" ) ; then
+		echo "$0: Failed to install 99-laptop-mode into /etc/pm/sleep.d. Installation failed."
+		exit 36
+	fi
+fi
+
+
 ACPI_DONE=0
 APM_DONE=0
 PMU_DONE=0
