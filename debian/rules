@@ -44,37 +44,37 @@ install: build
 	dh_installdirs
 
 	# Add here commands to install the package into debian/laptop-mode-tools.
-	mkdir -p $(DESTDIR)/etc/laptop-mode
-	mkdir -p $(DESTDIR)/etc/acpi/events
-	mkdir -p $(DESTDIR)/etc/acpi/actions
-	mkdir -p $(DESTDIR)/usr/sbin
-	mkdir -p $(DESTDIR)/usr/share/laptop-mode-tools/modules
-	mkdir -p $(DESTDIR)/usr/share/laptop-mode-tools/module-helpers
-	mkdir -p $(DESTDIR)/etc/apm/event.d
-	mkdir -p $(DESTDIR)/etc/power/scripts.d
-	mkdir -p $(DESTDIR)/etc/power/event.d
-	mkdir -p $(DESTDIR)/etc/pm/sleep.d
-	mkdir -p $(DESTDIR)/etc/laptop-mode/batt-start
-	mkdir -p $(DESTDIR)/etc/laptop-mode/batt-stop
-	mkdir -p $(DESTDIR)/etc/laptop-mode/lm-ac-start
-	mkdir -p $(DESTDIR)/etc/laptop-mode/lm-ac-stop
-	mkdir -p $(DESTDIR)/etc/laptop-mode/nolm-ac-start
-	mkdir -p $(DESTDIR)/etc/laptop-mode/nolm-ac-stop
-	mkdir -p $(DESTDIR)/etc/laptop-mode/conf.d
-	mkdir -p $(DESTDIR)/etc/laptop-mode/modules
-	install -m600 etc/laptop-mode/laptop-mode.conf $(DESTDIR)/etc/laptop-mode/laptop-mode.conf
-	install -m600 etc/laptop-mode/conf.d/* $(DESTDIR)/etc/laptop-mode/conf.d
-	install -m700 etc/acpi/actions/* $(DESTDIR)/etc/acpi/actions
-	install -m600 etc/acpi/events/* $(DESTDIR)/etc/acpi/events
-	install -m700 etc/apm/event.d/* $(DESTDIR)/etc/apm/event.d
-	install -m700 etc/power/scripts.d/* $(DESTDIR)/etc/power/scripts.d
-	install -m700 etc/power/event.d/* $(DESTDIR)/etc/power/event.d
-	install -m700 etc/pm/sleep.d/* $(DESTDIR)/etc/pm/sleep.d
-	install -m700 usr/sbin/laptop_mode $(DESTDIR)/usr/sbin
-	install -m700 usr/sbin/lm-syslog-setup $(DESTDIR)/usr/sbin
-	install -m700 usr/sbin/lm-profiler $(DESTDIR)/usr/sbin
-	install -m700 usr/share/laptop-mode-tools/modules/* $(DESTDIR)/usr/share/laptop-mode-tools/modules
-	install -m700 usr/share/laptop-mode-tools/module-helpers/* $(DESTDIR)/usr/share/laptop-mode-tools/module-helpers
+	install -m755 -d $(DESTDIR)/etc/laptop-mode
+	install -m755 -d $(DESTDIR)/etc/acpi/events
+	install -m755 -d $(DESTDIR)/etc/acpi/actions
+	install -m755 -d $(DESTDIR)/usr/sbin
+	install -m755 -d $(DESTDIR)/usr/share/laptop-mode-tools/modules
+	install -m755 -d $(DESTDIR)/usr/share/laptop-mode-tools/module-helpers
+	install -m755 -d $(DESTDIR)/etc/apm/event.d
+	install -m755 -d $(DESTDIR)/etc/power/scripts.d
+	install -m755 -d $(DESTDIR)/etc/power/event.d
+	install -m755 -d $(DESTDIR)/etc/pm/sleep.d
+	install -m755 -d $(DESTDIR)/etc/laptop-mode/batt-start
+	install -m755 -d $(DESTDIR)/etc/laptop-mode/batt-stop
+	install -m755 -d $(DESTDIR)/etc/laptop-mode/lm-ac-start
+	install -m755 -d $(DESTDIR)/etc/laptop-mode/lm-ac-stop
+	install -m755 -d $(DESTDIR)/etc/laptop-mode/nolm-ac-start
+	install -m755 -d $(DESTDIR)/etc/laptop-mode/nolm-ac-stop
+	install -m755 -d $(DESTDIR)/etc/laptop-mode/conf.d
+	install -m755 -d $(DESTDIR)/etc/laptop-mode/modules
+	install -m644 etc/laptop-mode/laptop-mode.conf $(DESTDIR)/etc/laptop-mode/laptop-mode.conf
+	install -m644 etc/laptop-mode/conf.d/* $(DESTDIR)/etc/laptop-mode/conf.d
+	install -m755 etc/acpi/actions/* $(DESTDIR)/etc/acpi/actions
+	install -m644 etc/acpi/events/* $(DESTDIR)/etc/acpi/events
+	install -m755 etc/apm/event.d/* $(DESTDIR)/etc/apm/event.d
+	install -m755 etc/power/scripts.d/* $(DESTDIR)/etc/power/scripts.d
+	install -m755 etc/power/event.d/* $(DESTDIR)/etc/power/event.d
+	install -m755 etc/pm/sleep.d/* $(DESTDIR)/etc/pm/sleep.d
+	install -m755 usr/sbin/laptop_mode $(DESTDIR)/usr/sbin
+	install -m755 usr/sbin/lm-syslog-setup $(DESTDIR)/usr/sbin
+	install -m755 usr/sbin/lm-profiler $(DESTDIR)/usr/sbin
+	install -m755 usr/share/laptop-mode-tools/modules/* $(DESTDIR)/usr/share/laptop-mode-tools/modules
+	install -m755 usr/share/laptop-mode-tools/module-helpers/* $(DESTDIR)/usr/share/laptop-mode-tools/module-helpers
 
 # Build architecture-independent files here.
 binary-arch: build install
