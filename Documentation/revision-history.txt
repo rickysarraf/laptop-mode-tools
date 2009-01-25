@@ -1,4 +1,4 @@
-1.46 - 18 January 2008
+1.46 - 25 January 2008
 
     * iwl4965 driver has been replaced by iwlagn in Linux 2.6.27. Add support
       for this. See Debian BTS #502022.
@@ -17,6 +17,9 @@
       (see http://lwn.net/Articles/312230). Contributed by Ritesh Raj Sarraf.
     * Include integration with pm-utils so that hardware settings are re-applied
       on resume from suspend/hibernate. See Debian BTS #481766.
+    * Use a different method to determine X displays and authorizations in the
+      dpms-standby module. The old method depended on w -hs output, which was
+      very unreliable.
 
 1.45 - 15 July 2008
 
