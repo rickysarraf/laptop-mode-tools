@@ -396,7 +396,19 @@ battery capacity.
 When this option is enabled, auto-hibernation will kick in when the battery
 reports its state as "critical".
 
+.SS "\fI/etc/laptop-mode/conf.d/battery-level-polling.conf\fP"
 
+Some battery hardware does not send out proper level change events, or too
+infrequent ones. For such hardware, laptop mode tools will not detect that the
+battery has reached a critical level. The battery-level-polling module allows
+you to use the auto-hibernate module and the other battery level dependent
+features of laptop mode tools even when your battery does not send out frequent
+ACPI to indicate a change in level.
+
+.IP "\fBENABLE_BATTERY_LEVEL_POLLING\fP" 10
+When this option is enabled, laptop mode tools will automatically poll the
+battery level every once in a while to see if the levels have changed, and to
+see if actions should be taken as a consequence.
 
 .SS "\fI/etc/laptop-mode/conf.d/start-stop-programs.conf\fP"
 

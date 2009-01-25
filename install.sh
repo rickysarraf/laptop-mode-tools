@@ -109,6 +109,7 @@ $INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode/lm-ac-stop"
 $INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode/nolm-ac-start"
 $INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode/nolm-ac-stop"
 $INSTALL -d -m 755 "$DESTDIR/usr/share/laptop-mode-tools/modules"
+$INSTALL -d -m 755 "$DESTDIR/usr/share/laptop-mode-tools/module-helpers"
 $INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode/conf.d"
 $INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode/modules"
 $INSTALL -d -m 755 "$DESTDIR/usr/sbin"
@@ -127,7 +128,7 @@ fi
 for CONF in etc/laptop-mode/conf.d/* ; do
 	if [ -f "$DESTDIR/$CONF" ] ; then
 		echo "Not reinstalling configuration file $DESTDIR/$CONF."
-	elif ( ! $INSTALL -m 600 "$CONF" "$DESTDIR/$CONF" ) ; then
+	elif ( ! $INSTALL -m 644 "$CONF" "$DESTDIR/$CONF" ) ; then
 		echo "$0: Failed to install configuration file $DESTDIR/$CONF. Installation failed."
 		exit 12
 	fi
@@ -136,22 +137,22 @@ done
 
 if [ -f "$DESTDIR/etc/laptop-mode/lm-profiler.conf" ] ; then
 	echo "Configuration file $DESTDIR/etc/laptop-mode/lm-profiler.conf already exists."
-elif ( ! $INSTALL -m 600 etc/laptop-mode/lm-profiler.conf "$DESTDIR/etc/laptop-mode" ) ; then
+elif ( ! $INSTALL -m 644 etc/laptop-mode/lm-profiler.conf "$DESTDIR/etc/laptop-mode" ) ; then
 	echo "$0: Failed to install configuration file in $DESTDIR/etc/laptop-mode/lm-profiler.conf. Installation failed."
 	exit 12
 fi
 
-if ( ! $INSTALL -m 700 usr/sbin/laptop_mode "$DESTDIR/usr/sbin" ) ; then
+if ( ! $INSTALL -m 755 usr/sbin/laptop_mode "$DESTDIR/usr/sbin" ) ; then
 	echo "$0: Failed to install $DESTDIR/usr/sbin/laptop_mode. Installation failed."
 	exit 11
 fi
 
-if ( ! $INSTALL -m 700 usr/sbin/lm-syslog-setup "$DESTDIR/usr/sbin" ) ; then
+if ( ! $INSTALL -m 755 usr/sbin/lm-syslog-setup "$DESTDIR/usr/sbin" ) ; then
 	echo "$0: Failed to install $DESTDIR/usr/sbin/lm-syslog-setup. installation failed."
 	exit 25
 fi
 
-if ( ! $INSTALL -m 700 usr/sbin/lm-profiler "$DESTDIR/usr/sbin" ) ; then
+if ( ! $INSTALL -m 755 usr/sbin/lm-profiler "$DESTDIR/usr/sbin" ) ; then
 	echo "$0: Failed to install $DESTDIR/usr/sbin/lm-profiler. Installation failed."
 	exit 11
 fi
@@ -163,9 +164,14 @@ if [ -f "$DESTDIR/usr/share/laptop-mode-tools/modules/core" ] ; then
 	fi
 fi		
 
-if ( ! $INSTALL -m 700 usr/share/laptop-mode-tools/modules/* "$DESTDIR/usr/share/laptop-mode-tools/modules" ) ; then
+if ( ! $INSTALL -m 755 usr/share/laptop-mode-tools/modules/* "$DESTDIR/usr/share/laptop-mode-tools/modules" ) ; then
 	echo "$0: Failed to install modules into /usr/share/laptop-mode-tools/modules. Installation failed."
 	exit 26
+fi
+
+if ( ! $INSTALL -m 755 usr/share/laptop-mode-tools/module-helpers/* "$DESTDIR/usr/share/laptop-mode-tools/module-helpers" ) ; then
+	echo "$0: Failed to install module helpers into /usr/share/laptop-mode-tools/module-helpers. Installation failed."
+	exit 37
 fi
 
 if ( ! $INSTALL -m 744 man/* "$DESTDIR/$MAN_D/man8" ) ; then
@@ -198,11 +204,11 @@ if [ "$ACPI" = "force" ] || [ "$ACPI" = "enabled" -a ! -d /proc/pmu -a -d "$DEST
 	# files don't exist and leave it at that.
 	rm -f "$DESTDIR/etc/acpi/actions/battery.sh" "$DESTDIR/etc/acpi/actions/ac.sh"
 	
-	if ( ! $INSTALL -m 700 etc/acpi/actions/* "$DESTDIR/etc/acpi/actions" ) ; then
+	if ( ! $INSTALL -m 755 etc/acpi/actions/* "$DESTDIR/etc/acpi/actions" ) ; then
 		echo "$0: Failed to install ACPI action scripts in $DESTDIR/etc/acpi/actions. Installation failed."
 		exit 13
 	fi
-	if ( ! $INSTALL -m 600 etc/acpi/events/* "$DESTDIR/etc/acpi/events" ) ; then
+	if ( ! $INSTALL -m 644 etc/acpi/events/* "$DESTDIR/etc/acpi/events" ) ; then
 		echo "$0: Failed to install ACPI event file in $DESTDIR/etc/acpi/events. Installation failed."
 		exit 14
 	fi
@@ -215,7 +221,7 @@ fi
 
 if [ "$APM" = "force" ] || [ "$APM" = "enabled" -a ! -d /proc/pmu -a -d /etc/apm ] ; then
 	$INSTALL -d -m 755 "$DESTDIR/etc/apm/event.d"
-	if ( ! $INSTALL -m 700 etc/apm/event.d/* "$DESTDIR/etc/apm/event.d" ) ; then
+	if ( ! $INSTALL -m 755 etc/apm/event.d/* "$DESTDIR/etc/apm/event.d" ) ; then
 		echo "$0: Failed to install APM event script in $DESTDIR/etc/apm/event.d. Installation failed."
 		exit 15
 	fi
@@ -226,7 +232,7 @@ fi
 if [ "$PMU" = "force" ] || [ "$PMU" = "enabled" -a -d /proc/pmu -a -d /etc/power ] ; then
 	$INSTALL -d -m 755 "$DESTDIR/etc/power/event.d"
 	$INSTALL -d -m 755 "$DESTDIR/etc/power/scripts.d"
-	if ( ! $INSTALL -m 700 etc/power/scripts.d/laptop-mode "$DESTDIR/etc/power/scripts.d" ) ; then
+	if ( ! $INSTALL -m 755 etc/power/scripts.d/laptop-mode "$DESTDIR/etc/power/scripts.d" ) ; then
 		echo "$0: Failed to install pbbuttonsd event script in $DESTDIR/etc/power/scripts.d. Installation failed."
 		exit 33
 	fi
@@ -271,7 +277,7 @@ fi
 if [ "$INIT_D" != "none" ] ; then
 	if [ -d "$INIT_D" -o -n "$DESTDIR" ] ; then
 		$INSTALL -d -m 755 "$INIT_D"
-		if ( ! $INSTALL -m 700 etc/init.d/laptop-mode "$INIT_D" ) ; then
+		if ( ! $INSTALL -m 755 etc/init.d/laptop-mode "$INIT_D" ) ; then
 			echo "$0: failed to install init script in $INIT_D. Installation failed."
 			exit 16
 		fi
