@@ -17,8 +17,9 @@ laptop-mode-tools (1.46-1) unstable; urgency=low
       battery events. Closes: #495208.
   * Recommend ethtool. Closes: #497343.
   * Depend on psmisc. Closes: #497345.
+  * Fix lintian warning on pbbuttonsd integration.
 
- -- Bart Samwel <bart@samwel.tk>  Sun, 25 Jan 2009 22:46:24 +0100
+ -- Bart Samwel <bart@samwel.tk>  Sun, 25 Jan 2009 22:59:46 +0100
 
 laptop-mode-tools (1.45-1) unstable; urgency=low
 
