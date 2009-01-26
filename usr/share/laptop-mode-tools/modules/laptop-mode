@@ -268,7 +268,7 @@ if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 1 ] ; then
 				$LM_VERBOSE && echo "Reducing file system type."  >> $OUTPUT
 				FST=${FST%%,*}
 				case "$FST" in
-					"ext3"|"reiserfs")
+					"ext3"|"reiserfs"|"ext4dev"|"ext4")
 						$LM_VERBOSE && echo "Removing commit mount option from original options."  >> $OUTPUT
 						PARSEDOPTS="$(remove_numeric_mount_option commit "$OPTS")"
 						$LM_VERBOSE && echo "Executing: mount $DEV $MP -t $FST -o remount,$PARSEDOPTS,commit=$MAX_LOST_WORK_SECONDS$NOATIME_OPT" >> $OUTPUT
@@ -385,7 +385,7 @@ else
 					SAVED_OPTS=${SAVED_OPTS#* } # trim device name
 				
 					case "$FST" in
-						"ext3"|"reiserfs")								
+						"ext3"|"reiserfs"|"ext4dev"|"ext4")								
 							PARSEDOPTS="$(replace_numeric_mount_option commit commit=0 $SAVED_OPTS $OPTS)"
 							PARSEDOPTS="$(replace_atime_mount_option $SAVED_OPTS $PARSEDOPTS)"
 							$LM_VERBOSE && echo "Executing: mount $DEV $MP -t $FST -o remount,$PARSEDOPTS" >> $OUTPUT
