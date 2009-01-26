@@ -17,7 +17,7 @@ if [ x$CONTROL_USB_AUTOSUSPEND = x1 ] ; then
 	    do
 		usb_device=`basename $usb_device`;
 		if [ -f /sys/bus/usb/devices/$usb_device/power/autosuspend ]; then
-		    echo AUTOSUSPEND_TIMEOUT > /sys/bus/usb/devices/$usb_device/power/autosuspend;
+		    echo $AUTOSUSPEND_TIMEOUT > /sys/bus/usb/devices/$usb_device/power/autosuspend;
 		    $LM_VERBOSE && echo "Enabling auto suspend mode for usb device $usb_device." >> $OUTPUT
 		else
 		    $LM_VERBOSE && echo "Not enabling auto suspend mode for usb device $usb_device -- /sys/bus/usb/devices/$usb_device/power/autosuspend not present." >> $OUTPUT
