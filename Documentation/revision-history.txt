@@ -1,3 +1,6 @@
+1.48 - 06 April 2009
+    * Fix udevinfo calls. See Debian BTS #522043
+
 1.47 - 26 January 2008
 
     * Fix typo in usb-autosuspend module, see Debian BTS #513078.
