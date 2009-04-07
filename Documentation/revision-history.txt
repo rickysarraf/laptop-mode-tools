@@ -1,5 +1,7 @@
 1.48 - 06 April 2009
     * Fix udevinfo calls. See Debian BTS #522043
+    * Laptops usually have only a single ethernet device, usually being the
+      first one, referred as eth0.
 
 1.47 - 26 January 2008
 
