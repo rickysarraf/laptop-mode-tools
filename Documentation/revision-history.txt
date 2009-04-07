@@ -2,6 +2,7 @@
     * Fix udevinfo calls. See Debian BTS #522043
     * Laptops usually have only a single ethernet device, usually being the
       first one, referred as eth0.
+    * Don't hard code ethernet configuration to 100MBit speed.
 
 1.47 - 26 January 2008
 

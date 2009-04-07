@@ -15,7 +15,7 @@ if [ x$CONTROL_ETHERNET = x1 ] ; then
 			fi
 		fi
 		
-		# Handle throttling to 100 Mbit
+		# Handle throttling
 		if [ $ON_AC -eq 1 ]; then
 			if [ "$ACTIVATE" -eq 1 ]; then
 				THROTTLE_ETHERNET="$LM_AC_THROTTLE_ETHERNET"
@@ -27,8 +27,8 @@ if [ x$CONTROL_ETHERNET = x1 ] ; then
 		fi
 		
 		if [ x$THROTTLE_ETHERNET = x1 ] ; then
-			if  ethtool -s $DEVICE autoneg off speed 100  >> $OUTPUT 2>&1 ; then			
-				$LM_VERBOSE && echo "Throttled speed to 100 Mbit for $DEVICE" >> $OUTPUT
+			if  ethtool -s $DEVICE autoneg off speed $MIN_SPEED  >> $OUTPUT 2>&1 ; then			
+				$LM_VERBOSE && echo "Throttled speed to $MIN_SPEED Mbit for $DEVICE" >> $OUTPUT
 			else
 				$LM_VERBOSE && echo "Could not throttle ethernet device $DEVICE" >> $OUTPUT
 			fi		
