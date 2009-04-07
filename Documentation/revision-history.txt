@@ -6,6 +6,7 @@
     * Restore ethernet speed to MAX_SPEED when back ON_AC. See Debian BTS
       #519426
     * Don't throttle ethernet when on AC power
+    * Restore auto-negotiation and speed, one at a time
 
 1.47 - 26 January 2008
 

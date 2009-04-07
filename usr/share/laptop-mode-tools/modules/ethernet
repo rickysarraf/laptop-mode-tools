@@ -15,11 +15,18 @@ if [ x$CONTROL_ETHERNET = x1 ] ; then
 				fi
 			fi
 		
-			# Handle throttling
-			if  ethtool -s $DEVICE autoneg on speed $MAX_SPEED  >> $OUTPUT 2>&1 ; then
+			# Handle auto-negotiation
+			if  ethtool -s $DEVICE autoneg on >> $OUTPUT 2>&1 ; then
+				$LM_VERBOSE && echo "Switched auto-negotiation to on for $DEVICE" >> $OUTPUT
+			else
+				$LM_VERBOSE && echo "Could not set auto-negotiation to on for $DEVICE" >> $OUTPUT
+			fi
+
+			# Handle Speed Throttling
+			if  ethtool -s $DEVICE speed $MAX_SPEED  >> $OUTPUT 2>&1 ; then
 				$LM_VERBOSE && echo "Restored speed to $MAX_SPEED Mbit for $DEVICE" >> $OUTPUT
 			else
-				$LM_VERBOSE && echo "Could not restore speed for ethernet device $DEVICE" >> $OUTPUT
+				$LM_VERBOSE && echo "Could not restore speed for $DEVICE" >> $OUTPUT
 			fi
 		done
 	else
@@ -39,7 +46,7 @@ if [ x$CONTROL_ETHERNET = x1 ] ; then
 				if  ethtool -s $DEVICE autoneg off speed $MIN_SPEED  >> $OUTPUT 2>&1 ; then
 					$LM_VERBOSE && echo "Throttled speed to $MIN_SPEED Mbit for $DEVICE" >> $OUTPUT
 				else
-					$LM_VERBOSE && echo "Could not throttle ethernet device $DEVICE" >> $OUTPUT
+					$LM_VERBOSE && echo "Could not throttle $DEVICE" >> $OUTPUT
 				fi
 			fi
 		done
