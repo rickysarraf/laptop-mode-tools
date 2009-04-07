@@ -4,36 +4,53 @@
 #
 
 if [ x$CONTROL_ETHERNET = x1 ] ; then
-	for DEVICE in $ETHERNET_DEVICES ; do
-
-		# Wakeup-on-LAN handling
-		if [ x$DISABLE_WAKEUP_ON_LAN = x1 ] ; then
-			if ethtool -s $DEVICE wol d >> $OUTPUT 2>&1 ; then			
-				$LM_VERBOSE && echo "Disabled wakeup-on-LAN for $DEVICE" >> $OUTPUT
-			else
-				$LM_VERBOSE && echo "Could not disable wakeup-on-LAN for $DEVICE" >> $OUTPUT
+	if [ $ON_AC -eq 1 ]; then
+		for DEVICE in $ETHERNET_DEVICES ; do
+			# Wakeup-on-LAN handling
+			if [ x$DISABLE_WAKEUP_ON_LAN = x1 ] ; then
+				if ethtool -s $DEVICE wol p >> $OUTPUT 2>&1 ; then			
+					$LM_VERBOSE && echo "Enabled wakeup-on-LAN for $DEVICE" >> $OUTPUT
+				else
+					$LM_VERBOSE && echo "Could not enable wakeup-on-LAN for $DEVICE" >> $OUTPUT
+				fi
 			fi
-		fi
 		
-		# Handle throttling
-		if [ $ON_AC -eq 1 ]; then
+			# Handle throttling
 			if [ "$ACTIVATE" -eq 1 ]; then
 				THROTTLE_ETHERNET="$LM_AC_THROTTLE_ETHERNET"
 			else
 				THROTTLE_ETHERNET="$NOLM_AC_THROTTLE_ETHERNET"
 			fi
-		else
-			THROTTLE_ETHERNET="$BATT_THROTTLE_ETHERNET"
-		fi
 		
-		if [ x$THROTTLE_ETHERNET = x1 ] ; then
-			if  ethtool -s $DEVICE autoneg off speed $MIN_SPEED  >> $OUTPUT 2>&1 ; then			
-				$LM_VERBOSE && echo "Throttled speed to $MIN_SPEED Mbit for $DEVICE" >> $OUTPUT
-			else
-				$LM_VERBOSE && echo "Could not throttle ethernet device $DEVICE" >> $OUTPUT
-			fi		
-		fi				
-	done
+			if [ x$THROTTLE_ETHERNET = x1 ] ; then
+				if  ethtool -s $DEVICE autoneg on speed $MAX_SPEED  >> $OUTPUT 2>&1 ; then
+					$LM_VERBOSE && echo "Restored speed to $MAX_SPEED Mbit for $DEVICE" >> $OUTPUT
+				else
+					$LM_VERBOSE && echo "Could not restore speed for ethernet device $DEVICE" >> $OUTPUT
+				fi
+			fi
+		done
+	else
+		for DEVICE in $ETHERNET_DEVICES ; do
+			# Wakeup-on-LAN handling
+			if [ x$DISABLE_WAKEUP_ON_LAN = x1 ] ; then
+				if ethtool -s $DEVICE wol d >> $OUTPUT 2>&1 ; then			
+					$LM_VERBOSE && echo "Disabled wakeup-on-LAN for $DEVICE" >> $OUTPUT
+				else
+					$LM_VERBOSE && echo "Could not disable wakeup-on-LAN for $DEVICE" >> $OUTPUT
+				fi
+			fi
+			
+			# Handle throttling
+			THROTTLE_ETHERNET="$BATT_THROTTLE_ETHERNET"
+			if [ x$THROTTLE_ETHERNET = x1 ] ; then
+				if  ethtool -s $DEVICE autoneg off speed $MIN_SPEED  >> $OUTPUT 2>&1 ; then
+					$LM_VERBOSE && echo "Throttled speed to $MIN_SPEED Mbit for $DEVICE" >> $OUTPUT
+				else
+					$LM_VERBOSE && echo "Could not throttle ethernet device $DEVICE" >> $OUTPUT
+				fi
+			fi
+		done
 else
 	$LM_VERBOSE && echo "Ethernet module is disabled." >> $OUTPUT
 fi
