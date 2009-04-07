@@ -5,6 +5,7 @@
     * Don't hard code ethernet configuration to 100MBit speed.
     * Restore ethernet speed to MAX_SPEED when back ON_AC. See Debian BTS
       #519426
+    * Don't throttle ethernet when on AC power
 
 1.47 - 26 January 2008
 

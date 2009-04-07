@@ -16,18 +16,10 @@ if [ x$CONTROL_ETHERNET = x1 ] ; then
 			fi
 		
 			# Handle throttling
-			if [ "$ACTIVATE" -eq 1 ]; then
-				THROTTLE_ETHERNET="$LM_AC_THROTTLE_ETHERNET"
+			if  ethtool -s $DEVICE autoneg on speed $MAX_SPEED  >> $OUTPUT 2>&1 ; then
+				$LM_VERBOSE && echo "Restored speed to $MAX_SPEED Mbit for $DEVICE" >> $OUTPUT
 			else
-				THROTTLE_ETHERNET="$NOLM_AC_THROTTLE_ETHERNET"
-			fi
-		
-			if [ x$THROTTLE_ETHERNET = x1 ] ; then
-				if  ethtool -s $DEVICE autoneg on speed $MAX_SPEED  >> $OUTPUT 2>&1 ; then
-					$LM_VERBOSE && echo "Restored speed to $MAX_SPEED Mbit for $DEVICE" >> $OUTPUT
-				else
-					$LM_VERBOSE && echo "Could not restore speed for ethernet device $DEVICE" >> $OUTPUT
-				fi
+				$LM_VERBOSE && echo "Could not restore speed for ethernet device $DEVICE" >> $OUTPUT
 			fi
 		done
 	else
