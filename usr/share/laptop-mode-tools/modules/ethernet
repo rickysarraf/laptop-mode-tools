@@ -50,6 +50,7 @@ if [ x$CONTROL_ETHERNET = x1 ] ; then
 				fi
 			fi
 		done
+	fi
 else
 	$LM_VERBOSE && echo "Ethernet module is disabled." >> $OUTPUT
 fi
