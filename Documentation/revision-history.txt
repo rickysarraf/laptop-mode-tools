@@ -7,6 +7,7 @@
       #519426
     * Don't throttle ethernet when on AC power
     * Restore auto-negotiation and speed, one at a time
+    * Create the pm/sleep.d directory when DESTDIR is given
 
 1.47 - 26 January 2008
 
