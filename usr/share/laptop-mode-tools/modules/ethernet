@@ -6,6 +6,27 @@
 if [ x$CONTROL_ETHERNET = x1 ] ; then
 	if [ $ON_AC -eq 1 ]; then
 		for DEVICE in $ETHERNET_DEVICES ; do
+			speed=`mii-tool -v $DEVICE | grep capabilities`
+			speed=(${speed//base/ });
+
+			case "$MAX_SPEED" in
+				"slowest")
+				MAX_SPEED=${speed[${#speed[@]} - 2 ]}
+				;;
+				"fastest")
+				MAX_SPEED=${speed[1]}
+				;;
+			esac
+			
+			case "$MIN_SPEED" in
+				"slowest")
+				MIN_SPEED=${speed[${#speed[@]} - 2 ]}
+				;;
+				"fastest")
+				MIN_SPEED=${speed[1]}
+				;;
+			esac
+
 			# Wakeup-on-LAN handling
 			if [ x$DISABLE_WAKEUP_ON_LAN = x1 ] ; then
 				if ethtool -s $DEVICE wol p >> $OUTPUT 2>&1 ; then			
@@ -31,6 +52,27 @@ if [ x$CONTROL_ETHERNET = x1 ] ; then
 		done
 	else
 		for DEVICE in $ETHERNET_DEVICES ; do
+			speed=`mii-tool -v $DEVICE | grep capabilities`
+			speed=(${speed//base/ });
+
+			case "$MAX_SPEED" in
+				"slowest")
+				MAX_SPEED=${speed[${#speed[@]} - 2 ]}
+				;;
+				"fastest")
+				MAX_SPEED=${speed[1]}
+				;;
+			esac
+			
+			case "$MIN_SPEED" in
+				"slowest")
+				MIN_SPEED=${speed[${#speed[@]} - 2 ]}
+				;;
+				"fastest")
+				MIN_SPEED=${speed[1]}
+				;;
+			esac
+
 			# Wakeup-on-LAN handling
 			if [ x$DISABLE_WAKEUP_ON_LAN = x1 ] ; then
 				if ethtool -s $DEVICE wol d >> $OUTPUT 2>&1 ; then			

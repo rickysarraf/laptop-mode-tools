@@ -10,6 +10,7 @@
     * Create the pm/sleep.d directory when DESTDIR is given
     * Minor if/fi fixes
     * udevadm info (or udevinfo) output has changed in version 140
+	* Handle friendly names for ethernet speed
 
 1.47 - 26 January 2008
 
