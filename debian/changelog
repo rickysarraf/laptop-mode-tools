@@ -1,3 +1,15 @@
+laptop-mode-tools (1.48-1) unstable; urgency=low
+
+  * New upstream release 1.48:
+	* Build-Depend on standard debhelper version.
+	* Add Homepage field.
+	* Bump Standards Version to 3.8.1
+	* Add dependency on udev version > 0.140
+	* Take maintenance from Bart Samwel
+	* Fix udevinfo call. Closes: #522043.
+
+ -- Ritesh Raj Sarraf <rrs@researchut.com>  Mon, 13 Apr 2009 16:44:58 +0530
+
 laptop-mode-tools (1.47-1) unstable; urgency=low
 
   * New upstream release 1.47:
