@@ -136,6 +136,14 @@ fi
 HAVE_UDEVINFO=0
 if [ -x "$(which udevadm 2> /dev/null)" ]; then
 	UDEVVERSION=$(udevadm info -V)
+	UDEV_VER_VERIFY=$(echo $UDEVVERSION | cut -b 1)
+	case $UDEV_VER_VERIFY in
+		[a-z]) UDEVVERSION=$(udevadm info -V | awk '{print $3}')
+		;;
+		*)
+		;;
+	esac
+
 	if [ "$UDEVVERSION" -gt 70 ] ; then
 		HAVE_UDEVINFO=1
 	else
