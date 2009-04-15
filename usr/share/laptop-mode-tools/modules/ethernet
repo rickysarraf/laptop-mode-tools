@@ -6,24 +6,34 @@
 if [ x$CONTROL_ETHERNET = x1 ] ; then
 	if [ $ON_AC -eq 1 ]; then
 		for DEVICE in $ETHERNET_DEVICES ; do
-			speed=`mii-tool -v $DEVICE | grep capabilities`
-			speed=(${speed//base/ });
+			speed=`mii-tool -v $DEVICE | grep capabilities | tr ' ' '\n' | sort -n | sed -ne '/^1.*/p' | cut -d "b" -f1`
+			max_s=0;
+			min_s=100000;
+			for s in speed;
+			do
+				if [ $s -gt $max_s ]; then
+					max_s=$s
+				fi
+				if [ $s -lt $min_s ]; then
+					min_s=$s
+				fi
+			done
 
 			case "$MAX_SPEED" in
 				"slowest")
-				MAX_SPEED=${speed[${#speed[@]} - 2 ]}
+				MAX_SPEED=$min_s
 				;;
 				"fastest")
-				MAX_SPEED=${speed[1]}
+				MAX_SPEED=$max_s
 				;;
 			esac
 			
 			case "$MIN_SPEED" in
 				"slowest")
-				MIN_SPEED=${speed[${#speed[@]} - 2 ]}
+				MIN_SPEED=$min_s
 				;;
 				"fastest")
-				MIN_SPEED=${speed[1]}
+				MIN_SPEED=$max_s
 				;;
 			esac
 

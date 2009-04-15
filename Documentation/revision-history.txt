@@ -12,6 +12,7 @@
     * udevadm info (or udevinfo) output has changed in version 140
 	* Handle friendly names for ethernet speed
 	* Handle udev versions in different formats
+	* Reliably get ethernet speed
 
 1.47 - 26 January 2008
 
