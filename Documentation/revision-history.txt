@@ -13,6 +13,7 @@
 	* Handle udev versions in different formats
 	* Reliably get ethernet speed
 	* Restore ethernet speed throttling in both situations
+	* Bump the version to 1.48 in laptop_mode
 
 1.47 - 26 January 2008
 
