@@ -22,7 +22,11 @@ is_capable() {
 	# It assumes more or less recent udev (> 070)
 	if [ $HAVE_UDEVINFO -ne 0 ] ; then
 		$LM_VERBOSE && echo -n "Querying $1 media type using udevinfo: " >> $OUTPUT
-		eval "$(udevinfo -q env -n $1 2>> $OUTPUT | egrep '(ID_TYPE=|ID_BUS=)' 2>&1 | tee -a $OUTPUT)"
+		if [ -x /sbin/udevadm ]; then
+			eval "$(udevadm info -q env -n $1 2>> $OUTPUT | egrep '(ID_TYPE=|ID_BUS=)' 2>&1 | tee -a $OUTPUT)"
+		else
+			eval "$(udevinfo -q env -n $1 2>> $OUTPUT | egrep '(ID_TYPE=|ID_BUS=)' 2>&1 | tee -a $OUTPUT)"
+		fi
 		if [ -n "$ID_TYPE" -a -n "$ID_BUS" ] ; then
 			$LM_VERBOSE && echo "type '$ID_TYPE' on bus '$ID_BUS' detected" >> $OUTPUT
 			MEDIA=$ID_TYPE
@@ -130,15 +134,34 @@ if [ -x "$(which sdparm 2> /dev/null)" ]; then
   SDPARM_AVAILABLE=1
 fi
 HAVE_UDEVINFO=0
-if [ -x "$(which udevinfo 2> /dev/null)" ] ; then
-	UDEVVERSION=$(udevinfo -V | awk '{ print $3; }')
+if [ -x "$(which udevadm 2> /dev/null)" ]; then
+	UDEVVERSION=$(udevadm info -V)
+	UDEV_VER_VERIFY=$(echo $UDEVVERSION | cut -b 1)
+	case $UDEV_VER_VERIFY in
+		[a-z]) UDEVVERSION=$(udevadm info -V | awk '{print $3}')
+		;;
+		*)
+		;;
+	esac
+
 	if [ "$UDEVVERSION" -gt 70 ] ; then
 		HAVE_UDEVINFO=1
 	else
-		$LM_VERBOSE && echo "udevinfo present but version not > 070, not using udev" >> $OUTPUT
+		$LM_VERBOSE && echo "udevadm info present but version not > 070, not using udev" >> $OUTPUT
+	fi
+else
+	# Older versions of udev (udevinfo) give output in the form of
+	# "udevinfo, version 125"
+	# Will be removed later. Currently only for backward compatibility
+	if [ -x "$(which udevinfo 2> /dev/null)" ] ; then
+		UDEVVERSION=$(udevinfo -V | awk '{ print $3; }')
+		if [ "$UDEVVERSION" -gt 70 ] ; then
+			HAVE_UDEVINFO=1
+		else
+			$LM_VERBOSE && echo "udevinfo present but version not > 070, not using udev" >> $OUTPUT
+		fi
 	fi
 fi
-
 
 if [ x$CONTROL_HD_POWERMGMT = x1 ] ; then
 	if [ $ON_AC -eq 1 ] ; then

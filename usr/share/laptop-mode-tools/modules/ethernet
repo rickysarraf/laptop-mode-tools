@@ -4,35 +4,80 @@
 #
 
 if [ x$CONTROL_ETHERNET = x1 ] ; then
+	if [ $ON_AC -eq 1 ]; then
+		if [ "$ACTIVATE" -eq 1 ]; then
+			THROTTLE_ETHERNET="$LM_AC_THROTTLE_ETHERNET"
+		else
+			THROTTLE_ETHERNET="$NOLM_AC_THROTTLE_ETHERNET"
+		fi
+	else
+		THROTTLE_ETHERNET="$BATT_THROTTLE_ETHERNET"
+	fi
+	
 	for DEVICE in $ETHERNET_DEVICES ; do
-
 		# Wakeup-on-LAN handling
 		if [ x$DISABLE_WAKEUP_ON_LAN = x1 ] ; then
-			if ethtool -s $DEVICE wol d >> $OUTPUT 2>&1 ; then			
-				$LM_VERBOSE && echo "Disabled wakeup-on-LAN for $DEVICE" >> $OUTPUT
+			if ethtool -s $DEVICE wol p >> $OUTPUT 2>&1 ; then			
+				$LM_VERBOSE && echo "Enabled wakeup-on-LAN for $DEVICE" >> $OUTPUT
 			else
-				$LM_VERBOSE && echo "Could not disable wakeup-on-LAN for $DEVICE" >> $OUTPUT
+				$LM_VERBOSE && echo "Could not enable wakeup-on-LAN for $DEVICE" >> $OUTPUT
 			fi
 		fi
 		
-		# Handle throttling to 100 Mbit
-		if [ $ON_AC -eq 1 ]; then
-			if [ "$ACTIVATE" -eq 1 ]; then
-				THROTTLE_ETHERNET="$LM_AC_THROTTLE_ETHERNET"
+		# Determine speed
+		speed=`mii-tool -v $DEVICE | grep capabilities | tr ' ' '\n' | sort -n | sed -ne '/^1.*/p' | cut -d "b" -f1`
+		max_s=0;
+		min_s=100000;
+		for s in $speed;
+		do
+			if [ $s -gt $max_s ]; then
+				max_s=$s
+			fi
+			if [ $s -lt $min_s ]; then
+				min_s=$s
+			fi
+		done
+		MAX_SPEED=$max_s;
+
+		case "$THROTTLE_SPEED" in
+			"slowest")
+			THROTTLE_SPEED=$min_s
+			;;
+			"fastest")
+			THROTTLE_SPEED=$max_s
+			;;
+		esac
+
+		# Handle throttling
+		if [ x$THROTTLE_ETHERNET = x1 ] ; then
+			# Handle auto-negotiation
+			if  ethtool -s $DEVICE autoneg off >> $OUTPUT 2>&1 ; then
+				$LM_VERBOSE && echo "Switched auto-negotiation to off for $DEVICE" >> $OUTPUT
 			else
-				THROTTLE_ETHERNET="$NOLM_AC_THROTTLE_ETHERNET"
+				$LM_VERBOSE && echo "Could not set auto-negotiation to off for $DEVICE" >> $OUTPUT
+			fi
+
+			# Handle Speed Throttling
+			if  ethtool -s $DEVICE speed $THROTTLE_SPEED >> $OUTPUT 2>&1 ; then
+				$LM_VERBOSE && echo "Throttled speed to $THROTTLE_SPEED Mbit for $DEVICE" >> $OUTPUT
+			else
+				$LM_VERBOSE && echo "Could not throttle speed for $DEVICE" >> $OUTPUT
 			fi
 		else
-			THROTTLE_ETHERNET="$BATT_THROTTLE_ETHERNET"
-		fi
-		
-		if [ x$THROTTLE_ETHERNET = x1 ] ; then
-			if  ethtool -s $DEVICE autoneg off speed 100  >> $OUTPUT 2>&1 ; then			
-				$LM_VERBOSE && echo "Throttled speed to 100 Mbit for $DEVICE" >> $OUTPUT
+			# Handle auto-negotiation
+			if  ethtool -s $DEVICE autoneg on >> $OUTPUT 2>&1 ; then
+				$LM_VERBOSE && echo "Switched auto-negotiation to on for $DEVICE" >> $OUTPUT
 			else
-				$LM_VERBOSE && echo "Could not throttle ethernet device $DEVICE" >> $OUTPUT
-			fi		
-		fi				
+				$LM_VERBOSE && echo "Could not set auto-negotiation to on for $DEVICE" >> $OUTPUT
+			fi
+
+			# Handle Speed Throttling
+			if  ethtool -s $DEVICE speed $MAX_SPEED  >> $OUTPUT 2>&1 ; then
+				$LM_VERBOSE && echo "Restored speed to $MAX_SPEED Mbit for $DEVICE" >> $OUTPUT
+			else
+				$LM_VERBOSE && echo "Could not restore speed for $DEVICE" >> $OUTPUT
+			fi
+		fi
 	done
 else
 	$LM_VERBOSE && echo "Ethernet module is disabled." >> $OUTPUT
