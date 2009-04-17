@@ -17,7 +17,7 @@ if [ x$CONTROL_ETHERNET = x1 ] ; then
 	for DEVICE in $ETHERNET_DEVICES ; do
 		# Wakeup-on-LAN handling
 		if [ x$DISABLE_WAKEUP_ON_LAN = x1 ] ; then
-			if ethtool -s $DEVICE wol p >> $OUTPUT 2>&1 ; then			
+			if ethtool -s $DEVICE wol d >> $OUTPUT 2>&1 ; then			
 				$LM_VERBOSE && echo "Enabled wakeup-on-LAN for $DEVICE" >> $OUTPUT
 			else
 				$LM_VERBOSE && echo "Could not enable wakeup-on-LAN for $DEVICE" >> $OUTPUT
