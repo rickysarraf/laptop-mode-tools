@@ -5,18 +5,21 @@
 
 
 # Some backward compatibility for version 1.42
-if [ x$BATT_ENABLE_HAL_POLLING  = x1 ] ; then
-	BATT_DISABLE_HAL_POLLING=0
-else
-	BATT_DISABLE_HAL_POLLING=1
-fi
-if [ x$AC_ENABLE_HAL_POLLING  = x1 ] ; then
-	AC_DISABLE_HAL_POLLING=0
-else
-	AC_DISABLE_HAL_POLLING=1
+if [ ! x$BATT_ENABLE_HAL_POLLING  = x ] ; then
+	if [ x$BATT_ENABLE_HAL_POLLING  = x1 ] ; then
+		BATT_DISABLE_HAL_POLLING=0
+	else
+		BATT_DISABLE_HAL_POLLING=1
+	fi
 fi
 
-
+if [ ! x$AC_ENABLE_HAL_POLLING  = x ] ; then
+	if [ x$AC_ENABLE_HAL_POLLING  = x1 ] ; then
+		AC_DISABLE_HAL_POLLING=0
+	else
+		AC_DISABLE_HAL_POLLING=1
+	fi
+fi
 
 
 if [ x$CONTROL_HAL_POLLING = x1 ] ; then
