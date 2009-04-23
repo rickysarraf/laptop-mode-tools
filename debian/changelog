@@ -1,16 +1,19 @@
 laptop-mode-tools (1.48-1) unstable; urgency=low
 
   * New upstream release 1.48:
-    * Build-Depend on standard debhelper version.
-    * Add Homepage field.
-    * Bump Standards Version to 3.8.1
-    * Co-Maintain with Bart Samwel
-    * Fix udevinfo call. Closes: #522043.
-    * Fix ethernet throttling. Closes: #519426.
-    * Ethernet throttling can now be fine-grained.
-    * Fix manpage error.
+    + Fix udevinfo call. Newer udev has deprecated the usage of
+      udevinfo in favor of 'udevadm info' Closes: #522043.
+    + Fix ethernet throttling. Throttle speed to a user specified
+      speed or probe speed from the device Closes: #519426.
+    + Restore ethernet speed to user specified speed or MAX speed
+      when switching back to AC.
+    + Fix manpage error.
+  * Build-Depend on debhelper version 5.
+  * Add Homepage field.
+  * Bump Standards Version to 3.8.1
+  * Co-Maintain with Bart Samwel
 
- -- Ritesh Raj Sarraf <rrs@researchut.com>  Fri, 17 Apr 2009 16:56:06 +0530
+ -- Ritesh Raj Sarraf <rrs@researchut.com>  Thu, 23 Apr 2009 18:05:13 +0530
 
 laptop-mode-tools (1.47-1) unstable; urgency=low
 
