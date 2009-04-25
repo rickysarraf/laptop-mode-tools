@@ -11,9 +11,10 @@ laptop-mode-tools (1.48-1) unstable; urgency=low
   * Build-Depend on debhelper version 5.
   * Add Homepage field.
   * Bump Standards Version to 3.8.1
-  * Co-Maintain with Bart Samwel
+  * Take maintenance from Bart Samwel
+  * Recommend net-tools for ethernet speed detection.
 
- -- Ritesh Raj Sarraf <rrs@researchut.com>  Thu, 23 Apr 2009 18:05:13 +0530
+ -- Ritesh Raj Sarraf <rrs@researchut.com>  Sat, 25 Apr 2009 18:01:51 +0530
 
 laptop-mode-tools (1.47-1) unstable; urgency=low
 
