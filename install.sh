@@ -316,6 +316,14 @@ if [ "$INIT_D" != "none" ] ; then
 			exit 24
 		fi
 	fi
+
+    # Check for acpid and restart if running
+    pid=`pidof acpid`
+
+    if [ ! -z $pid ]; then
+        echo "Reloading acpid daemon"
+        killall -SIGHUP acpid;
+    fi
 fi
 
 echo "Installation complete."
