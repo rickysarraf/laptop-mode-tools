@@ -25,8 +25,11 @@ set -e
 
 case "$1" in
   configure)
-    if [ -x /etc/init.d/acpid ]; then
-      invoke-rc.d acpid force-reload || true
+    pid=`pidof acpid`
+    if [ ! -z $pid ]; then
+      if [ -x /etc/init.d/acpid ]; then
+        invoke-rc.d acpid force-reload || true
+      fi
     fi
   ;;
   abort-upgrade|abort-remove|abort-deconfigure|triggered)
