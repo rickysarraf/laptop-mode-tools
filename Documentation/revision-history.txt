@@ -2,6 +2,7 @@
     * Update runlevel priority to 99. This is require to ensure that we
       start after hald. See LP #369807
     * Reload acpid on restart. Thanks Wido.
+    * Handle all power management daemons (apmd,pbbuttonsd,pmud)
 
 1.48 - 06 April 2009
     * Fix udevinfo calls. See Debian BTS #522043
