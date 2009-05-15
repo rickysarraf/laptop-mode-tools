@@ -36,6 +36,7 @@ if [ x$CONTROL_HAL_POLLING = x1 ] ; then
 	for DEV in $HAL_POLLING_DEVICES ; do
 		if [ -b "$DEV" ] ; then
 			$DISABLE_HAL_POLLING_CMD "$DEV"
+			log "VERBOSE" "Executing command $DISABLE_HAL_POLLING_CMD on device $DEV"
 		fi
 	done
 fi

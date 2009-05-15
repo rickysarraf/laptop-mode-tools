@@ -125,6 +125,22 @@ CONTROL_BRIGHTNESS=0
 BATT_BRIGHTNESS_COMMAND=false
 LM_AC_BRIGHTNESS_COMMAND=false
 NOLM_AC_BRIGHTNESS_COMMAND=false
+LOG_TO_SYSLOG=1
+
+# Function to handle logging
+LOGGER=`which logger`;
+
+function log {
+# $0 should be msg type
+# $1 should be the real msg
+if [ x$LOG_TO_SYSLOG = x1 ]; then
+    if [ -x $LOGGER ]; then
+        logger -p daemon.notice -t laptop-mode $1;
+    fi
+fi
+
+$LM_VERBOSE &&  echo $0: $1;
+}
 
 # No default on these ones -- we need to detect if they have been set, for
 # backward compatibility with MINIMUM_BATTERY_MINUTES etc.
@@ -143,14 +159,14 @@ if [ -d /etc/laptop-mode/conf.d ] ; then
 		if [ -r "$CONF" ] ; then
 			. "$CONF"
 		else
-			echo "Warning: Configuration file $CONF is not readable, skipping."
+			log "MSG" "Warning: Configuration file $CONF is not readable, skipping."
 		fi
 	done
 fi
 if [ -r /etc/laptop-mode/laptop-mode.conf ] ; then
 	. /etc/laptop-mode/laptop-mode.conf
 else
-	echo "$0: Configuration file /etc/laptop-mode/laptop-mode.conf not present or not readable."
+	log "ERR" "$0: Configuration file /etc/laptop-mode/laptop-mode.conf not present or not readable."
 	exit 1
 fi
 
@@ -340,21 +356,22 @@ fi
 
 if [ "$1" = "status" ] ; then
 	# Display a status report.
-	echo "Mounts:"
+	log "MSG" "Mounts:"
 	mount | sed "s/^/   /"
-	echo
-	echo "Drive power status:"
+    log "MSG" " "
+	log "MSG" "Drive power status:"
 	for disk in $HD; do
 		if [ -r $disk ]; then
 			hdparm -C $disk 2>/dev/null | sed "s/^/   /"
 		else
-			echo "   Cannot read $disk, permission denied - $0 needs to be run as root"
+			log "MSG" "   Cannot read $disk, permission denied - $0 needs to be run as root"
 		fi
 	done
-	echo
-	echo "(NOTE: drive settings affected by Laptop Mode cannot be retrieved.)"
-	echo
-	echo "Readahead states:"
+    log "MSG" " "
+	log "MSG" "(NOTE: drive settings affected by Laptop Mode cannot be retrieved.)"
+
+    log "MSG" " "
+	log "MSG" "Readahead states:"
 	cat /etc/mtab | while read DEV MP FST OPTS DUMP PASS ; do
 		# skip funny stuff
 		case "$FST" in 
@@ -363,29 +380,29 @@ if [ "$1" = "status" ] ; then
 		esac
 		if [ -b $DEV ] ; then
 			if [ -r $DEV ] ; then
-				echo "   $DEV: $((`blockdev --getra $DEV` / 2)) kB"
+				log "MSG" "   $DEV: $((`blockdev --getra $DEV` / 2)) kB"
 			else
-				echo "   Cannot read $DEV, permission denied - $0 needs to be run as root"
+				log "MSG" "   Cannot read $DEV, permission denied - $0 needs to be run as root"
 			fi
 		fi
 	done
-	echo
+    log "MSG" " "
 	if [ -e /var/run/laptop-mode-tools/enabled ] ; then
-		echo "Laptop Mode Tools is allowed to run: /var/run/laptop-mode-tools/enabled exists."
+		log "MSG" "Laptop Mode Tools is allowed to run: /var/run/laptop-mode-tools/enabled exists."
 	else
-		echo "Laptop Mode Tools is NOT allowed to run: /var/run/laptop-mode-tools/enabled does not exist."
+		log "ERR" "Laptop Mode Tools is NOT allowed to run: /var/run/laptop-mode-tools/enabled does not exist."
 	fi
-	echo
+    log "MSG" " "
 	STATFILES="/proc/sys/vm/laptop_mode /proc/apm /proc/pmu/info /proc/sys/vm/bdflush /proc/sys/vm/dirty_ratio /proc/sys/fs/xfs/age_buffer /proc/sys/fs/xfs/sync_interval /proc/sys/fs/xfs/lm_age_buffer /proc/sys/fs/xfs/lm_sync_interval /proc/sys/vm/pagebuf/lm_flush_age /proc/sys/fs/xfs/xfsbufd_centisecs /proc/sys/fs/xfs/xfssyncd_centisecs /proc/sys/vm/dirty_background_ratio /proc/sys/vm/dirty_expire_centisecs /proc/sys/fs/xfs/age_buffer/centisecs /proc/sys/vm/dirty_writeback_centisecs /sys/devices/system/cpu/*/cpufreq/cpuinfo_*_freq /sys/devices/system/cpu/*/cpufreq/scaling_governor /proc/acpi/button/lid/*/state /proc/acpi/ac_adapter/*/state /proc/acpi/battery/*/state /sys/class/power_supply/*/online /sys/class/power_supply/*/state"
 	for THISFILE in $STATFILES ; do
 		if [ -e "$THISFILE" ] ; then
-			echo "$THISFILE:"
+			log "MSG" "$THISFILE:"
 			if [ -r "$THISFILE" ] ; then
 				cat "$THISFILE" | sed "s/^/   /"
 			else
-				echo "   Not accessible, permission denied - $0 needs to be run as root."
+				log "ERR" "   Not accessible, permission denied - $0 needs to be run as root."
 			fi
-			echo
+            log "MSG" " "
 		fi
 	done
 
@@ -411,7 +428,7 @@ case "$KLEVEL" in
 	"2.4" ) ;;
 	"2.6" ) ;;
 	*)
-		echo "Unhandled kernel version: $KLEVEL ('uname -r' = '$(uname -r)')" >&2
+		log "ERR" "Unhandled kernel version: $KLEVEL ('uname -r' = '$(uname -r)')" >&2
 		exit 1
 		;;
 esac
@@ -420,19 +437,19 @@ esac
 set +a
 
 if [ "$1" = "--version" ] ; then
-	echo "Laptop Mode Tools $LMTVERSION"
+	log "MSG" "Laptop Mode Tools $LMTVERSION"
 	exit 0
 fi
-echo "Laptop Mode Tools $LMTVERSION" >> $OUTPUT
+log "MSG" "Laptop Mode Tools $LMTVERSION"
 
 if [ ! -e /proc/sys/vm/laptop_mode ] ; then
-	echo "Kernel does not have support for laptop mode. Please apply the laptop mode" >&2
-	echo "patch or install a newer kernel." >&2
+	log "ERR" "Kernel does not have support for laptop mode. Please apply the laptop mode"
+	log "ERR" "patch or install a newer kernel."
 	exit 1
 fi
 
 if [ ! -w /proc/sys/vm/laptop_mode ] ; then
-	echo "You do not have enough privileges to enable laptop_mode." >&2
+	log "ERR" "You do not have enough privileges to enable laptop_mode."
 	exit 1
 fi
 
@@ -447,7 +464,7 @@ while [ "$1" != "" ] ; do
 		start) ;;
 		stop) ;;
 		auto) ;;
-		*) echo "Unrecognized option $1."
+		*) log "ERR" "Unrecognized option $1."
 		   exit 1 ;;
 	esac
 	shift
@@ -471,7 +488,7 @@ ON_AC=0
 for POWER_SUPPLY in /sys/class/power_supply/* ; do
 	if [ -f $POWER_SUPPLY/type ] ; then
 		if [ "$(cat $POWER_SUPPLY/type)" = "Mains" ] ;then
-			$LM_VERBOSE && echo "Determining power state from $POWER_SUPPLY/online." >> $OUTPUT
+			log "VERBOSE" "Determining power state from $POWER_SUPPLY/online."
 			FOUND_SYS_CLASS_POWER_SUPPLY_AC=1
 			if [ "$(cat $POWER_SUPPLY/online)" = 1 ] ; then
 				ON_AC=1
@@ -482,9 +499,9 @@ done
 
 if [ $FOUND_SYS_CLASS_POWER_SUPPLY_AC = 1 ] ; then
 	# Already found it!
-	$LM_VERBOSE && echo "Not trying other options, already found a power supply." >> $OUTPUT
+	log "VERBOSE" "Not trying other options, already found a power supply."
 elif [ -d /proc/acpi/ac_adapter ] ; then
-	$LM_VERBOSE && echo "Determining power state from /proc/acpi/ac_adapter." >> $OUTPUT
+	log "VERBOSE" "Determining power state from /proc/acpi/ac_adapter."
 	ADAPTERS_FOUND=0
 	ON_AC=0
 	for ADAPTER in /proc/acpi/ac_adapter/* ; do
@@ -500,18 +517,18 @@ elif [ -d /proc/acpi/ac_adapter ] ; then
 		ON_AC=1
 	fi
 elif [ -f /proc/pmu/info ] ; then
-	$LM_VERBOSE && echo "Determining power state from /proc/pmu/info." >> $OUTPUT
+	log "VERBOSE" "Determining power state from /proc/pmu/info."
 	if ( grep -q "^AC Power.*0$" /proc/pmu/info ) ; then
-		$LM_VERBOSE && echo "/proc/pmu/info indicates absence of AC power." >> $OUTPUT
+		log "VERBOSE" "/proc/pmu/info indicates absence of AC power."
 		ON_AC=0
 	else
 		# It is possible that there is no AC Power = 1 in the file,
 		# but we always assume AC power when we're not sure.
 		ON_AC=1
-		$LM_VERBOSE && echo "/proc/pmu/info indicates presence of AC power." >> $OUTPUT
+		log "VERBOSE" "/proc/pmu/info indicates presence of AC power."
 	fi
 elif [ -f /proc/apm ] ; then
-	$LM_VERBOSE && echo "Determining power state from /proc/apm." >> $OUTPUT
+	log "VERBOSE" "Determining power state from /proc/apm."
 	read D1 D2 D3 APM_AC_STATE D0 </proc/apm
 	if [ "$APM_AC_STATE" = "0x00" ] ; then
 		ON_AC=0
@@ -519,7 +536,7 @@ elif [ -f /proc/apm ] ; then
 		ON_AC=1
 	fi
 else
-	$LM_VERBOSE && echo "No /sys/class/power_supply, ACPI, APM or PMU power management information found -- assuming AC power is present." >> $OUTPUT
+	log "VERBOSE" "No /sys/class/power_supply, ACPI, APM or PMU power management information found -- assuming AC power is present."
 	ON_AC=1
 fi
 
@@ -529,18 +546,18 @@ ACTIVATE=0
 
 if [ "$ON_AC" -eq 1 ] ; then
 	if [ "$ENABLE_LAPTOP_MODE_ON_AC" -ne 0 ] ; then
-		$LM_VERBOSE && echo "On AC power: Activating, because ENABLE_LAPTOP_MODE_ON_AC is set." >> $OUTPUT
+		log "VERBOSE" "On AC power: Activating, because ENABLE_LAPTOP_MODE_ON_AC is set."
 		ACTIVATE=1
 	else
-		$LM_VERBOSE && echo "On AC power: Deactivating, because ENABLE_LAPTOP_MODE_ON_AC is not set." >> $OUTPUT
+		log "VERBOSE" "On AC power: Deactivating, because ENABLE_LAPTOP_MODE_ON_AC is not set."
 		ACTIVATE=0
 	fi
 else
 	if [ "$ENABLE_LAPTOP_MODE_ON_BATTERY" -ne 0 ] ; then
-		$LM_VERBOSE && echo "On battery power: Activating, because ENABLE_LAPTOP_MODE_ON_BATTERY is set." >> $OUTPUT
+		log "VERBOSE" "On battery power: Activating, because ENABLE_LAPTOP_MODE_ON_BATTERY is set."
 		ACTIVATE=1
 	else
-		$LM_VERBOSE && echo "On battery power: Deactivating, because ENABLE_LAPTOP_MODE_ON_BATTERY is not set." >> $OUTPUT
+		log "VERBOSE" "On battery power: Deactivating, because ENABLE_LAPTOP_MODE_ON_BATTERY is not set."
 		ACTIVATE=0
 	fi
 fi
@@ -552,31 +569,31 @@ if [ "$ENABLE_LAPTOP_MODE_WHEN_LID_CLOSED" -ne 0 -a "$ACTIVATE" -eq 0 ] ; then
 	if [ "$HAL_LID_BUTTON" != "" ] ; then
 		HAL_LID_BUTTON_STATE=$(hal-get-property --udi $(hal-find-by-property --key "button.type" --string "lid") --key "button.state.value")
 		if [ "$HAL_LID_BUTTON_STATE" = "true" ] ; then
-			$LM_VERBOSE && echo "Setting action to \"start\" because the lid is closed (says HAL)." >> $OUTPUT
+			log "VERBOSE" "Setting action to \"start\" because the lid is closed (says HAL)."
 			ACTIVATE=1			
 		fi
 	elif [ -f /proc/acpi/button/lid/*/state ] ; then
 		if ( grep -q "closed" /proc/acpi/button/lid/*/state ) ; then
-			$LM_VERBOSE && echo 'Setting action to "start" because the lid is closed (says /proc/acpi/button/lid/*/state).' >> $OUTPUT
+			log "VERBOSE" 'Setting action to "start" because the lid is closed (says /proc/acpi/button/lid/*/state).'
 			ACTIVATE=1
 		fi
 	else
-		echo "Warning: ENABLE_LAPTOP_MODE_WHEN_LID_CLOSED is set, but there is no file"
-		echo "/proc/acpi/button/lid/.../state, and hal information is not available either!"
+		log "MSG" "Warning: ENABLE_LAPTOP_MODE_WHEN_LID_CLOSED is set, but there is no file"
+		log "MSG" "/proc/acpi/button/lid/.../state, and hal information is not available either!"
 	fi
 fi
 
 # If the init script has not been run or has been run with the "stop"
 # argument, then we should never start laptop mode.
 if [ ! -f /var/run/laptop-mode-tools/enabled ] ; then
-	$LM_VERBOSE && echo "Laptop mode disabled because /var/run/laptop-mode-tools/enabled is missing." >> $OUTPUT
+	log "VERBOSE" "Laptop mode disabled because /var/run/laptop-mode-tools/enabled is missing."
 	STATE=disabled
 fi
 
 if [ "$ACTIVATE" -eq 1 -a -f /etc/default/laptop-mode ] ; then
 	. /etc/default/laptop-mode
 	if ! ( echo "$ENABLE_LAPTOP_MODE" |grep y ) ; then
-		$LM_VERBOSE && echo "Not starting laptop mode because it is disabled in /etc/default/laptop-mode." >> $OUTPUT
+		log "VERBOSE" "Not starting laptop mode because it is disabled in /etc/default/laptop-mode."
 		STATE=disabled
 	fi
 fi
@@ -592,7 +609,7 @@ fi
 if [ "$ACTIVATE" -eq 0 ] ; then
 	ACTIVATE_WITH_POSSIBLE_DATA_LOSS=0
 elif [ "$ON_AC" = 1 ] ; then
-	$LM_VERBOSE && echo "On AC, not checking minimum battery charge." >> $OUTPUT
+	log "VERBOSE" "On AC, not checking minimum battery charge."
 	ACTIVATE_WITH_POSSIBLE_DATA_LOSS=1
 else
 	ACTIVATE_WITH_POSSIBLE_DATA_LOSS=1
@@ -601,19 +618,19 @@ else
 
 	# Weird way of checking that /sys/class/power_supply is not empty -- but it works.
 	if [ "$(echo /sys/class/power_supply/*)" != '/sys/class/power_supply/*' ] ; then
-		$LM_VERBOSE && echo 'Not on AC and we have battery information in /sys/class/power_supply/BAT* -- checking minimum battery charge.' >> $OUTPUT
+		log "VERBOSE" "Not on AC and we have battery information in /sys/class/power_supply/BAT* -- checking minimum battery charge."
 		for BATT in /sys/class/power_supply/* ; do
 			BATT_TYPE=$(cat $BATT/type)
-			$LM_VERBOSE && echo "$BATT is of type $BATT_TYPE." >> $OUTPUT
+			log "VERBOSE" "$BATT is of type $BATT_TYPE."
 			if [ "$BATT_TYPE" != "Battery" ] ; then
-				$LM_VERBOSE && echo "Not of type \"Battery\", skipping." >> $OUTPUT
+				log "VERBOSE" "Not of type \"Battery\", skipping."
 			else
 				PREV_ENOUGH_CHARGE=$ENOUGH_CHARGE
 				PREV_ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=$ENOUGH_CHARGE_TO_PREVENT_HIBERNATION
 
-				$LM_VERBOSE && echo "Checking levels for $BATT." >> $OUTPUT
+				log "VERBOSE" "Checking levels for $BATT."
 				PRESENT=$(cat $BATT/present)
-				$LM_VERBOSE && echo "Present: $PRESENT." >> $OUTPUT
+				log "VERBOSE" "Present: $PRESENT."
 
 				# Only do if the battery is present
 				if [ "$PRESENT" -eq 1 ] ; then
@@ -633,10 +650,10 @@ else
 						REMAINING=0
 					fi
 					if [ -z "$REMAINING" -o "$REMAINING" -eq 0 ] ; then
-						$LM_VERBOSE && echo "Battery does not report remaining charge. Perhaps it is not present?" >> $OUTPUT
+						log "VERBOSE" "Battery does not report remaining charge. Perhaps it is not present?"
 						REMAINING=0
 					fi
-					$LM_VERBOSE && echo "Remaining charge: $REMAINING" >> $OUTPUT
+					log "VERBOSE" "Remaining charge: $REMAINING"
 
 					if [ -f $BATT/charge_full_design ] ; then
 						CAPACITY=$(cat $BATT/charge_full_design)
@@ -646,7 +663,7 @@ else
 						CAPACITY=0
 					fi
 					if [ -z "$CAPACITY" -o "$CAPACITY" -eq 0 ] ; then
-						$LM_VERBOSE && echo "Battery does not report design full charge, using non-design full charge." >> $OUTPUT					
+						log "VERBOSE" "Battery does not report design full charge, using non-design full charge."
 						if [ -f $BATT/charge_full ] ; then
 							CAPACITY=$(cat $BATT/charge_full)
 						elif [ -f $BATT/energy_full_design ] ; then
@@ -655,18 +672,18 @@ else
 							CAPACITY=0
 						fi
 						if [ -z "$CAPACITY" -o "$CAPACITY" -eq 0] ; then
-							$LM_VERBOSE && echo "Battery does not report non-design full charge." >> $OUTPUT					
+							log "VERBOSE" "Battery does not report non-design full charge."	
 							CAPACITY=0
 						fi
 					fi
-					$LM_VERBOSE && echo "Full capacity: $CAPACITY" >> $OUTPUT
+					log "VERBOSE" "Full capacity: $CAPACITY"
 
 					# Check the charge percentage
 					if [ "$MINIMUM_BATTERY_CHARGE_PERCENT" -ne 0 ] ; then
 						FOUND_AN_ENABLED_CHECK=1
 						if [ "$CAPACITY" -eq 0 ] ; then
-							echo "WARNING: Battery does not report a capacity. Minimum battery"
-							echo "charge checking does not work without a design capacity."
+							log "MSG" "WARNING: Battery does not report a capacity. Minimum battery"
+							log "MSG" "charge checking does not work without a design capacity."
 							ENOUGH_CHARGE=1
 						elif [ "$(($REMAINING * 100 / $CAPACITY))" -ge "$MINIMUM_BATTERY_CHARGE_PERCENT" ] ; then
 							ENOUGH_CHARGE=1
@@ -675,8 +692,8 @@ else
 					if [ "$AUTO_HIBERNATION_BATTERY_CHARGE_PERCENT" -ne 0 ] ; then
 						FOUND_AN_ENABLED_HIBERNATION_CHECK=1
 						if [ "$CAPACITY" -eq 0 ] ; then
-							echo "WARNING: Battery does not report a design capacity. Auto hibernation"
-							echo "does not work without a design capacity."
+							log "MSG" "WARNING: Battery does not report a design capacity. Auto hibernation"
+							log "MSG" "does not work without a design capacity."
 							ENOUGH_CHARGE=1
 						elif [ "$(($REMAINING * 100 / $CAPACITY))" -ge "$AUTO_HIBERNATION_BATTERY_CHARGE_PERCENT" ] ; then
 							ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=1
@@ -735,24 +752,24 @@ else
 							fi
 						fi
 					else
-						echo "Failed to determine battery charge. Battery charge units are not in"
-						echo "mWh, uWh, mAh or uAh."
+						log "ERR" "Failed to determine battery charge. Battery charge units are not in"
+						log "ERR" "mWh, uWh, mAh or uAh."
 					fi
 										
 				else
-					$LM_VERBOSE && echo "Battery is not present." >> $OUTPUT
+					log "VERBOSE" "Battery is not present."
 				fi
 			fi
 		done		
 	elif [ "$(echo /proc/acpi/battery/*)" != '/proc/acpi/battery/*' ] ; then
-		$LM_VERBOSE && echo "Not on AC and we have batteries in /proc/acpi/battery -- checking minimum battery charge." >> $OUTPUT
+		log "VERBOSE" "Not on AC and we have batteries in /proc/acpi/battery -- checking minimum battery charge."
 		for BATT in /proc/acpi/battery/* ; do
 			PREV_ENOUGH_CHARGE=$ENOUGH_CHARGE
 			PREV_ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=$ENOUGH_CHARGE_TO_PREVENT_HIBERNATION
 
 			BATT_STATE=$BATT/state
 			BATT_INFO=$BATT/info
-			$LM_VERBOSE && echo "Checking info and state for $BATT." >> $OUTPUT
+			log "VERBOSE" "Checking info and state for $BATT."
 
 			# Only do if the battery is present
 			if ( grep -q 'present:.*yes' $BATT_INFO ) ; then
@@ -762,24 +779,24 @@ else
 				# Get the remaining capacity.
 				REMAINING=`grep "remaining capacity:" $BATT_STATE | sed  "s/.* \([0-9][0-9]* \).*/\1/" `
 				if [ -z "$REMAINING" ] ; then
-					$LM_VERBOSE && echo "Battery does not report remaining charte. Perhaps it is not present?" >> $OUTPUT
+					log "VERBOSE" "Battery does not report remaining charte. Perhaps it is not present?"
 					REMAINING=0
 				fi
-				$LM_VERBOSE && echo "Remaining charge: $REMAINING" >> $OUTPUT
+				log "VERBOSE" "Remaining charge: $REMAINING"
 
 				CAPACITY=`grep "design capacity:" $BATT_INFO | sed  "s/.* \([0-9][0-9]* \).*/\1/" `
 				if [ -z "$CAPACITY" ] ; then
-					$LM_VERBOSE && echo "Battery does not report capacity. Perhaps it is not present?" >> $OUTPUT
+					log "VERBOSE" "Battery does not report capacity. Perhaps it is not present?"
 					CAPACITY=0
 				fi
-				$LM_VERBOSE && echo "Design capacity: $CAPACITY" >> $OUTPUT
+				log "VERBOSE" "Design capacity: $CAPACITY"
 
 				# Check the charge percentage
 				if [ "$MINIMUM_BATTERY_CHARGE_PERCENT" -ne 0 ] ; then
 					FOUND_AN_ENABLED_CHECK=1
 					if [ "$CAPACITY" -eq 0 ] ; then
-						echo "WARNING: Battery does not report a design capacity. Minimum battery"
-						echo "charge checking does not work without a design capacity."
+						log "MSG" "WARNING: Battery does not report a design capacity. Minimum battery"
+						log "MSG" "charge checking does not work without a design capacity."
 						ENOUGH_CHARGE=1
 					elif [ "$(($REMAINING * 100 / $CAPACITY))" -ge "$MINIMUM_BATTERY_CHARGE_PERCENT" ] ; then
 						ENOUGH_CHARGE=1
@@ -788,8 +805,8 @@ else
 				if [ "$AUTO_HIBERNATION_BATTERY_CHARGE_PERCENT" -ne 0 ] ; then
 					FOUND_AN_ENABLED_HIBERNATION_CHECK=1
 					if [ "$CAPACITY" -eq 0 ] ; then
-						echo "WARNING: Battery does not report a design capacity. Auto hibernation"
-						echo "does not work without a design capacity."
+						log "MSG" "WARNING: Battery does not report a design capacity. Auto hibernation"
+						log "MSG" "does not work without a design capacity."
 						ENOUGH_CHARGE=1
 					elif [ "$(($REMAINING * 100 / $CAPACITY))" -ge "$AUTO_HIBERNATION_BATTERY_CHARGE_PERCENT" ] ; then
 						ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=1
@@ -835,8 +852,8 @@ else
 						fi
 					fi
 				else
-					echo "Failed to determine battery charge. Battery charge units are not in"
-					echo "mWh or mAh."
+					log "ERR" "Failed to determine battery charge. Battery charge units are not in"
+					log "ERR" "mWh or mAh."
 				fi
 			
 				CAP_STATE=`sed -r 's/^capacity state:\s*(.*)\s*$/\1/;t;d' "$BATT_STATE"`
@@ -861,67 +878,67 @@ else
 					fi
 				fi
 			else
-				$LM_VERBOSE && echo "Battery is not present." >> $OUTPUT
+				log "VERBOSE" "Battery is not present."
 			fi
 		done
 	else
 		ENOUGH_CHARGE=1
 		ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=1
-		$LM_VERBOSE && echo "Not on AC and could not check battery state -- data loss sensitive features stay enabled and auto-hibernation will not work." >> $OUTPUT
+		log "VERBOSE" "Not on AC and could not check battery state -- data loss sensitive features stay enabled and auto-hibernation will not work."
 	fi
 	if [ "$ENABLE_AUTO_HIBERNATION" -ne 0 -a "$ENOUGH_CHARGE_TO_PREVENT_HIBERNATION" -eq 0 ] ; then
-		$LM_VERBOSE && echo "None of the batteries have a charge above the auto-hibernation level." >> $OUTPUT
-		$LM_VERBOSE && echo "Starting hibernation." >> $OUTPUT
+		log "VERBOSE" "None of the batteries have a charge above the auto-hibernation level."
+		log "VERBOSE" "Starting hibernation."
 		$HIBERNATE_COMMAND
 		# Don't continue -- if things are configured correctly, then we
 		# will be called on resume.
 		exit 0			
 	fi
 	if [ "$ENOUGH_CHARGE" -eq 0 ] ; then
-		$LM_VERBOSE && echo "None of the batteries have a charge above the minimum level." >> $OUTPUT
-		$LM_VERBOSE && echo "Deactivating data loss sensitive features." >> $OUTPUT
+		log "VERBOSE" "None of the batteries have a charge above the minimum level."
+		log "VERBOSE" "Deactivating data loss sensitive features."
 		ACTIVATE_WITH_POSSIBLE_DATA_LOSS=0
 	fi
 fi
 
 if [ "$INIT" -eq 0 ] ; then
-	echo -n "Laptop mode "
+	log "MSG" "Laptop mode "
 fi
 
 # WAS_ACTIVE is used later on. If there is no /var/run/laptop-mode-tools/state, then
 # we know that laptop mode wasn't active before.
 WAS_ACTIVE=0
-$LM_VERBOSE && echo "Checking if desired state is different from current state." >> $OUTPUT
+log "VERBOSE" "Checking if desired state is different from current state."
 if [ -f /var/run/laptop-mode-tools/state ] ; then
 	read WAS_ACTIVE WAS_ON_AC WAS_ACTIVATE_WITH_POSSIBLE_DATA_LOSS WAS_STATE < /var/run/laptop-mode-tools/state
 	if [ "$WAS_STATE" != "" ] ; then
 		if [ "$WAS_ACTIVE" -eq "$ACTIVATE" -a "$WAS_ON_AC" -eq "$ON_AC" -a "$WAS_ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -a "$WAS_STATE" = "$STATE" -a "$FORCE" -eq 0 ] ; then
-			echo -n "$STATE, "
+			log "MSG" "$STATE, "
 			if [ "$WAS_ACTIVE" -eq 1 ] ; then
-				echo -n "active [unchanged]"
+				log "MSG" "active [unchanged]"
 				if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 0 ] ; then
-					echo -n " (Data-loss sensitive features disabled.)"
+					log "MSG" " (Data-loss sensitive features disabled.)"
 				fi
-				echo
+                log "MSG" " "
 			else
-				echo "not active [unchanged]"
+				log "MSG" "not active [unchanged]"
 			fi
 			exit 0
 		fi
 	fi
 else
-	$LM_VERBOSE && echo "/var/run/laptop-mode-tools/state does not exist, no previous state." >> $OUTPUT
+	log "VERBOSE" "/var/run/laptop-mode-tools/state does not exist, no previous state."
 fi
 echo "$ACTIVATE $ON_AC $ACTIVATE_WITH_POSSIBLE_DATA_LOSS $STATE" > /var/run/laptop-mode-tools/state
 
 if [ "$ACTIVATE" -eq 1 ] ; then
-	echo -n "$STATE, active"
+	log "MSG" "$STATE, active"
 	if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 0 ] ; then
-		echo -n " (Data-loss sensitive features disabled.)"
+		log "MSG" " (Data-loss sensitive features disabled.)"
 	fi
-	echo
+    log "MSG" " "
 else
-	echo "$STATE, not active"
+	log "MSG" "$STATE, not active"
 fi
 
 
@@ -936,10 +953,10 @@ fi
 export FORCE STATE ON_AC ACTIVATE ACTIVATE_WITH_POSSIBLE_DATA_LOSS KLEVEL KMINOR WAS_ACTIVE LM_VERBOSE
 for SCRIPT in /usr/share/laptop-mode-tools/modules/* /usr/local/lib/laptop-mode-tools/modules/* /usr/local/share/laptop-mode-tools/modules/* /etc/laptop-mode/modules/*; do
 	if [ -x "$SCRIPT" ] ; then
-		$LM_VERBOSE && echo "Invoking module $SCRIPT." >> $OUTPUT
-		"$SCRIPT" >> $OUTPUT
+		log "VERBOSE" "Invoking module $SCRIPT."
+		log "VERBOSE" "$SCRIPT"
 	else
-		$LM_VERBOSE && echo "Module $SCRIPT is not executable." >> $OUTPUT
+		log "VERBOSE" "Module $SCRIPT is not executable."
 	fi
 done
 

@@ -110,9 +110,9 @@ deduce_fstype () {
 # Parameter 2: the value
 #
 set_sysctl() {
-	$LM_VERBOSE && echo "Executing: echo $2 > $1" >> $OUTPUT
+	log "VERBOSE" "Executing: echo $2 > $1"
 	if ! echo "$2" > "$1" ; then
-		echo "SETTING OF KERNEL PARAMETER FAILED: echo $2 \> $1"
+		log "MSG" "SETTING OF KERNEL PARAMETER FAILED: echo $2 \> $1"
 	fi
 }
 
@@ -123,8 +123,8 @@ if [ "$CONTROL_READAHEAD" -ne 0 ] ; then
 	else
 		READAHEAD_OPTION=--setra
 		if [ "$KLEVEL" = "2.4" ] ; then
-			echo "Warning: Running a 2.4 kernel with blockdev that does not support --setfra."
-			echo "File system readahead will not function properly."
+			log "MSG" "Warning: Running a 2.4 kernel with blockdev that does not support --setfra."
+			log "MSG" "File system readahead will not function properly."
 		fi
 	fi
 fi
@@ -133,10 +133,10 @@ fi
 
 if [ $CONTROL_NOATIME -eq 1 ] ; then
 	if [ "$KLEVEL" = "2.4" ] ; then
-		$LM_VERBOSE && echo "Relatime is not supported on 2.4 kernels. Using noatime instead" >> $OUTPUT 
+		log "VERBOSE" "Relatime is not supported on 2.4 kernels. Using noatime instead" 
 		USE_RELATIME=0
 	elif [ "$KLEVEL" = "2.6" -a "$KMINOR" -lt 23 ] ; then
-		$LM_VERBOSE && echo "Relatime is not supported on kernels before 2.6.23. Using noatime instead." >> $OUTPUT
+		log "VERBOSE" "Relatime is not supported on kernels before 2.6.23. Using noatime instead."
 		USE_RELATIME=0
 	fi
 	if [ "$USE_RELATIME" = 1 ] ; then
@@ -163,28 +163,28 @@ if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 1 ] ; then
 		# (For 2.4 and early 2.6.)
 		# This only needs to be set, not reset -- it is only used when
 		# laptop mode is enabled.
-		$LM_VERBOSE && echo "Adjusting XFS kernel parameters for 2.4 and early 2.6 kernels." >> $OUTPUT
+		log "VERBOSE" "Adjusting XFS kernel parameters for 2.4 and early 2.6 kernels."
 		set_sysctl /proc/sys/vm/pagebuf/lm_flush_age  $XFS_AGE
 		set_sysctl /proc/sys/fs/xfs/lm_sync_interval  $XFS_AGE
 	elif [ -f /proc/sys/fs/xfs/lm_age_buffer ] ; then
 		# (A couple of early 2.6 laptop mode patches had these.)
 		# This only needs to be set, not reset -- it is only used when
 		# laptop mode is enabled.
-		$LM_VERBOSE && echo "Adjusting XFS kernel parameters for early patched 2.6 kernels." >> $OUTPUT
+		log "VERBOSE" "Adjusting XFS kernel parameters for early patched 2.6 kernels."
 		set_sysctl /proc/sys/fs/xfs/lm_age_buffer    $XFS_AGE
 		set_sysctl /proc/sys/fs/xfs/lm_sync_interval $XFS_AGE
 	elif [ -f /proc/sys/fs/xfs/age_buffer ] ; then
 		# (2.6.6)
 		# But not for these -- they are also used in normal
 		# operation.
-		$LM_VERBOSE && echo "Adjusting XFS kernel parameters for 2.6.6 kernel." >> $OUTPUT
+		log "VERBOSE" "Adjusting XFS kernel parameters for 2.6.6 kernel."
 		set_sysctl /proc/sys/fs/xfs/age_buffer       $XFS_AGE 
 		set_sysctl /proc/sys/fs/xfs/sync_interval    $XFS_AGE
 	elif [ -f /proc/sys/fs/xfs/age_buffer_centisecs ] ; then
 		# (2.6.7 upwards)
 		# And not for these either. These are in centisecs,
 		# not USER_HZ, so we have to use $AGE, not $XFS_AGE.
-		$LM_VERBOSE && echo "Adjusting XFS kernel parameters for >2.6.7 kernel." >> $OUTPUT
+		log "VERBOSE" "Adjusting XFS kernel parameters for >2.6.7 kernel."
 		set_sysctl /proc/sys/fs/xfs/age_buffer_centisecs  $AGE
 		set_sysctl /proc/sys/fs/xfs/xfssyncd_centisecs    $AGE
 		set_sysctl /proc/sys/fs/xfs/xfsbufd_centisecs     3000
@@ -192,12 +192,12 @@ if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 1 ] ; then
 
 	case "$KLEVEL" in
 		"2.4")
-			$LM_VERBOSE && echo "Adjusting 2.4 kernel parameters to enable laptop mode." >> $OUTPUT
+			log "VERBOSE" "Adjusting 2.4 kernel parameters to enable laptop mode."
 			set_sysctl /proc/sys/vm/laptop_mode   1
 			set_sysctl /proc/sys/vm/bdflush       "30 500 0 0 $AGE $AGE 60 20 0"
 			;;
 		"2.6")
-			$LM_VERBOSE && echo "Adjusting 2.6 kernel parameters to enable laptop mode." >> $OUTPUT
+			log "VERBOSE" "Adjusting 2.6 kernel parameters to enable laptop mode."
 			set_sysctl /proc/sys/vm/laptop_mode		  "$LM_SECONDS_BEFORE_SYNC"
 			set_sysctl /proc/sys/vm/dirty_writeback_centisecs "$AGE"
 			set_sysctl /proc/sys/vm/dirty_expire_centisecs    "$AGE"
@@ -206,7 +206,7 @@ if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 1 ] ; then
 			;;
 	esac
 	if [ $CONTROL_MOUNT_OPTIONS -eq 1 ]; then
-		$LM_VERBOSE && echo "Remounting filesystems." >> $OUTPUT
+		log "VERBOSE" "Remounting filesystems."
 		cat /etc/mtab | while read DEV MP FST OPTS DUMP PASS ; do
 			case "$FST" in 
 				rootfs|unionfs|tmpfs|squashfs|sysfs|usbfs|proc|devpts)
@@ -219,28 +219,28 @@ if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 1 ] ; then
 			case " $PARTITIONS " in
 				*" $DEV "*)
 					DO=1
-					$LM_VERBOSE && echo "$DEV found in PARTITIONS." >> $OUTPUT
+					log "VERBOSE" "$DEV found in PARTITIONS."
 					;;
 				*)
-					$LM_VERBOSE && echo "$DEV not found in PARTITIONS." >> $OUTPUT
+					log "VERBOSE" "$DEV not found in PARTITIONS."
 					;;
 			esac
 			case " $PARTITIONS " in
 				*" $MP "*)
 					DO=1
-					$LM_VERBOSE && echo "$MP found in PARTITIONS." >> $OUTPUT
+					log "VERBOSE" "$MP found in PARTITIONS."
 					;;
 				*)
-					$LM_VERBOSE && echo "$MP not found in PARTITIONS." >> $OUTPUT
+					log "VERBOSE" "$MP not found in PARTITIONS."
 			esac
 			case " $PARTITIONS " in
 				*" auto "*)
-					$LM_VERBOSE && echo "Checking $DEV against HD because PARTITIONS contains \"auto\"." >> $OUTPUT
+					log "VERBOSE" "Checking $DEV against HD because PARTITIONS contains \"auto\"."
 					for THISHD in $HD ; do
-						$LM_VERBOSE && echo "   Considering $THISHD." >> $OUTPUT
+						log "VERBOSE" "   Considering $THISHD."
 						case " $DEV" in *"$THISHD"*)
 							DO=1
-							$LM_VERBOSE && echo "   $DEV contains $THISHD, which is in HD, so we will remount it." >> $OUTPUT
+							log "VERBOSE" "   $DEV contains $THISHD, which is in HD, so we will remount it."
 							break
 							;;
 						esac
@@ -248,30 +248,30 @@ if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 1 ] ; then
 					;;
 			esac
 			if [ "$DO" -ne 0 ] ; then
-				$LM_VERBOSE && echo "Original options: $OPTS" >> $OUTPUT
+				log "VERBOSE" "Original options: $OPTS"
 				if [ "$WAS_ACTIVE" -eq 0 ] ; then
 					# Coming from inactive state: save last known mount options for the device.
-					$LM_VERBOSE && echo "Updating /var/run/laptop-mode-tools/nolm-mountopts."  >> $OUTPUT
+					log "VERBOSE" "Updating /var/run/laptop-mode-tools/nolm-mountopts." 
 					if [ -f /var/run/laptop-mode-tools/nolm-mountopts ] ; then 
 						sed -i "s|^$DEV .*$||" /var/run/laptop-mode-tools/nolm-mountopts
 					fi
 					echo $DEV $OPTS >> /var/run/laptop-mode-tools/nolm-mountopts
 				else
-					$LM_VERBOSE && echo "Not updating /var/run/laptop-mode-tools/nolm-mountopts because laptop mode was already active." >> $OUTPUT
+					log "VERBOSE" "Not updating /var/run/laptop-mode-tools/nolm-mountopts because laptop mode was already active."
 				fi
 				if [ "$FST" = 'unknown' ]; then
-					$LM_VERBOSE && echo "Deducing fstype for $MP." >> $OUTPUT
+					log "VERBOSE" "Deducing fstype for $MP."
 					FST=$(deduce_fstype $MP)
-					$LM_VERBOSE && echo "Deduced fstype for $MP as $FST." >> $OUTPUT
+					log "VERBOSE" "Deduced fstype for $MP as $FST."
 				fi
 				# Strip stuff like ext3,ext2 into just ext3.
-				$LM_VERBOSE && echo "Reducing file system type."  >> $OUTPUT
+				log "VERBOSE" "Reducing file system type." 
 				FST=${FST%%,*}
 				case "$FST" in
 					"ext3"|"reiserfs"|"ext4dev"|"ext4")
-						$LM_VERBOSE && echo "Removing commit mount option from original options."  >> $OUTPUT
+						log "VERBOSE" "Removing commit mount option from original options." 
 						PARSEDOPTS="$(remove_numeric_mount_option commit "$OPTS")"
-						$LM_VERBOSE && echo "Executing: mount $DEV $MP -t $FST -o remount,$PARSEDOPTS,commit=$MAX_LOST_WORK_SECONDS$NOATIME_OPT" >> $OUTPUT
+						log "VERBOSE" "Executing: mount $DEV $MP -t $FST -o remount,$PARSEDOPTS,commit=$MAX_LOST_WORK_SECONDS$NOATIME_OPT"
 						if (! mount $DEV $MP -t $FST -o remount,$PARSEDOPTS,commit=$MAX_LOST_WORK_SECONDS$NOATIME_OPT) ; then
 							if [ "$FST" = "ext3" -a "$MP" = "/" ] ; then
 								echo "BIG FAT WARNING: Your root filesystem mounted as ext3 seems to lack support for"
@@ -287,13 +287,13 @@ if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 1 ] ; then
 						fi
 						;;
 					*)
-						$LM_VERBOSE && echo "Executing: mount $DEV $MP -t $FST -o remount,$OPTS$NOATIME_OPT" >> $OUTPUT
+						log "VERBOSE" "Executing: mount $DEV $MP -t $FST -o remount,$OPTS$NOATIME_OPT"
 						mount $DEV $MP -t $FST -o remount,$OPTS$NOATIME_OPT
 						;;
 				esac
 				if [ -b $DEV -a "$CONTROL_READAHEAD" -ne 0 ] ; then
-					$LM_VERBOSE && echo "Executing: /sbin/blockdev $READAHEAD_OPTION $(($LM_READAHEAD * 2)) $DEV" >> $OUTPUT
-					/sbin/blockdev $READAHEAD_OPTION $(($LM_READAHEAD * 2)) $DEV >> $OUTPUT 2>&1
+					log "VERBOSE" "Executing: /sbin/blockdev $READAHEAD_OPTION $(($LM_READAHEAD * 2)) $DEV"
+					log "VERBOSE" "`/sbin/blockdev $READAHEAD_OPTION $(($LM_READAHEAD * 2)) $DEV 2>&1`"
 				fi
 			fi
 		done
@@ -305,23 +305,23 @@ else
 	set_sysctl /proc/sys/vm/laptop_mode 0
 	if [ -f /proc/sys/fs/xfs/age_buffer -a ! -f /proc/sys/fs/xfs/lm_age_buffer ] ; then
 		# These need to be restored, if there are no lm_*.
-		$LM_VERBOSE && echo "Restoring default XFS settings (pre-centisecs version)." >> $OUTPUT
+		log "VERBOSE" "Restoring default XFS settings (pre-centisecs version)."
 		set_sysctl /proc/sys/fs/xfs/age_buffer    $(($XFS_HZ*$DEF_XFS_AGE_BUFFER))
 		set_sysctl /proc/sys/fs/xfs/sync_interval $(($XFS_HZ*$DEF_XFS_SYNC_INTERVAL))
 	elif [ -f /proc/sys/fs/xfs/age_buffer_centisecs ] ; then
 		# These need to be restored as well.
-		$LM_VERBOSE && echo "Restoring default XFS settings." >> $OUTPUT
+		log "VERBOSE" "Restoring default XFS settings."
 		set_sysctl /proc/sys/fs/xfs/age_buffer_centisecs  $((100*$DEF_XFS_AGE_BUFFER))
 		set_sysctl /proc/sys/fs/xfs/xfssyncd_centisecs    $((100*$DEF_XFS_SYNC_INTERVAL))
 		set_sysctl /proc/sys/fs/xfs/xfsbufd_centisecs     $((100*$DEF_XFS_BUFD_INTERVAL))
 	fi
 	case "$KLEVEL" in
 		"2.4")
-			$LM_VERBOSE && echo "Adjusting 2.4 kernel parameters to disable laptop mode." >> $OUTPUT
+			log "VERBOSE" "Adjusting 2.4 kernel parameters to disable laptop mode."
 			set_sysctl /proc/sys/vm/bdflush "30 500 0 0 $U_AGE $B_AGE 60 20 0"
 			;;
 		"2.6")
-			$LM_VERBOSE && echo "Adjusting 2.6 kernel parameters to disable laptop mode." >> $OUTPUT
+			log "VERBOSE" "Adjusting 2.6 kernel parameters to disable laptop mode."
 			set_sysctl /proc/sys/vm/dirty_writeback_centisecs   "$U_AGE"
 			set_sysctl /proc/sys/vm/dirty_expire_centisecs      "$B_AGE"
 			set_sysctl /proc/sys/vm/dirty_ratio		    "$NOLM_DIRTY_RATIO"
@@ -329,35 +329,35 @@ else
 			;;
 	esac
 	if [ $CONTROL_MOUNT_OPTIONS -eq 1 ] ; then
-		$LM_VERBOSE && echo "Remounting filesystems." >> $OUTPUT
+		log "VERBOSE" "Remounting filesystems."
 		cat /etc/mtab | while read DEV MP FST OPTS DUMP PASS ; do
 			DO=0
 			case " $PARTITIONS " in
 				*" $DEV "*)
 					DO=1
-					$LM_VERBOSE && echo "$DEV found in PARTITIONS." >> $OUTPUT
+					log "VERBOSE" "$DEV found in PARTITIONS."
 					;;
 				*)
-					$LM_VERBOSE && echo "$DEV not found in PARTITIONS." >> $OUTPUT
+					log "VERBOSE" "$DEV not found in PARTITIONS."
 					;;
 			esac
 			case " $PARTITIONS " in
 				*" $MP "*)
 					DO=1
-					$LM_VERBOSE && echo "$MP found in PARTITIONS." >> $OUTPUT
+					log "VERBOSE" "$MP found in PARTITIONS."
 					;;
 				*)
-					$LM_VERBOSE && echo "$MP not found in PARTITIONS." >> $OUTPUT
+					log "VERBOSE" "$MP not found in PARTITIONS."
 					;;
 			esac
 			case " $PARTITIONS " in
 				*" auto "*)
-					$LM_VERBOSE && echo "Checking $DEV against HD because PARTITIONS contains \"auto\"." >> $OUTPUT
+					log "VERBOSE" "Checking $DEV against HD because PARTITIONS contains \"auto\"."
 					for THISHD in $HD ; do
-						$LM_VERBOSE && echo "   Considering $THISHD." >> $OUTPUT
+						log "VERBOSE" "   Considering $THISHD."
 						case " $DEV" in *"$THISHD"*)
 							DO=1
-							$LM_VERBOSE && echo "   $DEV contains $THISHD, which is in HD, so we will remount it." >> $OUTPUT
+							log "VERBOSE" "   $DEV contains $THISHD, which is in HD, so we will remount it."
 							break
 							;;
 						esac
@@ -366,15 +366,15 @@ else
 			esac
 			if [ "$DO" -ne 0 ] ; then
 				# Reset commit and atime options to defaults.
-				$LM_VERBOSE && echo "Original options: $OPTS" >> $OUTPUT
+				log "VERBOSE" "Original options: $OPTS"
 				if [ "$FST" = 'unknown' ]; then
-					$LM_VERBOSE && echo "Deducing fstype for $MP." >> $OUTPUT
+					log "VERBOSE" "Deducing fstype for $MP."
 					FST=$(deduce_fstype $MP)
-					$LM_VERBOSE && echo "Deduced fstype for $MP as $FST." >> $OUTPUT
+					log "VERBOSE" "Deduced fstype for $MP as $FST."
 				fi
 				
 				# Strip stuff like ext3,ext2 into just ext3.
-				$LM_VERBOSE && echo "Reducing file system type." >> $OUTPUT
+				log "VERBOSE" "Reducing file system type."
 				FST=${FST%%,*}
 				
 				# Retrieve original non-laptop mode mount options and restore them.
@@ -388,22 +388,22 @@ else
 						"ext3"|"reiserfs"|"ext4dev"|"ext4")								
 							PARSEDOPTS="$(replace_numeric_mount_option commit commit=0 $SAVED_OPTS $OPTS)"
 							PARSEDOPTS="$(replace_atime_mount_option $SAVED_OPTS $PARSEDOPTS)"
-							$LM_VERBOSE && echo "Executing: mount $DEV $MP -t $FST -o remount,$PARSEDOPTS" >> $OUTPUT
+							log "VERBOSE" "Executing: mount $DEV $MP -t $FST -o remount,$PARSEDOPTS"
 							mount $DEV $MP -t $FST -o remount,$PARSEDOPTS
 							;;
 						*)
 							PARSEDOPTS="$(replace_atime_mount_option $SAVED_OPTS $OPTS)"
-							$LM_VERBOSE && echo "Executing: mount $DEV $MP -t $FST -o remount,$PARSEDOPTS" >> $OUTPUT
+							log "VERBOSE" "Executing: mount $DEV $MP -t $FST -o remount,$PARSEDOPTS"
 							mount $DEV $MP -t $FST -o remount,$PARSEDOPTS
 							;;
 					esac
 				else
-					$LM_VERBOSE && echo "No saved mount options, so apparently we never remounted this filesystem during this session." >> $OUTPUT
-					$LM_VERBOSE && echo "Not remounting." >> $OUTPUT
+					log "VERBOSE" "No saved mount options, so apparently we never remounted this filesystem during this session."
+					log "VERBOSE" "Not remounting."
 				fi
 				if [ -b $DEV -a "$CONTROL_READAHEAD" -ne 0 ] ; then
-					$LM_VERBOSE && echo "Executing: /sbin/blockdev $READAHEAD_OPTION $(($NOLM_READAHEAD * 2)) $DEV" >> $OUTPUT
-					/sbin/blockdev $READAHEAD_OPTION $(($NOLM_READAHEAD * 2)) $DEV >> $OUTPUT 2>&1
+					log "VERBOSE" "Executing: /sbin/blockdev $READAHEAD_OPTION $(($NOLM_READAHEAD * 2)) $DEV"
+					log "VERBOSE" "`/sbin/blockdev $READAHEAD_OPTION $(($NOLM_READAHEAD * 2)) $DEV 2>&1`"
 				fi
 			fi
 		done

@@ -10,17 +10,17 @@ if [ x$CONTROL_BLUETOOTH = x1 ] ; then
 		ENABLE_BLUETOOTH=$AC_ENABLE_BLUETOOTH
 	fi
 	if [ x$ENABLE_BLUETOOTH = x1 ] ; then
-		$LM_VERBOSE && echo "Enabling bluetooth." >> $OUTPUT
+		log "VERBOSE" "Enabling bluetooth."
 		modprobe -q hci_usb
 		for INTF in $BLUETOOTH_INTERFACES ; do
 			[ -d /sys/class/bluetooth/$INTF ] || continue
-			hciconfig $INTF up 2>&1 >> $OUTPUT
+			log "VERBOSE" "`hciconfig $INTF up 2>&1`"
 		done
 	else
-		$LM_VERBOSE && echo "Disabling bluetooth." >> $OUTPUT
+		log "VERBOSE" "Disabling bluetooth."
 		for INTF in $BLUETOOTH_INTERFACES ; do
 			[ -d /sys/class/bluetooth/$INTF ] || continue
-			hciconfig $INTF down 2>&1 >> $OUTPUT
+			log "VERBOSE" "`hciconfig $INTF down 2>&1`" 
 		done
 		# This may take a while to work because the module may be
 		# temporarily in use; we try three times. We don't use rmmod

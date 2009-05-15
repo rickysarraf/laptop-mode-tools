@@ -7,11 +7,13 @@ do_xrandr () {
   	w -hs | while read -r USER TTY DISPLAY REMAINDER; do	
 	  	if [ "${DISPLAY#:}" != "$DISPLAY" ] ; then
 	  		# It's an X display.
-		  	if su $USER -c "xrandr --output $1 --$2" 2>> $OUTPUT | grep -q display >> $OUTPUT 2>&1 ; then
-				$LM_VERBOSE && echo "Unable to set video output $1 to $2." >> $OUTPUT
+		  	if su $USER -c "xrandr --output $1 --$2" 2>> $_OUTPUT | grep -q display >> $_OUTPUT 2>&1 ; then
+				log "VERBOSE" "Unable to set video output $1 to $2."
 			else 
-				$LM_VERBOSE && echo "Set video output $1 to $2" >> $OUTPUT
+				log "VERBOSE" "Set video output $1 to $2"
 			fi
+			log "VERBOSE" "$_OUTPUT"
+			_OUTPUT=""
 		fi
         done
 }
@@ -42,5 +44,5 @@ if [ x$CONTROL_VIDEO_OUTPUTS = x1 ] ; then
 		do_xrandr $VIDEO_OUTPUT off
 	done
 else
-	$LM_VERBOSE && echo "video-out module is disabled." >> $OUTPUT
+	log "VERBOSE" "video-out module is disabled."
 fi

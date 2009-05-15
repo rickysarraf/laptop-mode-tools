@@ -5,6 +5,7 @@
     * Handle all power management daemons (apmd,pbbuttonsd,pmud)
     * Allow custom timeout values to be set for Intel HDA Cards
     * Handle Intel HDA powersaving in multiple modes
+    * Add syslog logging functionality. Fixes LP #370005
 
 1.48 - 06 April 2009
     * Fix udevinfo calls. See Debian BTS #522043

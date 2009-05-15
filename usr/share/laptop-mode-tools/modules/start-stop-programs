@@ -47,7 +47,7 @@ if [ x$CONTROL_START_STOP = x1 ] ; then
 	if [ -d "$STOP_DIR" ] ; then
 		for SCRIPT in "$STOP_DIR"/* ; do
 			if [ -e "$SCRIPT" ] ; then
-				$LM_VERBOSE && echo "Stopping $SCRIPT" >> $OUTPUT
+				log "VERBOSE" "Stopping $SCRIPT"
 				"$SCRIPT" stop
 				# Dereference any links. When people configure
 				# the directories with links and then they remove
@@ -62,7 +62,7 @@ if [ x$CONTROL_START_STOP = x1 ] ; then
 	if [ -d "$START_DIR" ] ; then
 		for SCRIPT in "$START_DIR"/* ; do
 			if [ -e "$SCRIPT" ] ; then
-				$LM_VERBOSE && echo "Starting $SCRIPT" >> $OUTPUT
+				log "VERBOSE" "Starting $SCRIPT"
 				"$SCRIPT" start
 				LINKTARGET=`readlink -f "$SCRIPT"`
 				sed -i "1i $LINKTARGET stop" /var/run/laptop-mode-tools/start-stop-undo-actions
@@ -71,10 +71,10 @@ if [ x$CONTROL_START_STOP = x1 ] ; then
 	fi
 
 
-	echo "START_SERVICES = $START_SERVICES" >> $OUTPUT
-	echo "STOP_SERVICES = $STOP_SERVICES" >> $OUTPUT
+	log "MSG" "START_SERVICES = $START_SERVICES"
+	log "MSG" "STOP_SERVICES = $STOP_SERVICES"
 	if [ "$START_SERVICES" != "" -o "$STOP_SERVICES" != "" ] ; then
-		echo "Starting/stopping services" >> $OUTPUT
+		log "MSG" "Starting/stopping services"
 	
 		# Determine how we can start/restart services.
 		if ( which invoke-rc.d > /dev/null ) ; then
@@ -103,7 +103,7 @@ if [ x$CONTROL_START_STOP = x1 ] ; then
 			elif [ -d /etc/init.d ] ; then
 				INIT_D=/etc/init.d
 			else
-				$LM_VERBOSE && echo "Cannot determine location of init scripts." >> $OUTPUT
+				log "ERR" "Cannot determine location of init scripts."
 				exit 1
 			fi
 
@@ -111,12 +111,12 @@ if [ x$CONTROL_START_STOP = x1 ] ; then
 		fi
 
 		for SERVICE in $STOP_SERVICES ; do
-			$LM_VERBOSE && echo "Stopping service $SERVICE." >> $OUTPUT
+			log "VERBOSE" "Stopping service $SERVICE."
 			$RCPROG$SERVICE stop
 			sed -i "1i $RCPROG$SERVICE start" /var/run/laptop-mode-tools/start-stop-undo-actions
 		done
 		for SERVICE in $START_SERVICES ; do
-			$LM_VERBOSE && echo "Starting service $SERVICE." >> $OUTPUT
+			log "VERBOSE" "Starting service $SERVICE."
 			$RCPROG$SERVICE start
 			sed -i "1i $RCPROG$SERVICE stop" /var/run/laptop-mode-tools/start-stop-undo-actions
 		done

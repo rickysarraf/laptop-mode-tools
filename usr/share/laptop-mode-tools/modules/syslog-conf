@@ -10,25 +10,25 @@
 
 
 if [ x$CONTROL_SYSLOG_CONF = x1 ] ; then
-	$LM_VERBOSE && echo "Adjusting syslog configuration." >> $OUTPUT
+	log "VERBOSE" "Adjusting syslog configuration."
 	if [ "`readlink -f $SYSLOG_CONF`" != "$SYSLOG_CONF" ] ; then
-		echo "$SYSLOG_CONF is a symlink." >> $OUTPUT
+		log "MSG" "$SYSLOG_CONF is a symlink."
 		if [ ! -f "$SYSLOG_CONF.no-lm" ] ; then
-			$LM_VERBOSE && echo "But there is no $SYSLOG_CONF.no-lm. This must have been done by an earlier" >> $OUTPUT
-			$LM_VERBOSE && echo "version of laptop-mode-tools." >> $OUTPUT
-			$LM_VERBOSE && echo "Creating it now from $NOLM_AC_SYSLOG_CONF." >> $OUTPUT
+			log "VERBOSE" "But there is no $SYSLOG_CONF.no-lm. This must have been done by an earlier"
+			log "VERBOSE" "version of laptop-mode-tools."
+			log "VERBOSE" "Creating it now from $NOLM_AC_SYSLOG_CONF."
 			cp "$NOLM_AC_SYSLOG_CONF" "$SYSLOG_CONF.no-lm"
 		fi
 	else
-		$LM_VERBOSE && echo "$SYSLOG_CONF is not a symlink." >> $OUTPUT
+		log "VERBOSE" "$SYSLOG_CONF is not a symlink."
 		if [ "$STATE" = "enabled" ] ; then
-			$LM_VERBOSE && echo "Saving it to $SYSLOG_CONF.no-lm." >> $OUTPUT
+			log "VERBOSE" "Saving it to $SYSLOG_CONF.no-lm."
 			cp --backup=numbered "$SYSLOG_CONF" "$SYSLOG_CONF.no-lm"
 		fi
 	fi
 
 	if [ "$STATE" != "enabled" ] ; then
-		$LM_VERBOSE && echo "Laptop mode is not enabled. Restoring $SYSLOG_CONF." >> $OUTPUT
+		log "VERBOSE" "Laptop mode is not enabled. Restoring $SYSLOG_CONF."
 		if [ -f "$SYSLOG_CONF.no-lm" ] ; then
 			mv "$SYSLOG_CONF.no-lm" "$SYSLOG_CONF"
 		elif [ "`readlink -f $SYSLOG_CONF`" != "$SYSLOG_CONF" ] ; then
@@ -36,19 +36,19 @@ if [ x$CONTROL_SYSLOG_CONF = x1 ] ; then
 		fi
 	elif [ $ON_AC -eq 1 ] ; then
 		if [ "$ACTIVATE" -eq 1 ] ; then
-			$LM_VERBOSE && echo "Setting syslog config to $LM_AC_SYSLOG_CONF." >> $OUTPUT
+			log "VERBOSE" "Setting syslog config to $LM_AC_SYSLOG_CONF."
 			ln -fs "$LM_AC_SYSLOG_CONF" "$SYSLOG_CONF"
 		else
-			$LM_VERBOSE && echo "Setting syslog config to $NOLM_AC_SYSLOG_CONF." >> $OUTPUT
+			log "VERBOSE" "Setting syslog config to $NOLM_AC_SYSLOG_CONF."
 			ln -fs "$NOLM_AC_SYSLOG_CONF" "$SYSLOG_CONF"
 		fi
 	else
-		$LM_VERBOSE && echo "Setting syslog config to $BATT_SYSLOG_CONF." >> $OUTPUT
+		log "VERBOSE" "Setting syslog config to $BATT_SYSLOG_CONF."
 		ln -fs "$BATT_SYSLOG_CONF" "$SYSLOG_CONF"
 	fi
 	# Notify syslogd of configuration change.
 	if [ "$SYSLOG_CONF_SIGNAL_PROGRAM" != "" ] ; then
-		$LM_VERBOSE && echo "Sending SIGHUP to all $SYSLOG_CONF_SIGNAL_PROGRAM processes." >> $OUTPUT
+		log "VERBOSE" "Sending SIGHUP to all $SYSLOG_CONF_SIGNAL_PROGRAM processes."
 		killall -q -HUP $SYSLOG_CONF_SIGNAL_PROGRAM
 	fi
 fi

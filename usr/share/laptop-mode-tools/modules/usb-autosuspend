@@ -8,9 +8,9 @@ if [ x$CONTROL_USB_AUTOSUSPEND = x1 ] ; then
 	AUTOSUSPEND_TIMEOUT=2
 	if [ -f /sys/module/usbcore/parameters/autosuspend ]; then
 	    echo $AUTOSUSPEND_TIMEOUT > /sys/module/usbcore/parameters/autosuspend
-	    $LM_VERBOSE && echo "Enabling autosuspend mode for new USB devices, with timeout $AUTOSUSPEND_TIMEOUT." >> $OUTPUT
+	    log "VERBOSE" "Enabling autosuspend mode for USBCORE Controller, with timeout $AUTOSUSPEND_TIMEOUT."
 	else
-	    $LM_VERBOSE && echo "Not enabling autosuspend mode for new USB devices -- /sys/module/usbcore/parameters/autosuspend not present." >> $OUTPUT
+	    log "VERBOSE" "Not enabling autosuspend mode for USBCORE Controller. Not Supported"
 	fi
 	if [ -d /sys/bus/usb/devices ]; then
 	    for usb_device in /sys/bus/usb/devices/*;
@@ -18,23 +18,23 @@ if [ x$CONTROL_USB_AUTOSUSPEND = x1 ] ; then
 		usb_device=`basename $usb_device`;
 		if [ -f /sys/bus/usb/devices/$usb_device/power/autosuspend ]; then
 		    echo $AUTOSUSPEND_TIMEOUT > /sys/bus/usb/devices/$usb_device/power/autosuspend;
-		    $LM_VERBOSE && echo "Enabling auto suspend mode for usb device $usb_device." >> $OUTPUT
+		    log "VERBOSE" "Enabling auto suspend mode for usb device $usb_device."
 		else
-		    $LM_VERBOSE && echo "Not enabling auto suspend mode for usb device $usb_device -- /sys/bus/usb/devices/$usb_device/power/autosuspend not present." >> $OUTPUT
+		    log "VERBOSE" "Not enabling auto suspend mode for usb device $usb_device"
 		fi
 
 		if [ -f /sys/bus/usb/devices/$usb_device/power/level ]; then
 		    echo "auto" > /sys/bus/usb/devices/$usb_device/power/level;
-		    $LM_VERBOSE && echo "Enabling auto power level for usb device $usb_device." >> $OUTPUT
+		    log "VERBOSE" "Enabling auto power level for usb device $usb_device."
 		else
-		    $LM_VERBOSE && echo "Not enabling auto power level for usb device $usb_device -- /sys/bus/usb/devices/$usb_device/power/level not present." >> $OUTPUT
+		    log "VERBOSE" "Not enabling auto power level for usb device $usb_device"
 		fi
 	    done
 	else
 	    # This will rarely happen.
-	    $LM_VERBOSE && echo "There are no USB devices." >> $OUTPUT
+	    log "VERBOSE" "There are no USB devices."
 	fi
 else
-    $LM_VERBOSE && echo "USB autosuspend is disabled." >> $OUTPUT
+    log "VERBOSE" "USB autosuspend is disabled."
 fi
 

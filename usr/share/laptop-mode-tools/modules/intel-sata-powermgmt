@@ -6,12 +6,12 @@
 if [ x$CONTROL_INTEL_SATA_POWER = x1 ] ; then
 	for POLICYFILE in /sys/class/scsi_host/*/link_power_management_policy ; do
 		if [ -f $POLICYFILE ] ; then
-			$LM_VERBOSE && echo "Intel SATA link power saving enabled." >> $OUTPUT
+			log "VERBOSE" "Intel SATA link power saving enabled."
 			echo min_power > $POLICYFILE
 		else
-			$LM_VERBOSE && echo "Intel SATA link power saving enabled but not supported by system." >> $OUTPUT
+			log "VERBOSE" "Intel SATA link power saving enabled but not supported by system."
 		fi 
 	done
 else
-	$LM_VERBOSE && echo "Intel SATA link power saving disabled." >> $OUTPUT
+	log "VERBOSE" "Intel SATA link power saving disabled."
 fi
