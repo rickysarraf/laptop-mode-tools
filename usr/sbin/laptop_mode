@@ -671,7 +671,7 @@ else
 						else
 							CAPACITY=0
 						fi
-						if [ -z "$CAPACITY" -o "$CAPACITY" -eq 0] ; then
+						if [ -z "$CAPACITY" -o "$CAPACITY" -eq 0 ] ; then
 							log "VERBOSE" "Battery does not report non-design full charge."	
 							CAPACITY=0
 						fi
