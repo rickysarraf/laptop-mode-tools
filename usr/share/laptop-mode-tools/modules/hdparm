@@ -21,23 +21,25 @@ is_capable() {
 	# If we are running udev, this is the most portable way
 	# It assumes more or less recent udev (> 070)
 	if [ $HAVE_UDEVINFO -ne 0 ] ; then
-		$LM_VERBOSE && echo -n "Querying $1 media type using udevinfo: " >> $OUTPUT
+		log "VERBOSE" "Querying $1 media type using udevinfo: "
 		if [ -x /sbin/udevadm ]; then
-			eval "$(udevadm info -q env -n $1 2>> $OUTPUT | egrep '(ID_TYPE=|ID_BUS=)' 2>&1 | tee -a $OUTPUT)"
+			eval "$(udevadm info -q env -n $1 2>> $_OUTPUT | egrep '(ID_TYPE=|ID_BUS=)' 2>&1 | tee -a $_OUTPUT)"
 		else
-			eval "$(udevinfo -q env -n $1 2>> $OUTPUT | egrep '(ID_TYPE=|ID_BUS=)' 2>&1 | tee -a $OUTPUT)"
+			eval "$(udevinfo -q env -n $1 2>> $_OUTPUT | egrep '(ID_TYPE=|ID_BUS=)' 2>&1 | tee -a $_OUTPUT)"
 		fi
+		log "VERBOSE" "$_OUTPUT"
+		_OUTPUT=""
 		if [ -n "$ID_TYPE" -a -n "$ID_BUS" ] ; then
-			$LM_VERBOSE && echo "type '$ID_TYPE' on bus '$ID_BUS' detected" >> $OUTPUT
+			log "VERBOSE" "type '$ID_TYPE' on bus '$ID_BUS' detected"
 			MEDIA=$ID_TYPE
 			BUS=$ID_BUS
 		else
-			$LM_VERBOSE && echo "failed - udev not active?" >> $OUTPUT
+			log "ERR" "failed - udev not active?"
 		fi
 	fi
 
 	if [ -z "$MEDIA" ] ; then
-		$LM_VERBOSE && echo -n "Querying $1 media type using device name: " >> $OUTPUT
+		log "VERBOSE" "Querying $1 media type using device name: "
 		case $dev in
 			hd*)	# IDE device
 				if [ -r /proc/ide/$dev/media ]; then
@@ -61,28 +63,30 @@ is_capable() {
 
 		esac
 		if [ -n "$MEDIA" ] ; then
-			$LM_VERBOSE && echo "type '$MEDIA' on bus '$BUS' detected" >> $OUTPUT
+			log "VERBOSE" "type '$MEDIA' on bus '$BUS' detected"
 		else
-			$LM_VERBOSE && echo "failed - unknown name" >> $OUTPUT
+			log "ERR" "failed - unknown name"
 		fi
 	fi
 
 	if [ -z "$MEDIA" ] ; then
 		if [ "$HDPARM_AVAILABLE" = "1" ]; then
-			$LM_VERBOSE && echo -n "Querying $1 type using hdparm: " >> $OUTPUT
-			if hdparm -I $1 2> $OUTPUT | grep -q CD-ROM >> $OUTPUT 2>&1 ; then
+			log "VERBOSE" "Querying $1 type using hdparm: "
+			if hdparm -I $1 2> $_OUTPUT | grep -q CD-ROM >> $_OUTPUT 2>&1 ; then
 				MEDIA=cd
 			else
 				MEDIA=disk
 			fi
+			log "VERBOSE" "$_OUTPUT"
+			_OUTPUT=""
 			BUS=ata # or acts like it anyway, because hdparm supports it.
-			$LM_VERBOSE && echo "type '$MEDIA' on bus '$BUS' detected" >> $OUTPUT
+			log "VERBOSE" "type '$MEDIA' on bus '$BUS' detected"
 		fi
 	fi
 
 	# Sanity check
 	if [ -z "$MEDIA" -o -z "$BUS" ] ; then
-		$LM_VERBOSE && echo "Querying $1 type - unknown type or bus, disabling hdparm/sdparm" >> $OUTPUT
+		log "ERR" "Querying $1 type - unknown type or bus, disabling hdparm/sdparm"
 		return 1
 	fi
 
@@ -147,7 +151,7 @@ if [ -x "$(which udevadm 2> /dev/null)" ]; then
 	if [ "$UDEVVERSION" -gt 70 ] ; then
 		HAVE_UDEVINFO=1
 	else
-		$LM_VERBOSE && echo "udevadm info present but version not > 070, not using udev" >> $OUTPUT
+		log "VERBOSE" "udevadm info present but version not > 070, not using udev"
 	fi
 else
 	# Older versions of udev (udevinfo) give output in the form of
@@ -158,7 +162,7 @@ else
 		if [ "$UDEVVERSION" -gt 70 ] ; then
 			HAVE_UDEVINFO=1
 		else
-			$LM_VERBOSE && echo "udevinfo present but version not > 070, not using udev" >> $OUTPUT
+			log "VERBOSE" "udevinfo present but version not > 070, not using udev"
 		fi
 	fi
 fi
@@ -174,22 +178,22 @@ if [ x$CONTROL_HD_POWERMGMT = x1 ] ; then
 		HD_POWERMGMT=$BATT_HD_POWERMGMT
 	fi
 
-	$LM_VERBOSE && echo "Setting powermanagement on drives to $HD_POWERMGMT." >> $OUTPUT
+	log "VERBOSE" "Setting powermanagement on drives to $HD_POWERMGMT."
 	for THISHD in $HD ; do
 		if is_capable $THISHD POWERMGMT ; then
 			if is_capable $THISHD HDPARM ; then
 				if [ "$HDPARM_AVAILABLE" = "1" ]; then
-					$LM_VERBOSE && echo "Executing: hdparm -B $HD_POWERMGMT $THISHD" >> $OUTPUT
-					hdparm -B $HD_POWERMGMT $THISHD >> $OUTPUT 2>&1
+					log "VERBOSE" "Executing: hdparm -B $HD_POWERMGMT $THISHD"
+					log "VERBOSE" "`hdparm -B $HD_POWERMGMT $THISHD 2>&1`"
 				else
-					echo "ERROR: hdparm not installed."				
+					log "ERR" "ERROR: hdparm not installed."				
 				fi
 			else
-				$LM_VERBOSE && echo "Skipping $THISHD: powermgmt only possible with hdparm but drive does not" >> $OUTPUT
-				$LM_VERBOSE && echo "support hdparm." >> $OUTPUT
+				log "VERBOSE" "Skipping $THISHD: powermgmt only possible with hdparm but drive does not"
+				log "VERBOSE" "support hdparm."
 			fi
 		else
-			$LM_VERBOSE && echo "Skipping $THISHD: powermanagement control not supported." >> $OUTPUT
+			log "VERBOSE" "Skipping $THISHD: powermanagement control not supported."
 		fi
 	done
 fi
@@ -209,30 +213,30 @@ if [ x$CONTROL_HD_IDLE_TIMEOUT = x1 ] ; then
 		HD_IDLE_TIMEOUT=$NOLM_HD_IDLE_TIMEOUT
 		HD_IDLE_TIMEOUT_SECONDS=$NOLM_HD_IDLE_TIMEOUT_SECONDS
 	fi
-	$LM_VERBOSE && echo "Setting spindown timeout on drives to $HD_IDLE_TIMEOUT_SECONDS seconds." >> $OUTPUT
-	$LM_VERBOSE && echo "(hdparm configuration value = $HD_IDLE_TIMEOUT.)" >> $OUTPUT
+	log "VERBOSE" "Setting spindown timeout on drives to $HD_IDLE_TIMEOUT_SECONDS seconds."
+	log "VERBOSE" "(hdparm configuration value = $HD_IDLE_TIMEOUT.)"
 	for THISHD in $HD ; do
 		if is_capable $THISHD IDLE_TIMEOUT ; then
 			if is_capable $THISHD HDPARM ; then
 				if [ "$HDPARM_AVAILABLE" = "1" ]; then
-					$LM_VERBOSE && echo "Executing: hdparm -S $HD_IDLE_TIMEOUT $THISHD" >> $OUTPUT
-					hdparm -S $HD_IDLE_TIMEOUT $THISHD >> $OUTPUT 2>&1
+					log "VERBOSE" "Executing: hdparm -S $HD_IDLE_TIMEOUT $THISHD"
+					log "VERBOSE" "`hdparm -S $HD_IDLE_TIMEOUT $THISHD 2>&1`"
 				else
-					echo "ERROR: hdparm not installed."
+					log "VERBOSE" "ERROR: hdparm not installed."
 				fi
 			elif is_capable $THISHD SDPARM ; then
 				if [ "$SDPARM_AVAILABLE" = "1" ]; then
 					HD_IDLE_TIMEOUT_DECISECONDS=$(($HD_IDLE_TIMEOUT_SECONDS*10))
-					$LM_VERBOSE && echo "Executing: sdparm -q -s SCT=$HD_IDLE_TIMEOUT_DECISECONDS $THISHD" >> $OUTPUT
-					sdparm -q -s SCT=$HD_IDLE_TIMEOUT_DECISECONDS $THISHD >> $OUTPUT 2>&1
+					log "VERBOSE" "Executing: sdparm -q -s SCT=$HD_IDLE_TIMEOUT_DECISECONDS $THISHD"
+					log "VERBOSE" "`sdparm -q -s SCT=$HD_IDLE_TIMEOUT_DECISECONDS $THISHD 2>&1`"
 				else
-					echo "ERROR: sdparm not installed."
+					log "ERR" "ERROR: sdparm not installed."
 				fi
 			else
-				$LM_VERBOSE && echo "Skipping $THISHD: drive supports neither hdparm nor sdparm." >> $OUTPUT
+				log "VERBOSE" "Skipping $THISHD: drive supports neither hdparm nor sdparm."
 			fi
 		else
-			$LM_VERBOSE && echo "Skipping $THISHD: idle timeout control not supported." >> $OUTPUT
+			log "VERBOSE" "Skipping $THISHD: idle timeout control not supported."
 		fi
 	done
 fi
@@ -254,22 +258,22 @@ if [ x$CONTROL_HD_WRITECACHE = x1 ] ; then
 			HD_WRITECACHE=$NOLM_BATT_HD_WRITECACHE
 		fi
 	fi
-	$LM_VERBOSE && echo "Setting write cache on drives to $HD_WRITECACHE." >> $OUTPUT
+	log "VERBOSE" "Setting write cache on drives to $HD_WRITECACHE."
 	for THISHD in $HD ; do
 		if is_capable $THISHD WRITECACHE ; then
 			if is_capable $THISHD HDPARM ; then
 				if [ "$HDPARM_AVAILABLE" = "1" ]; then
-					$LM_VERBOSE && echo "Executing: hdparm -W $HD_WRITECACHE $THISHD" >> $OUTPUT
-					hdparm -W $HD_WRITECACHE $THISHD >> $OUTPUT 2>&1
+					log "VERBOSE" "Executing: hdparm -W $HD_WRITECACHE $THISHD"
+					log "VERBOSE" "`hdparm -W $HD_WRITECACHE $THISHD 2>&1`"
 				else
-					echo "ERROR: hdparm not installed."
+					log "ERR" "ERROR: hdparm not installed."
 				fi
 			else
-				$LM_VERBOSE && echo "Skipping $THISHD: writecache only possible with hdparm but drive does not" >> $OUTPUT
-				$LM_VERBOSE && echo "support hdparm." >> $OUTPUT
+				log "VERBOSE" "Skipping $THISHD: writecache only possible with hdparm but drive does not"
+				log "VERBOSE" "support hdparm."
 			fi
 		else
-			$LM_VERBOSE && echo "Skipping $THISHD: writecache control not supported." >> $OUTPUT
+			log "VERBOSE" "Skipping $THISHD: writecache control not supported."
 		fi
 	done
 fi

@@ -9,7 +9,7 @@
 # Parameter 1: sysctl/proc path
 # Parameter 2: the value
 set_sysctl() {
-	$LM_VERBOSE && echo "Executing: echo $2 > $1" >> $OUTPUT
+	log "VERBOSE" "Executing: echo $2 > $1"
 	if ! echo "$2" > "$1" ; then
 		echo "SETTING OF KERNEL PARAMETER FAILED: echo $2 \> $1"
 	fi
@@ -77,19 +77,19 @@ if [ x$CONTROL_CPU_FREQUENCY = x1 ] ; then
 				;;
 			esac
 
-			$LM_VERBOSE && echo "Setting CPU maximum frequency for cpu $THISCPU to $THIS_CPU_MAXFREQ." >> $OUTPUT
+			log "VERBOSE" "Setting CPU maximum frequency for cpu $THISCPU to $THIS_CPU_MAXFREQ."
 			set_sysctl $THISCPU/cpufreq/scaling_max_freq $THIS_CPU_MAXFREQ
-			$LM_VERBOSE && echo "Setting CPU minimum frequency for cpu $THISCPU to $THIS_CPU_MINFREQ." >> $OUTPUT
+			log "VERBOSE" "Setting CPU minimum frequency for cpu $THISCPU to $THIS_CPU_MINFREQ."
 			set_sysctl $THISCPU/cpufreq/scaling_min_freq $THIS_CPU_MINFREQ
-			$LM_VERBOSE && echo "Setting CPU frequency governor for cpu $THISCPU to $THIS_CPU_GOVERNOR." >> $OUTPUT
-			/sbin/modprobe -q cpufreq_$THIS_CPU_GOVERNOR >> $OUTPUT 2>&1
+			log "VERBOSE" "Setting CPU frequency governor for cpu $THISCPU to $THIS_CPU_GOVERNOR."
+			log "VERBOSE" "`/sbin/modprobe -q cpufreq_$THIS_CPU_GOVERNOR 2>&1`"
 			set_sysctl $THISCPU/cpufreq/scaling_governor $THIS_CPU_GOVERNOR
 			if [ -f "$THISCPU/cpufreq/$THIS_CPU_GOVERNOR/ignore_nice_load" ] ; then
-				$LM_VERBOSE && echo "Setting CPU ignore_nice_load for cpu $THISCPU to $THIS_CPU_IGNORE_NICE_LOAD." >> $OUTPUT
+				log "VERBOSE" "Setting CPU ignore_nice_load for cpu $THISCPU to $THIS_CPU_IGNORE_NICE_LOAD."
 				set_sysctl $THISCPU/cpufreq/$THIS_CPU_GOVERNOR/ignore_nice_load $THIS_CPU_IGNORE_NICE_LOAD
 			else
-				$LM_VERBOSE && echo "Not setting CPU ignore_nice_load for cpu $THISCPU." >> $OUTPUT
-				$LM_VERBOSE && echo "File $THISCPU/cpufreq/$THIS_CPU_GOVERNOR/ignore_nice_load does not exist." >> $OUTPUT
+				log "VERBOSE" "Not setting CPU ignore_nice_load for cpu $THISCPU."
+				log "VERBOSE" "File $THISCPU/cpufreq/$THIS_CPU_GOVERNOR/ignore_nice_load does not exist."
 			fi
 		fi
 	done
@@ -124,7 +124,7 @@ if [ x$CONTROL_CPU_THROTTLING = x1 ] ; then
 				THIS_CPU_THROTTLING="$CPU_THROTTLING"
 			esac
 			
-			$LM_VERBOSE && echo "Setting throttling level for cpu $THISCPU to $THIS_CPU_THROTTLING." >> $OUTPUT
+			log "VERBOSE" "Setting throttling level for cpu $THISCPU to $THIS_CPU_THROTTLING."
 			set_sysctl $THISCPU/throttling $THIS_CPU_THROTTLING
 		fi
 	done

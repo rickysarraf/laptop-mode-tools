@@ -5,23 +5,23 @@
 
 if [ x$CONTROL_SCHED_MC_POWER_SAVINGS = x1 ] ; then
 	if [ $ON_AC -eq 1 ]; then
-		$LM_VERBOSE && echo "On AC power: setting scheduler power saving to 0." >> $OUTPUT
+		log "VERBOSE" "On AC power: setting scheduler power saving to 0."
 		if [ -w /sys/devices/system/cpu/sched_mc_power_savings ]; then
 			echo 0 > /sys/devices/system/cpu/sched_mc_power_savings 
-			$LM_VERBOSE && echo "Scheduler power save mode disabled." >> $OUTPUT
+			log "VERBOSE" "Scheduler power save mode disabled."
 		else
-			$LM_VERBOSE && echo "Scheduler power saving is not available." >> $OUTPUT
+			log "VERBOSE" "Scheduler power saving is not available."
 		fi
 	else
-		$LM_VERBOSE && echo "On battery: setting scheduler power saving to 1." >> $OUTPUT
+		log "VERBOSE" "On battery: setting scheduler power saving to 1."
 		if [ -w /sys/devices/system/cpu/sched_mc_power_savings ]; then
 			echo 2 > /sys/devices/system/cpu/sched_mc_power_savings 
-			$LM_VERBOSE && echo "Scheduler power save mode enabled." >> $OUTPUT
+			log "VERBOSE" "Scheduler power save mode enabled."
 		else
-			$LM_VERBOSE && echo "Scheduler power saving is not available." >> $OUTPUT
+			log "VERBOSE" "Scheduler power saving is not available."
 		fi
 
 	fi
 else
-	$LM_VERBOSE && echo "Scheduler power setting is disabled." >> $OUTPUT
+	log "VERBOSE" "Scheduler power setting is disabled."
 fi

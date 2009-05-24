@@ -4,20 +4,20 @@
 #
 
 if [ x$ENABLE_BATTERY_LEVEL_POLLING = x1 ] ; then
-	$LM_VERBOSE && echo "Battery level polling is enabled." >> $OUTPUT
+	log "VERBOSE" "Battery level polling is enabled."
 	if [ x$ON_AC = x1 ] ; then
-		$LM_VERBOSE && echo "On AC, stopping the polling daemon." >> $OUTPUT
+		log "VERBOSE" "On AC, stopping the polling daemon."
 
 		# In AC mode we disable the polling daemon.
 		killall -q lm-polling-daemon
 	else
 		if ! pidof lm-polling-daemon ; then
-			$LM_VERBOSE && echo "On battery and there was no polling daemon yet, starting the polling daemon." >> $OUTPUT
+			log "VERBOSE" "On battery and there was no polling daemon yet, starting the polling daemon."
 			
 			# If there is no polling daemon, we start one.
 			/usr/share/laptop-mode-tools/module-helpers/lm-polling-daemon &
 		fi
 	fi
 else
-	$LM_VERBOSE && echo "Battery level polling is disabled." >> $OUTPUT
+	log "VERBOSE" "Battery level polling is disabled."
 fi

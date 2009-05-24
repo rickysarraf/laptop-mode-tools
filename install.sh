@@ -316,6 +316,31 @@ if [ "$INIT_D" != "none" ] ; then
 			exit 24
 		fi
 	fi
+
+    # Check for acpid and restart if running
+    acpi_pid=`pidof acpid`
+    if [ ! -z $acpi_pid ]; then
+        echo "Reloading acpid daemon"
+        killall -SIGHUP acpid;
+    fi
+
+    apm_pid=`pidof apmd`
+    if [ ! -z $apm_pid ]; then
+        echo "Reloading apmd daemon"
+        killall -SIGHUP apmd;
+    fi
+
+    pbbuttonsd_pid=`pidof pbbuttonsd`
+    if [ ! -z $pbbuttonsd_pid ]; then
+        echo "Reloading pbbuttonsd daemon"
+        killall -SIGHUP pbbuttonsd;
+    fi
+
+    pmud_pid=`pidof pmud`
+    if [ ! -z $pmud_pid ]; then
+        echo "Reloading pmud daemon"
+        killall -SIGHUP pmud;
+    fi
 fi
 
 echo "Installation complete."

@@ -26,14 +26,14 @@ if [ x$CONTROL_IPW_POWER = x1 ] ; then
 	elif [ -x /usr/sbin/iwpriv ] ; then
 		IWPRIV=/usr/sbin/iwpriv
 	else
-		$LM_VERBOSE && echo "iwpriv is not installed" >> $OUTPUT
+		log "VERBOSE" "iwpriv is not installed"
 	fi
 	if [ -x /sbin/iwconfig ] ; then
 		IWCONFIG=/sbin/iwconfig
 	elif [ -x /usr/sbin/iwconfig ] ; then
 		IWCONFIG=/usr/sbin/iwconfig
 	else
-		$LM_VERBOSE && echo "iwconfig is not installed" >> $OUTPUT
+		log "VERBOSE" "iwconfig is not installed"
 	fi
 
 	SET_I3945_AC_PARMS="set_power $IPW3945_AC_POWER"
@@ -92,7 +92,7 @@ if [ x$CONTROL_IPW_POWER = x1 ] ; then
 		findWifiIfsByDriver $1;
 
 		for DEVICE in $WIFI_IFNAMES; do
-			$LM_VERBOSE && echo "Wireless power saving: $2 $DEVICE $3" >> $OUTPUT
+			log "VERBOSE" "Wireless power saving: $2 $DEVICE $3"
 			$2 $DEVICE $3
 		done
 	}
@@ -134,5 +134,5 @@ if [ x$CONTROL_IPW_POWER = x1 ] ; then
 		[ -d /sys/module/$I2100_DRIVERNAME ] && intel2100_BatPwrSave
 	fi
 else
-	$LM_VERBOSE && echo "Intel IPW Wireless power setting is disabled." >> $OUTPUT
+	log "VERBOSE" "Intel IPW Wireless power setting is disabled."
 fi

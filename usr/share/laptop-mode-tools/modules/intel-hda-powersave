@@ -4,12 +4,39 @@
 #
 
 if [ x$CONTROL_INTEL_HDA_POWER = x1 ] ; then
+    if [ $ON_AC -eq 1 ]; then
+		if [ "$ACTIVATE" -eq 1 ]; then
+			INTEL_HDA_POWERSAVE="$LM_AC_INTEL_HDA_POWERSAVE"
+		else
+			INTEL_HDA_POWERSAVE="$NOLM_AC_INTEL_HDA_POWERSAVE"
+		fi
+	else
+		INTEL_HDA_POWERSAVE="$BATT_INTEL_HDA_POWERSAVE"
+	fi
+
+    # Handle Intel HDA Power Save
+    if [ x$INTEL_HDA_POWERSAVE = x1 ]; then
         if [ -w /sys/module/snd_hda_intel/parameters/power_save ]; then
-                echo 1 > /sys/module/snd_hda_intel/parameters/power_save
-                $LM_VERBOSE && echo "Intel HDA power save mode enabled." >> $OUTPUT
+                echo $INTEL_HDA_DEVICE_TIMEOUT > /sys/module/snd_hda_intel/parameters/power_save
+                log "VERBOSE" "Intel HDA power save mode enabled with timeout $INTEL_HDA_DEVICE_TIMEOUT."
         else
-                $LM_VERBOSE && echo "Intel HDA power saving is not available on this system." >> $OUTPUT
+                log "VERBOSE" "Intel HDA power saving is not available on this system."
         fi
+    fi
+
+    # Handle Intel HDA Controller Power Savings.
+    if [ x$INTEL_HDA_DEVICE_CONTROLLER = x1 ]; then
+        POWER_SAVE="Y"
+    else
+        POWER_SAVE="N"
+    fi
+
+    if [ -w /sys/module/snd_hda_intel/parameters/power_save_controller ]; then
+        echo $POWER_SAVE > /sys/module/snd_hda_intel/parameters/power_save_controller
+        log "VERBOSE" "Intel HDA Controller power save set to $POWER_SAVE."
+    else
+        log "VERBOSE" "Sound Card doesn't seem to support Controller Power Save."
+    fi
 else
-	$LM_VERBOSE && echo "Intel HDA audio power setting is disabled." >> $OUTPUT
+	log "VERBOSE" "Intel HDA audio power setting is disabled."
 fi

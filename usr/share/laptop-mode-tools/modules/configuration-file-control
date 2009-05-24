@@ -4,7 +4,7 @@
 #
 
 if [ x$CONTROL_CONFIG_FILES = x1 ] ; then
-	echo "Swapping out configuration files." >> $OUTPUT
+	log "MSG" "Swapping out configuration files."
 	for CONFFILE in $CONFIG_FILES ; do
 		if [ -e $CONFFILE ] ; then
 			#
@@ -25,16 +25,16 @@ if [ x$CONTROL_CONFIG_FILES = x1 ] ; then
 			# Create the .lmbackup file
 			#
 			if [ "`readlink -f $CONFFILE`" != "$CONFFILE" ] ; then
-				echo "$CONFFILE is a symlink." >> $OUTPUT
+				log "MSG" "$CONFFILE is a symlink."
 				if [ ! -f "$CONFFILE.lmbackup" ] ; then
-					echo "But there is no $CONFFILE.lmbackup." >> $OUTPUT
-					echo "Creating it now from $CONFFILE-nolm-ac." >> $OUTPUT
+					log "MSG" "But there is no $CONFFILE.lmbackup."
+					log "MSG" "Creating it now from $CONFFILE-nolm-ac."
 					cp "$CONFFILE-nolm-ac" "$CONFFILE.lmbackup"
 				fi
 			else
-				echo "$CONFFILE is not a symlink." >> $OUTPUT
+				log "MSG" "$CONFFILE is not a symlink."
 				if [ "$STATE" = "enabled" ] ; then
-					echo "Saving it to $CONFFILE.lmbackup." >> $OUTPUT
+					log "MSG" "Saving it to $CONFFILE.lmbackup."
 					cp --backup=numbered "$CONFFILE" "$CONFFILE.lmbackup"
 				fi
 			fi
@@ -43,7 +43,7 @@ if [ x$CONTROL_CONFIG_FILES = x1 ] ; then
 			# Swizzle the config file
 			#
 			if [ "$STATE" != "enabled" ] ; then
-				echo "Laptop mode is not enabled. Restoring $CONFFILE." >> $OUTPUT
+				log "MSG" "Laptop mode is not enabled. Restoring $CONFFILE."
 				if [ -f "$CONFFILE.lmbackup" ] ; then
 					mv "$CONFFILE.lmbackup" "$CONFFILE"
 				elif [ "`readlink -f $CONFFILE`" != "$CONFFILE" ] ; then
@@ -51,21 +51,21 @@ if [ x$CONTROL_CONFIG_FILES = x1 ] ; then
 				fi
 			elif [ $ON_AC -eq 1 ] ; then
 				if [ "$ACTIVATE" -eq 1 ] ; then
-					echo "Pointing config file $CONFFILE to $CONFFILE-lm-ac." >> $OUTPUT
+					log "MSG" "Pointing config file $CONFFILE to $CONFFILE-lm-ac."
 					ln -fs "$CONFFILE-lm-ac" "$CONFFILE"
 				else
-					echo "Pointing config file $CONFFILE to $CONFFILE-nolm-ac." >> $OUTPUT
+					log "MSG" "Pointing config file $CONFFILE to $CONFFILE-nolm-ac."
 					ln -fs "$CONFFILE-nolm-ac" "$CONFFILE"
 				fi
 			else
-				echo "Pointing config file $CONFFILE to $CONFFILE-batt." >> $OUTPUT
+				log "MSG" "Pointing config file $CONFFILE to $CONFFILE-batt."
 				ln -fs "$CONFFILE-batt" "$CONFFILE"
 			fi
 		fi
 	done
 	# Notify daemons of configuration change.
 	for PROGRAM in $CONFIG_FILE_SIGNAL_PROGRAMS ; do	
-		$LM_VERBOSE && echo "Sending SIGHUP to all $PROGRAM processes." >> $OUTPUT
+		log "VERBOSE" "Sending SIGHUP to all $PROGRAM processes."
 		killall -q -HUP $PROGRAM
 	done
 
@@ -98,7 +98,7 @@ if [ x$CONTROL_CONFIG_FILES = x1 ] ; then
 			elif [ -d /etc/init.d ] ; then
 				INIT_D=/etc/init.d
 			else
-				$LM_VERBOSE && echo "Cannot determine location of init scripts." >> $OUTPUT
+				log "VERBOSE" "Cannot determine location of init scripts."
 				exit 1
 			fi
 
@@ -106,7 +106,7 @@ if [ x$CONTROL_CONFIG_FILES = x1 ] ; then
 		fi
 
 		for SERVICE in $CONFIG_FILE_RELOAD_SERVICES ; do
-			$LM_VERBOSE && echo "Reloading service $SERVICE." >> $OUTPUT
+			log "VERBOSE" "Reloading service $SERVICE."
 			$RCPROG$SERVICE reload
 		done
 	fi

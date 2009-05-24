@@ -1,8 +1,21 @@
 laptop-mode-tools (1.49-1) unstable; urgency=low
 
-  * Test Release
+  * New Upstream Release 1.49:
+    + Fix syntax error in laptop_mode. Closes: #528835.
+    + New feature to log messages to syslog. LP: #370005.
+    + Improved Intel HDA Powersaving module. Can now be enabled in
+      different (BATT,LM,NOLM) modes.
+    + Reload Power Management Daemons during installation. Thanks to Wido
+      for pointing out the problem.
+    + Update runlevel priority to 99 to ensure laptop-mode is started late
+      enough while its dependency daemon are starting. LP: #369807
+    + Put a proper check for Hal Polling. Thanks Vincent Panel.
+    + Fix typo error in Wake-On-Lan module.
+  * Handle Power Management Daemons to restart during package
+    post-installation.
+  * DO NOT RELEASE. TEST RELEASE.
 
- -- Ritesh Raj Sarraf <rrs@researchut.com>  Sun, 24 May 2009 21:02:04 +0530
+ -- Ritesh Raj Sarraf <rrs@researchut.com>  Sun, 24 May 2009 21:26:26 +0530
 
 laptop-mode-tools (1.48-1) unstable; urgency=low
 
