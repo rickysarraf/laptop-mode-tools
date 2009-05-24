@@ -44,14 +44,14 @@ if [ $PMU_FOUND -ne 0 -a -f /etc/apm/event.d/laptop-mode ] ; then
 fi
 
 if [ $APM_FOUND -eq 0 -a $ACPI_FOUND -eq 0 -a $PMU_FOUND=0 ] ; then
-  echo Warning: No ACPI, APM or PMU support was found in the running kernel. To
-  echo be able to start laptop mode automatically when running on battery, you
-  echo must recompile your kernel with support for ACPI/APM/PMU (depending on
-  echo what your computer supports). It is possible that your computer supports
-  echo none of these. If this is the case, then you must control laptop mode
-  echo manually, using the laptop_mode command, or you can enable the 
-  echo ENABLE_LAPTOP_MODE_ON_AC option in the configuration file
-  echo /etc/laptop-mode/laptop-mode.conf. 
+  echo "Warning: No ACPI, APM or PMU support was found in the running kernel. To"
+  echo "be able to start laptop mode automatically when running on battery, you"
+  echo "must recompile your kernel with support for ACPI/APM/PMU (depending on"
+  echo "what your computer supports). It is possible that your computer supports"
+  echo "none of these. If this is the case, then you must control laptop mode"
+  echo "manually, using the laptop_mode command, or you can enable the "
+  echo "ENABLE_LAPTOP_MODE_ON_AC option in the configuration file"
+  echo "/etc/laptop-mode/laptop-mode.conf."
 fi
 
 exit 0
