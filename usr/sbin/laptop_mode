@@ -130,7 +130,8 @@ LOG_TO_SYSLOG=1
 # Function to handle logging
 LOGGER=`which logger`;
 
-function log {
+log ()
+{
 # $0 should be msg type
 # $1 should be the real msg
 if [ x$LOG_TO_SYSLOG = x1 ]; then
