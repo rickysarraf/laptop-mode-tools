@@ -135,7 +135,7 @@ log ()
 # $1 should be msg type
 # $2 should be the real msg
 if [ x$LOG_TO_SYSLOG = x1 ]; then
-    if [ -x $LOGGER ]; then
+    if [ -x $LOGGER -a "$1" != "STATUS" ]; then
         logger -p daemon.notice -t laptop-mode $2;
     fi
 fi
@@ -357,22 +357,22 @@ fi
 
 if [ "$1" = "status" ] ; then
 	# Display a status report.
-	log "MSG" "Mounts:"
+	log "STATUS" "Mounts:"
 	mount | sed "s/^/   /"
-    log "MSG" " "
-	log "MSG" "Drive power status:"
+    log "STATUS" " "
+	log "STATUS" "Drive power status:"
 	for disk in $HD; do
 		if [ -r $disk ]; then
 			hdparm -C $disk 2>/dev/null | sed "s/^/   /"
 		else
-			log "MSG" "   Cannot read $disk, permission denied - $0 needs to be run as root"
+			log "STATUS" "   Cannot read $disk, permission denied - $0 needs to be run as root"
 		fi
 	done
-    log "MSG" " "
-	log "MSG" "(NOTE: drive settings affected by Laptop Mode cannot be retrieved.)"
+    log "STATUS" " "
+	log "STATUS" "(NOTE: drive settings affected by Laptop Mode cannot be retrieved.)"
 
-    log "MSG" " "
-	log "MSG" "Readahead states:"
+    log "STATUS" " "
+	log "STATUS" "Readahead states:"
 	cat /etc/mtab | while read DEV MP FST OPTS DUMP PASS ; do
 		# skip funny stuff
 		case "$FST" in 
@@ -381,29 +381,29 @@ if [ "$1" = "status" ] ; then
 		esac
 		if [ -b $DEV ] ; then
 			if [ -r $DEV ] ; then
-				log "MSG" "   $DEV: $((`blockdev --getra $DEV` / 2)) kB"
+				log "STATUS" "   $DEV: $((`blockdev --getra $DEV` / 2)) kB"
 			else
-				log "MSG" "   Cannot read $DEV, permission denied - $0 needs to be run as root"
+				log "STATUS" "   Cannot read $DEV, permission denied - $0 needs to be run as root"
 			fi
 		fi
 	done
-    log "MSG" " "
+    log "STATUS" " "
 	if [ -e /var/run/laptop-mode-tools/enabled ] ; then
-		log "MSG" "Laptop Mode Tools is allowed to run: /var/run/laptop-mode-tools/enabled exists."
+		log "STATUS" "Laptop Mode Tools is allowed to run: /var/run/laptop-mode-tools/enabled exists."
 	else
-		log "ERR" "Laptop Mode Tools is NOT allowed to run: /var/run/laptop-mode-tools/enabled does not exist."
+		log "STATUS" "Laptop Mode Tools is NOT allowed to run: /var/run/laptop-mode-tools/enabled does not exist."
 	fi
-    log "MSG" " "
+    log "STATUS" " "
 	STATFILES="/proc/sys/vm/laptop_mode /proc/apm /proc/pmu/info /proc/sys/vm/bdflush /proc/sys/vm/dirty_ratio /proc/sys/fs/xfs/age_buffer /proc/sys/fs/xfs/sync_interval /proc/sys/fs/xfs/lm_age_buffer /proc/sys/fs/xfs/lm_sync_interval /proc/sys/vm/pagebuf/lm_flush_age /proc/sys/fs/xfs/xfsbufd_centisecs /proc/sys/fs/xfs/xfssyncd_centisecs /proc/sys/vm/dirty_background_ratio /proc/sys/vm/dirty_expire_centisecs /proc/sys/fs/xfs/age_buffer/centisecs /proc/sys/vm/dirty_writeback_centisecs /sys/devices/system/cpu/*/cpufreq/cpuinfo_*_freq /sys/devices/system/cpu/*/cpufreq/scaling_governor /proc/acpi/button/lid/*/state /proc/acpi/ac_adapter/*/state /proc/acpi/battery/*/state /sys/class/power_supply/*/online /sys/class/power_supply/*/state"
 	for THISFILE in $STATFILES ; do
 		if [ -e "$THISFILE" ] ; then
-			log "MSG" "$THISFILE:"
+			log "STATUS" "$THISFILE:"
 			if [ -r "$THISFILE" ] ; then
 				cat "$THISFILE" | sed "s/^/   /"
 			else
-				log "ERR" "   Not accessible, permission denied - $0 needs to be run as root."
+				log "STATUS" "   Not accessible, permission denied - $0 needs to be run as root."
 			fi
-            log "MSG" " "
+            log "STATUS" " "
 		fi
 	done
 
