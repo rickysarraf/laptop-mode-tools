@@ -132,15 +132,15 @@ LOGGER=`which logger`;
 
 log ()
 {
-# $0 should be msg type
-# $1 should be the real msg
+# $1 should be msg type
+# $2 should be the real msg
 if [ x$LOG_TO_SYSLOG = x1 ]; then
     if [ -x $LOGGER ]; then
-        logger -p daemon.notice -t laptop-mode $1;
+        logger -p daemon.notice -t laptop-mode $2;
     fi
 fi
 
-$LM_VERBOSE &&  echo $0: $1;
+$LM_VERBOSE &&  echo $1: $2;
 }
 
 # No default on these ones -- we need to detect if they have been set, for
