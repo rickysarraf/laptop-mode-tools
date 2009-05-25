@@ -140,7 +140,7 @@ if [ x$LOG_TO_SYSLOG = x1 ]; then
     fi
 fi
 
-if [ "$1" == "VERBOSE" ]; then
+if [ "$1" = "VERBOSE" ]; then
     $LM_VERBOSE &&  echo $2;
 else
     echo $2;
