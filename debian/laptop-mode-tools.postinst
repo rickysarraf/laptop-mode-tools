@@ -3,10 +3,7 @@
 #
 # see: dh_installdeb(1)
 
-# We can't run in -e mode because we need to probe the running
-# power management daemons. And thus, leaving one, else all are
-# going to return nothing which as per "set -e" is a failure.
-#set -e
+set -e
 
 # summary of how this script can be called:
 #        * <postinst> `configure' <most-recently-configured-version>
@@ -28,29 +25,29 @@
 
 case "$1" in
   configure)
-    acpi_pid=`pidof acpid`
-    if [ ! -z $acpi_pid ]; then
+    acpi_pid=`pidof acpid || echo 0`
+    if [ ! -z $acpi_pid -a $acpi_pid != 0 ]; then
       if [ -x /etc/init.d/acpid ]; then
         invoke-rc.d acpid force-reload || true
       fi
     fi
 
-    apm_pid=`pidof apmd`
-    if [ ! -z $apm_pid ]; then
+    apm_pid=`pidof apmd || echo 0`
+    if [ ! -z $apm_pid -a $apm_pid != 0 ]; then
       if [ -x /etc/init.d/apmd ]; then
         invoke-rc.d apmd force-reload || true
       fi
     fi
 
-    pbbuttonsd_pid=`pidof pbbuttonsd`
-    if [ ! -z $pbbuttonsd_pid ]; then
+    pbbuttonsd_pid=`pidof pbbuttonsd || echo 0`
+    if [ ! -z $pbbuttonsd_pid -a $pbbuttonsd_pid != 0 ]; then
       if [ -x /etc/init.d/pbbuttonsd ]; then
         invoke-rc.d pbbuttonsd force-reload || true
       fi
     fi
 
-    pmud_pid=`pidof pmud`
-    if [ ! -z $pmud_pid ]; then
+    pmud_pid=`pidof pmud || echo 0`
+    if [ ! -z $pmud_pid -a $pmud_pid != 0 ]; then
       if [ -x /etc/init.d/pmud ]; then
         invoke-rc.d pmud force-reload || true
       fi
