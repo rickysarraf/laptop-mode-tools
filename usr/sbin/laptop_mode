@@ -140,7 +140,7 @@ if [ x$LOG_TO_SYSLOG = x1 ]; then
     fi
 fi
 
-$LM_VERBOSE &&  echo $1: $2;
+$LM_VERBOSE &&  echo $2;
 }
 
 # No default on these ones -- we need to detect if they have been set, for
