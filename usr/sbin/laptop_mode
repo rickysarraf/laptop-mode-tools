@@ -932,7 +932,6 @@ if [ -f /var/run/laptop-mode-tools/state ] ; then
 				if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 0 ] ; then
 					log "MSG" " (Data-loss sensitive features disabled.)"
 				fi
-                #log "MSG" "\n"
 			else
 				log "MSG" "not active [unchanged]"
 			fi
@@ -949,7 +948,6 @@ if [ "$ACTIVATE" -eq 1 ] ; then
 	if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 0 ] ; then
 		log "MSG" " (Data-loss sensitive features disabled.)"
 	fi
-    #log "MSG" "\n"
 else
 	log "MSG" "$STATE, not active"
 fi
@@ -967,7 +965,7 @@ export FORCE STATE ON_AC ACTIVATE ACTIVATE_WITH_POSSIBLE_DATA_LOSS KLEVEL KMINOR
 for SCRIPT in /usr/share/laptop-mode-tools/modules/* /usr/local/lib/laptop-mode-tools/modules/* /usr/local/share/laptop-mode-tools/modules/* /etc/laptop-mode/modules/*; do
 	if [ -x "$SCRIPT" ] ; then
 		log "VERBOSE" "Invoking module $SCRIPT."
-		log "VERBOSE" "$SCRIPT"
+        . $SCRIPT
 	else
 		log "VERBOSE" "Module $SCRIPT is not executable."
 	fi
