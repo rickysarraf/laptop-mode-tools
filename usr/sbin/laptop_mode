@@ -13,7 +13,8 @@
 # Please consult the manual pages laptop-mode.conf(8) and laptop_mode(8) for
 # additional information.
 #
-# Maintainer:        Bart Samwel (bart@samwel.tk)
+# Maintainer:             Ritesh Raj Sarraf (rrs@researchut.com)
+# Original Author:        Bart Samwel (bart@samwel.tk)
 # Project home page: http://samwel.tk/laptop_mode
 #
 # Contributors to this script:   Bart Samwel
