@@ -141,21 +141,21 @@ if [ x$LOG_TO_SYSLOG = x1 ]; then
     # modules and logging
     #if [ -x $LOGGER -a "$1" != "STATUS" -a ! -z $2 ]; then
         if [ "$1" = "MSG" ]; then
-            logger -p daemon.info -t laptop-mode $2;
+            logger -p daemon.info -t laptop-mode "$2";
         elif [ "$1" = "ERR" ]; then
-            logger -p daemon.err -t laptop-mode $2;
+            logger -p daemon.err -t laptop-mode "$2";
         elif [ "$1" = "VERBOSE" ]; then
-            logger -p daemon.debug -t laptop-mode $2;
+            logger -p daemon.debug -t laptop-mode "$2";
         else
-            logger -p daemon.notice -t laptop-mode $2;
+            logger -p daemon.notice -t laptop-mode "$2";
         fi
     fi
 fi
 
 if [ "$1" = "VERBOSE" ]; then
-    $LM_VERBOSE &&  echo $2;
+    $LM_VERBOSE &&  echo "$2";
 else
-    echo $2;
+    echo "$2";
 fi
 }
 
