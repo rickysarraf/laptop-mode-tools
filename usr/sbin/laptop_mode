@@ -932,7 +932,7 @@ if [ -f /var/run/laptop-mode-tools/state ] ; then
 				if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 0 ] ; then
 					log "MSG" " (Data-loss sensitive features disabled.)"
 				fi
-                log "MSG" "\n"
+                #log "MSG" "\n"
 			else
 				log "MSG" "not active [unchanged]"
 			fi
@@ -949,7 +949,7 @@ if [ "$ACTIVATE" -eq 1 ] ; then
 	if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 0 ] ; then
 		log "MSG" " (Data-loss sensitive features disabled.)"
 	fi
-    log "MSG" "\n"
+    #log "MSG" "\n"
 else
 	log "MSG" "$STATE, not active"
 fi
