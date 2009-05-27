@@ -18,7 +18,6 @@ if [ x$CONTROL_ETHERNET = x1 ] ; then
 		# Wakeup-on-LAN handling
 		if [ x$DISABLE_WAKEUP_ON_LAN = x1 ] ; then
 			ret=`ethtool -s $DEVICE wol d 2>&1`
-			log "VERBOSE" "$ret"
 			if [ $ret ]; then			
 				log "VERBOSE" "Enabled wakeup-on-LAN for $DEVICE"
 			else

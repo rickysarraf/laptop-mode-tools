@@ -135,7 +135,11 @@ log ()
 # $1 should be msg type
 # $2 should be the real msg
 if [ x$LOG_TO_SYSLOG = x1 ]; then
-    if [ -x $LOGGER -a "$1" != "STATUS" ]; then
+    #if [ -x $LOGGER -a "$1" != "STATUS" ]; then
+    # NOTE: Remove the check on $2 being empty, once you are confident
+    # that there aren't any bugs in logging. And no bugs in executing 
+    # modules and logging
+    if [ -x $LOGGER -a "$1" != "STATUS" -a ! -z $2 ]; then
         if [ "$1" = "MSG" ]; then
             logger -p daemon.info -t laptop-mode $2;
         elif [ "$1" = "ERR" ]; then
@@ -932,7 +936,6 @@ if [ -f /var/run/laptop-mode-tools/state ] ; then
 				if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 0 ] ; then
 					log "MSG" " (Data-loss sensitive features disabled.)"
 				fi
-                log "MSG" "\n"
 			else
 				log "MSG" "not active [unchanged]"
 			fi
@@ -949,7 +952,6 @@ if [ "$ACTIVATE" -eq 1 ] ; then
 	if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 0 ] ; then
 		log "MSG" " (Data-loss sensitive features disabled.)"
 	fi
-    log "MSG" "\n"
 else
 	log "MSG" "$STATE, not active"
 fi
@@ -967,7 +969,7 @@ export FORCE STATE ON_AC ACTIVATE ACTIVATE_WITH_POSSIBLE_DATA_LOSS KLEVEL KMINOR
 for SCRIPT in /usr/share/laptop-mode-tools/modules/* /usr/local/lib/laptop-mode-tools/modules/* /usr/local/share/laptop-mode-tools/modules/* /etc/laptop-mode/modules/*; do
 	if [ -x "$SCRIPT" ] ; then
 		log "VERBOSE" "Invoking module $SCRIPT."
-		log "VERBOSE" "$SCRIPT"
+        . $SCRIPT
 	else
 		log "VERBOSE" "Module $SCRIPT is not executable."
 	fi
