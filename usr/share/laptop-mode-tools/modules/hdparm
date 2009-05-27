@@ -23,12 +23,10 @@ is_capable() {
 	if [ $HAVE_UDEVINFO -ne 0 ] ; then
 		log "VERBOSE" "Querying $1 media type using udevinfo: "
 		if [ -x /sbin/udevadm ]; then
-			eval "$(udevadm info -q env -n $1 2>> $_OUTPUT | egrep '(ID_TYPE=|ID_BUS=)' 2>&1 | tee -a $_OUTPUT)"
+			eval "$(udevadm info -q env -n $1 | egrep '(ID_TYPE=|ID_BUS=)' )"
 		else
-			eval "$(udevinfo -q env -n $1 2>> $_OUTPUT | egrep '(ID_TYPE=|ID_BUS=)' 2>&1 | tee -a $_OUTPUT)"
+			eval "$(udevinfo -q env -n $1 | egrep '(ID_TYPE=|ID_BUS=)' )"
 		fi
-		log "VERBOSE" "$_OUTPUT"
-		_OUTPUT=""
 		if [ -n "$ID_TYPE" -a -n "$ID_BUS" ] ; then
 			log "VERBOSE" "type '$ID_TYPE' on bus '$ID_BUS' detected"
 			MEDIA=$ID_TYPE
@@ -72,13 +70,11 @@ is_capable() {
 	if [ -z "$MEDIA" ] ; then
 		if [ "$HDPARM_AVAILABLE" = "1" ]; then
 			log "VERBOSE" "Querying $1 type using hdparm: "
-			if hdparm -I $1 2> $_OUTPUT | grep -q CD-ROM >> $_OUTPUT 2>&1 ; then
+			if hdparm -I $1 | grep -q CD-ROM ; then
 				MEDIA=cd
 			else
 				MEDIA=disk
 			fi
-			log "VERBOSE" "$_OUTPUT"
-			_OUTPUT=""
 			BUS=ata # or acts like it anyway, because hdparm supports it.
 			log "VERBOSE" "type '$MEDIA' on bus '$BUS' detected"
 		fi
