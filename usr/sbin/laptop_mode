@@ -135,11 +135,11 @@ log ()
 # $1 should be msg type
 # $2 should be the real msg
 if [ x$LOG_TO_SYSLOG = x1 ]; then
-    if [ -x $LOGGER -a "$1" != "STATUS" ]; then
+    #if [ -x $LOGGER -a "$1" != "STATUS" ]; then
     # NOTE: Add the check on $2 being empty, once you are confident
     # that there aren't any bugs in logging. And no bugs in executing 
     # modules and logging
-    #if [ -x $LOGGER -a "$1" != "STATUS" -a ! -z $2 ]; then
+    if [ -x $LOGGER -a "$1" != "STATUS" -a ! -z $2 ]; then
         if [ "$1" = "MSG" ]; then
             logger -p daemon.info -t laptop-mode "$2";
         elif [ "$1" = "ERR" ]; then
