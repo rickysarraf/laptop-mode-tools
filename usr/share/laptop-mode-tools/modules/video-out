@@ -7,13 +7,11 @@ do_xrandr () {
   	w -hs | while read -r USER TTY DISPLAY REMAINDER; do	
 	  	if [ "${DISPLAY#:}" != "$DISPLAY" ] ; then
 	  		# It's an X display.
-		  	if su $USER -c "xrandr --output $1 --$2" 2>> $_OUTPUT | grep -q display >> $_OUTPUT 2>&1 ; then
+		  	if su $USER -c "xrandr --output $1 --$2" | grep -q display ; then
 				log "VERBOSE" "Unable to set video output $1 to $2."
 			else 
 				log "VERBOSE" "Set video output $1 to $2"
 			fi
-			log "VERBOSE" "$_OUTPUT"
-			_OUTPUT=""
 		fi
         done
 }
