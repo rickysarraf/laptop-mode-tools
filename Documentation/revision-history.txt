@@ -9,6 +9,8 @@
     * Fix shell syntax error in laptop_mode. Fixes Debian Bug #528835
     * Add check with iwconfig when determining a ipw* based wirelss
       device. Fixes: LP #369113
+    * Explicitly commit messages to stdout/stderr. This way, user can filter
+      irrelevant messages.
 
 1.48 - 06 April 2009
     * Fix udevinfo calls. See Debian BTS #522043
