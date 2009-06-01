@@ -71,8 +71,8 @@ if [ x$CONTROL_START_STOP = x1 ] ; then
 	fi
 
 
-	log "MSG" "START_SERVICES = $START_SERVICES"
-	log "MSG" "STOP_SERVICES = $STOP_SERVICES"
+	log "VERBOSE" "START_SERVICES = $START_SERVICES"
+	log "VERBOSE" "STOP_SERVICES = $STOP_SERVICES"
 	if [ "$START_SERVICES" != "" -o "$STOP_SERVICES" != "" ] ; then
 		log "MSG" "Starting/stopping services"
 	
