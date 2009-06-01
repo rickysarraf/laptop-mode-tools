@@ -7,6 +7,8 @@
     * Handle Intel HDA powersaving in multiple modes
     * Add syslog logging functionality. Fixes LP #370005
     * Fix shell syntax error in laptop_mode. Fixes Debian Bug #528835
+    * Add check with iwconfig when determining a ipw* based wirelss
+      device. Fixes: LP #369113
 
 1.48 - 06 April 2009
     * Fix udevinfo calls. See Debian BTS #522043
