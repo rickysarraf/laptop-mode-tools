@@ -156,9 +156,12 @@ if [ x$LOG_TO_SYSLOG = x1 ]; then
 fi
 
 if [ "$1" = "VERBOSE" ]; then
-    $LM_VERBOSE &&  echo "$2";
+    $LM_VERBOSE &&  echo "$2" >/dev/fd/2;
+elif [ "$1" = "ERR" ]; then
+    echo "$2" >/dev/fd/2;
 else
-    echo "$2";
+    # Message of type MSG and STATUS can go to stdout.
+    echo "$2" >/dev/fd/1;
 fi
 }
 
