@@ -1,4 +1,4 @@
-1.49 - TBD
+1.49 - 03 June 2009
     * Update runlevel priority to 99. This is require to ensure that we
       start after hald. See LP #369807
     * Reload acpid on restart. Thanks Wido.
