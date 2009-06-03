@@ -1,4 +1,4 @@
-laptop-mode-tools (1.49-1) unstable; urgency=low
+laptop-mode-tools (1.49-1) unreleased; urgency=low
 
   * New Upstream Release 1.49:
     + Fix syntax error in laptop_mode. Closes: #528835.
@@ -13,9 +13,8 @@ laptop-mode-tools (1.49-1) unstable; urgency=low
     + Fix typo error in Wake-On-Lan module.
   * Handle Power Management Daemons to restart during package
     post-installation.
-  * DO NOT RELEASE. TEST RELEASE.
 
- -- Ritesh Raj Sarraf <rrs@researchut.com>  Sun, 24 May 2009 21:26:26 +0530
+ -- Ritesh Raj Sarraf <rrs@researchut.com>  Wed, 03 Jun 2009 19:19:33 +0530
 
 laptop-mode-tools (1.48-1) unstable; urgency=low
 
