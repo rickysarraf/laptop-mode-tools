@@ -3,6 +3,7 @@ Section: utils
 Priority: optional
 Maintainer: Ritesh Raj Sarraf <rrs@researchut.com>
 Homepage: http://www.samwel.tk/laptop_mode/
+Uploaders: Bart Samwel <bart@samwel.tk>
 DM-Upload-Allowed: yes
 Build-Depends: debhelper (>= 5)
 Standards-Version: 3.8.1
@@ -10,7 +11,7 @@ Standards-Version: 3.8.1
 Package: laptop-mode-tools
 Architecture: all
 Depends: lsb-base (>= 3.0-10), util-linux (>= 2.13), psmisc
-Recommends: acpid | apmd | pbbuttonsd | pmud, hdparm, sdparm, hal, ethtool, net-tools
+Recommends: acpid | apmd | pbbuttonsd | pmud, hdparm, sdparm, hal, ethtool, net-tools, wireless-tools
 Conflicts: noflushd
 Description: Scripts to spin down hard drive and save power
  Laptop mode is a Linux kernel feature that allows your laptop to save 

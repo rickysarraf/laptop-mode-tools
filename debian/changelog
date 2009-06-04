@@ -1,4 +1,4 @@
-laptop-mode-tools (1.49-1) unreleased; urgency=low
+laptop-mode-tools (1.49-1) unstable; urgency=low
 
   * New Upstream Release 1.49:
     + Fix syntax error in laptop_mode. Closes: #528835.
@@ -11,10 +11,14 @@ laptop-mode-tools (1.49-1) unreleased; urgency=low
       enough while its dependency daemon are starting. LP: #369807
     + Put a proper check for Hal Polling. Thanks Vincent Panel.
     + Fix typo error in Wake-On-Lan module.
+    + Add check on iwconfig to determine an ipw based wireless device.
+      Fixes: LP #369113
   * Handle Power Management Daemons to restart during package
     post-installation.
+  * Add wireless-tools under Recommends since laptop-mode-tools depends on
+    it for the wireless powersaving module.
 
- -- Ritesh Raj Sarraf <rrs@researchut.com>  Wed, 03 Jun 2009 19:19:33 +0530
+ -- Ritesh Raj Sarraf <rrs@researchut.com>  Thu, 04 Jun 2009 13:18:14 +0530
 
 laptop-mode-tools (1.48-1) unstable; urgency=low
 
