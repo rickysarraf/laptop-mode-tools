@@ -15,10 +15,14 @@ laptop-mode-tools (1.49-1) unstable; urgency=low
       Fixes: LP #369113
   * Handle Power Management Daemons to restart during package
     post-installation.
-  * Add wireless-tools under Recommends since laptop-mode-tools depends on
+  * debian/control
+    + Add wireless-tools under Recommends since laptop-mode-tools depends on
     it for the wireless powersaving module.
+    + Add Bart Samwel <bart@samwel.tk> to Uploaders.
+  * debian/rules
+    + Cleanup some commented lines.
 
- -- Ritesh Raj Sarraf <rrs@researchut.com>  Thu, 04 Jun 2009 13:18:14 +0530
+ -- Ritesh Raj Sarraf <rrs@researchut.com>  Thu, 04 Jun 2009 13:28:58 +0530
 
 laptop-mode-tools (1.48-1) unstable; urgency=low
 
