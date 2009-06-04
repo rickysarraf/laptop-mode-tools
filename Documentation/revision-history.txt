@@ -1,4 +1,4 @@
-1.49 - TBD
+1.49 - 03 June 2009
     * Update runlevel priority to 99. This is require to ensure that we
       start after hald. See LP #369807
     * Reload acpid on restart. Thanks Wido.
@@ -7,6 +7,10 @@
     * Handle Intel HDA powersaving in multiple modes
     * Add syslog logging functionality. Fixes LP #370005
     * Fix shell syntax error in laptop_mode. Fixes Debian Bug #528835
+    * Add check with iwconfig when determining a ipw* based wirelss
+      device. Fixes: LP #369113
+    * Explicitly commit messages to stdout/stderr. This way, user can filter
+      irrelevant messages.
 
 1.48 - 06 April 2009
     * Fix udevinfo calls. See Debian BTS #522043

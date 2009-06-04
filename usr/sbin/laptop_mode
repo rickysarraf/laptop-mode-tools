@@ -13,7 +13,8 @@
 # Please consult the manual pages laptop-mode.conf(8) and laptop_mode(8) for
 # additional information.
 #
-# Maintainer:        Bart Samwel (bart@samwel.tk)
+# Maintainer:             Ritesh Raj Sarraf (rrs@researchut.com)
+# Original Author:        Bart Samwel (bart@samwel.tk)
 # Project home page: http://samwel.tk/laptop_mode
 #
 # Contributors to this script:   Bart Samwel
@@ -34,7 +35,7 @@ set -a
 
 # The laptop mode tools version number. Extracted by the installer makefile
 # as well, so don't change the format!
-LMTVERSION=1.48
+LMTVERSION=1.49
 
 # This script is loaded from multiple scripts to set the config defaults
 # and to read the configuration on top of those. Only when the command is
@@ -155,9 +156,12 @@ if [ x$LOG_TO_SYSLOG = x1 ]; then
 fi
 
 if [ "$1" = "VERBOSE" ]; then
-    $LM_VERBOSE &&  echo "$2";
+    $LM_VERBOSE &&  echo "$2" >/dev/fd/2;
+elif [ "$1" = "ERR" ]; then
+    echo "$2" >/dev/fd/2;
 else
-    echo "$2";
+    # Message of type MSG and STATUS can go to stdout.
+    echo "$2" >/dev/fd/1;
 fi
 }
 
