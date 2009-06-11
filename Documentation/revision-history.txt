@@ -1,3 +1,10 @@
+1.50 - UNRELEASED
+    * Ship pm-utils hooks in /usr/lib/ and not in /etc/pm/
+      Distributions will always want to have customized settings in /etc
+      and default upstream settings in /usr/lib. See LP: #384875
+    * Fix incorrect explanation of Intel HDA Power Savings. See Debian
+      BTS: #532733
+
 1.49 - 03 June 2009
     * Update runlevel priority to 99. This is require to ensure that we
       start after hald. See LP #369807
