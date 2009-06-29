@@ -4,36 +4,76 @@
 #
 
 if [ x$CONTROL_USB_AUTOSUSPEND = x1 ] ; then
-	# We ALWAYS s
-	AUTOSUSPEND_TIMEOUT=2
-	if [ -f /sys/module/usbcore/parameters/autosuspend ]; then
-	    echo $AUTOSUSPEND_TIMEOUT > /sys/module/usbcore/parameters/autosuspend
-	    log "VERBOSE" "Enabling autosuspend mode for USBCORE Controller, with timeout $AUTOSUSPEND_TIMEOUT."
-	else
-	    log "VERBOSE" "Not enabling autosuspend mode for USBCORE Controller. Not Supported"
-	fi
-	if [ -d /sys/bus/usb/devices ]; then
-	    for usb_device in /sys/bus/usb/devices/*;
-	    do
-		usb_device=`basename $usb_device`;
-		if [ -f /sys/bus/usb/devices/$usb_device/power/autosuspend ]; then
-		    echo $AUTOSUSPEND_TIMEOUT > /sys/bus/usb/devices/$usb_device/power/autosuspend;
-		    log "VERBOSE" "Enabling auto suspend mode for usb device $usb_device."
-		else
-		    log "VERBOSE" "Not enabling auto suspend mode for usb device $usb_device"
-		fi
+    if [ $ON_AC -eq 1 ]; then
+        if [ "$ACTIVATE" -eq 1 ]; then
+            SUSPEND_USB_DEVICES="$LM_AC_SUSPEND_USB"
+        else
+            SUSPEND_USB_DEVICES="$NOLM_AC_SUSPEND_USB"
+        fi
+    else
+        SUSPEND_USB_DEVICES="$BATT_SUSPEND_USB"
+    fi
 
-		if [ -f /sys/bus/usb/devices/$usb_device/power/level ]; then
-		    echo "auto" > /sys/bus/usb/devices/$usb_device/power/level;
-		    log "VERBOSE" "Enabling auto power level for usb device $usb_device."
-		else
-		    log "VERBOSE" "Not enabling auto power level for usb device $usb_device"
-		fi
-	    done
-	else
-	    # This will rarely happen.
-	    log "VERBOSE" "There are no USB devices."
-	fi
+    if [ x$SUSPEND_USB_DEVICES = x1 ]; then
+	  if [ -f /sys/module/usbcore/parameters/autosuspend ]; then
+	      echo $AUTOSUSPEND_TIMEOUT > /sys/module/usbcore/parameters/autosuspend
+	      log "VERBOSE" "Enabling autosuspend mode for USBCORE Controller, with timeout $AUTOSUSPEND_TIMEOUT."
+	  else
+	      log "VERBOSE" "Not enabling autosuspend mode for USBCORE Controller. Not Supported"
+	  fi
+	  if [ -d /sys/bus/usb/devices ]; then
+	      for usb_device in /sys/bus/usb/devices/*;
+	      do
+		  usb_device=`basename $usb_device`;
+		  if [ -f /sys/bus/usb/devices/$usb_device/power/autosuspend ]; then
+		      echo $AUTOSUSPEND_TIMEOUT > /sys/bus/usb/devices/$usb_device/power/autosuspend;
+		      log "VERBOSE" "Enabling auto suspend mode for usb device $usb_device."
+		  else
+		      log "VERBOSE" "Not enabling auto suspend mode for usb device $usb_device"
+		  fi
+
+		  if [ -f /sys/bus/usb/devices/$usb_device/power/level ]; then
+		      echo "auto" > /sys/bus/usb/devices/$usb_device/power/level;
+		      log "VERBOSE" "Enabling auto power level for usb device $usb_device."
+		  else
+		      log "VERBOSE" "Not enabling auto power level for usb device $usb_device"
+		  fi
+	      done
+	  else
+	      # This will rarely happen.
+	      log "VERBOSE" "There are no USB devices."
+	  fi
+    else
+	  AUTOSUSPEND_TIMEOUT=0
+	  if [ -f /sys/module/usbcore/parameters/autosuspend ]; then
+	      echo $AUTOSUSPEND_TIMEOUT > /sys/module/usbcore/parameters/autosuspend
+	      log "VERBOSE" "Disabling autosuspend mode for USBCORE Controller, with timeout $AUTOSUSPEND_TIMEOUT."
+	  else
+	      log "VERBOSE" "Not disabling autosuspend mode for USBCORE Controller. Not Supported"
+	  fi
+	  if [ -d /sys/bus/usb/devices ]; then
+	      for usb_device in /sys/bus/usb/devices/*;
+	      do
+		  usb_device=`basename $usb_device`;
+		  if [ -f /sys/bus/usb/devices/$usb_device/power/autosuspend ]; then
+		      echo $AUTOSUSPEND_TIMEOUT > /sys/bus/usb/devices/$usb_device/power/autosuspend;
+		      log "VERBOSE" "Disabling auto suspend mode for usb device $usb_device."
+		  else
+		      log "VERBOSE" "Not disabling auto suspend mode for usb device $usb_device"
+		  fi
+
+		  if [ -f /sys/bus/usb/devices/$usb_device/power/level ]; then
+		      echo "on" > /sys/bus/usb/devices/$usb_device/power/level;
+		      log "VERBOSE" "Enabling ON power level for usb device $usb_device."
+		  else
+		      log "VERBOSE" "Not enabling ON power level for usb device $usb_device"
+		  fi
+	      done
+	  else
+	      # This will rarely happen.
+	      log "VERBOSE" "There are no USB devices."
+	  fi
+    fi
 else
     log "VERBOSE" "USB autosuspend is disabled."
 fi
