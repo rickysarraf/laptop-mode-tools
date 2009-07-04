@@ -934,9 +934,9 @@ log "VERBOSE" "Checking if desired state is different from current state."
 if [ -f /var/run/laptop-mode-tools/state ] ; then
 	read WAS_ACTIVE WAS_ON_AC WAS_ACTIVATE_WITH_POSSIBLE_DATA_LOSS WAS_STATE < /var/run/laptop-mode-tools/state
 	if [ "$WAS_STATE" != "" ] ; then
-		if [ "$WAS_ACTIVE" -eq "$ACTIVATE" -a "$WAS_ON_AC" -eq "$ON_AC" -a "$WAS_ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -a "$WAS_STATE" = "$STATE" -a "$FORCE" -eq 0 ] ; then
+		if [ "$WAS_ACTIVE" == "$ACTIVATE" -a "$WAS_ON_AC" == "$ON_AC" -a "$WAS_ACTIVATE_WITH_POSSIBLE_DATA_LOSS" == "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -a "$WAS_STATE" = "$STATE" -a "$FORCE" -eq 0 ] ; then
 			log "MSG" "$STATE, "
-			if [ "$WAS_ACTIVE" -eq 1 ] ; then
+			if [ "$WAS_ACTIVE" == 1 ] ; then
 				log "MSG" "active [unchanged]"
 				if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 0 ] ; then
 					log "MSG" " (Data-loss sensitive features disabled.)"
@@ -952,9 +952,9 @@ else
 fi
 echo "$ACTIVATE $ON_AC $ACTIVATE_WITH_POSSIBLE_DATA_LOSS $STATE" > /var/run/laptop-mode-tools/state
 
-if [ "$ACTIVATE" -eq 1 ] ; then
+if [ "$ACTIVATE" == 1 ] ; then
 	log "MSG" "$STATE, active"
-	if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 0 ] ; then
+	if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" == 0 ] ; then
 		log "MSG" " (Data-loss sensitive features disabled.)"
 	fi
 else

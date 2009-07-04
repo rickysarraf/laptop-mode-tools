@@ -249,7 +249,7 @@ if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 1 ] ; then
 			esac
 			if [ "$DO" -ne 0 ] ; then
 				log "VERBOSE" "Original options: $OPTS"
-				if [ "$WAS_ACTIVE" -eq 0 ] ; then
+				if [ "$WAS_ACTIVE" == 0 ] ; then
 					# Coming from inactive state: save last known mount options for the device.
 					log "VERBOSE" "Updating /var/run/laptop-mode-tools/nolm-mountopts." 
 					if [ -f /var/run/laptop-mode-tools/nolm-mountopts ] ; then 
@@ -380,7 +380,7 @@ else
 				# Retrieve original non-laptop mode mount options and restore them.
 				# If the file that stores them doesn't exist, then laptop mode
 				# has never been started.
-				if [ "$WAS_ACTIVE" -ne 0 -a -f /var/run/laptop-mode-tools/nolm-mountopts ] ; then						
+				if [ "$WAS_ACTIVE" != 0 -a -f /var/run/laptop-mode-tools/nolm-mountopts ] ; then						
 					SAVED_OPTS=`grep "^$DEV " /var/run/laptop-mode-tools/nolm-mountopts`
 					SAVED_OPTS=${SAVED_OPTS#* } # trim device name
 				
