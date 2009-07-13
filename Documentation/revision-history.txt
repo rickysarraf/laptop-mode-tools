@@ -11,6 +11,7 @@
       the weirdness of broken usb drivers. Fixes Debian Bug #535051
     * Do the test comparision of integeres using string operators. Fixes Debian
       Bug #535650
+    * Run pidof with the -x Script Mode switch. Thanks Matthijs Kooijman
 
 1.49 - 03 June 2009
     * Update runlevel priority to 99. This is require to ensure that we

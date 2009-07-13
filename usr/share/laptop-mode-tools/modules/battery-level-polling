@@ -11,7 +11,7 @@ if [ x$ENABLE_BATTERY_LEVEL_POLLING = x1 ] ; then
 		# In AC mode we disable the polling daemon.
 		killall -q lm-polling-daemon
 	else
-		if ! pidof lm-polling-daemon ; then
+		if ! pidof -x lm-polling-daemon ; then
 			log "VERBOSE" "On battery and there was no polling daemon yet, starting the polling daemon."
 			
 			# If there is no polling daemon, we start one.
