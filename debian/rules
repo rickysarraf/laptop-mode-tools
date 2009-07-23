@@ -51,7 +51,7 @@ install: build
 	install -m755 -d $(DESTDIR)/etc/apm/event.d
 	install -m755 -d $(DESTDIR)/etc/power/scripts.d
 	install -m755 -d $(DESTDIR)/etc/power/event.d
-	install -m755 -d $(DESTDIR)/etc/pm/sleep.d
+	install -m755 -d $(DESTDIR)/usr/lib/pm-utils/sleep.d
 	install -m755 -d $(DESTDIR)/etc/laptop-mode/batt-start
 	install -m755 -d $(DESTDIR)/etc/laptop-mode/batt-stop
 	install -m755 -d $(DESTDIR)/etc/laptop-mode/lm-ac-start
