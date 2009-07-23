@@ -29,7 +29,7 @@ if [ x$CONTROL_ETHERNET = x1 ] ; then
 		
 		# Determine speed
 		speed=`mii-tool -v $DEVICE | grep capabilities | tr ' ' '\n' | sort -n | sed -ne '/^1.*/p' | cut -d "b" -f1`
-        if [ -z $speed ]; then
+        if [ -z "$speed" ]; then
             speed=0;
         fi
 		max_s=0;
