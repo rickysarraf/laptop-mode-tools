@@ -194,7 +194,7 @@ else
 fi
 
 # Add a simple bash debug mode switch
-if [ "DEBUG" == 1 ]; then
+if [ "$DEBUG" == 1 ]; then
     set -vx;
 fi
 
