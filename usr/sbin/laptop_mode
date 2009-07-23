@@ -128,6 +128,16 @@ LM_AC_BRIGHTNESS_COMMAND=false
 NOLM_AC_BRIGHTNESS_COMMAND=false
 LOG_TO_SYSLOG=1
 
+checkint ()
+{
+    # $1 arg should be the string/integer
+    # that you want to check for as an integer.
+    echo $1 | grep "[^0-9]" > /dev/null 2>&1
+
+    return $?;
+    # Returns 1 if it is an integer
+}
+
 # Function to handle logging
 LOGGER=`which logger`;
 
