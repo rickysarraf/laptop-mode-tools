@@ -13,6 +13,7 @@
       Bug #535650
     * Run pidof with the -x Script Mode switch. Thanks Matthijs Kooijman
     * Disconnect descriptors when backgrounding a script. Thanks Matthijs Kooijman
+    * Add option to run in shell debug mode
 
 1.49 - 03 June 2009
     * Update runlevel priority to 99. This is require to ensure that we

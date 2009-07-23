@@ -193,6 +193,11 @@ else
 	exit 1
 fi
 
+# Add a simple bash debug mode switch
+if [ "DEBUG" == 1 ]; then
+    set -vx;
+fi
+
 # Support for old config settings
 if [ "$AC_HD" != "" ] ; then
 	AC_HD_WITHOUT_LM="$AC_HD"
