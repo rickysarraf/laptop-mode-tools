@@ -183,7 +183,7 @@ fi
 # Install pm-utils hook only if pm-utils config dir is present, or force the
 # install if we have a DESTDIR.
 if [ -n "$DESTDIR" -o -d "$DESTDIR/usr/lib/pm-utils/sleep.d" ] ; then
-	if ( ! $INSTALL -D -m 755 usr/lib/pm-utils/sleep.d/99laptop-mode "$DESTDIR/usr/lib/pm-utils/sleep.d" ) ; then
+	if ( ! $INSTALL -D -m 755 usr/lib/pm-utils/sleep.d/99laptop-mode "$DESTDIR/usr/lib/pm-utils/sleep.d/99laptop-mode" ) ; then
 		echo "$0: Failed to install 99-laptop-mode into /usr/lib/pm-utils/sleep.d. Installation failed."
 		exit 36
 	fi
