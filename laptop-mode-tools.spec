@@ -12,7 +12,7 @@ Vendor: Laptop Mode Tools Developers
 Distribution: RPM Based distributions
 Packager: Ritesh Raj Sarraf <rrs@researchut.com>
 
-Source: http://www.samwel.tk/laptop_mode/tools/downloads/laptop-mode-tools-%{version}.tar.gz
+Source: http://www.samwel.tk/laptop_mode/tools/downloads/laptop-mode-tools_%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildArch: noarch
@@ -33,7 +33,7 @@ addition, it provides a set of modules which allow you to apply
 various other power savings.
 
 %prep
-%setup
+%setup -n %{name}_%{version}
 
 %build
 
