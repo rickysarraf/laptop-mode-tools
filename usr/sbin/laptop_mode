@@ -35,7 +35,7 @@ set -a
 
 # The laptop mode tools version number. Extracted by the installer makefile
 # as well, so don't change the format!
-LMTVERSION=1.49
+LMTVERSION=1.50
 
 # This script is loaded from multiple scripts to set the config defaults
 # and to read the configuration on top of those. Only when the command is
@@ -128,6 +128,16 @@ LM_AC_BRIGHTNESS_COMMAND=false
 NOLM_AC_BRIGHTNESS_COMMAND=false
 LOG_TO_SYSLOG=1
 
+checkint ()
+{
+    # $1 arg should be the string/integer
+    # that you want to check for as an integer.
+    echo $1 | grep "[^0-9]" > /dev/null 2>&1
+
+    return $?;
+    # Returns 1 if it is an integer
+}
+
 # Function to handle logging
 LOGGER=`which logger`;
 
@@ -191,6 +201,11 @@ if [ -r /etc/laptop-mode/laptop-mode.conf ] ; then
 else
 	log "ERR" "$0: Configuration file /etc/laptop-mode/laptop-mode.conf not present or not readable."
 	exit 1
+fi
+
+# Add a simple bash debug mode switch
+if [ "$DEBUG" -eq 1 ]; then
+    set -vx;
 fi
 
 # Support for old config settings
@@ -463,7 +478,6 @@ if [ "$1" = "--version" ] ; then
 	log "MSG" "Laptop Mode Tools $LMTVERSION"
 	exit 0
 fi
-log "MSG" "Laptop Mode Tools $LMTVERSION"
 
 if [ ! -e /proc/sys/vm/laptop_mode ] ; then
 	log "ERR" "Kernel does not have support for laptop mode. Please apply the laptop mode"

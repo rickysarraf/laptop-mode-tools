@@ -209,6 +209,11 @@ while [ $SECONDS_DONE -le $PROFILE_RUN_LENGTH ] ; do
 done
 printf '\r                                                    \r'
 stop_profiling
+
+echo "Write frequency : "; cat $WORKDIR/write_accesses_* | sed -e 's/^[ \t]*//;s/[ \t]*$//' -e '/^$/ d'  | sort | uniq -c | sort -n
+echo "Read frequency : "; cat $WORKDIR/read_accesses_* | sed -e 's/^[ \t]*//;s/[ \t]*$//' -e '/^$/ d'  | sort | uniq -c | sort -n
+echo;
+
 NETPROFILE=`profilenet`
 echo "Profiling run completed."
 
