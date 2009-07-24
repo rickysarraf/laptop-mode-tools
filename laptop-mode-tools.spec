@@ -8,12 +8,20 @@ Release: 1
 License: GPL
 Group: System Environment/Base
 URL: http://www.samwel.tk/laptop_mode
+Vendor: Laptop Mode Tools Developers
+Distribution: RPM Based distributions
+Packager: Ritesh Raj Sarraf <rrs@researchut.com>
 
-Source: http://www.samwel.tk/laptop_mode/tools/downloads/laptop-mode-tools_%{version}.tar.gz
+Source: http://www.samwel.tk/laptop_mode/tools/downloads/laptop-mode-tools-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildArch: noarch
-Requires: acpid
+Requires: acpid 
+Requires: lsb-base
+Requires: psmisc
+Requires: util-linux
+%{?with_suggest_tags:Suggests: hal}
+%{?with_suggest_tags:Suggests: ethtool}
 
 %description
 Laptop mode is a Linux kernel feature that allows your laptop to save
@@ -81,6 +89,7 @@ fi
 %dir %{_sysconfdir}/acpi/events
 %dir %{_sysconfdir}/acpi/actions
 %dir %{_usr}/sbin
+%dir %{_usr}/lib/pm-utils/sleep.d
 %dir %{_usr}/share/laptop-mode-tools/modules
 %dir %{_usr}/share/laptop-mode-tools/module-helpers/*
 %dir %{_sysconfdir}/apm/event.d
