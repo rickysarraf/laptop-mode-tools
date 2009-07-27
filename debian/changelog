@@ -4,25 +4,22 @@ laptop-mode-tools (1.50-1) unstable; urgency=low
     + Ship pm-utils hooks in /usr/lib/ and not in /etc/pm/
       Distributions will always want to have customized settings in /etc
       and default upstream settings in /usr/lib. See LP: #384875
-    + Fix incorrect explanation of Intel HDA Power Savings. See Debian
-      BTS: #532733.
-      Closes: #532733.
+    + Fix incorrect explanation of Intel HDA Power Savings. Closes: #532733.
     + Don't clutter screen with print messages.
-    + Add patch from Mulyadi Santosa that adds ability to lm-profiler to show
-      read/write frequency of each collected program. Thank you.
-    + Enhance usb-autosuspend module to be executed under conditions. Also explain
-      the weirdness of broken usb drivers. Fixes Debian Bug #535051
-      Closes: # 535051
-    + Do the test comparision of integeres using string operators. Fixes Debian
-      Bug #535650
+    + Add patch from Mulyadi Santosa that adds ability to lm-profiler to
+      show read/write frequency of each collected program. Thank you.
+    + Enhance usb-autosuspend module to be executed under conditions. Also
+      explain the weirdness of broken usb drivers. Closes: # 535051
+    + Do the test comparision of integeres using string operators.
       Closes: #535650.
     + Run pidof with the -x Script Mode switch. Thanks Matthijs Kooijman
-    + Disconnect descriptors when backgrounding a script. Thanks Matthijs Kooijman
+    + Disconnect descriptors when backgrounding a script. Thanks Matthijs
+      Kooijman
     + Add option to run in shell debug mode
     + Add a spec file to generate an RPM package
   * Update Standards Version to 3.8.2 (No Changes Required) 
 
- -- Ritesh Raj Sarraf <rrs@researchut.com>  Mon, 27 Jul 2009 16:44:56 +0530
+ -- Ritesh Raj Sarraf <rrs@researchut.com>  Mon, 27 Jul 2009 16:48:56 +0530
 
 laptop-mode-tools (1.49-1) unstable; urgency=low
 
