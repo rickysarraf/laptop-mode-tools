@@ -11,7 +11,7 @@ blacklisted() {
 		vendor=$(echo $usbid | cut -d: -f1)
 		product=$(echo $usbid | cut -d: -f2)
 		grep -qi $vendor $1/idVendor 2>/dev/null\
-		 || grep -qi $product $1/idProduct 2>/dev/null\
+		 && grep -qi $product $1/idProduct 2>/dev/null\
 		 && return 0
 	done
 	return 1
