@@ -1,3 +1,10 @@
+laptop-mode-tools (1.51-1) unstable; urgency=low
+
+  * Change one line description since laptop-mode-tools does more than what
+    the old description had 
+
+ -- Ritesh Raj Sarraf <rrs@researchut.com>  Mon, 03 Aug 2009 11:08:37 +0530
+
 laptop-mode-tools (1.50-1) unstable; urgency=low
 
   * New Upstream Release 1.50:

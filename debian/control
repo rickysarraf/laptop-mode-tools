@@ -13,7 +13,7 @@ Architecture: all
 Depends: lsb-base (>= 3.0-10), util-linux (>= 2.13), psmisc
 Recommends: acpid | apmd | pbbuttonsd | pmud, hdparm, sdparm, hal, ethtool, net-tools, wireless-tools
 Conflicts: noflushd
-Description: Scripts to spin down hard drive and save power
+Description: Tools for Power Savings based on battery/AC status
  Laptop mode is a Linux kernel feature that allows your laptop to save 
  considerable power, by allowing the hard drive to spin down for longer 
  periods of time. This package contains the userland scripts that are 
