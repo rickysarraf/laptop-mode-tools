@@ -1,0 +1,21 @@
+#! /bin/sh
+
+if [ x$SUPERHE_CONTROL_FILE = x ]; then
+    SUPERHE_CONTROL_FILE=/sys/devices/platform/eeepc/cpufv
+    log "VERBOSE" "Control file is $SUPERHE_CONTROL_FILE"
+fi
+
+if [ x$CONTROL_SUPERHE = x1 ]; then
+    if [ $ON_AC -eq 1 ]; then
+        if [ $ACTIVATE -eq 1 ]; then
+            SUPERHE_VALUE="$LM_AC_SUPERHE"
+        else
+            SUPERHE_VALUE="$NOLM_AC_SUPERHE"
+        fi
+    else
+        SUPERHE_VALUE="$BATT_SUPERHE"
+    fi
+    echo $SUPERHE_VALUE > $SUPERHE_CONTROL_FILE
+    log "VERBOSE" "SuperHe triggered with value $SUPERHE_VALUE"
+fi
+
