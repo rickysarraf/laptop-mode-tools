@@ -36,8 +36,8 @@ if [ x$CONTROL_IWL_POWER = x1 ] ; then
 	log "VERBOSE" "Setting power levels for iwlwifi wireless interfaces."
 
 	# Provide defaults for config file settings
-	[ "$IWL_AC_POWER" ]   || IWL_AC_POWER=6
-	[ "$IWL_BATT_POWER" ] || IWL_BATT_POWER=7
+	[ "$IWL_AC_POWER" ]   || IWL_AC_POWER=0
+	[ "$IWL_BATT_POWER" ] || IWL_BATT_POWER=3
 
 	WIFI_IFNAMES=""
 	[ -d /sys/module/iwl3945 ] && findWifiIfsByDriver iwl3945
