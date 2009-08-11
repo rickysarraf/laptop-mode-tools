@@ -1,9 +1,10 @@
 laptop-mode-tools (1.51-1) unstable; urgency=low
 
   * Change one line description since laptop-mode-tools does more than what
-    the old description had 
+    the old description had
+  * Update debian/watch file to scan the correct link
 
- -- Ritesh Raj Sarraf <rrs@researchut.com>  Mon, 03 Aug 2009 11:08:37 +0530
+ -- Ritesh Raj Sarraf <rrs@researchut.com>  Tue, 11 Aug 2009 13:53:02 +0530
 
 laptop-mode-tools (1.50-1) unstable; urgency=low
 
