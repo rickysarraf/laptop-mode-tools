@@ -2,9 +2,12 @@ laptop-mode-tools (1.51-1) unstable; urgency=low
 
   * Change one line description since laptop-mode-tools does more than what
     the old description had
-  * Update debian/watch file to scan the correct link
+  * debian/watch
+    + Scan for the correct link in watch file.
+  * debian/control
+    + Add Recommends for pm-utils. Closes: #541447
 
- -- Ritesh Raj Sarraf <rrs@researchut.com>  Tue, 11 Aug 2009 13:53:02 +0530
+ -- Ritesh Raj Sarraf <rrs@researchut.com>  Fri, 14 Aug 2009 17:14:22 +0530
 
 laptop-mode-tools (1.50-1) unstable; urgency=low
 

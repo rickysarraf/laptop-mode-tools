@@ -11,7 +11,7 @@ Standards-Version: 3.8.2
 Package: laptop-mode-tools
 Architecture: all
 Depends: lsb-base (>= 3.0-10), util-linux (>= 2.13), psmisc
-Recommends: acpid | apmd | pbbuttonsd | pmud, hdparm, sdparm, hal, ethtool, net-tools, wireless-tools
+Recommends: acpid | apmd | pbbuttonsd | pmud, hdparm, sdparm, hal, ethtool, net-tools, wireless-tools, pm-utils
 Conflicts: noflushd
 Description: Tools for Power Savings based on battery/AC status
  Laptop mode is a Linux kernel feature that allows your laptop to save 
@@ -22,5 +22,8 @@ Description: Tools for Power Savings based on battery/AC status
  supports various other power management features, such as starting and 
  stopping daemons depending on power mode, automatically hibernating if 
  battery levels are too low, and adjusting terminal blanking and X11
- screen blanking.
+ screen blanking
+ .
+ laptop-mode-tools uses the Linux kernel's Laptop Mode feature and thus
+ is also used on Desktops and Servers to conserve power
 
