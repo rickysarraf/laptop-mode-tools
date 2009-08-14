@@ -5,6 +5,8 @@
     * Add support for EeePC FSB Control. Thanks to James Rayner
     * Update iwlwifi power modes. Thanks to Clemens Buchacher
       See Debian BTS: #540639
+    * Use the standard pm-hibernate script from pm-utils for hibernation
+      See Debian BTS: #541447
 
 1.50 - 24 July 2009
     * Ship pm-utils hooks in /usr/lib/ and not in /etc/pm/
