@@ -12,6 +12,8 @@
       See Debian BTS: #541447
     * Check if wireless device is disabled before attempting to power configure it
       Thanks to Clemens Buchacher. See Debian BTS: #541997
+    * On speed change, an ethernet device can lose connectivity. Document that in
+      the config file
 
 1.50 - 24 July 2009
     * Ship pm-utils hooks in /usr/lib/ and not in /etc/pm/
