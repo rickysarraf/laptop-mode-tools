@@ -11,7 +11,7 @@ if [ x$CONTROL_AC97_POWER = x1 ] ; then
                         # This can fail if the audio device is busy.
                         # Since this failure is non-fatal (worst case is that the timer changes
                         # don't get activated), we don't bother if it was successful or not
-                        echo 1 > /dev/dsp;
+                        (exec 2>/dev/null; echo 1 > /dev/dsp;)
                         log "VERBOSE" "Initialize timer change by close/open /dev/dsp"
                 fi
 	else
