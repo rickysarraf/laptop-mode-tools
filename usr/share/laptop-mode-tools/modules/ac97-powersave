@@ -7,10 +7,13 @@ if [ x$CONTROL_AC97_POWER = x1 ] ; then
 	if [ -w /sys/module/snd_ac97_codec/parameters/power_save ]; then
 		echo 1 > /sys/module/snd_ac97_codec/parameters/power_save
 		log "VERBOSE" "AC97 power save mode enabled."
-        if [ -c /dev/dsp ]; then
-            echo 1 > /dev/dsp;
-            log "VERBOSE" "Initialize timer change by close/open /dev/dsp"
-        fi
+                if [ -c /dev/dsp ]; then
+                        # This can fail if the audio device is busy.
+                        # Since this failure is non-fatal (worst case is that the timer changes
+                        # don't get activated), we don't bother if it was successful or not
+                        echo 1 > /dev/dsp;
+                        log "VERBOSE" "Initialize timer change by close/open /dev/dsp"
+                fi
 	else
 		log "VERBOSE" "AC97 power saving is not available. Perhaps CONFIG_SND_AC97_POWER_SAVE option"
 		log "VERBOSE" "is not set in the kernel config, or the snd_ac97_codec module is not loaded."
