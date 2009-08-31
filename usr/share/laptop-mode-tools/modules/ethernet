@@ -18,7 +18,7 @@ if [ x$CONTROL_ETHERNET = x1 ] ; then
 		# Wakeup-on-LAN handling
 		if [ x$DISABLE_WAKEUP_ON_LAN = x1 ] ; then
 			ret=`ethtool -s $DEVICE wol d 2>&1`
-            exit_status=$?;
+                        exit_status=$?;
 			log "VERBOSE" "$ret"
 			if [ $exit_status -eq 0 ]; then			
 				log "VERBOSE" "Enabled wakeup-on-LAN for $DEVICE"
@@ -28,10 +28,11 @@ if [ x$CONTROL_ETHERNET = x1 ] ; then
 		fi
 		
 		# Determine speed
-		speed=`mii-tool -v $DEVICE | grep capabilities | tr ' ' '\n' | sort -n | sed -ne '/^1.*/p' | cut -d "b" -f1`
-        if [ -z "$speed" ]; then
-            speed=0;
-        fi
+		speed=`mii-tool -v $DEVICE | grep capabilities | tr ' ' '\n' |\
+                        sort -n | sed -ne '/^1.*/p' | cut -d "b" -f1`
+                if [ -z "$speed" ]; then
+                        speed=0;
+                fi
 		max_s=0;
 		min_s=100000;
 		for s in $speed;
@@ -58,8 +59,8 @@ if [ x$CONTROL_ETHERNET = x1 ] ; then
 		if [ x$THROTTLE_ETHERNET = x1 ] ; then
 			# Handle auto-negotiation
 			ret=`ethtool -s $DEVICE autoneg off 2>&1`
-            exit_status=$?;
-            log "VERBOSE" "$ret";
+                        exit_status=$?;
+                        log "VERBOSE" "$ret";
 			if [ $exit_status -eq 0 ]; then
 				log "VERBOSE" "Switched auto-negotiation to off for $DEVICE"
 			else
@@ -68,8 +69,8 @@ if [ x$CONTROL_ETHERNET = x1 ] ; then
 
 			# Handle Speed Throttling
 			ret=`ethtool -s $DEVICE speed $THROTTLE_SPEED 2>&1`
-            exit_status=$?;
-            log "VERBOSE" "$ret";
+                        exit_status=$?;
+                        log "VERBOSE" "$ret";
 			if [ $exit_status -eq 0 ]; then
 				log "VERBOSE" "Throttled speed to $THROTTLE_SPEED Mbit for $DEVICE"
 			else
@@ -78,8 +79,8 @@ if [ x$CONTROL_ETHERNET = x1 ] ; then
 		else
 			# Handle auto-negotiation
 			ret=`ethtool -s $DEVICE autoneg on 2>&1`
-            exit_status=$?;
-            log "VERBOSE" "$ret";
+                        exit_status=$?;
+                        log "VERBOSE" "$ret";
 			if [ $exit_status -eq 0 ]; then
 				log "VERBOSE" "Switched auto-negotiation to on for $DEVICE"
 			else
@@ -88,8 +89,8 @@ if [ x$CONTROL_ETHERNET = x1 ] ; then
 
 			# Handle Speed Throttling
 			ret=`ethtool -s $DEVICE speed $MAX_SPEED 2>&1`
-            exit_status=$?;
-            log "VERBOSE" "$ret";
+                        exit_status=$?;
+                        log "VERBOSE" "$ret";
 			if [ $exit_status -eq 0 ]; then
 				log "VERBOSE" "Restored speed to $MAX_SPEED Mbit for $DEVICE"
 			else
