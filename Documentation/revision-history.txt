@@ -1,3 +1,7 @@
+1.52 - TBD
+    * Initialize DEBUG to 0 by default. THanks to Matthijs Kooijman for pointing
+      it out.
+
 1.51 - Tue Sep  1 20:48:29 IST 2009
     * Add option to blacklist usb devices by their device id.
       Thanks to ich@phuk.ath.cx for the patch
