@@ -1,4 +1,4 @@
-1.51 - TBD
+1.51 - Tue Sep  1 20:48:29 IST 2009
     * Add option to blacklist usb devices by their device id.
       Thanks to ich@phuk.ath.cx for the patch
     * Trigger timer change for power mgmt by doing a device open/close
