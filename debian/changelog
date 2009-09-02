@@ -1,13 +1,35 @@
 laptop-mode-tools (1.51-1) unstable; urgency=low
 
-  * Change one line description since laptop-mode-tools does more than what
-    the old description had
+  * New Upstream Release
+    + Add option to blacklist usb devices by their device id.
+      Thanks to ich@phuk.ath.cx for the patch
+    + Trigger timer change for power mgmt by doing a device open/close
+      The open/close operation can fail if the audio device is busy.
+      Since this failure is non-fatal (worst case is that the timer changes
+      don't get activated), we don't bother if it was successful or not.
+    + Add support for EeePC FSB Control. Thanks to James Rayner
+    + Update iwlwifi power modes. Thanks to Clemens Buchacher
+      (Closes: #540639)
+    + Use the standard pm-hibernate script from pm-utils for hibernation
+      (Closes: #541447)
+    + Check if wireless device is disabled before attempting to power configure it
+      Thanks to Clemens Buchacher. (Closes: #541997)
+    + On speed change, an ethernet device can lose connectivity. Document that in
+      the config file
   * debian/watch
     + Scan for the correct link in watch file.
   * debian/control
     + Add Recommends for pm-utils. Closes: #541447
+    + Format the description
+    + Update Standards Version to 3.8.3 (No changes required)
+  * debian/rules
+    + Add a get-orig-source target. It can fetch the relevant source tarball
+      parsing the changelog
+  * Change one line description since laptop-mode-tools does more than what
+    the old description had
+  * Add a README.source file explaining on how to get the source
 
- -- Ritesh Raj Sarraf <rrs@researchut.com>  Fri, 14 Aug 2009 17:14:22 +0530
+ -- Ritesh Raj Sarraf <rrs@researchut.com>  Wed, 02 Sep 2009 15:26:01 +0530
 
 laptop-mode-tools (1.50-1) unstable; urgency=low
 
