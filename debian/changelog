@@ -12,10 +12,10 @@ laptop-mode-tools (1.51-1) unstable; urgency=low
       (Closes: #540639)
     + Use the standard pm-hibernate script from pm-utils for hibernation
       (Closes: #541447)
-    + Check if wireless device is disabled before attempting to power configure it
-      Thanks to Clemens Buchacher. (Closes: #541997)
-    + On speed change, an ethernet device can lose connectivity. Document that in
-      the config file
+    + Check if wireless device is disabled before attempting to power
+      configure it. Thanks to Clemens Buchacher. (Closes: #541997)
+    + On speed change, an ethernet device can lose connectivity. Document
+      that in the config file.
   * debian/watch
     + Scan for the correct link in watch file.
   * debian/control
@@ -29,7 +29,7 @@ laptop-mode-tools (1.51-1) unstable; urgency=low
     the old description had
   * Add a README.source file explaining on how to get the source
 
- -- Ritesh Raj Sarraf <rrs@researchut.com>  Wed, 02 Sep 2009 15:26:01 +0530
+ -- Ritesh Raj Sarraf <rrs@researchut.com>  Wed, 02 Sep 2009 15:31:19 +0530
 
 laptop-mode-tools (1.50-1) unstable; urgency=low
 
