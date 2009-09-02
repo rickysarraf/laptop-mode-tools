@@ -3,6 +3,20 @@
 # Laptop mode tools module: usb-autosuspend.
 #
 
+blacklisted() {
+	for usbid in $AUTOSUSPEND_USBID_BLACKLIST; do
+		if ! echo $usbid | grep -q ':'; then
+			log "MSG" "WARNING: Invalid entry \"$usbid\" in AUTOSUSPEND_USBID_BLACKLIST."
+		fi
+		vendor=$(echo $usbid | cut -d: -f1)
+		product=$(echo $usbid | cut -d: -f2)
+		grep -qi $vendor $1/idVendor 2>/dev/null\
+		 && grep -qi $product $1/idProduct 2>/dev/null\
+		 && return 0
+	done
+	return 1
+}
+
 if [ x$CONTROL_USB_AUTOSUSPEND = x1 ] ; then
     if [ $ON_AC -eq 1 ]; then
         if [ "$ACTIVATE" -eq 1 ]; then
@@ -25,18 +39,22 @@ if [ x$CONTROL_USB_AUTOSUSPEND = x1 ] ; then
 	      for usb_device in /sys/bus/usb/devices/*;
 	      do
 		  usb_device=`basename $usb_device`;
-		  if [ -f /sys/bus/usb/devices/$usb_device/power/autosuspend ]; then
-		      echo $AUTOSUSPEND_TIMEOUT > /sys/bus/usb/devices/$usb_device/power/autosuspend;
-		      log "VERBOSE" "Enabling auto suspend mode for usb device $usb_device."
-		  else
-		      log "VERBOSE" "Not enabling auto suspend mode for usb device $usb_device"
-		  fi
+		  if ! blacklisted /sys/bus/usb/devices/$usb_device; then
+			  if [ -f /sys/bus/usb/devices/$usb_device/power/autosuspend ]; then
+				  echo $AUTOSUSPEND_TIMEOUT > /sys/bus/usb/devices/$usb_device/power/autosuspend;
+				  log "VERBOSE" "Enabling auto suspend mode for usb device $usb_device."
+			  else
+				  log "VERBOSE" "Not enabling auto suspend mode for usb device $usb_device"
+			  fi
 
-		  if [ -f /sys/bus/usb/devices/$usb_device/power/level ]; then
-		      echo "auto" > /sys/bus/usb/devices/$usb_device/power/level;
-		      log "VERBOSE" "Enabling auto power level for usb device $usb_device."
+			  if [ -f /sys/bus/usb/devices/$usb_device/power/level ]; then
+				  echo "auto" > /sys/bus/usb/devices/$usb_device/power/level;
+				  log "VERBOSE" "Enabling auto power level for usb device $usb_device."
+			  else
+				  log "VERBOSE" "Not enabling auto power level for usb device $usb_device"
+			  fi
 		  else
-		      log "VERBOSE" "Not enabling auto power level for usb device $usb_device"
+			  log "VERBOSE" "USB device $usbid is in the autosuspend blacklist."
 		  fi
 	      done
 	  else

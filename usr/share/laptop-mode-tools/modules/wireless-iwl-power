@@ -16,6 +16,7 @@
 findWifiIfsByDriver () {
 	local DEVICE;
 	local LINK_TARGET;
+	local ENABLED;
 
 	for DEVICE in /sys/class/net/*; do
 		if [ -d $DEVICE/wireless -a -h $DEVICE/device/driver ]; then
@@ -23,10 +24,13 @@ findWifiIfsByDriver () {
 			# the driver.
 			LINK_TARGET=`readlink $DEVICE/device/driver`
 			LINK_TARGET=${LINK_TARGET##*/}
+			ENABLED=`cat $DEVICE/device/enable` 
 			
-			if [ "$LINK_TARGET" = "$1" ] ; then
+			if [ $ENABLED -eq 1 -a "$LINK_TARGET" = "$1" ] ; then
 				# add the interface name to the list
 				WIFI_IFNAMES="$WIFI_IFNAMES ${DEVICE##*/}"
+                        else
+                                log "VERBOSE" "$DEVICE doesn't seem to be enabled. Radio Switched off?";
 			fi
 		fi
 	done
@@ -36,8 +40,8 @@ if [ x$CONTROL_IWL_POWER = x1 ] ; then
 	log "VERBOSE" "Setting power levels for iwlwifi wireless interfaces."
 
 	# Provide defaults for config file settings
-	[ "$IWL_AC_POWER" ]   || IWL_AC_POWER=6
-	[ "$IWL_BATT_POWER" ] || IWL_BATT_POWER=7
+	[ "$IWL_AC_POWER" ]   || IWL_AC_POWER=0
+	[ "$IWL_BATT_POWER" ] || IWL_BATT_POWER=3
 
 	WIFI_IFNAMES=""
 	[ -d /sys/module/iwl3945 ] && findWifiIfsByDriver iwl3945

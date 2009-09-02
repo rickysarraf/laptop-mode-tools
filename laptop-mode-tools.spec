@@ -3,7 +3,7 @@
 
 Summary: Tools for power savings based on battery/AC status
 Name: laptop-mode-tools
-Version: 1.50
+Version: 1.51
 Release: 1
 License: GPL
 Group: System Environment/Base
@@ -16,12 +16,6 @@ Source: http://www.samwel.tk/laptop_mode/tools/downloads/laptop-mode-tools_%{ver
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildArch: noarch
-Requires: acpid 
-Requires: lsb-base
-Requires: psmisc
-Requires: util-linux
-%{?with_suggest_tags:Suggests: hal}
-%{?with_suggest_tags:Suggests: ethtool}
 
 %description
 Laptop mode is a Linux kernel feature that allows your laptop to save
@@ -98,6 +92,9 @@ fi
 
 
 %changelog
+* Tue Sep  1 20:53:28 IST 2009 Ritesh Raj Sarraf <rrs@researchut.com> - 1.51-1
+- Updated to release 1.51.
+
 * Fri Jul 24 2009 Ritesh Raj Sarraf <rrs@researchut.com> - 1.50-1
 - Updated to release 1.50.
 

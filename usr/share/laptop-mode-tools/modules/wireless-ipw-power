@@ -60,6 +60,7 @@ if [ x$CONTROL_IPW_POWER = x1 ] ; then
 	findWifiIfsByDriver() {
 		local DEVICE;
 		local LINK_TARGET;
+                local ENABLED;
 		WIFI_IFNAMES=""
 
 		for DEVICE in /sys/class/net/*; do
@@ -68,10 +69,13 @@ if [ x$CONTROL_IPW_POWER = x1 ] ; then
 				# the driver.
 				LINK_TARGET=`readlink $DEVICE/device/driver`
 				LINK_TARGET=${LINK_TARGET##*/}
+                                ENABLED=`cat $DEVICE/device/enable`
 
-				if [ "$LINK_TARGET" = "$1" ]; then
+				if [ $ENABLED -eq 1 -a "$LINK_TARGET" = "$1" ]; then
 					# add the interface name to the list
-		    		WIFI_IFNAMES="$WIFI_IFNAMES ${DEVICE##*/}"
+		    		        WIFI_IFNAMES="$WIFI_IFNAMES ${DEVICE##*/}"
+                                else
+                                        log "VERBOSE" "$DEVICE doesn't seem to be enabled. Radio Switched off?";
 				fi
             else
                 # LP: #369113
