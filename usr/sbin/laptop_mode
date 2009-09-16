@@ -194,7 +194,7 @@ if [ -d /etc/laptop-mode/conf.d ] ; then
 			. "$CONF"
                         #Handle individual module debug settings
                         if [ "$DEBUG" -eq 1 ]; then
-                                export $(basename $CONF | cut -d . -f1 | tr "[:lower:]" "[:upper:]" | sed 's/-/_/')_DEBUG=1
+                                export $(basename $CONF | cut -d . -f1 | tr "[:lower:]" "[:upper:]" | sed 's/-/_/g')_DEBUG=1
                                 log "VERBOSE" "Enabling debug mode for module $CONF"
                         fi
                         DEBUG=0
