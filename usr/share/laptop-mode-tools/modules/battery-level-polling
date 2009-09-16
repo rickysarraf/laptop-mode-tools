@@ -3,6 +3,11 @@
 # Laptop mode tools module: Battery level polling.
 #
 
+# Check if debug is enabled
+if [ x$(($(basename $SCRIPT | cut -d . -f1 | tr "[:lower:]" "[:upper:]" | sed 's/-/_/')_DEBUG)) = x1 ]; then
+        set -vx
+fi
+
 if [ x$ENABLE_BATTERY_LEVEL_POLLING = x1 ] ; then
 	log "VERBOSE" "Battery level polling is enabled."
 	if [ x$ON_AC = x1 ] ; then
@@ -20,4 +25,9 @@ if [ x$ENABLE_BATTERY_LEVEL_POLLING = x1 ] ; then
 	fi
 else
 	log "VERBOSE" "Battery level polling is disabled."
+fi
+
+# Disable debug is individual to the module
+if [ x$(($(basename $SCRIPT | cut -d . -f1 | tr "[:lower:]" "[:upper:]" | sed 's/-/_/')_DEBUG)) = x1 ]; then
+        set +vx
 fi

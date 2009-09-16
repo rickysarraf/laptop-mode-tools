@@ -3,6 +3,10 @@
 # Laptop mode tools module: control LCD brightness
 #
 
+# Check if debug is enabled
+if [ x$(($(basename $SCRIPT | cut -d . -f1 | tr "[:lower:]" "[:upper:]" | sed 's/-/_/')_DEBUG)) = x1 ]; then
+        set -vx
+fi
 
 
 # Control LCD brightness
@@ -35,3 +39,7 @@ if [ x$CONTROL_BRIGHTNESS = x1 ] ; then
 	fi
 fi
 
+# Disable debug is individual to the module
+if [ x$(($(basename $SCRIPT | cut -d . -f1 | tr "[:lower:]" "[:upper:]" | sed 's/-/_/')_DEBUG)) = x1 ]; then
+        set +vx
+fi

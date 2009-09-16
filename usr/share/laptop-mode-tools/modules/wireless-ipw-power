@@ -8,6 +8,12 @@
 #
 # Original source: http://ubuntuforums.org/showthread.php?t=419772
 
+# Check if debug is enabled
+if [ x$(($(basename $SCRIPT | cut -d . -f1 | tr "[:lower:]" "[:upper:]" | sed 's/-/_/')_DEBUG)) = x1 ]; then
+        set -vx
+fi
+
+
 if [ x$CONTROL_IPW_POWER = x1 ] ; then
 
 	# Provide defaults for config file settings
@@ -148,4 +154,9 @@ if [ x$CONTROL_IPW_POWER = x1 ] ; then
 	fi
 else
 	log "VERBOSE" "Intel IPW Wireless power setting is disabled."
+fi
+
+# Disable debug is individual to the module
+if [ x$(($(basename $SCRIPT | cut -d . -f1 | tr "[:lower:]" "[:upper:]" | sed 's/-/_/')_DEBUG)) = x1 ]; then
+        set +vx
 fi

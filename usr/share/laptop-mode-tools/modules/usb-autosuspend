@@ -3,6 +3,11 @@
 # Laptop mode tools module: usb-autosuspend.
 #
 
+# Check if debug is enabled
+if [ x$(($(basename $SCRIPT | cut -d . -f1 | tr "[:lower:]" "[:upper:]" | sed 's/-/_/')_DEBUG)) = x1 ]; then
+        set -vx
+fi
+
 blacklisted() {
 	for usbid in $AUTOSUSPEND_USBID_BLACKLIST; do
 		if ! echo $usbid | grep -q ':'; then
@@ -96,3 +101,7 @@ else
     log "VERBOSE" "USB autosuspend is disabled."
 fi
 
+# Disable debug is individual to the module
+if [ x$(($(basename $SCRIPT | cut -d . -f1 | tr "[:lower:]" "[:upper:]" | sed 's/-/_/')_DEBUG)) = x1 ]; then
+        set +vx
+fi

@@ -1,5 +1,10 @@
 #! /bin/sh
 
+# Check if debug is enabled
+if [ x$(($(basename $SCRIPT | cut -d . -f1 | tr "[:lower:]" "[:upper:]" | sed 's/-/_/')_DEBUG)) = x1 ]; then
+        set -vx
+fi
+
 if [ x$SUPERHE_CONTROL_FILE = x ]; then
     SUPERHE_CONTROL_FILE=/sys/devices/platform/eeepc/cpufv
     log "VERBOSE" "Control file is $SUPERHE_CONTROL_FILE"
@@ -19,3 +24,7 @@ if [ x$CONTROL_SUPERHE = x1 ]; then
     log "VERBOSE" "SuperHe triggered with value $SUPERHE_VALUE"
 fi
 
+# Disable debug is individual to the module
+if [ x$(($(basename $SCRIPT | cut -d . -f1 | tr "[:lower:]" "[:upper:]" | sed 's/-/_/')_DEBUG)) = x1 ]; then
+        set +vx
+fi

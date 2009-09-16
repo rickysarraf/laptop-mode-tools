@@ -9,6 +9,11 @@
 # This script relies upon the name of the driver.
 #
 
+# Check if debug is enabled
+if [ x$(($(basename $SCRIPT | cut -d . -f1 | tr "[:lower:]" "[:upper:]" | sed 's/-/_/')_DEBUG)) = x1 ]; then
+        set -vx
+fi
+
 #
 # Find all the wireless devices using the supplied driver names.
 # Place the interface names on the list WIFI_IFNAMES.
@@ -62,4 +67,9 @@ if [ x$CONTROL_IWL_POWER = x1 ] ; then
 	done
 else
 	log "VERBOSE" "Intel IWL Wireless power setting is disabled."
+fi
+
+# Disable debug is individual to the module
+if [ x$(($(basename $SCRIPT | cut -d . -f1 | tr "[:lower:]" "[:upper:]" | sed 's/-/_/')_DEBUG)) = x1 ]; then
+        set +vx
 fi

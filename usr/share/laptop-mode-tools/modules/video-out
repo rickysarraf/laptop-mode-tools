@@ -3,6 +3,12 @@
 # Laptop mode tools module: selectively disable video outputs
 #
 
+# Check if debug is enabled
+if [ x$(($(basename $SCRIPT | cut -d . -f1 | tr "[:lower:]" "[:upper:]" | sed 's/-/_/')_DEBUG)) = x1 ]; then
+        set -vx
+fi
+
+
 do_xrandr () {
   	w -hs | while read -r USER TTY DISPLAY REMAINDER; do	
 	  	if [ "${DISPLAY#:}" != "$DISPLAY" ] ; then
@@ -43,4 +49,9 @@ if [ x$CONTROL_VIDEO_OUTPUTS = x1 ] ; then
 	done
 else
 	log "VERBOSE" "video-out module is disabled."
+fi
+
+# Disable debug is individual to the module
+if [ x$(($(basename $SCRIPT | cut -d . -f1 | tr "[:lower:]" "[:upper:]" | sed 's/-/_/')_DEBUG)) = x1 ]; then
+        set +vx
 fi

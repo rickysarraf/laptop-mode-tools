@@ -3,6 +3,10 @@
 # Laptop mode tools module to handle CPU frequency settings.
 #
 
+# Check if debug is enabled
+if [ x$(($(basename $SCRIPT | cut -d . -f1 | tr "[:lower:]" "[:upper:]" | sed 's/-/_/')_DEBUG)) = x1 ]; then
+        set -vx
+fi
 
 
 # Set kernel setting, showing an error if this fails.
@@ -128,4 +132,9 @@ if [ x$CONTROL_CPU_THROTTLING = x1 ] ; then
 			set_sysctl $THISCPU/throttling $THIS_CPU_THROTTLING
 		fi
 	done
+fi
+
+# Disable debug is individual to the module
+if [ x$(($(basename $SCRIPT | cut -d . -f1 | tr "[:lower:]" "[:upper:]" | sed 's/-/_/')_DEBUG)) = x1 ]; then
+        set +vx
 fi

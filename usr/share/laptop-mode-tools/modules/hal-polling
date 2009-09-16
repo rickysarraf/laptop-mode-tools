@@ -3,6 +3,10 @@
 # Laptop mode tools module: change HAL polling mode
 #
 
+# Check if debug is enabled
+if [ x$(($(basename $SCRIPT | cut -d . -f1 | tr "[:lower:]" "[:upper:]" | sed 's/-/_/')_DEBUG)) = x1 ]; then
+        set -vx
+fi
 
 # Some backward compatibility for version 1.42
 if [ ! x$BATT_ENABLE_HAL_POLLING  = x ] ; then
@@ -39,4 +43,9 @@ if [ x$CONTROL_HAL_POLLING = x1 ] ; then
 			log "VERBOSE" "Executing command $DISABLE_HAL_POLLING_CMD on device $DEV"
 		fi
 	done
+fi
+
+# Disable debug is individual to the module
+if [ x$(($(basename $SCRIPT | cut -d . -f1 | tr "[:lower:]" "[:upper:]" | sed 's/-/_/')_DEBUG)) = x1 ]; then
+        set +vx
 fi

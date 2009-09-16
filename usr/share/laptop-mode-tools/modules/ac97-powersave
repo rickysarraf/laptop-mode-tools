@@ -3,6 +3,11 @@
 # Laptop mode tools module: Intel AC97 integrated audio power saving mode.
 #
 
+# Check if debug is enabled
+if [ x$(($(basename $SCRIPT | cut -d . -f1 | tr "[:lower:]" "[:upper:]" | sed 's/-/_/')_DEBUG)) = x1 ]; then
+        set -vx
+fi
+
 if [ x$CONTROL_AC97_POWER = x1 ] ; then
 	if [ -w /sys/module/snd_ac97_codec/parameters/power_save ]; then
 		echo 1 > /sys/module/snd_ac97_codec/parameters/power_save
@@ -22,4 +27,9 @@ if [ x$CONTROL_AC97_POWER = x1 ] ; then
 	fi
 else
 	log "VERBOSE" "AC97 audio power setting is disabled."
+fi
+
+# Disable debug is individual to the module
+if [ x$(($(basename $SCRIPT | cut -d . -f1 | tr "[:lower:]" "[:upper:]" | sed 's/-/_/')_DEBUG)) = x1 ]; then
+        set +vx
 fi
