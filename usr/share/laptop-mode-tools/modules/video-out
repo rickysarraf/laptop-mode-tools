@@ -4,10 +4,7 @@
 #
 
 # Check if debug is enabled
-if [ x$(($(basename $SCRIPT | cut -d . -f1 | tr "[:lower:]" "[:upper:]" | sed 's/-/_/g')_DEBUG)) = x1 ]; then
-        set -vx
-fi
-
+enableDebug $SCRIPT;
 
 do_xrandr () {
   	w -hs | while read -r USER TTY DISPLAY REMAINDER; do	
@@ -52,6 +49,4 @@ else
 fi
 
 # Disable debug is individual to the module
-if [ x$(($(basename $SCRIPT | cut -d . -f1 | tr "[:lower:]" "[:upper:]" | sed 's/-/_/g')_DEBUG)) = x1 ]; then
-        set +vx
-fi
+disableDebug $SCRIPT;

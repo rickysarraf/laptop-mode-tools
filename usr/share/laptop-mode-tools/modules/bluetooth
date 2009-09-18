@@ -4,9 +4,7 @@
 #
 
 # Check if debug is enabled
-if [ x$(($(basename $SCRIPT | cut -d . -f1 | tr "[:lower:]" "[:upper:]" | sed 's/-/_/g')_DEBUG)) = x1 ]; then
-        set -vx
-fi
+enableDebug $SCRIPT;
 
 if [ x$CONTROL_BLUETOOTH = x1 ] ; then
 	ENABLE_BLUETOOTH=$BATT_ENABLE_BLUETOOTH
@@ -34,6 +32,4 @@ if [ x$CONTROL_BLUETOOTH = x1 ] ; then
 fi
 
 # Disable debug is individual to the module
-if [ x$(($(basename $SCRIPT | cut -d . -f1 | tr "[:lower:]" "[:upper:]" | sed 's/-/_/g')_DEBUG)) = x1 ]; then
-        set +vx
-fi
+disableDebug $SCRIPT;

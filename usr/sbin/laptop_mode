@@ -176,6 +176,22 @@ else
 fi
 }
 
+enableDebug ()
+{
+        # Check if debug is enabled
+        if [ x$(($(basename $1 | cut -d . -f1 | tr "[:lower:]" "[:upper:]" | sed 's/-/_/g')_DEBUG)) = x1 ]; then
+                set -vx
+        fi
+}
+
+disableDebug ()
+{
+        # Check if debug is enabled
+        if [ x$(($(basename $1 | cut -d . -f1 | tr "[:lower:]" "[:upper:]" | sed 's/-/_/g')_DEBUG)) = x1 ]; then
+                set +vx
+        fi
+}
+
 # No default on these ones -- we need to detect if they have been set, for
 # backward compatibility with MINIMUM_BATTERY_MINUTES etc.
 AUTO_HIBERNATION_BATTERY_CHARGE_PERCENT=

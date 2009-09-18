@@ -4,9 +4,7 @@
 #
 
 # Check if debug is enabled
-if [ x$(($(basename $SCRIPT | cut -d . -f1 | tr "[:lower:]" "[:upper:]" | sed 's/-/_/g')_DEBUG)) = x1 ]; then
-        set -vx
-fi
+enableDebug $SCRIPT;
 
 if [ x$CONTROL_INTEL_SATA_POWER = x1 ] ; then
 	for POLICYFILE in /sys/class/scsi_host/*/link_power_management_policy ; do
@@ -22,6 +20,4 @@ else
 fi
 
 # Disable debug is individual to the module
-if [ x$(($(basename $SCRIPT | cut -d . -f1 | tr "[:lower:]" "[:upper:]" | sed 's/-/_/g')_DEBUG)) = x1 ]; then
-        set +vx
-fi
+disableDebug $SCRIPT;

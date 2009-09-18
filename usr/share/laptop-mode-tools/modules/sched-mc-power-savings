@@ -4,9 +4,7 @@
 #
 
 # Check if debug is enabled
-if [ x$(($(basename $SCRIPT | cut -d . -f1 | tr "[:lower:]" "[:upper:]" | sed 's/-/_/g')_DEBUG)) = x1 ]; then
-        set -vx
-fi
+enableDebug $SCRIPT;
 
 if [ x$CONTROL_SCHED_MC_POWER_SAVINGS = x1 ] ; then
 	if [ $ON_AC -eq 1 ]; then
@@ -32,6 +30,4 @@ else
 fi
 
 # Disable debug is individual to the module
-if [ x$(($(basename $SCRIPT | cut -d . -f1 | tr "[:lower:]" "[:upper:]" | sed 's/-/_/g')_DEBUG)) = x1 ]; then
-        set +vx
-fi
+disableDebug $SCRIPT;

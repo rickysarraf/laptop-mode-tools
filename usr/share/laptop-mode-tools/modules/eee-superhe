@@ -1,9 +1,7 @@
 #! /bin/sh
 
 # Check if debug is enabled
-if [ x$(($(basename $SCRIPT | cut -d . -f1 | tr "[:lower:]" "[:upper:]" | sed 's/-/_/g')_DEBUG)) = x1 ]; then
-        set -vx
-fi
+enableDebug $SCRIPT;
 
 if [ x$SUPERHE_CONTROL_FILE = x ]; then
     SUPERHE_CONTROL_FILE=/sys/devices/platform/eeepc/cpufv
@@ -25,6 +23,4 @@ if [ x$CONTROL_SUPERHE = x1 ]; then
 fi
 
 # Disable debug is individual to the module
-if [ x$(($(basename $SCRIPT | cut -d . -f1 | tr "[:lower:]" "[:upper:]" | sed 's/-/_/g')_DEBUG)) = x1 ]; then
-        set +vx
-fi
+disableDebug $SCRIPT;
