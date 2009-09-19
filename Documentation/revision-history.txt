@@ -4,6 +4,7 @@
     * Add an option to completely disable ethernet devices when on battery.
     * Introduce hooks to enable debug mode for individual modules
     * Use iwconfig to determine device type for iwlwifi devices also
+    * Collect the correct exit code for iwconfig execution.
 
 1.51 - Tue Sep  1 20:48:29 IST 2009
     * Add option to blacklist usb devices by their device id.
