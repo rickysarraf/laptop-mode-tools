@@ -3,9 +3,6 @@
 # Laptop mode tools module: virtual terminal blanking
 #
 
-# Check if debug is enabled
-enableDebug $SCRIPT;
-
 # Set terminal blanking/powerdown timeouts
 if [ x$CONTROL_TERMINAL = x1 ] ; then
 	if [ $ON_AC -eq 1 ]; then
@@ -33,5 +30,3 @@ else
 	log "VERBOSE" "CONTROL_TERMINAL is disabled, skipping..."
 fi
 
-# Disable debug is individual to the module
-disableDebug $SCRIPT;

@@ -3,9 +3,6 @@
 # Laptop mode tools module: control X display standby / suspend / off using DPMS
 #
 
-# Check if debug is enabled
-enableDebug $SCRIPT;
-
 # getXuser gets the X user belonging to the display in $displaynum.
 # (This code was borrowed from the Debian acpi-support package.)
 getXuser() {
@@ -67,5 +64,3 @@ else
 	log "VERBOSE" "CONTROL_DPMS_STANDBY is disabled, skipping..."
 fi
 
-# Disable debug is individual to the module
-disableDebug $SCRIPT;

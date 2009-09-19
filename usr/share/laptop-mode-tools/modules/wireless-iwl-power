@@ -9,9 +9,6 @@
 # This script relies upon the name of the driver.
 #
 
-# Check if debug is enabled
-enableDebug $SCRIPT;
-
 #
 # Find all the wireless devices using the supplied driver names.
 # Place the interface names on the list WIFI_IFNAMES.
@@ -77,5 +74,3 @@ else
 	log "VERBOSE" "Intel IWL Wireless power setting is disabled."
 fi
 
-# Disable debug is individual to the module
-disableDebug $SCRIPT;

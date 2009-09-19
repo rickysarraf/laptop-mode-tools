@@ -3,9 +3,6 @@
 # Laptop mode tools module: switch config files based on power state.
 #
 
-# Check if debug is enabled
-enableDebug $SCRIPT;
-
 if [ x$CONTROL_CONFIG_FILES = x1 ] ; then
 	log "MSG" "Swapping out configuration files."
 	for CONFFILE in $CONFIG_FILES ; do
@@ -115,5 +112,3 @@ if [ x$CONTROL_CONFIG_FILES = x1 ] ; then
 	fi
 fi
 
-# Disable debug is individual to the module
-disableDebug $SCRIPT;

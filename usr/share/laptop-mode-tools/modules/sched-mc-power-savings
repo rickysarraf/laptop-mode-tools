@@ -3,9 +3,6 @@
 # Laptop mode tools module: Scheduler tunables for multi-socket/multi-core systems.
 #
 
-# Check if debug is enabled
-enableDebug $SCRIPT;
-
 if [ x$CONTROL_SCHED_MC_POWER_SAVINGS = x1 ] ; then
 	if [ $ON_AC -eq 1 ]; then
 		log "VERBOSE" "On AC power: setting scheduler power saving to 0."
@@ -29,5 +26,3 @@ else
 	log "VERBOSE" "Scheduler power setting is disabled."
 fi
 
-# Disable debug is individual to the module
-disableDebug $SCRIPT;

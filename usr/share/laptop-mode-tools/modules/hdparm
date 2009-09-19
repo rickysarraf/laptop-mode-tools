@@ -6,9 +6,6 @@
 # file.
 #
 
-# Check if debug is enabled
-enableDebug $SCRIPT;
-
 #
 # Function for drive capability check. This prevents ugly errors in
 # the kernel output about unsupported commands.
@@ -276,5 +273,3 @@ if [ x$CONTROL_HD_WRITECACHE = x1 ] ; then
 	done
 fi
 
-# Disable debug is individual to the module
-disableDebug $SCRIPT;

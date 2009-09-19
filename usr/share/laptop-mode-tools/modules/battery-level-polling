@@ -3,9 +3,6 @@
 # Laptop mode tools module: Battery level polling.
 #
 
-# Check if debug is enabled
-enableDebug $SCRIPT;
-
 if [ x$ENABLE_BATTERY_LEVEL_POLLING = x1 ] ; then
 	log "VERBOSE" "Battery level polling is enabled."
 	if [ x$ON_AC = x1 ] ; then
@@ -25,5 +22,3 @@ else
 	log "VERBOSE" "Battery level polling is disabled."
 fi
 
-# Disable debug is individual to the module
-disableDebug $SCRIPT;

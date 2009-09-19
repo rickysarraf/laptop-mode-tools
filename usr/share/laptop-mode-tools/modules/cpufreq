@@ -3,9 +3,6 @@
 # Laptop mode tools module to handle CPU frequency settings.
 #
 
-# Check if debug is enabled
-enableDebug $SCRIPT;
-
 # Set kernel setting, showing an error if this fails.
 # Parameter 1: sysctl/proc path
 # Parameter 2: the value
@@ -131,5 +128,3 @@ if [ x$CONTROL_CPU_THROTTLING = x1 ] ; then
 	done
 fi
 
-# Disable debug is individual to the module
-disableDebug $SCRIPT;

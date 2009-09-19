@@ -8,9 +8,6 @@
 #
 # Original source: http://ubuntuforums.org/showthread.php?t=419772
 
-# Check if debug is enabled
-enableDebug $SCRIPT;
-
 if [ x$CONTROL_IPW_POWER = x1 ] ; then
 
 	# Provide defaults for config file settings
@@ -153,5 +150,3 @@ else
 	log "VERBOSE" "Intel IPW Wireless power setting is disabled."
 fi
 
-# Disable debug is individual to the module
-disableDebug $SCRIPT;

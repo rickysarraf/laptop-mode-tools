@@ -7,9 +7,6 @@
 # still supported for backward compatibility.
 # 
 
-# Check if debug is enabled
-enableDebug $SCRIPT;
-
 if [ x$CONTROL_SYSLOG_CONF = x1 ] ; then
 	log "VERBOSE" "Adjusting syslog configuration."
 	if [ "`readlink -f $SYSLOG_CONF`" != "$SYSLOG_CONF" ] ; then
@@ -54,5 +51,3 @@ if [ x$CONTROL_SYSLOG_CONF = x1 ] ; then
 	fi
 fi
 
-# Disable debug is individual to the module
-disableDebug $SCRIPT;

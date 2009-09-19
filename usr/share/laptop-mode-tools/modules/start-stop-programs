@@ -3,9 +3,6 @@
 # Laptop mode tools module: start and stop programs
 #
 
-# Check if debug is enabled
-enableDebug $SCRIPT;
-
 if [ x$CONTROL_START_STOP = x1 ] ; then
    #
    # Undo the previous state.
@@ -126,5 +123,3 @@ if [ x$CONTROL_START_STOP = x1 ] ; then
    fi
 fi
 
-# Disable debug is individual to the module
-disableDebug $SCRIPT;

@@ -3,9 +3,6 @@
 # Laptop mode tools module: bluetooth
 #
 
-# Check if debug is enabled
-enableDebug $SCRIPT;
-
 if [ x$CONTROL_BLUETOOTH = x1 ] ; then
 	ENABLE_BLUETOOTH=$BATT_ENABLE_BLUETOOTH
 	if [ $ON_AC -eq 1 ] ; then
@@ -31,5 +28,3 @@ if [ x$CONTROL_BLUETOOTH = x1 ] ; then
 	fi
 fi
 
-# Disable debug is individual to the module
-disableDebug $SCRIPT;

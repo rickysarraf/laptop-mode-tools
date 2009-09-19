@@ -3,9 +3,6 @@
 # Laptop mode tools module: Intel HDA integrated audio power saving mode.
 #
 
-# Check if debug is enabled
-enableDebug $SCRIPT;
-
 if [ x$CONTROL_INTEL_HDA_POWER = x1 ] ; then
     if [ $ON_AC -eq 1 ]; then
 		if [ "$ACTIVATE" -eq 1 ]; then
@@ -53,5 +50,3 @@ else
 	log "VERBOSE" "Intel HDA audio power setting is disabled."
 fi
 
-# Disable debug is individual to the module
-disableDebug $SCRIPT;

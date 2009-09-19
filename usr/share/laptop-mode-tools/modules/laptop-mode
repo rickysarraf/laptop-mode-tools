@@ -3,10 +3,6 @@
 # Laptop mode tools module: core laptop mode functionality
 #
 
-# Check if debug is enabled
-enableDebug $SCRIPT;
-
-
 # Remove an option (the first parameter) of the form option=<number> from
 # a mount options string (the rest of the parameters).
 remove_numeric_mount_option () {
@@ -411,5 +407,3 @@ else
 	fi
 fi
 
-# Disable debug is individual to the module
-disableDebug $SCRIPT;

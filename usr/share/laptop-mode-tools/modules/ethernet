@@ -3,9 +3,6 @@
 # Laptop mode tools module: Ethernet power saving tweaks.
 #
 
-# Check if debug is enabled
-enableDebug $SCRIPT;
-
 if [ x$CONTROL_ETHERNET = x1 ] ; then
 	if [ $ON_AC -eq 1 ]; then
 		if [ "$ACTIVATE" -eq 1 ]; then
@@ -158,5 +155,3 @@ else
 	log "VERBOSE" "Ethernet module is disabled."
 fi
 
-# Disable debug is individual to the module
-disableDebug $SCRIPT;

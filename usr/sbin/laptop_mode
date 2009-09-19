@@ -1012,7 +1012,9 @@ export FORCE STATE ON_AC ACTIVATE ACTIVATE_WITH_POSSIBLE_DATA_LOSS KLEVEL KMINOR
 for SCRIPT in /usr/share/laptop-mode-tools/modules/* /usr/local/lib/laptop-mode-tools/modules/* /usr/local/share/laptop-mode-tools/modules/* /etc/laptop-mode/modules/*; do
 	if [ -x "$SCRIPT" ] ; then
 		log "VERBOSE" "Invoking module $SCRIPT."
-        . $SCRIPT
+                enableDebug $SCRIPT
+                . $SCRIPT
+                disableDebug $SCRIPT
 	else
 		log "VERBOSE" "Module $SCRIPT is not executable."
 	fi
