@@ -22,6 +22,7 @@ if [ x$CONTROL_ETHERNET = x1 ] ; then
                         DISABLE_ETHERNET=2
                         # IF this is the case, don't touch the device for
                         # enable/disable
+                fi
 	else
 		THROTTLE_ETHERNET="$BATT_THROTTLE_ETHERNET"
 
