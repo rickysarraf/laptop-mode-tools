@@ -37,7 +37,8 @@ findWifiIfsByDriver () {
                         # Kernel's 2.6.29 and above have been reported to be missing
                         # the $DEVICE/wireless folder.
                         dev=`basename $DEVICE`
-                        ret=`$IWCONFIG $dev >/dev/null 2>&1`;
+                        IWCONFIG $dev >/dev/null 2>&1;
+                        ret=$?;
                         if [ "$ret" = "0" ]; then
 			        # add the interface name to the list
 		    		WIFI_IFNAMES="$WIFI_IFNAMES ${DEVICE##*/}"
