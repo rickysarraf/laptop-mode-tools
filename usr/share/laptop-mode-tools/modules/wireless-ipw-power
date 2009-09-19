@@ -80,16 +80,16 @@ if [ x$CONTROL_IPW_POWER = x1 ] ; then
                                 else
                                         log "VERBOSE" "$DEVICE doesn't seem to be enabled. Radio Switched off?";
 				fi
-            else
-                # LP: #369113
-                # Kernel's 2.6.29 and above have been reported to be missing
-                # the $DEVICE/wireless folder.
-                dev=`basename $DEVICE`
-                ret=`$IWCONFIG $dev >/dev/null 2>&1`;
-                if [ "$ret" = "0" ]; then
+                        else
+                                # LP: #369113
+                                # Kernel's 2.6.29 and above have been reported to be missing
+                                # the $DEVICE/wireless folder.
+                                dev=`basename $DEVICE`
+                                ret=`$IWCONFIG $dev >/dev/null 2>&1`;
+                                if [ "$ret" = "0" ]; then
 					# add the interface name to the list
-		    		WIFI_IFNAMES="$WIFI_IFNAMES ${DEVICE##*/}"
-                fi
+		    		        WIFI_IFNAMES="$WIFI_IFNAMES ${DEVICE##*/}"
+                                fi
 			fi
 		done
 	}
