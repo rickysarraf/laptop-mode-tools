@@ -57,8 +57,11 @@ if [ x$CONTROL_ETHERNET = x1 ] ; then
                                         log "VERBOSE" "ethernet: Re-enabling ethernet device $DEVICE"
                                         DISABLED=1
                                 fi
-                        else [ x$DISABLE_ETHERNET = x2 ]; then
+                        elif [ x$DISABLE_ETHERNET = x2 ]; then
                                 DISABLED=0 # Be safe. :-)
+                        else
+                                DISABLED=0 # Same here. Be safe. :-)
+                                           # For all other cases also, just disable it.
                         fi
                 else
                         log "VERBOSE" "$DEVICE does not seem to be supporting enable/disable"
