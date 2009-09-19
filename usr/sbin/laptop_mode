@@ -1012,9 +1012,11 @@ export FORCE STATE ON_AC ACTIVATE ACTIVATE_WITH_POSSIBLE_DATA_LOSS KLEVEL KMINOR
 for SCRIPT in /usr/share/laptop-mode-tools/modules/* /usr/local/lib/laptop-mode-tools/modules/* /usr/local/share/laptop-mode-tools/modules/* /etc/laptop-mode/modules/*; do
 	if [ -x "$SCRIPT" ] ; then
 		log "VERBOSE" "Invoking module $SCRIPT."
-                enableDebug $SCRIPT
+                SCRIPT_DEBUG=$SCRIPT; # We do this because in start-stop-programs module a $SCRIPT variable is used. That
+                                      # changes the whole meaning when passed to disableDebug ()
+                enableDebug $SCRIPT_DEBUG;
                 . $SCRIPT
-                disableDebug $SCRIPT
+                disableDebug $SCRIPT_DEBUG;
 	else
 		log "VERBOSE" "Module $SCRIPT is not executable."
 	fi
