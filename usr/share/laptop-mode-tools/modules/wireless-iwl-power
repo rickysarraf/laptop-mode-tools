@@ -37,7 +37,7 @@ findWifiIfsByDriver () {
                         # Kernel's 2.6.29 and above have been reported to be missing
                         # the $DEVICE/wireless folder.
                         dev=`basename $DEVICE`
-                        IWCONFIG $dev >/dev/null 2>&1;
+                        $IWCONFIG $dev >/dev/null 2>&1;
                         ret=$?;
                         if [ "$ret" = "0" ]; then
 			        # add the interface name to the list
@@ -53,6 +53,22 @@ if [ x$CONTROL_IWL_POWER = x1 ] ; then
 	# Provide defaults for config file settings
 	[ "$IWL_AC_POWER" ]   || IWL_AC_POWER=0
 	[ "$IWL_BATT_POWER" ] || IWL_BATT_POWER=3
+
+	# find executables
+	if [ -x /sbin/iwpriv ] ; then
+		IWPRIV=/sbin/iwpriv
+	elif [ -x /usr/sbin/iwpriv ] ; then
+		IWPRIV=/usr/sbin/iwpriv
+	else
+		log "VERBOSE" "iwpriv is not installed"
+	fi
+	if [ -x /sbin/iwconfig ] ; then
+		IWCONFIG=/sbin/iwconfig
+	elif [ -x /usr/sbin/iwconfig ] ; then
+		IWCONFIG=/usr/sbin/iwconfig
+	else
+		log "VERBOSE" "iwconfig is not installed"
+	fi
 
 	WIFI_IFNAMES=""
 	[ -d /sys/module/iwl3945 ] && findWifiIfsByDriver iwl3945
