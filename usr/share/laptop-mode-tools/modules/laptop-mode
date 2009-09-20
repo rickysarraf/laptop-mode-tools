@@ -204,7 +204,11 @@ if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 1 ] ; then
 	esac
 	if [ $CONTROL_MOUNT_OPTIONS -eq 1 ]; then
 		log "VERBOSE" "Remounting filesystems."
-		cat /etc/mtab | while read DEV MP FST OPTS DUMP PASS ; do
+		# The -r flag makes 'read' preserve backslashes read from
+		# mtab. Spaces are represented by \040 in mtab. (also UTF-8)
+		cat /etc/mtab | while read -r DEV MP FST OPTS DUMP PASS ; do
+			# Now expand the escapes, inside quotes to preserve the spaces :)
+			MP="$(echo $MP)"
 			case "$FST" in 
 				rootfs|unionfs|tmpfs|squashfs|sysfs|usbfs|proc|devpts)
 				  	continue
@@ -269,7 +273,7 @@ if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 1 ] ; then
 						log "VERBOSE" "Removing commit mount option from original options." 
 						PARSEDOPTS="$(remove_numeric_mount_option commit "$OPTS")"
 						log "VERBOSE" "Executing: mount $DEV $MP -t $FST -o remount,$PARSEDOPTS,commit=$MAX_LOST_WORK_SECONDS$NOATIME_OPT"
-						if (! mount $DEV $MP -t $FST -o remount,$PARSEDOPTS,commit=$MAX_LOST_WORK_SECONDS$NOATIME_OPT) ; then
+						if (! mount $DEV "$MP" -t $FST -o remount,$PARSEDOPTS,commit=$MAX_LOST_WORK_SECONDS$NOATIME_OPT) ; then
 							if [ "$FST" = "ext3" -a "$MP" = "/" ] ; then
 								echo "BIG FAT WARNING: Your root filesystem mounted as ext3 seems to lack support for"
 								echo "the commit mount option. This usually means that your root filesystem is"
@@ -285,7 +289,7 @@ if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 1 ] ; then
 						;;
 					*)
 						log "VERBOSE" "Executing: mount $DEV $MP -t $FST -o remount,$OPTS$NOATIME_OPT"
-						mount $DEV $MP -t $FST -o remount,$OPTS$NOATIME_OPT
+						mount $DEV "$MP" -t $FST -o remount,$OPTS$NOATIME_OPT
 						;;
 				esac
 				if [ -b $DEV -a "$CONTROL_READAHEAD" -ne 0 ] ; then
@@ -327,7 +331,11 @@ else
 	esac
 	if [ $CONTROL_MOUNT_OPTIONS -eq 1 ] ; then
 		log "VERBOSE" "Remounting filesystems."
-		cat /etc/mtab | while read DEV MP FST OPTS DUMP PASS ; do
+		# The -r flag makes 'read' preserve backslashes read from
+		# mtab. Spaces are represented by \040 in mtab. (also UTF-8)
+		cat /etc/mtab | while read -r DEV MP FST OPTS DUMP PASS ; do
+			# Now expand the escapes, inside quotes to preserve the spaces :)
+			MP="$(echo $MP)"
 			DO=0
 			case " $PARTITIONS " in
 				*" $DEV "*)
@@ -386,12 +394,12 @@ else
 							PARSEDOPTS="$(replace_numeric_mount_option commit commit=0 $SAVED_OPTS $OPTS)"
 							PARSEDOPTS="$(replace_atime_mount_option $SAVED_OPTS $PARSEDOPTS)"
 							log "VERBOSE" "Executing: mount $DEV $MP -t $FST -o remount,$PARSEDOPTS"
-							mount $DEV $MP -t $FST -o remount,$PARSEDOPTS
+							mount $DEV "$MP" -t $FST -o remount,$PARSEDOPTS
 							;;
 						*)
 							PARSEDOPTS="$(replace_atime_mount_option $SAVED_OPTS $OPTS)"
 							log "VERBOSE" "Executing: mount $DEV $MP -t $FST -o remount,$PARSEDOPTS"
-							mount $DEV $MP -t $FST -o remount,$PARSEDOPTS
+							mount $DEV "$MP" -t $FST -o remount,$PARSEDOPTS
 							;;
 					esac
 				else
