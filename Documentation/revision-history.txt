@@ -7,6 +7,7 @@
     * Collect the correct exit code for iwconfig execution.
     * Use iwconfig in wireless-iwl-power. Thanks to Darren Hoo for spotting it
     * Handle spaces in mount point names. Thanks to Louis Simard for the patch
+    * Clarify about Global Debug mode and Module Specific Debug mode.
 
 1.51 - Tue Sep  1 20:48:29 IST 2009
     * Add option to blacklist usb devices by their device id.
