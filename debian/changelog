@@ -1,3 +1,10 @@
+laptop-mode-tools (1.51-2) UNRELEASED; urgency=low
+
+  * laptop-mode-tools.preinst: remove (and backup) the obsolete
+    /etc/pm/sleep.d/99laptop-mode config file
+
+ -- Tormod Volden <debian.tormod@gmail.com>  Sun, 27 Sep 2009 02:13:38 +0200
+
 laptop-mode-tools (1.51-1) unstable; urgency=low
 
   * New Upstream Release
