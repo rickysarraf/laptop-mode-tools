@@ -1,9 +1,22 @@
-laptop-mode-tools (1.51-2) UNRELEASED; urgency=low
+laptop-mode-tools (1.52-1) unstable; urgency=low
 
+  * New Upstream Release
+    + Initialize DEBUG to 0 by default. THanks to Matthijs Kooijman for
+      pointing it out. (Closes: #546371)
+    + Add an option to completely disable ethernet devices when on battery.
+    + Introduce hooks to enable debug mode for individual modules
+    + Use iwconfig to determine device type for iwlwifi devices also
+    + Collect the correct exit code for iwconfig execution.
+    + Use iwconfig in wireless-iwl-power. Thanks to Darren Hoo for spotting it
+    + Handle spaces in mount point names. Thanks to Louis Simard for the patch
+    + Clarify about Global Debug mode and Module Specific Debug mode.
+    + Fix incorrect variable reference in video-out module. Thanks to Hans
+      Werner for noticing that.
   * laptop-mode-tools.preinst: remove (and backup) the obsolete
-    /etc/pm/sleep.d/99laptop-mode config file
+    /etc/pm/sleep.d/99laptop-mode config file. Thanks to Tormod
+    Volden for the fix.
 
- -- Tormod Volden <debian.tormod@gmail.com>  Sun, 27 Sep 2009 02:13:38 +0200
+ -- Ritesh Raj Sarraf <rrs@researchut.com>  Thu, 08 Oct 2009 14:57:14 +0530
 
 laptop-mode-tools (1.51-1) unstable; urgency=low
 
