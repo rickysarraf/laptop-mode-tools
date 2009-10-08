@@ -14,9 +14,9 @@ laptop-mode-tools (1.52-1) unstable; urgency=low
       Werner for noticing that.
   * laptop-mode-tools.preinst: remove (and backup) the obsolete
     /etc/pm/sleep.d/99laptop-mode config file. Thanks to Tormod
-    Volden for the fix.
+    Volden for the fix. (LP: #384875)
 
- -- Ritesh Raj Sarraf <rrs@researchut.com>  Thu, 08 Oct 2009 14:57:14 +0530
+ -- Ritesh Raj Sarraf <rrs@researchut.com>  Thu, 08 Oct 2009 15:05:44 +0530
 
 laptop-mode-tools (1.51-1) unstable; urgency=low
 
