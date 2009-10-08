@@ -3,7 +3,6 @@
 # Laptop mode tools module: control X display standby / suspend / off using DPMS
 #
 
-
 # getXuser gets the X user belonging to the display in $displaynum.
 # (This code was borrowed from the Debian acpi-support package.)
 getXuser() {
@@ -64,3 +63,4 @@ if [ x$CONTROL_DPMS_STANDBY = x1 ] ; then
 else
 	log "VERBOSE" "CONTROL_DPMS_STANDBY is disabled, skipping..."
 fi
+

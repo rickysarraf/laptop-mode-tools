@@ -19,12 +19,12 @@ do_xrandr () {
 if [ x$CONTROL_VIDEO_OUTPUTS = x1 ] ; then
 	if [ $ON_AC -eq 1 ]; then
 		if [ "$ACTIVATE" -eq 1 ]; then
-			DISABLE_VIDEO_OUTPUTS="$LM_AC_THROTTLE_ETHERNET"
+			DISABLE_VIDEO_OUTPUTS="$LM_AC_DISABLE_VIDEO_OUTPUTS"
 		else
-			DISABLE_VIDEO_OUTPUTS="$NOLM_AC_THROTTLE_ETHERNET"
+			DISABLE_VIDEO_OUTPUTS="$NOLM_AC_DISABLE_VIDEO_OUTPUTS"
 		fi
 	else
-		DISABLE_VIDEO_OUTPUTS="$BATT_THROTTLE_ETHERNET"
+		DISABLE_VIDEO_OUTPUTS="$BATT_DISABLE_VIDEO_OUTPUTS"
 	fi
 
 	if [ -f /var/run/laptop-mode-tools/disabled-video-outputs ] ; then
@@ -44,3 +44,4 @@ if [ x$CONTROL_VIDEO_OUTPUTS = x1 ] ; then
 else
 	log "VERBOSE" "video-out module is disabled."
 fi
+

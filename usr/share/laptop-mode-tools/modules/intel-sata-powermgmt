@@ -15,3 +15,4 @@ if [ x$CONTROL_INTEL_SATA_POWER = x1 ] ; then
 else
 	log "VERBOSE" "Intel SATA link power saving disabled."
 fi
+

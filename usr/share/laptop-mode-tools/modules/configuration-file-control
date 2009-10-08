@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/sh
 #
 # Laptop mode tools module: switch config files based on power state.
 #
@@ -111,3 +111,4 @@ if [ x$CONTROL_CONFIG_FILES = x1 ] ; then
 		done
 	fi
 fi
+

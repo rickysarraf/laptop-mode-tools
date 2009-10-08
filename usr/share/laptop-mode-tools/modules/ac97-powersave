@@ -23,3 +23,4 @@ if [ x$CONTROL_AC97_POWER = x1 ] ; then
 else
 	log "VERBOSE" "AC97 audio power setting is disabled."
 fi
+

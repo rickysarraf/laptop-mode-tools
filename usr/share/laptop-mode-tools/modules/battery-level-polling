@@ -21,3 +21,4 @@ if [ x$ENABLE_BATTERY_LEVEL_POLLING = x1 ] ; then
 else
 	log "VERBOSE" "Battery level polling is disabled."
 fi
+

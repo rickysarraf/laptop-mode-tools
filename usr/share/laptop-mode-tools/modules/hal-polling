@@ -3,7 +3,6 @@
 # Laptop mode tools module: change HAL polling mode
 #
 
-
 # Some backward compatibility for version 1.42
 if [ ! x$BATT_ENABLE_HAL_POLLING  = x ] ; then
 	if [ x$BATT_ENABLE_HAL_POLLING  = x1 ] ; then
@@ -40,3 +39,4 @@ if [ x$CONTROL_HAL_POLLING = x1 ] ; then
 		fi
 	done
 fi
+

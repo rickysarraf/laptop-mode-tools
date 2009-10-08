@@ -7,8 +7,6 @@
 # still supported for backward compatibility.
 # 
 
-
-
 if [ x$CONTROL_SYSLOG_CONF = x1 ] ; then
 	log "VERBOSE" "Adjusting syslog configuration."
 	if [ "`readlink -f $SYSLOG_CONF`" != "$SYSLOG_CONF" ] ; then

@@ -10,11 +10,64 @@ if [ x$CONTROL_ETHERNET = x1 ] ; then
 		else
 			THROTTLE_ETHERNET="$NOLM_AC_THROTTLE_ETHERNET"
 		fi
+
+                if [ x$DISABLE_ETHERNET_ON_BATTERY = x1 ]; then
+                        # We are ON_AC and Disable feature is requested
+                        # So we might be required to re-enable the device.
+                        DISABLE_ETHERNET=0 #zero would mean that the device needs be re-enabled.
+                else
+                        DISABLE_ETHERNET=2
+                        # IF this is the case, don't touch the device for
+                        # enable/disable
+                fi
 	else
 		THROTTLE_ETHERNET="$BATT_THROTTLE_ETHERNET"
+
+                if [ x$DISABLE_ETHERNET_ON_BATTERY = x1 ]; then
+                        DISABLE_ETHERNET=1
+                else
+                        DISABLE_ETHERNET=0
+                fi
 	fi
 	
 	for DEVICE in $ETHERNET_DEVICES ; do
+                DISABLED=0
+                path=`readlink -f /sys/class/net/$DEVICE`
+                log "VERBOSE" "ethernet: $path"
+                if ! [ -z $path ]; then
+                        if [ -d $path/device ]; then
+                          dev_path=`readlink -f $path/device`
+                          log "VERBOSE" "ethernet: $dev_path"
+                        fi
+                fi
+
+                if ! [ -z $dev_path ] && [ -f $dev_path/enable ]; then
+                        if [ x$DISABLE_ETHERNET = x1 ]; then
+                                if [ -f $dev_path/enable ]; then
+                                        echo 0 > $dev_path/enable
+                                        log "VERBOSE" "ethernet: Disabling ethernet device $DEVICE"
+                                        DISABLED=1
+                                fi
+                        elif [ x$DISABLE_ETHERNET = x0 ]; then
+                                if [ -f $dev_path/enable ]; then
+                                        echo 1 > $dev_path/enable
+                                        log "VERBOSE" "ethernet: Re-enabling ethernet device $DEVICE"
+                                        DISABLED=1
+                                fi
+                        elif [ x$DISABLE_ETHERNET = x2 ]; then
+                                DISABLED=0 # Be safe. :-)
+                        else
+                                DISABLED=0 # Same here. Be safe. :-)
+                                           # For all other cases also, just disable it.
+                        fi
+                else
+                        log "VERBOSE" "$DEVICE does not seem to be supporting enable/disable"
+                fi
+
+               if [ x$DISABLED = x1 ]; then
+                       continue
+               fi
+
 		# Wakeup-on-LAN handling
 		if [ x$DISABLE_WAKEUP_ON_LAN = x1 ] ; then
 			ret=`ethtool -s $DEVICE wol d 2>&1`
@@ -101,3 +154,4 @@ if [ x$CONTROL_ETHERNET = x1 ] ; then
 else
 	log "VERBOSE" "Ethernet module is disabled."
 fi
+

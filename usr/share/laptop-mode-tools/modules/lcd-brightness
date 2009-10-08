@@ -3,8 +3,6 @@
 # Laptop mode tools module: control LCD brightness
 #
 
-
-
 # Control LCD brightness
 if [ x$CONTROL_BRIGHTNESS = x1 ] ; then
 	if [ $ON_AC -eq 1 ]; then

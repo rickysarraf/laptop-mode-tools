@@ -49,3 +49,4 @@ if [ x$CONTROL_INTEL_HDA_POWER = x1 ] ; then
 else
 	log "VERBOSE" "Intel HDA audio power setting is disabled."
 fi
+

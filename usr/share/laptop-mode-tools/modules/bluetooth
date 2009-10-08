@@ -3,7 +3,6 @@
 # Laptop mode tools module: bluetooth
 #
 
-
 if [ x$CONTROL_BLUETOOTH = x1 ] ; then
 	ENABLE_BLUETOOTH=$BATT_ENABLE_BLUETOOTH
 	if [ $ON_AC -eq 1 ] ; then
@@ -28,3 +27,4 @@ if [ x$CONTROL_BLUETOOTH = x1 ] ; then
 		modprobe -rq hci_usb || (sleep 1 ; modprobe -rq hci_usb) || (sleep 1 ; modprobe -rq hci_usb)		
 	fi
 fi
+

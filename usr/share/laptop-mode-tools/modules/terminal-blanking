@@ -3,8 +3,6 @@
 # Laptop mode tools module: virtual terminal blanking
 #
 
-
-
 # Set terminal blanking/powerdown timeouts
 if [ x$CONTROL_TERMINAL = x1 ] ; then
 	if [ $ON_AC -eq 1 ]; then

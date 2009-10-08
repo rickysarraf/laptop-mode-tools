@@ -3,8 +3,6 @@
 # Laptop mode tools module to handle CPU frequency settings.
 #
 
-
-
 # Set kernel setting, showing an error if this fails.
 # Parameter 1: sysctl/proc path
 # Parameter 2: the value
@@ -129,3 +127,4 @@ if [ x$CONTROL_CPU_THROTTLING = x1 ] ; then
 		fi
 	done
 fi
+

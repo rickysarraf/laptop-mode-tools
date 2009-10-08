@@ -35,7 +35,7 @@ set -a
 
 # The laptop mode tools version number. Extracted by the installer makefile
 # as well, so don't change the format!
-LMTVERSION=1.51
+LMTVERSION=1.52
 
 # This script is loaded from multiple scripts to set the config defaults
 # and to read the configuration on top of those. Only when the command is
@@ -127,6 +127,7 @@ BATT_BRIGHTNESS_COMMAND=false
 LM_AC_BRIGHTNESS_COMMAND=false
 NOLM_AC_BRIGHTNESS_COMMAND=false
 LOG_TO_SYSLOG=1
+DEBUG=0
 
 checkint ()
 {
@@ -175,6 +176,22 @@ else
 fi
 }
 
+enableDebug ()
+{
+        # Check if debug is enabled
+        if [ x$(($(basename $1 | cut -d . -f1 | tr "[:lower:]" "[:upper:]" | sed 's/-/_/g')_DEBUG)) = x1 ]; then
+                set -vx
+        fi
+}
+
+disableDebug ()
+{
+        # Check if debug is enabled
+        if [ x$(($(basename $1 | cut -d . -f1 | tr "[:lower:]" "[:upper:]" | sed 's/-/_/g')_DEBUG)) = x1 ]; then
+                set +vx
+        fi
+}
+
 # No default on these ones -- we need to detect if they have been set, for
 # backward compatibility with MINIMUM_BATTERY_MINUTES etc.
 AUTO_HIBERNATION_BATTERY_CHARGE_PERCENT=
@@ -191,6 +208,12 @@ if [ -d /etc/laptop-mode/conf.d ] ; then
 	for CONF in /etc/laptop-mode/conf.d/*.conf ; do
 		if [ -r "$CONF" ] ; then
 			. "$CONF"
+                        #Handle individual module debug settings
+                        if [ "$DEBUG" -eq 1 ]; then
+                                export $(basename $CONF | cut -d . -f1 | tr "[:lower:]" "[:upper:]" | sed 's/-/_/g')_DEBUG=1
+                                log "VERBOSE" "Enabling debug mode for module $CONF"
+                        fi
+                        DEBUG=0
 		else
 			log "MSG" "Warning: Configuration file $CONF is not readable, skipping."
 		fi
@@ -396,7 +419,7 @@ if [ "$1" = "status" ] ; then
 	# Display a status report.
 	log "STATUS" "Mounts:"
 	mount | sed "s/^/   /"
-    log "STATUS" " "
+        log "STATUS" " "
 	log "STATUS" "Drive power status:"
 	for disk in $HD; do
 		if [ -r $disk ]; then
@@ -405,10 +428,10 @@ if [ "$1" = "status" ] ; then
 			log "STATUS" "   Cannot read $disk, permission denied - $0 needs to be run as root"
 		fi
 	done
-    log "STATUS" " "
+        log "STATUS" " "
 	log "STATUS" "(NOTE: drive settings affected by Laptop Mode cannot be retrieved.)"
 
-    log "STATUS" " "
+        log "STATUS" " "
 	log "STATUS" "Readahead states:"
 	cat /etc/mtab | while read DEV MP FST OPTS DUMP PASS ; do
 		# skip funny stuff
@@ -424,7 +447,7 @@ if [ "$1" = "status" ] ; then
 			fi
 		fi
 	done
-    log "STATUS" " "
+        log "STATUS" " "
 	if [ -e /var/run/laptop-mode-tools/enabled ] ; then
 		log "STATUS" "Laptop Mode Tools is allowed to run: /var/run/laptop-mode-tools/enabled exists."
 	else
@@ -440,7 +463,7 @@ if [ "$1" = "status" ] ; then
 			else
 				log "STATUS" "   Not accessible, permission denied - $0 needs to be run as root."
 			fi
-            log "STATUS" " "
+                        log "STATUS" " "
 		fi
 	done
 
@@ -989,7 +1012,11 @@ export FORCE STATE ON_AC ACTIVATE ACTIVATE_WITH_POSSIBLE_DATA_LOSS KLEVEL KMINOR
 for SCRIPT in /usr/share/laptop-mode-tools/modules/* /usr/local/lib/laptop-mode-tools/modules/* /usr/local/share/laptop-mode-tools/modules/* /etc/laptop-mode/modules/*; do
 	if [ -x "$SCRIPT" ] ; then
 		log "VERBOSE" "Invoking module $SCRIPT."
-        . $SCRIPT
+                SCRIPT_DEBUG=$SCRIPT; # We do this because in start-stop-programs module a $SCRIPT variable is used. That
+                                      # changes the whole meaning when passed to disableDebug ()
+                enableDebug $SCRIPT_DEBUG;
+                . $SCRIPT
+                disableDebug $SCRIPT_DEBUG;
 	else
 		log "VERBOSE" "Module $SCRIPT is not executable."
 	fi

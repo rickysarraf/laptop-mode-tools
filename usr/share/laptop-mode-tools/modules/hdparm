@@ -6,7 +6,6 @@
 # file.
 #
 
-
 #
 # Function for drive capability check. This prevents ugly errors in
 # the kernel output about unsupported commands.

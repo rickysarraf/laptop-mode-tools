@@ -25,3 +25,4 @@ if [ x$CONTROL_SCHED_MC_POWER_SAVINGS = x1 ] ; then
 else
 	log "VERBOSE" "Scheduler power setting is disabled."
 fi
+
