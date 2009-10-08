@@ -3,7 +3,7 @@
 
 Summary: Tools for power savings based on battery/AC status
 Name: laptop-mode-tools
-Version: 1.51
+Version: 1.52
 Release: 1
 License: GPL
 Group: System Environment/Base
@@ -92,6 +92,9 @@ fi
 
 
 %changelog
+* Thu Oct  8 14:12:23 IST 2009 Ritesh Raj Sarraf <rrs@researchut.com> - 1.52-1
+- Updated to release 1.52.
+
 * Tue Sep  1 20:53:28 IST 2009 Ritesh Raj Sarraf <rrs@researchut.com> - 1.51-1
 - Updated to release 1.51.
 
