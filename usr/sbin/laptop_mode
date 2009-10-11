@@ -128,6 +128,7 @@ LM_AC_BRIGHTNESS_COMMAND=false
 NOLM_AC_BRIGHTNESS_COMMAND=false
 LOG_TO_SYSLOG=1
 DEBUG=0
+ENABLE_LAPTOP_MODE_TOOLS=1
 
 checkint ()
 {
@@ -224,6 +225,11 @@ if [ -r /etc/laptop-mode/laptop-mode.conf ] ; then
 else
 	log "ERR" "$0: Configuration file /etc/laptop-mode/laptop-mode.conf not present or not readable."
 	exit 1
+fi
+
+if [ $ENABLE_LAPTOP_MODE_TOOLS = x0 ]; then
+        log "MSG" "laptop-mode-tools is disabled in config file. Exiting"
+        exit 0;
 fi
 
 # Add a simple bash debug mode switch
