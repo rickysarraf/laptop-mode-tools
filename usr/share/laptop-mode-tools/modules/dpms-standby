@@ -24,7 +24,7 @@ getXuser() {
 
 
 # Set X screen standby/suspend/powerdown timing
-if [ x$CONTROL_DPMS_STANDBY = x1 ] ; then
+if [ x$CONTROL_DPMS_STANDBY = x1 ]  || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_DPMS_STANDBY = xauto ]; then
 	if [ $ON_AC -eq 1 ]; then
 		if [ "$ACTIVATE" -eq 1 ]; then
 			STANDBY="$LM_AC_DPMS_STANDBY"

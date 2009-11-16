@@ -17,7 +17,7 @@ blacklisted() {
 	return 1
 }
 
-if [ x$CONTROL_USB_AUTOSUSPEND = x1 ] ; then
+if [ x$CONTROL_USB_AUTOSUSPEND = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_USB_AUTOSUSPEND = xauto ]; then
     if [ $ON_AC -eq 1 ]; then
         if [ "$ACTIVATE" -eq 1 ]; then
             SUSPEND_USB_DEVICES="$LM_AC_SUSPEND_USB"

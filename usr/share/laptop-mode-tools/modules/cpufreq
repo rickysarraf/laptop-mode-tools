@@ -25,7 +25,7 @@ get_medium_value() {
 }
 
 
-if [ x$CONTROL_CPU_FREQUENCY = x1 ] ; then
+if [ x$CONTROL_CPU_FREQUENCY = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_CPU_FREQUENCY = xauto ]; then
 	if [ $ON_AC -eq 1 ] ; then
 		if [ "$ACTIVATE" -eq 1 ] ; then
 			CPU_MAXFREQ="$LM_AC_CPU_MAXFREQ"
@@ -93,7 +93,7 @@ if [ x$CONTROL_CPU_FREQUENCY = x1 ] ; then
 	done
 fi
 
-if [ x$CONTROL_CPU_THROTTLING = x1 ] ; then
+if [ x$CONTROL_CPU_THROTTLING = x1 ]  || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_CPU_THROTTLING = xauto ]; then
 	if [ $ON_AC -eq 1 ] ; then
 		if [ "$ACTIVATE" -eq 1 ] ; then
 			CPU_THROTTLING="$LM_AC_CPU_THROTTLING"

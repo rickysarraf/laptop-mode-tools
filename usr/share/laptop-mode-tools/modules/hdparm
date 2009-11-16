@@ -162,7 +162,7 @@ else
 	fi
 fi
 
-if [ x$CONTROL_HD_POWERMGMT = x1 ] ; then
+if [ x$CONTROL_HD_POWERMGMT = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_HD_POWERMGMT = xauto ]; then
 	if [ $ON_AC -eq 1 ] ; then
 		if [ "$ACTIVATE" -eq 1 ] ; then
 			HD_POWERMGMT=$LM_AC_HD_POWERMGMT

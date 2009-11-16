@@ -3,7 +3,7 @@
 # Laptop mode tools module: Scheduler tunables for multi-socket SMT systems.
 #
 
-if [ x$CONTROL_SCHED_SMT_POWER_SAVINGS = x1 ] ; then
+if [ x$CONTROL_SCHED_SMT_POWER_SAVINGS = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_SCHED_SMT_POWER_SAVINGS = xauto ]; then
 	if [ $ON_AC -eq 1 ]; then
 		log "VERBOSE" "On AC power: setting scheduler power saving to 0."
 		if [ -w /sys/devices/system/cpu/sched_smt_power_savings ]; then

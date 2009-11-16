@@ -2,6 +2,8 @@
     * Add global enable/disable switch for laptop-mode-tools
     * Add scheduler power saving module for SMT processors. Thanks to John
       Reilly.
+    * Add a new "Auto Modules" mode which enables all modules whitelisted as
+      auto with a single configuration setting, ENABLE_AUTO_MODULES.
 
 
 1.52 - Thu Oct  8 14:12:23 IST 2009

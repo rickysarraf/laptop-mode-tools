@@ -8,7 +8,7 @@
 #
 # Original source: http://ubuntuforums.org/showthread.php?t=419772
 
-if [ x$CONTROL_IPW_POWER = x1 ] ; then
+if [ x$CONTROL_IPW_POWER = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_IPW_POWER = xauto ]; then
 
 	# Provide defaults for config file settings
 	[ "$IPW3945_AC_POWER" ]   || IPW3945_AC_POWER=6
