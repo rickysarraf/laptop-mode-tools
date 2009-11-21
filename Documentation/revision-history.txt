@@ -4,6 +4,7 @@
       Reilly.
     * Add a new "Auto Modules" mode which enables all modules whitelisted as
       auto with a single configuration setting, ENABLE_AUTO_MODULES.
+    * Add LM/NOLM option for Intel SATA Power Management
 
 
 1.52 - Thu Oct  8 14:12:23 IST 2009
