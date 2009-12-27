@@ -3,7 +3,7 @@
 # Laptop mode tools module: Intel HDA integrated audio power saving mode.
 #
 
-if [ x$CONTROL_INTEL_HDA_POWER = x1 ] ; then
+if [ x$CONTROL_INTEL_HDA_POWER = x1 ]  || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_INTEL_HDA_POWER = xauto ]; then
     if [ $ON_AC -eq 1 ]; then
 		if [ "$ACTIVATE" -eq 1 ]; then
 			INTEL_HDA_POWERSAVE="$LM_AC_INTEL_HDA_POWERSAVE"

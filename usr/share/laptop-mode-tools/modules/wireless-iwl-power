@@ -47,7 +47,7 @@ findWifiIfsByDriver () {
 	done
 }
 
-if [ x$CONTROL_IWL_POWER = x1 ] ; then
+if [ x$CONTROL_IWL_POWER = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_IWL_POWER = xauto ]; then
 	log "VERBOSE" "Setting power levels for iwlwifi wireless interfaces."
 
 	# Provide defaults for config file settings

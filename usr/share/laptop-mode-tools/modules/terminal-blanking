@@ -4,7 +4,7 @@
 #
 
 # Set terminal blanking/powerdown timeouts
-if [ x$CONTROL_TERMINAL = x1 ] ; then
+if [ x$CONTROL_TERMINAL = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_TERMINAL = xauto ]; then
 	if [ $ON_AC -eq 1 ]; then
 		if [ "$ACTIVATE" -eq 1 ]; then
 			BLANK_MINUTES="$LM_AC_TERMINAL_BLANK_MINUTES"
