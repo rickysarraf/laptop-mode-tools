@@ -21,5 +21,6 @@ if [ x$CONTROL_SUPERHE = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_SUPER
             log "VERBOSE" "SuperHe triggered with value $SUPERHE_VALUE"
     else
             log "VERBOSE" "Platform does not support SuperHe"
+    fi
 fi
 
