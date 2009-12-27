@@ -16,7 +16,7 @@ if [ x$CONTROL_SUPERHE = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_SUPER
         SUPERHE_VALUE="$BATT_SUPERHE"
     fi
 
-    if [ -a $SUPERHE_CONTROL_FILE ]; then
+    if [ -e $SUPERHE_CONTROL_FILE ]; then
             echo $SUPERHE_VALUE > $SUPERHE_CONTROL_FILE
             log "VERBOSE" "SuperHe triggered with value $SUPERHE_VALUE"
     else
