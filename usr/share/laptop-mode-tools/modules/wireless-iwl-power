@@ -1,7 +1,7 @@
 #! /bin/sh
 # 
 # Laptop mode tools module, called from /usr/sbin/laptop_mode.
-# Configuration in /etc/laptop-mode/conf.d/wireless-ipw-power.conf.
+# Configuration in /etc/laptop-mode/conf.d/wireless-iwl-power.conf.
 #
 # PURPOSE: power saving for the Intel 3945 and 4965 adapters when using the
 #          iwlwifi drivers.
