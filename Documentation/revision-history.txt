@@ -1,4 +1,4 @@
-1.53 - TBD
+1.53 - Sat Jan  2 23:42:50 IST 2010
     * Add global enable/disable switch for laptop-mode-tools
     * Add scheduler power saving module for SMT processors. Thanks to John
       Reilly.

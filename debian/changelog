@@ -1,4 +1,4 @@
-laptop-mode-tools (1.53-1) UNRELEASED; urgency=low
+laptop-mode-tools (1.53-1) unstable; urgency=low
 
   * New Upstream Release 
     + Add global enable/disable switch for laptop-mode-tools
@@ -9,7 +9,7 @@ laptop-mode-tools (1.53-1) UNRELEASED; urgency=low
     + Add LM/NOLM option for Intel SATA Power Management
     + Do a check before trying to write to the SuperHE Control File
 
- -- Ritesh Raj Sarraf <rrs@researchut.com>  Sun, 27 Dec 2009 11:16:53 +0530
+ -- Ritesh Raj Sarraf <rrs@researchut.com>  Thu, 07 Jan 2010 16:59:22 +0530
 
 laptop-mode-tools (1.52-1) unstable; urgency=low
 
