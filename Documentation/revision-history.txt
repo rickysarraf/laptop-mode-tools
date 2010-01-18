@@ -1,3 +1,7 @@
+1.54 - TBD
+    * Fix wireless-iwl module. Activation of power saving using iwconfig was
+	never done. Thanks to Sergio Cambra for the report
+
 1.53 - Sat Jan  2 23:42:50 IST 2010
     * Add global enable/disable switch for laptop-mode-tools
     * Add scheduler power saving module for SMT processors. Thanks to John
