@@ -82,6 +82,8 @@ if [ x$CONTROL_CPU_FREQUENCY = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL
 			log "VERBOSE" "Setting CPU frequency governor for cpu $THISCPU to $THIS_CPU_GOVERNOR."
 			log "VERBOSE" "`/sbin/modprobe -q cpufreq_$THIS_CPU_GOVERNOR 2>&1`"
 			set_sysctl $THISCPU/cpufreq/scaling_governor $THIS_CPU_GOVERNOR
+
+			# Retain for backward compatibility
 			if [ -f "$THISCPU/cpufreq/$THIS_CPU_GOVERNOR/ignore_nice_load" ] ; then
 				log "VERBOSE" "Setting CPU ignore_nice_load for cpu $THISCPU to $THIS_CPU_IGNORE_NICE_LOAD."
 				set_sysctl $THISCPU/cpufreq/$THIS_CPU_GOVERNOR/ignore_nice_load $THIS_CPU_IGNORE_NICE_LOAD
@@ -91,6 +93,15 @@ if [ x$CONTROL_CPU_FREQUENCY = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL
 			fi
 		fi
 	done
+
+	# For kernels 2.6.32 and above, the sysfs interface for OnDemand per-core power savings has changed.
+	# Instead of per-core, the new interface is generic and a single one
+	if [ -f "/sys/devices/system/cpu/cpufreq/ondemand/ignore_nice_load" ]; then
+		log "VERBOSE" "Setting CPU ignore_nice_load for all cpus"
+		set_sysctl /sys/devices/system/cpu/cpufreq/ondemand/ignore_nice_load $CPU_IGNORE_NICE_LOAD
+	else
+		log "VERBOSE" "No generic CPU ignore_nice_load interface available"
+	fi
 fi
 
 if [ x$CONTROL_CPU_THROTTLING = x1 ]  || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_CPU_THROTTLING = xauto ]; then

@@ -1,6 +1,9 @@
 1.54 - TBD
     * Fix wireless-iwl module. Activation of power saving using iwconfig was
 	never done. Thanks to Sergio Cambra for the report
+    * Handle new generic interface for ignore_nice_load. The new sysfs
+	interface is no more core specific. Thanks to Roman v. Gemmeren for
+	reporting it
 
 1.53 - Sat Jan  2 23:42:50 IST 2010
     * Add global enable/disable switch for laptop-mode-tools
