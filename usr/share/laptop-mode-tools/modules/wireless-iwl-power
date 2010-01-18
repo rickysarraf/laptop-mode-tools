@@ -83,7 +83,7 @@ if [ x$CONTROL_IWL_POWER = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_IWL
 			else
 				# For iwlagn, it is one standard behavior. Not multiple like ipwXXXX
 				# Thus let's just simply exec the command here.
-				$IWCONFIG $IF "power off"
+				$IWCONFIG $IF power off
 				log "VERBOSE" "Using $IWCONFIG for power mgmt"
 			fi
 		else
@@ -92,7 +92,7 @@ if [ x$CONTROL_IWL_POWER = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_IWL
 				echo $IWL_BATT_POWER > /sys/class/net/$IF/device/power_level;
 				log "VERBOSE" "Using method echo for power mgmt"
 			else
-				$IWCONFIG $IF "power on"
+				$IWCONFIG $IF power on
 				log "VERBOSE" "Using $IWCONFIG for power mgmt"
 			fi
 		fi
