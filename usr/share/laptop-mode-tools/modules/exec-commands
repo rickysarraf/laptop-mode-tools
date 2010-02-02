@@ -1,0 +1,38 @@
+#! /bin/sh
+# 
+# Laptop mode tools module: Execute specific commands for power saving.
+#
+
+if [ x$CONTROL_EXEC_COMMANDS = x1 ]  || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_EXEC_COMMANDS = xauto ]; then
+    if [ $ON_AC -eq 1 ]; then
+		if [ "$ACTIVATE" -eq 1 ]; then
+			EXEC_COMMANDS="$LM_AC_EXEC_COMMANDS"
+			COMMAND_TYPE=LM_AC_EXEC_COMMAND
+		else
+			EXEC_COMMANDS="$NOLM_AC_EXEC_COMMANDS"
+			COMMAND_TYPE=NOLM_AC_EXEC_COMMAND
+		fi
+    else
+		EXEC_COMMANDS="$BATT_EXEC_COMMANDS"
+		COMMAND_TYPE=BATT_EXEC_COMMAND
+    fi
+
+    # Handle Command Execution
+    if [ x$EXEC_COMMANDS = x1 ]; then
+	    COUNTER=0
+	    while true;
+	    do
+		    COMMAND="$COMMAND_TYPE"_$COUNTER
+		    if [ -z "$COMMAND" ]; then
+			    break;
+		    fi
+
+		    log "VERBOSE" "Executing comand $COMMAND"
+		    exec $COMMAND;
+
+		    COUNTER=`expr $COUNTER + 1`
+	    done
+    fi
+else
+	log "VERBOSE" "Module exec-commands is disabled"
+fi

@@ -4,6 +4,8 @@
     * Handle new generic interface for ignore_nice_load. The new sysfs
 	interface is no more core specific. Thanks to Roman v. Gemmeren for
 	reporting it
+    * Add a new "exec-commands" module. With this module, users can add
+	custom commands specific to their requirements.
 
 1.53 - Sat Jan  2 23:42:50 IST 2010
     * Add global enable/disable switch for laptop-mode-tools
