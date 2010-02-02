@@ -27,6 +27,9 @@ if [ x$CONTROL_EXEC_COMMANDS = x1 ]  || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTRO
 			    break;
 		    fi
 
+		    # Now we need the acutal user command
+		    COMMAND="$COMMAND"
+
 		    log "VERBOSE" "Executing comand $COMMAND"
 		    exec $COMMAND;
 
