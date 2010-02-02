@@ -1,7 +1,7 @@
 #! /bin/sh
 # 
 # Laptop mode tools module, called from /usr/sbin/laptop_mode.
-# Configuration in /etc/laptop-mode/conf.d/wireless-ipw-power.conf.
+# Configuration in /etc/laptop-mode/conf.d/wireless-iwl-power.conf.
 #
 # PURPOSE: power saving for the Intel 3945 and 4965 adapters when using the
 #          iwlwifi drivers.
@@ -77,13 +77,23 @@ if [ x$CONTROL_IWL_POWER = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_IWL
 	for IF in $WIFI_IFNAMES ; do
 		if [ $ON_AC -eq 1 ] ; then
 			log "VERBOSE" "On AC power: setting power level for $IF to $IWL_AC_POWER."
-			if ( ! echo $IWL_AC_POWER > /sys/class/net/$IF/device/power_level ) ; then
-				log "ERR" "Failed."
+			if [ -f /sys/class/net/$IF/device/power_level ]; then
+				echo $IWL_AC_POWER > /sys/class/net/$IF/device/power_level;
+				log "VERBOSE" "Using method echo for power mgmt"
+			else
+				# For iwlagn, it is one standard behavior. Not multiple like ipwXXXX
+				# Thus let's just simply exec the command here.
+				$IWCONFIG $IF power off
+				log "VERBOSE" "Using $IWCONFIG for power mgmt"
 			fi
 		else
 			log "VERBOSE" "On battery: setting power level for $IF to $IWL_BATT_POWER."
-			if ( ! echo $IWL_BATT_POWER > /sys/class/net/$IF/device/power_level ) ; then
-				log "ERR" "Failed."
+			if [ -f /sys/class/net/$IF/device/power_level ]; then
+				echo $IWL_BATT_POWER > /sys/class/net/$IF/device/power_level;
+				log "VERBOSE" "Using method echo for power mgmt"
+			else
+				$IWCONFIG $IF power on
+				log "VERBOSE" "Using $IWCONFIG for power mgmt"
 			fi
 		fi
 	done

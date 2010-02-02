@@ -2,8 +2,10 @@ laptop-mode-tools (1.54-1) UNRELEASED; urgency=low
 
   * New Upstream Release
     + Add new exec-commands module
+    + Fix wireless-iwl module activation
+    + Add generic interface for ignore_nice_load
 
- -- Ritesh Raj Sarraf <rrs@researchut.com>  Tue, 02 Feb 2010 17:15:54 +0530
+ -- Ritesh Raj Sarraf <rrs@researchut.com>  Tue, 02 Feb 2010 17:17:32 +0530
 
 laptop-mode-tools (1.53-1) unstable; urgency=low
 
