@@ -22,16 +22,15 @@ if [ x$CONTROL_EXEC_COMMANDS = x1 ]  || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTRO
 	    COUNTER=0
 	    while true;
 	    do
-		    COMMAND="$COMMAND_TYPE"_$COUNTER
+		    COMMAND=\${${COMMAND_TYPE}_${COUNTER}}
+		    COMMAND=$(eval echo $COMMAND)
+
 		    if [ -z "$COMMAND" ]; then
 			    break;
 		    fi
 
-		    # Now we need the acutal user command
-		    COMMAND="$COMMAND"
-
 		    log "VERBOSE" "Executing comand $COMMAND"
-		    exec $COMMAND;
+		    log "VERBOSE" $($COMMAND)
 
 		    COUNTER=`expr $COUNTER + 1`
 	    done
