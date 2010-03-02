@@ -8,6 +8,8 @@
       custom commands specific to their requirements.
     * Document cpufreq frequency behavior about older P4 processors and set
       the default to 0
+    * ThinkPads running with thinkpad_acpi driver have a simpler interface for
+      bluetooth and video. Currently utilizing the bluetooth interface
 
 1.53 - Sat Jan  2 23:42:50 IST 2010
     * Add global enable/disable switch for laptop-mode-tools
