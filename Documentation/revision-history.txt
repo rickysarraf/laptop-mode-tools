@@ -10,6 +10,8 @@
       the default to 0
     * ThinkPads running with thinkpad_acpi driver have a simpler interface for
       bluetooth and video. Currently utilizing the bluetooth interface
+    * Don't log VERBOSE messages to syslog unless VERBOSE_OUTPUT=1
+      (DBTS: #567766)
 
 1.53 - Sat Jan  2 23:42:50 IST 2010
     * Add global enable/disable switch for laptop-mode-tools
