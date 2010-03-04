@@ -15,8 +15,21 @@ if [ x$CONTROL_BLUETOOTH = x1 ] ; then
 			[ -d /sys/class/bluetooth/$INTF ] || continue
 			log "VERBOSE" "`hciconfig $INTF up 2>&1`"
 		done
+
+		# For thinkpads, where the thinkpad_acpi driver is loaded,
+		# we can handle bluetooth easily
+		if [ -f /proc/acpi/ibm/bluetooth ]; then
+			log "VERBOSE" "Enabling ThinkPad Bluetooth device"
+			echo "enable" > /proc/acpi/ibm/bluetooth
+		fi
 	else
 		log "VERBOSE" "Disabling bluetooth."
+
+		if [ -f /proc/acpi/ibm/bluetooth ]; then
+			log "VERBOSE" "Disabling ThinkPad Bluetooth device"
+			echo "disable" > /proc/acpi/ibm/bluetooth
+		fi
+		
 		for INTF in $BLUETOOTH_INTERFACES ; do
 			[ -d /sys/class/bluetooth/$INTF ] || continue
 			log "VERBOSE" "`hciconfig $INTF down 2>&1`" 

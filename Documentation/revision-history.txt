@@ -1,11 +1,17 @@
 1.54 - TBD
     * Fix wireless-iwl module. Activation of power saving using iwconfig was
-	never done. Thanks to Sergio Cambra for the report
+      never done. Thanks to Sergio Cambra for the report
     * Handle new generic interface for ignore_nice_load. The new sysfs
-	interface is no more core specific. Thanks to Roman v. Gemmeren for
-	reporting it
+      interface is no more core specific. Thanks to Roman v. Gemmeren for
+      reporting it
     * Add a new "exec-commands" module. With this module, users can add
-	custom commands specific to their requirements.
+      custom commands specific to their requirements.
+    * Document cpufreq frequency behavior about older P4 processors and set
+      the default to 0
+    * ThinkPads running with thinkpad_acpi driver have a simpler interface for
+      bluetooth and video. Currently utilizing the bluetooth interface
+    * Don't log VERBOSE messages to syslog unless VERBOSE_OUTPUT=1
+      (DBTS: #567766)
 
 1.53 - Sat Jan  2 23:42:50 IST 2010
     * Add global enable/disable switch for laptop-mode-tools
