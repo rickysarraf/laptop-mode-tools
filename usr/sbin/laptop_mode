@@ -159,8 +159,10 @@ if [ x$LOG_TO_SYSLOG = x1 ]; then
             logger -p daemon.info -t laptop-mode "$2";
         elif [ "$1" = "ERR" ]; then
             logger -p daemon.err -t laptop-mode "$2";
-        elif [ "$1" = "VERBOSE" -a x$VERBOSE_OUTPUT = x1 ]; then
-            logger -p daemon.debug -t laptop-mode "$2";
+        elif [ "$1" = "VERBOSE" ]; then
+		if [ x$VERBOSE_OUTPUT = x1 ]; then
+            		logger -p daemon.debug -t laptop-mode "$2";
+		fi
         else
             logger -p daemon.notice -t laptop-mode "$2";
         fi
