@@ -4,8 +4,12 @@ laptop-mode-tools (1.54-1) UNRELEASED; urgency=low
     + Add new exec-commands module
     + Fix wireless-iwl module activation
     + Add generic interface for ignore_nice_load
+    + Document cpufreq frequency scaling behavior for older P4 processors
+    + Add support for bluetooth on IBM Thinkpads using the thinkpad_acpi driver
+    + Don't spam syslog if VERBOSE_OUTPUT is not enabled (Closes: #567766)
+   
 
- -- Ritesh Raj Sarraf <rrs@researchut.com>  Tue, 02 Feb 2010 17:17:32 +0530
+ -- Ritesh Raj Sarraf <rrs@researchut.com>  Wed, 10 Mar 2010 16:31:37 +0530
 
 laptop-mode-tools (1.53-1) unstable; urgency=low
 
