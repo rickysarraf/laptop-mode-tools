@@ -7,9 +7,9 @@ laptop-mode-tools (1.54-1) UNRELEASED; urgency=low
     + Document cpufreq frequency scaling behavior for older P4 processors
     + Add support for bluetooth on IBM Thinkpads using the thinkpad_acpi driver
     + Don't spam syslog if VERBOSE_OUTPUT is not enabled (Closes: #567766)
-   
+  * Add ${misc:Depends} to make it lintian clean
 
- -- Ritesh Raj Sarraf <rrs@researchut.com>  Wed, 10 Mar 2010 16:31:37 +0530
+ -- Ritesh Raj Sarraf <rrs@researchut.com>  Wed, 10 Mar 2010 16:41:50 +0530
 
 laptop-mode-tools (1.53-1) unstable; urgency=low
 
