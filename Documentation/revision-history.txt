@@ -1,4 +1,4 @@
-1.54 - TBD
+1.54 - Wed Mar 10 16:09:34 IST 2010
     * Fix wireless-iwl module. Activation of power saving using iwconfig was
       never done. Thanks to Sergio Cambra for the report
     * Handle new generic interface for ignore_nice_load. The new sysfs
