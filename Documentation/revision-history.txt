@@ -6,6 +6,8 @@
 	reporting it
     * Add wireless-power module, for generic non-Intel wireless interfaces that
       support the iwconfig "power" option.
+    * Fixed upgrade path for configurations which didn't have the LM/NOLM
+      options in the Intel SATA Power Management module config.
 
 1.53 - Sat Jan  2 23:42:50 IST 2010
     * Add global enable/disable switch for laptop-mode-tools
