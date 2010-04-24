@@ -566,6 +566,22 @@ This option should contain a space-separated list of services which should be
 reloaded after the config files have been switched around.
 
 
+.SS "\fI/etc/laptop-mode/conf.d/wireless-power.conf\fP"
+
+The wireless-power module allows you to alter the power management settings
+for wireless network adapters that support the iwconfig "power" option. This
+module is not usable for Intel network adapters that use the iwlwifi or ipw
+drivers, they are supported by separate modules described below.
+
+.IP "\fBCONTROL_WIRELESS_POWER_SAVING\fP" 10
+If this option is enabled, laptop mode tools will set the wireless power
+saving mode settings based on the power state.
+
+.IP "\fBWIRELESS_AC_POWER_SAVING\fP" 10
+.IP "\fBWIRELESS_BATT_POWER_SAVING\fP" 10
+These settings define the power saving modes on AC and on battery. The allowed
+values are 0 (to disable power saving mode) and 1 (to enable power saving mode).
+
 
 .SS "\fI/etc/laptop-mode/conf.d/wireless-ipw-power.conf\fP"
 
