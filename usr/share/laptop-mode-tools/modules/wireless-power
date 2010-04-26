@@ -7,21 +7,41 @@
 #          the iwconfig power command.
 #
 
+[ "$WIRELESS_POWER_SAVING_EXCLUDE_DRIVERS" ] || WIRELESS_POWER_SAVING_EXCLUDE_DRIVERS="iwl3945 iwl4965 iwlagn ipw3945 ipw2200 ipw2100"
+
 #
-# Find all the wireless devices.
+# Find all the wireless devices that do not use an excluded driver.
 # Place the interface names on the list WIFI_IFNAMES.
 #
 findWifiIfs () {
-	local DEVICE;
+	local SYSDEVICE EXCLUDED LINK_TARGET DRIVER IFNAME EXCLUDED_DRIVER;
 	
-	for DEVICE in /sys/class/net/*; do
-		dev=`basename $DEVICE`
+	for SYSDEVICE in /sys/class/net/*; do
+		IFNAME=`basename $SYSDEVICE`
+
                 # Check if it is a wireless device
-                $IWCONFIG $dev >/dev/null 2>&1;
+                $IWCONFIG $IFNAME >/dev/null 2>&1;
                 ret=$?;
                 if [ "$ret" = "0" ]; then
-		        # Add the interface name to the list
-	    		WIFI_IFNAMES="$WIFI_IFNAMES ${DEVICE##*/}"
+			# Yes, it is a wireless device.
+			if [ -h $SYSDEVICE/device/driver ]; then
+				# Read the driver name
+				LINK_TARGET=`readlink $SYSDEVICE/device/driver`
+				DRIVER=${LINK_TARGET##*/}
+				
+				EXCLUDED=0
+				for EXCLUDED_DRIVER in $WIRELESS_POWER_SAVING_EXCLUDE_DRIVERS ; do
+					if [ "$EXCLUDED_DRIVER" = "$DRIVER" ] ; then
+						log "VERBOSE" "Wireless interface $IFNAME excluded for wireless-power by driver name."
+						EXCLUDED=1
+					fi 
+				done
+				if [ $EXCLUDED = 0 ] ; then
+					# add the interface name to the list
+					WIFI_IFNAMES="$WIFI_IFNAMES $IFNAME"
+				fi
+			fi
+
                 fi
 	done
 }
