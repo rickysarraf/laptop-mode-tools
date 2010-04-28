@@ -81,7 +81,7 @@ if [ x$CONTROL_ETHERNET = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_ETHE
 		fi
 		
 		# Determine speed
-		speed=`mii-tool -v $DEVICE | grep capabilities | tr ' ' '\n' |\
+		speed=`mii-tool -v $DEVICE 2>/dev/null | grep capabilities | tr ' ' '\n' |\
                         sort -n | sed -ne '/^1.*/p' | cut -d "b" -f1`
                 if [ -z "$speed" ]; then
                         speed=0;
