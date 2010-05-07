@@ -1,4 +1,4 @@
-laptop-mode-tools (1.54-1) UNRELEASED; urgency=low
+laptop-mode-tools (1.54-1) unstable; urgency=low
 
   * New Upstream Release
     + Add new exec-commands module
@@ -10,7 +10,7 @@ laptop-mode-tools (1.54-1) UNRELEASED; urgency=low
   * Add ${misc:Depends} to make it lintian clean
   * Update Standards Version to 3.8.4 (No changes required) 
 
- -- Ritesh Raj Sarraf <rrs@researchut.com>  Wed, 10 Mar 2010 16:42:40 +0530
+ -- Ritesh Raj Sarraf <rrs@researchut.com>  Wed, 17 Mar 2010 16:38:32 +0530
 
 laptop-mode-tools (1.53-1) unstable; urgency=low
 
