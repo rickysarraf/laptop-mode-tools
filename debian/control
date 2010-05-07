@@ -1,7 +1,7 @@
 Source: laptop-mode-tools
 Section: utils
 Priority: optional
-Maintainer: Ritesh Raj Sarraf <rrs@researchut.com>
+Maintainer: Ritesh Raj Sarraf <rrs@debian.org>
 Homepage: http://www.samwel.tk/laptop_mode/
 Uploaders: Bart Samwel <bart@samwel.tk>
 DM-Upload-Allowed: yes

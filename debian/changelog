@@ -1,3 +1,9 @@
+laptop-mode-tools (1.54-2) UNRELEASED; urgency=low
+
+  * Change address to my official Debian address
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sat, 08 May 2010 03:46:05 +0530
+
 laptop-mode-tools (1.54-1) unstable; urgency=low
 
   * New Upstream Release
