@@ -9,6 +9,8 @@
       options in the Intel SATA Power Management module config.
     * Add flush-* to ignored programs for lm-profiler, because it is the
       successor to pdflush.
+    * Fix WoL regression introduced by DISABLE_ETHERNET_ON_BATTERY. Thanks
+      to Matthias Dienstbier for the report and the patch
 
 1.54 - Wed Mar 10 16:09:34 IST 2010
     * Fix wireless-iwl module. Activation of power saving using iwconfig was
