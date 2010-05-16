@@ -239,6 +239,39 @@ kernels the value of HZ is 100 for the most common architectures, so
 you need only change this value if you use a less common architecture. 
 
 
+.SS "\fI/etc/laptop-mode/conf.d/ethernet.conf\fP"
+
+The ethernet module allows you to control the behavior of your ethernet devices
+during AC and battery states.
+
+.IP "\fBCONTROL_ETHERNET\fP" 10 
+Enable this to control various aspects of power savings in the ethernet devices.
+
+.IP "\fBBATT_THROTTLE_ETHERNET=1\fP" 10
+.IP "\fBLM_AC_THROTTLE_ETHERNET=0\fP" 10
+.IP "\fBNOLM_AC_THROTTLE_ETHERNET=0\fP" 10
+These options specify the power states in which you would like to control the
+ethernet device
+
+.IP "\fBTHROTTLE_SPEED\fP" 10 
+Here, you can specify the throttling speed for your ethernet device. The default
+is "slowest". Valid values are "slowest", "fastest" or the speed of your ethernet
+device, like 1000. To know the exact speed of your ethernet device, you can use
+the ethtool tool.
+
+.IP "\fBDISABLE_WAKEUP_ON_LAN\fP" 10 
+This setting controls the option to enable/disable the WoL (Wake On LAN) feature.
+It permanently disables the WOL feature on the ethernet device. Default is 1.
+Set it to 0 to enable the WOL feature.
+
+.IP "\fBETHERNET_DEVICES\fP" 10 
+Specify the list of ethernet devices to control. Defaults to eth0
+
+.IP "\fBDISABLE_ETHERNET_ON_BATTERY\fP" 10 
+Set this to 1 if you want to completely disable your ethernet device when running on
+battery. Default is 0
+
+
 .SS "\fI/etc/laptop-mode/conf.d/cpufreq.conf\fP"
 
 The cpufreq module allows you to control the Linux kernel's CPU frequency
