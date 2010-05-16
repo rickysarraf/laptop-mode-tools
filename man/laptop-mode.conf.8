@@ -58,6 +58,9 @@ don't want this. Useful for debugging purposes.
 .IP "\fBLOG_TO_SYSLOG\fP" 10
 Set this to 1 if you want to log messages to syslog when you start/stop laptop mode, and to 0 if you don't want this. Useful for debugging purposes.
 
+.IP "\fBDEBUG\fP" 10
+Set this to 1 if you would like to execute the entire laptop-mode program in debug mode. WARNING: This will create a lot of text output. If you are debugging an individual module, perhaps you would want to enable each module specific debug mode (available in module conf files)
+
 .IP "\fBENABLE_LAPTOP_MODE_ON_BATTERY\fP" 10 
 .IP "\fBENABLE_LAPTOP_MODE_ON_AC\fP" 10 
 These options determine whether laptop mode will be activated when the
@@ -623,7 +626,7 @@ management settings based on the power state.
 .IP "\fBIWL_AC_POWER\fP" 10
 .IP "\fBIWL_BATT_POWER\fP" 10
 These settings define the power management levels on AC and on battery. The
-defaults are 6 for AC, and 7 for battery mode. The allowed values are 1 (highest
+defaults are 0 for AC, and 3 for battery mode. The allowed values are 0 (highest
 power) to 5 (lowest power), 6 (AC mode, full power) and 7 (battery mode, lowest
 power).
 
@@ -638,6 +641,24 @@ If this option is enabled, laptop mode tools will automatically enable the
 USB autosuspend feature for all devices. The USB autosuspend feature will always
 be enabled, not only on battery power.
 
+.IP "\fBAUTOSUSPEND_USBID_BLACKLIST\fP" 10
+Here, you can specify the list of USB IDs that should not use autosuspend.
+Use lsusb to find out the IDs of your USB devices.
+Example: AUTOSUSPEND_USBID_BLACKLIST="046d:c025 0123:abcd"
+
+.SS "\fI/etc/laptop-mode/conf.d/eee-superhe.conf\fP"
+The eee-superhe module allows you to control the CPU frequency scalling on the
+EEE PC. It requires the eeepc_laptop kernel module to be loaded.
+
+.IP "\fBCONTROL_SUPERHE\fP" 10
+It this option is enabled, laptop mode tools will automatically control the FSB
+speed on the EEE PC.
+
+.IP "\fBBATT_SUPERHE\fP" 10
+.IP "\fBLM_AC_SUPERHE\fP" 10
+.IP "\fBNOLM_AC_SUPERHE\fP" 10
+These settings define the power management levels on AC and on battery. The
+defaults are 0 for LM_AC and NOLM_AC, and 2 for battery mode.
 
 
 .SS "\fI/etc/laptop-mode/conf.d/hal-polling.conf\fP"
