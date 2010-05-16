@@ -12,6 +12,7 @@
     * Fix WoL regression introduced by DISABLE_ETHERNET_ON_BATTERY. Thanks
       to Matthias Dienstbier for the report and the patch
     * Update comments in wireless-iwl-power.conf. (Debian BTS: #580730)
+    * Check for old hook in pm-utils and remove it
 
 1.54 - Wed Mar 10 16:09:34 IST 2010
     * Fix wireless-iwl module. Activation of power saving using iwconfig was

@@ -189,6 +189,9 @@ if [ -n "$DESTDIR" -o -d "$DESTDIR/usr/lib/pm-utils/sleep.d" ] ; then
 	fi
 fi
 
+if [ -f "$DESTDIR/usr/lib/pm-utils/sleep.d/99laptop-mode" ]; then
+	rm -f $DESTDIR/usr/lib/pm-utils/sleep.d/99laptop-mode;
+fi
 
 ACPI_DONE=0
 APM_DONE=0
