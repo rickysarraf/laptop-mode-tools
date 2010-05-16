@@ -65,6 +65,12 @@ Set this to 1 if you want to log messages to syslog when you start/stop laptop m
 .IP "\fBDEBUG\fP" 10
 Set this to 1 if you would like to execute the entire laptop-mode program in debug mode. WARNING: This will create a lot of text output. If you are debugging an individual module, perhaps you would want to enable each module specific debug mode (available in module conf files)
 
+
+.IP "\fBENABLE_AUTO_MODULES\fP" 10 
+Set this to 1 to enable all laptop mode tools modules that are termed safe to be enabled and are marked auto.
+With this option alone, you can enable all auto modules. Incase you need to fine-control the behavior of individual modules, you can modify them accordingly. Default is 0
+
+
 .IP "\fBENABLE_LAPTOP_MODE_ON_BATTERY\fP" 10 
 .IP "\fBENABLE_LAPTOP_MODE_ON_AC\fP" 10 
 These options determine whether laptop mode will be activated when the
