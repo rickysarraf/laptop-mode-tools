@@ -682,6 +682,22 @@ power) to 5 (lowest power), 6 (AC mode, full power) and 7 (battery mode, lowest
 power).
 
 
+.SS "\fI/etc/laptop-mode/conf.d/exec-commands.conf\fP"
+
+There can be many odd machines and many power savings settings, that laptop-mode-tools currently does not cover. If you run into a similar power saving problem, where you do not have a laptop-mode-tools module for it, you can use the exec-commands module to trigger the command during power state changes. Please do contribute back the power saving item as a module to the upstream developers.
+
+.IP "\fBCONTROL_EXEC_COMMANDS\fP" 10
+Set this to 0 to disable execution of custom commands during power state changes. Default is auto.
+
+.IP "\fBBATT_EXEC_COMMAND_0=\fP" 10
+.IP "\fBBATT_EXEC_COMMAND_1=\fP" 10
+.IP "\fBLM_AC_EXEC_COMMAND_0=\fP" 10
+.IP "\fBLM_AC_EXEC_COMMAND_1=\fP" 10
+.IP "\fBNOLM_AC_EXEC_COMMAND_0=\fP" 10
+.IP "\fBNOLM_AC_EXEC_COMMAND_1=\fP" 10
+Here you can specify your custom command that will need to be executed. The numbers can grow upto 9. The command needs to be specified in double quotes
+
+
 .SS "\fI/etc/laptop-mode/conf.d/usb-autosuspend.conf\fP"
 
 The usb-autosuspend module allows you to automatically enable the Linux
