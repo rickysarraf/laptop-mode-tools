@@ -1,4 +1,4 @@
-1.55 - TBD
+1.55 - Wed May 26 21:22:33 IST 2010
     * On Intel HD Audio, revert power saving changes when switching back to AC.
       Thanks to Christoph Langguth for the report and the patch
     * Install the pm-utils hook as 01laptop-mode to ensure proper execution in
