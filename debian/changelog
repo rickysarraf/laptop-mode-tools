@@ -17,8 +17,9 @@ laptop-mode-tools (1.55-1) unstable; urgency=low
     + Update comments in wireless-iwl-power.conf. (Debian BTS: #580730)
     + Check for old hook in pm-utils and remove it
     + Update manpage for all missing modules and options.
+  * Switch source format to 3.0 (quilt) 
 
- -- Ritesh Raj Sarraf <rrs@debian.org>  Sat, 05 Jun 2010 13:09:31 +0530
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sat, 05 Jun 2010 13:54:09 +0530
 
 laptop-mode-tools (1.54-1) unstable; urgency=low
 
