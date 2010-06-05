@@ -1,3 +1,20 @@
+1.55 - Wed May 26 21:22:33 IST 2010
+    * On Intel HD Audio, revert power saving changes when switching back to AC.
+      Thanks to Christoph Langguth for the report and the patch
+    * Install the pm-utils hook as 01laptop-mode to ensure proper execution in
+      reverse ordering
+    * Add wireless-power module, for generic non-Intel wireless interfaces that
+      support the iwconfig "power" option.
+    * Fixed upgrade path for configurations which didn't have the LM/NOLM
+      options in the Intel SATA Power Management module config.
+    * Add flush-* to ignored programs for lm-profiler, because it is the
+      successor to pdflush.
+    * Fix WoL regression introduced by DISABLE_ETHERNET_ON_BATTERY. Thanks
+      to Matthias Dienstbier for the report and the patch
+    * Update comments in wireless-iwl-power.conf. (Debian BTS: #580730)
+    * Check for old hook in pm-utils and remove it
+    * Update manpage for all missing modules and options.
+
 1.54 - Wed Mar 10 16:09:34 IST 2010
     * Fix wireless-iwl module. Activation of power saving using iwconfig was
       never done. Thanks to Sergio Cambra for the report

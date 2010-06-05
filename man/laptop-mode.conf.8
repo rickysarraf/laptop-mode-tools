@@ -51,12 +51,25 @@ This is the main configuration file. It contains the settings for enabling and
 disabling, plus the core features: the Linux kernel laptop mode feature and
 related settings.
 
+.IP "\fBENABLE_LAPTOP_MODE_TOOLS\fP" 10
+This module determines if laptop-mode-tools should be run or not. Default is 1
+Set it to 0 if you would like to completely disable laptop-mode-tools
+
 .IP "\fBVERBOSE_OUTPUT\fP" 10
 Set this to 1 if you want to see a lot of output when you start/stop laptop mode, and to 0 if you
 don't want this. Useful for debugging purposes.
 
 .IP "\fBLOG_TO_SYSLOG\fP" 10
 Set this to 1 if you want to log messages to syslog when you start/stop laptop mode, and to 0 if you don't want this. Useful for debugging purposes.
+
+.IP "\fBDEBUG\fP" 10
+Set this to 1 if you would like to execute the entire laptop-mode program in debug mode. WARNING: This will create a lot of text output. If you are debugging an individual module, perhaps you would want to enable each module specific debug mode (available in module conf files)
+
+
+.IP "\fBENABLE_AUTO_MODULES\fP" 10 
+Set this to 1 to enable all laptop mode tools modules that are termed safe to be enabled and are marked auto.
+With this option alone, you can enable all auto modules. Incase you need to fine-control the behavior of individual modules, you can modify them accordingly. Default is 0
+
 
 .IP "\fBENABLE_LAPTOP_MODE_ON_BATTERY\fP" 10 
 .IP "\fBENABLE_LAPTOP_MODE_ON_AC\fP" 10 
@@ -236,6 +249,39 @@ kernels the value of HZ is 100 for the most common architectures, so
 you need only change this value if you use a less common architecture. 
 
 
+.SS "\fI/etc/laptop-mode/conf.d/ethernet.conf\fP"
+
+The ethernet module allows you to control the behavior of your ethernet devices
+during AC and battery states.
+
+.IP "\fBCONTROL_ETHERNET\fP" 10 
+Enable this to control various aspects of power savings in the ethernet devices.
+
+.IP "\fBBATT_THROTTLE_ETHERNET=1\fP" 10
+.IP "\fBLM_AC_THROTTLE_ETHERNET=0\fP" 10
+.IP "\fBNOLM_AC_THROTTLE_ETHERNET=0\fP" 10
+These options specify the power states in which you would like to control the
+ethernet device
+
+.IP "\fBTHROTTLE_SPEED\fP" 10 
+Here, you can specify the throttling speed for your ethernet device. The default
+is "slowest". Valid values are "slowest", "fastest" or the speed of your ethernet
+device, like 1000. To know the exact speed of your ethernet device, you can use
+the ethtool tool.
+
+.IP "\fBDISABLE_WAKEUP_ON_LAN\fP" 10 
+This setting controls the option to enable/disable the WoL (Wake On LAN) feature.
+It permanently disables the WOL feature on the ethernet device. Default is 1.
+Set it to 0 to enable the WOL feature.
+
+.IP "\fBETHERNET_DEVICES\fP" 10 
+Specify the list of ethernet devices to control. Defaults to eth0
+
+.IP "\fBDISABLE_ETHERNET_ON_BATTERY\fP" 10 
+Set this to 1 if you want to completely disable your ethernet device when running on
+battery. Default is 0
+
+
 .SS "\fI/etc/laptop-mode/conf.d/cpufreq.conf\fP"
 
 The cpufreq module allows you to control the Linux kernel's CPU frequency
@@ -288,6 +334,14 @@ You can change it to any level listed in
 (use only the number!). In addition, you can use "maximum" (which is the slowest
 option), "minimum" (full speed) and "medium" (about halfway).
 
+
+.SS "\fI/etc/laptop-mode/conf.d/sched-smt-power-savings.conf\fP"
+
+The sched-smt-power-savings module controls the behavior of the process scheduler
+on SMT boxes, when running in battery mode.
+
+.IP "\fBCONTROL_SCHED_SMT_POWER_SAVINGS\fP" 10
+Set this to 1 to enable power savings in the process scheduler for SMT processors.
 
 
 .SS "\fI/etc/laptop-mode/conf.d/dpms-standby.conf\fP"
@@ -566,6 +620,22 @@ This option should contain a space-separated list of services which should be
 reloaded after the config files have been switched around.
 
 
+.SS "\fI/etc/laptop-mode/conf.d/wireless-power.conf\fP"
+
+The wireless-power module allows you to alter the power management settings
+for wireless network adapters that support the iwconfig "power" option. This
+module is not usable for Intel network adapters that use the iwlwifi or ipw
+drivers, they are supported by separate modules described below.
+
+.IP "\fBCONTROL_WIRELESS_POWER_SAVING\fP" 10
+If this option is enabled, laptop mode tools will set the wireless power
+saving mode settings based on the power state.
+
+.IP "\fBWIRELESS_AC_POWER_SAVING\fP" 10
+.IP "\fBWIRELESS_BATT_POWER_SAVING\fP" 10
+These settings define the power saving modes on AC and on battery. The allowed
+values are 0 (to disable power saving mode) and 1 (to enable power saving mode).
+
 
 .SS "\fI/etc/laptop-mode/conf.d/wireless-ipw-power.conf\fP"
 
@@ -607,9 +677,25 @@ management settings based on the power state.
 .IP "\fBIWL_AC_POWER\fP" 10
 .IP "\fBIWL_BATT_POWER\fP" 10
 These settings define the power management levels on AC and on battery. The
-defaults are 6 for AC, and 7 for battery mode. The allowed values are 1 (highest
+defaults are 0 for AC, and 3 for battery mode. The allowed values are 0 (highest
 power) to 5 (lowest power), 6 (AC mode, full power) and 7 (battery mode, lowest
 power).
+
+
+.SS "\fI/etc/laptop-mode/conf.d/exec-commands.conf\fP"
+
+There can be many odd machines and many power savings settings, that laptop-mode-tools currently does not cover. If you run into a similar power saving problem, where you do not have a laptop-mode-tools module for it, you can use the exec-commands module to trigger the command during power state changes. Please do contribute back the power saving item as a module to the upstream developers.
+
+.IP "\fBCONTROL_EXEC_COMMANDS\fP" 10
+Set this to 0 to disable execution of custom commands during power state changes. Default is auto.
+
+.IP "\fBBATT_EXEC_COMMAND_0=\fP" 10
+.IP "\fBBATT_EXEC_COMMAND_1=\fP" 10
+.IP "\fBLM_AC_EXEC_COMMAND_0=\fP" 10
+.IP "\fBLM_AC_EXEC_COMMAND_1=\fP" 10
+.IP "\fBNOLM_AC_EXEC_COMMAND_0=\fP" 10
+.IP "\fBNOLM_AC_EXEC_COMMAND_1=\fP" 10
+Here you can specify your custom command that will need to be executed. The numbers can grow upto 9. The command needs to be specified in double quotes
 
 
 .SS "\fI/etc/laptop-mode/conf.d/usb-autosuspend.conf\fP"
@@ -622,6 +708,24 @@ If this option is enabled, laptop mode tools will automatically enable the
 USB autosuspend feature for all devices. The USB autosuspend feature will always
 be enabled, not only on battery power.
 
+.IP "\fBAUTOSUSPEND_USBID_BLACKLIST\fP" 10
+Here, you can specify the list of USB IDs that should not use autosuspend.
+Use lsusb to find out the IDs of your USB devices.
+Example: AUTOSUSPEND_USBID_BLACKLIST="046d:c025 0123:abcd"
+
+.SS "\fI/etc/laptop-mode/conf.d/eee-superhe.conf\fP"
+The eee-superhe module allows you to control the CPU frequency scalling on the
+EEE PC. It requires the eeepc_laptop kernel module to be loaded.
+
+.IP "\fBCONTROL_SUPERHE\fP" 10
+It this option is enabled, laptop mode tools will automatically control the FSB
+speed on the EEE PC.
+
+.IP "\fBBATT_SUPERHE\fP" 10
+.IP "\fBLM_AC_SUPERHE\fP" 10
+.IP "\fBNOLM_AC_SUPERHE\fP" 10
+These settings define the power management levels on AC and on battery. The
+defaults are 0 for LM_AC and NOLM_AC, and 2 for battery mode.
 
 
 .SS "\fI/etc/laptop-mode/conf.d/hal-polling.conf\fP"
@@ -676,6 +780,12 @@ Aggressive Link Power Management (ALPM).
 If this option is enabled, laptop mode tools will automatically enable the
 Intel SATA controller power saving settings. The power saving settings are
 always enabled, not only on battery power.
+
+.IP "\fBBATT_ACTIVATE_SATA_POWER=1\fP" 10
+.IP "\fBLM_AC_ACTIVATE_SATA_POWER=0\fP" 10
+.IP "\fBNOLM_AC_ACTIVATE_SATA_POWER=0\fP" 10
+These settings control the behavior of the SATA devices under AC and battery power states
+
 
 
 .SS "\fI/etc/laptop-mode/conf.d/sched-mc-power-savings.conf\fP"

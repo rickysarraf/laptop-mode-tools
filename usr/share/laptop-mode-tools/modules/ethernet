@@ -26,7 +26,7 @@ if [ x$CONTROL_ETHERNET = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_ETHE
                 if [ x$DISABLE_ETHERNET_ON_BATTERY = x1 ]; then
                         DISABLE_ETHERNET=1
                 else
-                        DISABLE_ETHERNET=0
+                        DISABLE_ETHERNET=2
                 fi
 	fi
 	
@@ -52,7 +52,7 @@ if [ x$CONTROL_ETHERNET = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_ETHE
                                 if [ -f $dev_path/enable ]; then
                                         echo 1 > $dev_path/enable
                                         log "VERBOSE" "ethernet: Re-enabling ethernet device $DEVICE"
-                                        DISABLED=1
+                                        DISABLED=0
                                 fi
                         elif [ x$DISABLE_ETHERNET = x2 ]; then
                                 DISABLED=0 # Be safe. :-)
@@ -81,7 +81,7 @@ if [ x$CONTROL_ETHERNET = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_ETHE
 		fi
 		
 		# Determine speed
-		speed=`mii-tool -v $DEVICE | grep capabilities | tr ' ' '\n' |\
+		speed=`mii-tool -v $DEVICE 2>/dev/null | grep capabilities | tr ' ' '\n' |\
                         sort -n | sed -ne '/^1.*/p' | cut -d "b" -f1`
                 if [ -z "$speed" ]; then
                         speed=0;

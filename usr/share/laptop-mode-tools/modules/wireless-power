@@ -1,0 +1,89 @@
+#! /bin/sh
+# 
+# Laptop mode tools module, called from /usr/sbin/laptop_mode.
+# Configuration in /etc/laptop-mode/conf.d/wireless-power.conf.
+#
+# PURPOSE: power saving for generic wireless adapters that support
+#          the iwconfig power command.
+#
+
+[ "$WIRELESS_POWER_SAVING_EXCLUDE_DRIVERS" ] || WIRELESS_POWER_SAVING_EXCLUDE_DRIVERS="iwl3945 iwl4965 iwlagn ipw3945 ipw2200 ipw2100"
+
+#
+# Find all the wireless devices that do not use an excluded driver.
+# Place the interface names on the list WIFI_IFNAMES.
+#
+findWifiIfs () {
+	local SYSDEVICE EXCLUDED LINK_TARGET DRIVER IFNAME EXCLUDED_DRIVER;
+	
+	for SYSDEVICE in /sys/class/net/*; do
+		IFNAME=`basename $SYSDEVICE`
+
+                # Check if it is a wireless device
+                $IWCONFIG $IFNAME >/dev/null 2>&1;
+                ret=$?;
+                if [ "$ret" = "0" ]; then
+			# Yes, it is a wireless device.
+			if [ -h $SYSDEVICE/device/driver ]; then
+				# Read the driver name
+				LINK_TARGET=`readlink $SYSDEVICE/device/driver`
+				DRIVER=${LINK_TARGET##*/}
+				
+				EXCLUDED=0
+				for EXCLUDED_DRIVER in $WIRELESS_POWER_SAVING_EXCLUDE_DRIVERS ; do
+					if [ "$EXCLUDED_DRIVER" = "$DRIVER" ] ; then
+						log "VERBOSE" "Wireless interface $IFNAME excluded for wireless-power by driver name."
+						EXCLUDED=1
+					fi 
+				done
+				if [ $EXCLUDED = 0 ] ; then
+					# add the interface name to the list
+					WIFI_IFNAMES="$WIFI_IFNAMES $IFNAME"
+				fi
+			fi
+
+                fi
+	done
+}
+
+if [ x$CONTROL_WIRELESS_POWER_SAVING = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_WIRELESS_POWER_SAVING = xauto ]; then
+	log "VERBOSE" "Setting power saving for generic wireless interfaces."
+
+	# Provide defaults for config file settings
+	[ "$WIRELESS_AC_POWER_SAVING" ]   || WIRELESS_AC_POWER_SAVING=0
+	[ "$WIRELESS_BATT_POWER_SAVING" ] || WIRELESS_BATT_POWER_SAVING=1
+
+	# Find executables
+	if [ -x /sbin/iwconfig ] ; then
+		IWCONFIG=/sbin/iwconfig
+	elif [ -x /usr/sbin/iwconfig ] ; then
+		IWCONFIG=/usr/sbin/iwconfig
+	else
+		log "VERBOSE" "iwconfig is not installed"
+	fi
+
+	# Translate 1 => on, 0 => off
+	WIRELESS_AC_POWER_SAVING_ONOFF=off
+	WIRELESS_BATT_POWER_SAVING_ONOFF=off
+	[ "$WIRELESS_AC_POWER_SAVING" = 1 ] && WIRELESS_AC_POWER_SAVING_ONOFF=on
+	[ "$WIRELESS_BATT_POWER_SAVING" = 1 ] && WIRELESS_BATT_POWER_SAVING_ONOFF=on
+
+	WIFI_IFNAMES=""
+	findWifiIfs
+	for IF in $WIFI_IFNAMES ; do
+		if [ $ON_AC -eq 1 ] ; then
+			log "VERBOSE" "On AC power: setting power saving mode for $IF to $WIRELESS_AC_POWER_SAVING_ONOFF."
+			if ( ! iwconfig $IF power $WIRELESS_AC_POWER_SAVING_ONOFF ) ; then
+				log "ERR" "Failed."
+			fi
+		else
+			log "VERBOSE" "On battery: setting power saving mode for $IF to $WIRELESS_BATT_POWER_SAVING_ONOFF."
+			if ( ! iwconfig $IF power $WIRELESS_BATT_POWER_SAVING_ONOFF ) ; then
+				log "ERR" "Failed."
+			fi
+		fi
+	done
+else
+	log "VERBOSE" "Generic wireless interface power saving module is disabled."
+fi
+

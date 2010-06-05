@@ -4,6 +4,13 @@
 #
 
 if [ x$CONTROL_INTEL_SATA_POWER = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_INTEL_SATA_POWER = xauto ]; then
+                        SATA_POWER="$LM_AC_ACTIVATE_SATA_POWER"
+	# Set defaults (these settings were added later)	
+	[ "$BATT_ACTIVATE_SATA_POWER" ] || BATT_ACTIVATE_SATA_POWER=1
+	[ "$LM_AC_ACTIVATE_SATA_POWER" ] || LM_AC_ACTIVATE_SATA_POWER=0
+	[ "$NOLM_AC_ACTIVATE_SATA_POWER" ] || NOLM_AC_ACTIVATE_SATA_POWER=0
+
+	# Determine setting
         if [ $ON_AC -eq 1 ]; then
                 if [ "$ACTIVATE" -eq 1 ]; then
                         SATA_POWER="$LM_AC_ACTIVATE_SATA_POWER"

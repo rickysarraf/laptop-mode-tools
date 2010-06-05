@@ -1,8 +1,24 @@
-laptop-mode-tools (1.54-2) UNRELEASED; urgency=low
+laptop-mode-tools (1.55-1) unstable; urgency=low
 
   * Change address to my official Debian address
+  * New Upstream Release
+    + On Intel HD Audio, revert power saving changes when switching back to AC.
+      Thanks to Christoph Langguth for the report and the patch
+    + Install the pm-utils hook as 01laptop-mode to ensure proper execution in
+      reverse ordering
+    + Add wireless-power module, for generic non-Intel wireless interfaces that
+      support the iwconfig "power" option.
+    + Fixed upgrade path for configurations which didn't have the LM/NOLM
+      options in the Intel SATA Power Management module config.
+    + Add flush-* to ignored programs for lm-profiler, because it is the
+      successor to pdflush.
+    + Fix WoL regression introduced by DISABLE_ETHERNET_ON_BATTERY. Thanks
+      to Matthias Dienstbier for the report and the patch
+    + Update comments in wireless-iwl-power.conf. (Debian BTS: #580730)
+    + Check for old hook in pm-utils and remove it
+    + Update manpage for all missing modules and options.
 
- -- Ritesh Raj Sarraf <rrs@debian.org>  Sat, 08 May 2010 03:46:05 +0530
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sat, 05 Jun 2010 13:09:31 +0530
 
 laptop-mode-tools (1.54-1) unstable; urgency=low
 

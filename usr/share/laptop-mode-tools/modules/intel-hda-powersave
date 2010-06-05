@@ -10,13 +10,13 @@ if [ x$CONTROL_INTEL_HDA_POWER = x1 ]  || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONT
 		else
 			INTEL_HDA_POWERSAVE="$NOLM_AC_INTEL_HDA_POWERSAVE"
 		fi
-	else
-		INTEL_HDA_POWERSAVE="$BATT_INTEL_HDA_POWERSAVE"
-	fi
+    else
+	    INTEL_HDA_POWERSAVE="$BATT_INTEL_HDA_POWERSAVE"
+    fi
 
     # Handle Intel HDA Power Save
-    if [ x$INTEL_HDA_POWERSAVE = x1 ]; then
-        if [ -w /sys/module/snd_hda_intel/parameters/power_save ]; then
+    if [ -w /sys/module/snd_hda_intel/parameters/power_save ]; then
+        if [ x$INTEL_HDA_POWERSAVE = x1 ]; then
                 echo $INTEL_HDA_DEVICE_TIMEOUT > /sys/module/snd_hda_intel/parameters/power_save
                 log "VERBOSE" "Intel HDA power save mode enabled with timeout $INTEL_HDA_DEVICE_TIMEOUT."
                 if [ -c /dev/dsp ]; then
@@ -29,12 +29,15 @@ if [ x$CONTROL_INTEL_HDA_POWER = x1 ]  || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONT
                     log "VERBOSE" "Initialize timer change by close/open /dev/dsp"
                 fi
         else
-                log "VERBOSE" "Intel HDA power saving is not available on this system."
+                echo 0 > /sys/module/snd_hda_intel/parameters/power_save
+                log "VERBOSE" "Intel HDA power save mode disabled."
         fi
+    else
+            log "VERBOSE" "Intel HDA power saving is not available on this system."
     fi
 
     # Handle Intel HDA Controller Power Savings.
-    if [ x$INTEL_HDA_DEVICE_CONTROLLER = x1 ]; then
+    if [ x$INTEL_HDA_DEVICE_CONTROLLER = x1 -a x$INTEL_HDA_POWERSAVE = x1 ]; then
         POWER_SAVE="Y"
     else
         POWER_SAVE="N"
