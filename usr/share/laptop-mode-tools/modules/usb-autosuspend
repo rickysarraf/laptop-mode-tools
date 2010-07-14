@@ -47,7 +47,10 @@ if [ x$CONTROL_USB_AUTOSUSPEND = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTR
 				  log "VERBOSE" "Not enabling auto suspend mode for usb device $usb_device"
 			  fi
 
-			  if [ -f /sys/bus/usb/devices/$usb_device/power/level ]; then
+			  if [ -f /sys/bus/usb/devices/$usb_device/power/control ]; then
+				  echo "auto" > /sys/bus/usb/devices/$usb_device/power/control;
+				  log "VERBOSE" "Enabling auto power level for usb device $usb_device."
+			  elif [ -f /sys/bus/usb/devices/$usb_device/power/level ]; then
 				  echo "auto" > /sys/bus/usb/devices/$usb_device/power/level;
 				  log "VERBOSE" "Enabling auto power level for usb device $usb_device."
 			  else
@@ -80,7 +83,10 @@ if [ x$CONTROL_USB_AUTOSUSPEND = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTR
 		      log "VERBOSE" "Not disabling auto suspend mode for usb device $usb_device"
 		  fi
 
-		  if [ -f /sys/bus/usb/devices/$usb_device/power/level ]; then
+		  if [ -f /sys/bus/usb/devices/$usb_device/power/control ]; then
+		      echo "on" > /sys/bus/usb/devices/$usb_device/power/control;
+		      log "VERBOSE" "Enabling ON power level for usb device $usb_device."
+		  elif [ -f /sys/bus/usb/devices/$usb_device/power/level ]; then
 		      echo "on" > /sys/bus/usb/devices/$usb_device/power/level;
 		      log "VERBOSE" "Enabling ON power level for usb device $usb_device."
 		  else

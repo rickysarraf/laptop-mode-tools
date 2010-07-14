@@ -1,6 +1,8 @@
 1.56 - TBD
     * Enable ENABLE_AUTO_MODULES by default. When a user installs the package,
       the first immediate expectation is to see some changes
+    * USB suspend interface has changed with kernels 2.6.35 and above.
+      (Debian BTS: #589000)
 
 1.55 - Wed May 26 21:22:33 IST 2010
     * On Intel HD Audio, revert power saving changes when switching back to AC.
