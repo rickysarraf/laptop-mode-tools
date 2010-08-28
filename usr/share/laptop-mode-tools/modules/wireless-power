@@ -20,8 +20,10 @@ findWifiIfs () {
 		IFNAME=`basename $SYSDEVICE`
 
                 # Check if it is a wireless device
-                $IWCONFIG $IFNAME >/dev/null 2>&1;
-                ret=$?;
+		#
+		# Inverting return values, we get "0" for wireless device, 
+		# and "1" for non-wireless device.
+		($IWCONFIG $IFNAME 2>&1 | grep -q "no wireless extensions.") && ret=1 || ret=0
                 if [ "$ret" = "0" ]; then
 			# Yes, it is a wireless device.
 			if [ -h $SYSDEVICE/device/driver ]; then
