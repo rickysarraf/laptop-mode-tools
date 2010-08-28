@@ -41,7 +41,6 @@ findWifiIfsByDriver () {
 			# Inverting return values, we get "0" for wireless device, 
 			# and "1" for non-wireless device.
 			($IWCONFIG $IFNAME 2>&1 | grep -q "no wireless extensions.") && ret=1 || ret=0
-                        ret=$?;
                         if [ "$ret" = "0" ]; then
 			        # add the interface name to the list
 		    		WIFI_IFNAMES="$WIFI_IFNAMES ${DEVICE##*/}"
