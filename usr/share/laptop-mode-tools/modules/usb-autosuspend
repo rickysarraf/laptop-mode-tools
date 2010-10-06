@@ -17,6 +17,29 @@ blacklisted() {
 	return 1
 }
 
+# Check whether the USB driver type is blacklisted
+blacklisted_by_type() {
+	device=$1
+	device_base=`basename $device`
+	for driver_type in $AUTOSUSPEND_USBTYPE_BLACKLIST; do
+		if grep -q DRIVER=$driver_type $device/uevent; then
+			return 0
+		fi
+		# Check child devices as well.  The actual driver type is
+		# listed in a child device, not the top-level device.
+		for subdevice in $device/$device_base*; do
+			if [ -f $subdevice/uevent ]; then
+				if grep -q DRIVER=$driver_type\
+				    $subdevice/uevent; then
+					return 0
+				fi
+			fi
+		done
+	done
+	return 1
+}
+
+
 if [ x$CONTROL_USB_AUTOSUSPEND = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_USB_AUTOSUSPEND = xauto ]; then
     if [ $ON_AC -eq 1 ]; then
         if [ "$ACTIVATE" -eq 1 ]; then
@@ -40,6 +63,7 @@ if [ x$CONTROL_USB_AUTOSUSPEND = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTR
 	      do
 		  usb_device=`basename $usb_device`;
 		  if ! blacklisted /sys/bus/usb/devices/$usb_device; then
+			if ! blacklisted_by_type /sys/bus/usb/devices/$usb_device; then
 			  if [ -f /sys/bus/usb/devices/$usb_device/power/autosuspend ]; then
 				  echo $AUTOSUSPEND_TIMEOUT > /sys/bus/usb/devices/$usb_device/power/autosuspend;
 				  log "VERBOSE" "Enabling auto suspend mode for usb device $usb_device."
@@ -56,6 +80,9 @@ if [ x$CONTROL_USB_AUTOSUSPEND = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTR
 			  else
 				  log "VERBOSE" "Not enabling auto power level for usb device $usb_device"
 			  fi
+			else
+			  log "VERBOSE" "Device $usb_device has blacklisted driver type, skipping auto suspend."
+			fi
 		  else
 			  log "VERBOSE" "USB device $usbid is in the autosuspend blacklist."
 		  fi

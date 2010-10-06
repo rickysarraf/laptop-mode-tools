@@ -6,6 +6,7 @@
     * Add support for Linux Runtime Power Management (Debian BTS: #592661)
     * On many other distributions, wireless-tools packages is still old and does not
       return proper exit status on failures. Thanks to Luca Landolfi for the patch.
+    * Add support to blacklist USB Devices by types. Thanks to Simon Que for the patch
 
 1.55 - Wed May 26 21:22:33 IST 2010
     * On Intel HD Audio, revert power saving changes when switching back to AC.
