@@ -8,8 +8,6 @@
 #
 # Original source: http://ubuntuforums.org/showthread.php?t=419772
 
-[ "$WIRELESS_POWER_SAVING_EXCLUDE_DRIVERS" ] || WIRELESS_POWER_SAVING_EXCLUDE_DRIVERS="iwl3945 iwl4965 iwlagn ipw3945 ipw2200 ipw2100"
-
 if [ x$CONTROL_IPW_POWER = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_IPW_POWER = xauto ]; then
 
 	# Provide defaults for config file settings

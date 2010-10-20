@@ -9,8 +9,6 @@
 # This script relies upon the name of the driver.
 #
 
-[ "$WIRELESS_POWER_SAVING_EXCLUDE_DRIVERS" ] || WIRELESS_POWER_SAVING_EXCLUDE_DRIVERS="iwl3945 iwl4965 iwlagn ipw3945 ipw2200 ipw2100"
-
 #
 # Find all the wireless devices using the supplied driver names.
 # Place the interface names on the list WIFI_IFNAMES.
