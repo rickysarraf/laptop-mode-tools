@@ -9,6 +9,8 @@
     * Add support to blacklist USB Devices by types. Thanks to Simon Que for the patch
     * Re-initialize dev_path before the next iteration. Thanks to Faustus for the bug
       report and the patch (LP: #662924)
+    * ENABLE_LAPTOP_MODE_TOOLS was ignore because of wrong check. Thanks to Matus Harvan
+      for reporting this. (Debian BTS: #602278)
 
 1.55 - Wed May 26 21:22:33 IST 2010
     * On Intel HD Audio, revert power saving changes when switching back to AC.

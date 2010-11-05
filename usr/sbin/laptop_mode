@@ -229,7 +229,7 @@ else
 	exit 1
 fi
 
-if [ $ENABLE_LAPTOP_MODE_TOOLS = x0 ]; then
+if [ x$ENABLE_LAPTOP_MODE_TOOLS = x0 ]; then
         log "MSG" "laptop-mode-tools is disabled in config file. Exiting"
         exit 0;
 fi
