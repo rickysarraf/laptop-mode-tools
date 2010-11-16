@@ -532,6 +532,14 @@ while [ "$1" != "" ] ; do
 		start) ;;
 		stop) ;;
 		auto) ;;
+		modules=*)
+			MODULES=$1
+			MODULES=${MODULES#"modules="}
+			;;
+		devices=*)
+			DEVICES=$1
+			DEVICES=${DEVICES#"devices="}
+			;;
 		*) log "ERR" "Unrecognized option $1."
 		   exit 1 ;;
 	esac
@@ -1016,17 +1024,41 @@ fi
 # as no defaults have been given for them.
 
 # Note that the /usr/local/lib path is deprecated.
-export FORCE STATE ON_AC ACTIVATE ACTIVATE_WITH_POSSIBLE_DATA_LOSS KLEVEL KMINOR WAS_ACTIVE LM_VERBOSE
-for SCRIPT in /usr/share/laptop-mode-tools/modules/* /usr/local/lib/laptop-mode-tools/modules/* /usr/local/share/laptop-mode-tools/modules/* /etc/laptop-mode/modules/*; do
-	if [ -x "$SCRIPT" ] ; then
-		log "VERBOSE" "Invoking module $SCRIPT."
-                SCRIPT_DEBUG=$SCRIPT; # We do this because in start-stop-programs module a $SCRIPT variable is used. That
-                                      # changes the whole meaning when passed to disableDebug ()
-                enableDebug $SCRIPT_DEBUG;
-                . $SCRIPT
-                disableDebug $SCRIPT_DEBUG;
+export FORCE STATE ON_AC ACTIVATE ACTIVATE_WITH_POSSIBLE_DATA_LOSS KLEVEL KMINOR WAS_ACTIVE LM_VERBOSE DEVICES
+for SCRIPT in /usr/share/laptop-mode-tools/modules/* /usr/local/lib/laptop-mode-tools/modules/* /usr/local/share/laptop-mode-tools/modules/* /etc/laptop-mode/modules/* ; do
+	if [ -z "$MODULES" ] ; then
+		# If a module list has not been provided, execute all modules
+		EXECUTE_SCRIPT=1
 	else
-		log "VERBOSE" "Module $SCRIPT is not executable."
+		# If a module list has been provided, execute only the listed
+		# modules.
+		EXECUTE_SCRIPT=0
+		for MODULE in $MODULES; do
+			# Attempt to remove the module name from the end of the
+			# full script path.  If the module name matches the
+			# script, the name will be removed from the end of the
+			# full file path, leaving the path to the script.  If
+			# there was not a match made, the module name would not
+			# be removed from the path, and $PATH_TO_SCRIPT would
+			# be the same as $SCRIPT.
+			PATH_TO_SCRIPT=${SCRIPT%%$MODULE}
+			# Execute the script if a match was found (module name
+			# was removed from the script path, making it shorter.
+			if [ $PATH_TO_SCRIPT != $SCRIPT ] ; then
+				EXECUTE_SCRIPT=1
+			fi
+		done
+	fi
+
+	if [ -x "$SCRIPT" -a $EXECUTE_SCRIPT -eq 1 ] ; then
+		log "VERBOSE" "Invoking module $SCRIPT."
+		SCRIPT_DEBUG=$SCRIPT; # We do this because in start-stop-programs module a $SCRIPT variable is used. That
+				      # changes the whole meaning when passed to disableDebug ()
+		enableDebug $SCRIPT_DEBUG;
+		. $SCRIPT
+		disableDebug $SCRIPT_DEBUG;
+	else
+		log "VERBOSE" "Module $SCRIPT is not executable or is to be skipped."
 	fi
 done
 

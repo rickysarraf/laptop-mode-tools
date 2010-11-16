@@ -11,6 +11,8 @@
       report and the patch (LP: #662924)
     * ENABLE_LAPTOP_MODE_TOOLS was ignore because of wrong check. Thanks to Matus Harvan
       for reporting this. (Debian BTS: #602278)
+    * Add support to invoke laptop-mode-tools with hotplug events. This currently only has
+      support for the usb-autosuspend module. Thanks to Simon Que for the patch
 
 1.55 - Wed May 26 21:22:33 IST 2010
     * On Intel HD Audio, revert power saving changes when switching back to AC.

@@ -1,0 +1,1 @@
+SUBSYSTEM=="usb", ACTION=="add", RUN+="/usr/sbin/laptop_mode force modules=usb-autosuspend devices=%k"
