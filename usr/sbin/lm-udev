@@ -1,0 +1,29 @@
+#!/bin/sh
+
+# If LMT lock is present, plain exit.
+# We do not want Laptop Mode Tools executed on each invocation
+# of udev event. That will kill the OS
+# Instead we wait for a fair number of seconds and then execute.
+# Until then, we just check and exit.
+if [ -f /var/lock/lmt-udev.lock ]; then
+                #echo "LMT lock available. Exiting"
+                exit 0;
+fi
+
+
+# If LMT lock is not there, probably first invocation of udev,
+# wait till N seconds for udev to stabilize
+if ! [ -f /var/lock/lmt-udev.lock ]; then
+                touch /tmp/lmt-udev.lock;
+                #echo "Acquiring LMT Lock"
+fi
+
+sleep 10;
+
+# Now let's execute lmt
+test -f /usr/sbin/laptop_mode || exit 0
+/usr/sbin/laptop_mode auto
+
+# Now clean lock.
+rm -rf /var/lock/lmt-udev.lock;
+
