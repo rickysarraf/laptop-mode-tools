@@ -37,7 +37,9 @@ set -a
 # See lm-udev for more details on locking and LMT invocation
 LOCK2="/var/lock/lm-udev-lock2.lock"
 
-if ! [ -f $LOCK2 ]; then
+if [ -f $LOCK2 ]; then
+		exit 0; # Someone has already invoked LMT
+else
 		touch $LOCK2;
 fi
 
