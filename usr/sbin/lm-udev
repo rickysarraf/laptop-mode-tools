@@ -1,29 +1,60 @@
 #!/bin/sh
 
-# If LMT lock is present, plain exit.
+#LOCK 1: Intent-to-run-laptop-mode-tools
+#LOCK 2: Running-laptop-mode-tools
+LOCK1="/var/lock/lmt-udev-lock1.lock"
+LOCK2="/var/lock/lmt-udev-lock2.lock"
+
+# If LMT lock, lock1, is present, plain exit.
 # We do not want Laptop Mode Tools executed on each invocation
 # of udev event. That will kill the OS
 # Instead we wait for a fair number of seconds and then execute.
 # Until then, we just check and exit.
-if [ -f /var/lock/lmt-udev.lock ]; then
+if [ -f $LOCK1 ]; then
                 #echo "LMT lock available. Exiting"
                 exit 0;
 fi
 
-
-# If LMT lock is not there, probably first invocation of udev,
-# wait till N seconds for udev to stabilize
-if ! [ -f /var/lock/lmt-udev.lock ]; then
-                touch /tmp/lmt-udev.lock;
+# If LMT lock1 is not there, probably first invocation of udev,
+# So we declare that we want to run LMT
+if ! [ -f $LOCK1 ]; then
+                touch $LOCK1;
                 #echo "Acquiring LMT Lock"
 fi
 
-sleep 10;
+
+# Check if lock2 is acquired, if so, wait for 10 seconds
+if [ -f $LOCK2 ]; then
+		sleep 10s;
+fi
+
+# Now acquire the lock, lock2, to really run LMT
+if ! [ -f $LOCK2 ]; then
+		touch $LOCK2;
+else
+		#RFC: Should we wait longer?
+		# Should we loop ?
+		# Maybe not. If the system is under heavy load or is still
+		# preparing to execute LMT, those event changes are already
+		# done to the OS. So when LMT executes, it will act on those changes
+
+		# There might be a corner case, say, where the OS is under very heavy
+		# load, where in every execution of LMT module takes some time.
+		# Under this situation, we can lose some events that should have been
+		# acted upon by LMT
+		exit 0;
+fi
+
+# And release lock1 before invoking LMT
+rm -f $LOCK1;
 
 # Now let's execute lmt
-test -f /usr/sbin/laptop_mode || exit 0
+test -x /usr/sbin/laptop_mode || exit 0
 /usr/sbin/laptop_mode auto
 
-# Now clean lock.
-rm -rf /var/lock/lmt-udev.lock;
+# Very low probability that we'll ever reach here.
+# Even if we do, LMT on invocation from another udev event, will create a lock.
+if [ -f $LOCK2 ]; then
+		rm -f $LOCK2;
+fi
 
