@@ -33,16 +33,6 @@
 
 set -a
 
-
-# See lm-udev for more details on locking and LMT invocation
-LOCK2="/var/lock/lm-udev-lock2.lock"
-
-if [ -f $LOCK2 ]; then
-		exit 0; # Someone has already invoked LMT
-else
-		touch $LOCK2;
-fi
-
 # The laptop mode tools version number. Extracted by the installer makefile
 # as well, so don't change the format!
 LMTVERSION=1.55
@@ -1072,11 +1062,6 @@ for SCRIPT in /usr/share/laptop-mode-tools/modules/* /usr/local/lib/laptop-mode-
 	fi
 done
 
-# Release lock2
-# Irrespective of whether udev or acpid called us, we clean here.
-if [ -f $LOCK2 ]; then
-		rm -f $LOCK2;
-fi
 
 exit 0
 
