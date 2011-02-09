@@ -17,6 +17,29 @@ blacklisted() {
 	return 1
 }
 
+# Check whether the USB driver type is blacklisted
+blacklisted_by_type() {
+	device=$1
+	device_base=`basename $device`
+	for driver_type in $AUTOSUSPEND_USBTYPE_BLACKLIST; do
+		if grep -q DRIVER=$driver_type $device/uevent; then
+			return 0
+		fi
+		# Check child devices as well.  The actual driver type is
+		# listed in a child device, not the top-level device.
+		for subdevice in $device/$device_base*; do
+			if [ -f $subdevice/uevent ]; then
+				if grep -q DRIVER=$driver_type\
+				    $subdevice/uevent; then
+					return 0
+				fi
+			fi
+		done
+	done
+	return 1
+}
+
+
 if [ x$CONTROL_USB_AUTOSUSPEND = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_USB_AUTOSUSPEND = xauto ]; then
     if [ $ON_AC -eq 1 ]; then
         if [ "$ACTIVATE" -eq 1 ]; then
@@ -28,6 +51,23 @@ if [ x$CONTROL_USB_AUTOSUSPEND = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTR
         SUSPEND_USB_DEVICES="$BATT_SUSPEND_USB"
     fi
 
+    if [ -d /sys/bus/usb/devices ]; then
+	if [ "$DEVICES" != "" ]; then
+		# If a list of devices has been provided, operate on only the
+		# listed USB devices.
+		DEVICE_LIST=""
+		for DEVICE in $DEVICES; do
+			DEVICE_LIST="$DEVICE_LIST $DEVICE"
+		done
+	else
+		# If no list was provided, operate on all USB devices
+		DEVICE_LIST=/sys/bus/usb/devices/*
+	fi
+    else
+	# This will rarely happen.
+	log "VERBOSE" "There are no USB devices."
+    fi
+
     if [ x$SUSPEND_USB_DEVICES = x1 ]; then
 	  if [ -f /sys/module/usbcore/parameters/autosuspend ]; then
 	      echo $AUTOSUSPEND_TIMEOUT > /sys/module/usbcore/parameters/autosuspend
@@ -35,11 +75,13 @@ if [ x$CONTROL_USB_AUTOSUSPEND = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTR
 	  else
 	      log "VERBOSE" "Not enabling autosuspend mode for USBCORE Controller. Not Supported"
 	  fi
-	  if [ -d /sys/bus/usb/devices ]; then
-	      for usb_device in /sys/bus/usb/devices/*;
+
+	  if [ "$DEVICE_LIST" != "" ]; then
+	      for usb_device in $DEVICE_LIST;
 	      do
 		  usb_device=`basename $usb_device`;
 		  if ! blacklisted /sys/bus/usb/devices/$usb_device; then
+			if ! blacklisted_by_type /sys/bus/usb/devices/$usb_device; then
 			  if [ -f /sys/bus/usb/devices/$usb_device/power/autosuspend ]; then
 				  echo $AUTOSUSPEND_TIMEOUT > /sys/bus/usb/devices/$usb_device/power/autosuspend;
 				  log "VERBOSE" "Enabling auto suspend mode for usb device $usb_device."
@@ -47,19 +89,22 @@ if [ x$CONTROL_USB_AUTOSUSPEND = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTR
 				  log "VERBOSE" "Not enabling auto suspend mode for usb device $usb_device"
 			  fi
 
-			  if [ -f /sys/bus/usb/devices/$usb_device/power/level ]; then
+			  if [ -f /sys/bus/usb/devices/$usb_device/power/control ]; then
+				  echo "auto" > /sys/bus/usb/devices/$usb_device/power/control;
+				  log "VERBOSE" "Enabling auto power level for usb device $usb_device."
+			  elif [ -f /sys/bus/usb/devices/$usb_device/power/level ]; then
 				  echo "auto" > /sys/bus/usb/devices/$usb_device/power/level;
 				  log "VERBOSE" "Enabling auto power level for usb device $usb_device."
 			  else
 				  log "VERBOSE" "Not enabling auto power level for usb device $usb_device"
 			  fi
+			else
+			  log "VERBOSE" "Device $usb_device has blacklisted driver type, skipping auto suspend."
+			fi
 		  else
 			  log "VERBOSE" "USB device $usbid is in the autosuspend blacklist."
 		  fi
 	      done
-	  else
-	      # This will rarely happen.
-	      log "VERBOSE" "There are no USB devices."
 	  fi
     else
 	  AUTOSUSPEND_TIMEOUT=0
@@ -69,8 +114,9 @@ if [ x$CONTROL_USB_AUTOSUSPEND = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTR
 	  else
 	      log "VERBOSE" "Not disabling autosuspend mode for USBCORE Controller. Not Supported"
 	  fi
-	  if [ -d /sys/bus/usb/devices ]; then
-	      for usb_device in /sys/bus/usb/devices/*;
+
+	  if [ "$DEVICE_LIST" != "" ]; then
+	      for usb_device in $DEVICE_LIST;
 	      do
 		  usb_device=`basename $usb_device`;
 		  if [ -f /sys/bus/usb/devices/$usb_device/power/autosuspend ]; then
@@ -80,16 +126,16 @@ if [ x$CONTROL_USB_AUTOSUSPEND = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTR
 		      log "VERBOSE" "Not disabling auto suspend mode for usb device $usb_device"
 		  fi
 
-		  if [ -f /sys/bus/usb/devices/$usb_device/power/level ]; then
+		  if [ -f /sys/bus/usb/devices/$usb_device/power/control ]; then
+		      echo "on" > /sys/bus/usb/devices/$usb_device/power/control;
+		      log "VERBOSE" "Enabling ON power level for usb device $usb_device."
+		  elif [ -f /sys/bus/usb/devices/$usb_device/power/level ]; then
 		      echo "on" > /sys/bus/usb/devices/$usb_device/power/level;
 		      log "VERBOSE" "Enabling ON power level for usb device $usb_device."
 		  else
 		      log "VERBOSE" "Not enabling ON power level for usb device $usb_device"
 		  fi
 	      done
-	  else
-	      # This will rarely happen.
-	      log "VERBOSE" "There are no USB devices."
 	  fi
     fi
 else
