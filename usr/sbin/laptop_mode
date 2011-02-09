@@ -1086,6 +1086,7 @@ lock_retry ()
 	i=10;
 	while [ $i -ge 1 ]
 	do
+		log "VERBOSE" "Couldn't acquire lock. Retrying....\n"
 	    $FLOCK -x -w 1 9 && lmt_main_function && break;
 	    i=$(( $i - 1 ))
 	done
