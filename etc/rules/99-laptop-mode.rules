@@ -1,1 +1,3 @@
-SUBSYSTEM=="usb", ACTION=="add", RUN+="/usr/sbin/laptop_mode force modules=usb-autosuspend devices=%k"
+ACTION=="change", SUBSYSTEM=="power_supply", RUN+="/usr/sbin/laptop_mode auto"
+ACTION=="add|remove", SUBSYSTEM=="machinecheck", RUN+="/usr/sbin/laptop_mode auto"
+ACTION=="add", SUBSYSTEM=="usb", RUN+="/usr/sbin/laptop_mode force modules=usb-autosuspend devices=%k"

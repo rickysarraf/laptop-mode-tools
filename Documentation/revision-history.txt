@@ -14,6 +14,7 @@
     * Add support to invoke laptop-mode-tools with hotplug events. This currently only has
       support for the usb-autosuspend module. Thanks to Simon Que for the patch
     * Add locking support using flock. (Debian BTS: #566613)
+    * Add 99-laptop-mode.rules to trap multiple kernel events
 
 1.55 - Wed May 26 21:22:33 IST 2010
     * On Intel HD Audio, revert power saving changes when switching back to AC.
