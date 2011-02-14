@@ -3,7 +3,7 @@
 
 Summary: Tools for power savings based on battery/AC status
 Name: laptop-mode-tools
-Version: 1.55
+Version: 1.56
 Release: 1
 License: GPL
 Group: System Environment/Base
@@ -70,6 +70,7 @@ fi
 %doc %{_mandir}/man8/lm-syslog-setup.8
 %config %{_sysconfdir}/acpi/actions/lm_*.sh
 %config %{_sysconfdir}/acpi/events/lm_*
+%config %{_sysconfdir}/udev/rules.d/99-laptop-mode.rules
 %config(noreplace) %{_sysconfdir}/laptop-mode/
 %config %{_initrddir}/laptop-mode
 
@@ -92,6 +93,9 @@ fi
 
 
 %changelog
+* Mon Feb 14 2011 Ritesh Raj Sarraf <rrs@researchut.com> - 1.56-1
+- Updated to release 1.56.
+
 * Wed May 26 2010 Ritesh Raj Sarraf <rrs@researchut.com> - 1.55-1
 - Updated to release 1.55.
 
