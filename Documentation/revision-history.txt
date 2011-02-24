@@ -1,3 +1,7 @@
+1.57 - TBD
+    * Pass calling application's arguments to the main function. Thanks to Radek for the 
+      report and the patch
+
 1.56 - Mon Feb 14 23:57:50 IST 2011
     * Enable ENABLE_AUTO_MODULES by default. When a user installs the package,
       the first immediate expectation is to see some changes
