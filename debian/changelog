@@ -1,9 +1,32 @@
-laptop-mode-tools (1.56-1) UNRELEASED; urgency=low
+laptop-mode-tools (1.57-1) UNRELEASED; urgency=low
 
   * New Upstream Release
+    + Pass calling application's arguments to the main function. Thanks to
+      Radek for the report and the patch
+    + Use governor policy from the config file. Thanks to Michael Orlov for
+      the report.
+    + Enable ENABLE_AUTO_MODULES by default. When a user installs the package,
+      the first immediate expectation is to see some changes
+    + USB suspend interface has changed with kernels 2.6.35 and above.
+      (Closes: #589000)
+    + Add support for Linux Runtime Power Management (Closes: #592661)
+    + On many other distributions, wireless-tools packages is still old and
+      does not return proper exit status on failures. Thanks to Luca Landolfi for the
+      patch.
+    + Add support to blacklist USB Devices by types. Thanks to Simon Que for
+      the patch
+    + Re-initialize dev_path before the next iteration. Thanks to Faustus for
+      the bug report and the patch (LP: #662924)
+    + ENABLE_LAPTOP_MODE_TOOLS was ignore because of wrong check. Thanks to
+      Matus Harvan for reporting this. (Closes: #602278)
+    + Add support to invoke laptop-mode-tools with hotplug events. This
+      currently only has support for the usb-autosuspend module.
+      Thanks to Simon Que for the patch
+    + Add locking support using flock. (Closes: #566613)
+    + Add 99-laptop-mode.rules to trap multiple kernel events
   * Drop pm-utils from recommends since it conflicts with us (Closes: #614024) 
 
- -- Ritesh Raj Sarraf <rrs@debian.org>  Sun, 27 Feb 2011 12:45:19 +0530
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sun, 27 Feb 2011 13:18:03 +0530
 
 laptop-mode-tools (1.55-1) unstable; urgency=low
 
