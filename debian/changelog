@@ -1,4 +1,4 @@
-laptop-mode-tools (1.57-1) UNRELEASED; urgency=low
+laptop-mode-tools (1.57-1) unstable; urgency=low
 
   * New Upstream Release
     + Pass calling application's arguments to the main function. Thanks to
@@ -11,8 +11,8 @@ laptop-mode-tools (1.57-1) UNRELEASED; urgency=low
       (Closes: #589000)
     + Add support for Linux Runtime Power Management (Closes: #592661)
     + On many other distributions, wireless-tools packages is still old and
-      does not return proper exit status on failures. Thanks to Luca Landolfi for the
-      patch.
+      does not return proper exit status on failures. Thanks to Luca Landolfi
+      for the patch.
     + Add support to blacklist USB Devices by types. Thanks to Simon Que for
       the patch
     + Re-initialize dev_path before the next iteration. Thanks to Faustus for
@@ -27,7 +27,7 @@ laptop-mode-tools (1.57-1) UNRELEASED; urgency=low
   * Drop pm-utils from recommends since it conflicts with us (Closes: #614024) 
   * Bump Standards Version to 3.9.1 (No changes required) 
 
- -- Ritesh Raj Sarraf <rrs@debian.org>  Sun, 27 Feb 2011 13:27:37 +0530
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sun, 27 Feb 2011 13:28:48 +0530
 
 laptop-mode-tools (1.55-1) unstable; urgency=low
 
