@@ -11,7 +11,7 @@ Standards-Version: 3.8.4
 Package: laptop-mode-tools
 Architecture: all
 Depends: ${misc:Depends}, lsb-base (>= 3.0-10), util-linux (>= 2.13), psmisc
-Recommends: acpid | apmd | pbbuttonsd | pmud, hdparm, sdparm, hal, ethtool, net-tools, wireless-tools
+Recommends: acpid | apmd | pbbuttonsd | pmud, hdparm, sdparm, hal, ethtool, net-tools, wireless-tools, udev
 Conflicts: noflushd
 Description: Tools for Power Savings based on battery/AC status
  Laptop mode is a Linux kernel feature that allows your laptop to save 
