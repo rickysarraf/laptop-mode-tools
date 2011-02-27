@@ -1,8 +1,9 @@
 laptop-mode-tools (1.56-1) UNRELEASED; urgency=low
 
   * New Upstream Release
+  * Drop pm-utils from recommends since it conflicts with us (Closes: #614024) 
 
- -- Ritesh Raj Sarraf <rrs@debian.org>  Thu, 10 Feb 2011 00:04:12 +0530
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sun, 27 Feb 2011 12:45:19 +0530
 
 laptop-mode-tools (1.55-1) unstable; urgency=low
 
