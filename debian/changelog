@@ -25,8 +25,9 @@ laptop-mode-tools (1.57-1) UNRELEASED; urgency=low
     + Add locking support using flock. (Closes: #566613)
     + Add 99-laptop-mode.rules to trap multiple kernel events
   * Drop pm-utils from recommends since it conflicts with us (Closes: #614024) 
+  * Bump Standards Version to 3.9.1 (No changes required) 
 
- -- Ritesh Raj Sarraf <rrs@debian.org>  Sun, 27 Feb 2011 13:18:03 +0530
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sun, 27 Feb 2011 13:27:37 +0530
 
 laptop-mode-tools (1.55-1) unstable; urgency=low
 
