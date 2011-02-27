@@ -35,7 +35,7 @@ set -a
 
 # The laptop mode tools version number. Extracted by the installer makefile
 # as well, so don't change the format!
-LMTVERSION=1.55
+LMTVERSION=1.57
 
 # This script is loaded from multiple scripts to set the config defaults
 # and to read the configuration on top of those. Only when the command is
@@ -1087,7 +1087,7 @@ lock_retry ()
 	while [ $i -ge 1 ]
 	do
 		log "VERBOSE" "Couldn't acquire lock. Retrying....\n"
-	    $FLOCK -x -w 1 9 && lmt_main_function && break;
+	    $FLOCK -x -w 1 9 && lmt_main_function "$@" && break;
 	    i=$(( $i - 1 ))
 	done
 	) 8>$LMT_REQ_LOCK
@@ -1100,6 +1100,6 @@ lock_retry ()
     ( $FLOCK -n -x -w 1 8; ) 8>$LMT_REQ_LOCK
 ) & (
   (
-        ($FLOCK -n -x -w 1 9 && lmt_main_function;) || lock_retry
+        ($FLOCK -n -x -w 1 9 && lmt_main_function "$@";) || lock_retry "$@"
   ) 9<>$LMT_INVOC_LOCK
 ) &

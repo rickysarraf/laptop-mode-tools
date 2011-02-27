@@ -1,4 +1,9 @@
-1.56 - TBD
+1.57 - Sun Feb 27 12:50:19 IST 2011
+    * Pass calling application's arguments to the main function. Thanks to Radek for the 
+      report and the patch
+    * Use governor policy from the config file. Thanks to Michael Orlov for the report.
+
+1.56 - Mon Feb 14 23:57:50 IST 2011
     * Enable ENABLE_AUTO_MODULES by default. When a user installs the package,
       the first immediate expectation is to see some changes
     * USB suspend interface has changed with kernels 2.6.35 and above.
@@ -14,6 +19,7 @@
     * Add support to invoke laptop-mode-tools with hotplug events. This currently only has
       support for the usb-autosuspend module. Thanks to Simon Que for the patch
     * Add locking support using flock. (Debian BTS: #566613)
+    * Add 99-laptop-mode.rules to trap multiple kernel events
 
 1.55 - Wed May 26 21:22:33 IST 2010
     * On Intel HD Audio, revert power saving changes when switching back to AC.
