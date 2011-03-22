@@ -1081,17 +1081,15 @@ lmt_main_function ()
 
 lock_retry ()
 {
-    ( count=11;
 	( $FLOCK -n -x -w 1 8 || exit 0;
 	i=10;
 	while [ $i -ge 1 ]
 	do
-		log "VERBOSE" "Couldn't acquire lock. Retrying....\n"
+		log "ERR" "Couldn't acquire lock. Retrying.... PID is $$\n"
 	    $FLOCK -x -w 1 9 && lmt_main_function "$@" && break;
 	    i=$(( $i - 1 ))
 	done
 	) 8>$LMT_REQ_LOCK
-    )
 }
 
 
