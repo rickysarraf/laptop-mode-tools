@@ -130,6 +130,8 @@ LOG_TO_SYSLOG=1
 DEBUG=0
 ENABLE_LAPTOP_MODE_TOOLS=1
 
+# Initialize the PATH Variable
+export PATH="${PATH}":/bin:/sbin:/usr/bin:/usr/sbin
 
 # This is a 2 phase locking approach. LMT_REQ_LOCK is the outer lock and LMT_INVOC_LOCK is the inner lock
 # We take this approach to ensure the scenario that, "At any point when an event occurs (AC/BATT), the
