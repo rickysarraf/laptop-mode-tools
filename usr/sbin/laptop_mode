@@ -988,7 +988,12 @@ lmt_main_function ()
 	    if [ "$ENABLE_AUTO_HIBERNATION" -ne 0 -a "$ENOUGH_CHARGE_TO_PREVENT_HIBERNATION" -eq 0 ] ; then
 		    log "VERBOSE" "None of the batteries have a charge above the auto-hibernation level."
 		    log "VERBOSE" "Starting hibernation."
-		    $HIBERNATE_COMMAND
+		    if [ -x $HIBERNATE_COMMAND ]; then
+			    $HIBERNATE_COMMAND
+		    elif [ -f /sys/power/state ]; then
+			    grep -q disk /sys/power/state && echo disk > /sys/power/state
+		    fi
+
 		    # Don't continue -- if things are configured correctly, then we
 		    # will be called on resume.
 		    exit 0			
