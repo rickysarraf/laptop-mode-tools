@@ -4,6 +4,8 @@
     * Enable new in-kernel polling mechanism for block devices (Debian BTS: #617705, #574867)
     * Check for kernel's native suspend functionality
     * Support execution of complex commands. Thanks to Changaco for the patch
+    * Add new module nmi-watchdog to handle NMI Watchdog related power savings. Thanks to
+      Quentin Denis for the report
 
 1.57 - Sun Feb 27 12:50:19 IST 2011
     * Pass calling application's arguments to the main function. Thanks to Radek for the 
