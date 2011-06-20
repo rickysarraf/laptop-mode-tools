@@ -1,0 +1,8 @@
+#!/bin/sh -e
+# /usr is not guaranteed to be mounted when udev starts
+
+(
+	. /lib/udev/hotplug.functions
+	wait_for_file /usr/sbin/laptop_mode
+	exec /usr/sbin/laptop_mode "$@"
+) &
