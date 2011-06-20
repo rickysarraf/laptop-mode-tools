@@ -519,6 +519,7 @@ lmt_main_function ()
     case "$KLEVEL" in
 	    "2.4" ) ;;
 	    "2.6" ) ;;
+    	    "3.0" ) ;;
 	    *)
 		    log "ERR" "Unhandled kernel version: $KLEVEL ('uname -r' = '$(uname -r)')" >&2
 		    exit 1

@@ -8,6 +8,7 @@
       Quentin Denis for the report
     * Fix error messages during early boot if /usr is on a different partition.
       (Debian BTS: #624678)
+    * Add support for new Linux 3.x kernels. (Debian BTS: #6628764)
 
 1.57 - Sun Feb 27 12:50:19 IST 2011
     * Pass calling application's arguments to the main function. Thanks to Radek for the 
