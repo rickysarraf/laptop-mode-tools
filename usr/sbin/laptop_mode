@@ -790,6 +790,7 @@ lmt_main_function ()
 						    fi
 					    fi
 
+					    # $BATT/alarm is the design_capacity_warning of a battery.
 					    ALARM_LEVEL=$(cat $BATT/alarm)
 					    if [ "$ALARM_LEVEL" -ne 0 ] ; then
 						    if [ "$REMAINING" -le "$ALARM_LEVEL" ] ; then				
