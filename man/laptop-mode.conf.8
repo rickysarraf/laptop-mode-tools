@@ -529,6 +529,17 @@ If this option is enabled, laptop mode tools will automatically enable the
 AC97 power saving settings. The power saving settings are always enabled, not
 only on battery power.
 
+
+.SS "\fI/etc/laptop-mode/conf.d/nmi-watchdog.conf\fP"
+
+The nmi-watchdog module allows you to enable the NMI Watchdog timer power savings.
+Enabling this module lowers down one hw-pmu counter.
+
+.IP "\fBCONTROL_NMI_WATCHDOG\fP" 10
+If this option is enabled, laptop mode tools will automatically disable the
+NMI Watchdog timer when on battery. This module is part of auto modules. Thus enabling
+auto modules setting will activate this module automatically
+
 .SS "\fI/etc/laptop-mode/conf.d/runtime-pm.conf\fP"
 
 The runtime-pm module allows you to enable the Runtime Power Management

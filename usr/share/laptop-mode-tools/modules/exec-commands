@@ -26,7 +26,7 @@ if [ x$CONTROL_EXEC_COMMANDS = x1 ]  || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTRO
 	    fi
 	    
 	    log "VERBOSE" "Executing comand $COMMAND"
-	    log "VERBOSE" $($COMMAND)
+	    log "VERBOSE" $(eval $COMMAND)
 	    
 	    COUNTER=`expr $COUNTER + 1`
     done

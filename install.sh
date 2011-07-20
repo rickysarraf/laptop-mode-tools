@@ -199,6 +199,11 @@ if ( ! $INSTALL -D -m 644 etc/rules/99-laptop-mode.rules "$DESTDIR/etc/udev/rule
     exit 23
 fi
 
+# udev helper tool
+if ( ! $INSTALL -D -m 755 etc/rules/lmt-udev "$DESTDIR/lib/udev/lmt-udev" ) ; then
+	echo "$0: Failed to install udev helper tool into /lib/udev/ Installation failed."
+fi
+
 ACPI_DONE=0
 APM_DONE=0
 PMU_DONE=0

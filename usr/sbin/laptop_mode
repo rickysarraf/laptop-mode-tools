@@ -130,6 +130,21 @@ LOG_TO_SYSLOG=1
 DEBUG=0
 ENABLE_LAPTOP_MODE_TOOLS=1
 
+# Initialize the PATH Variable
+export PATH="${PATH}":/bin:/sbin:/usr/bin:/usr/sbin
+
+# This is a 2 phase locking approach. LMT_REQ_LOCK is the outer lock and LMT_INVOC_LOCK is the inner lock
+# We take this approach to ensure the scenario that, "At any point when an event occurs (AC/BATT), the
+# kernel can generate multiple events spanning over a couple of events. The first event is honored and
+# lmt executes. If the last event triggered at the 9th second, there is a fair chance that a good amount
+# of state change would have occured in the OS, to honor that state, we keep an outer lock  (LMT_REQ_LOCK)
+# handy, so that those changes can also be applied and not forgotten.
+# Workflow:
+# Event-1 is generated and lmt executes (lmt runtime could span 5-10 seconds)
+# At seventh second, 4 events generate. But Event-1 is still running.
+# We don't want to discard all the remaining 4 events, but at least honor 1 so that we can act to the changes
+# that occured in the last 7 seconds.
+# So, Event-2 acquire LMT_REQ_LOCK and waits to acquire LMT_INVOC_LOCK (which is acquire by Event-1)
 LMT_REQ_LOCK="/var/lock/lmt-req.lock"
 LMT_INVOC_LOCK="/var/lock/lmt-invoc.lock"
 FLOCK=`which flock`
@@ -501,15 +516,6 @@ lmt_main_function ()
 			    }
     )"
 
-    case "$KLEVEL" in
-	    "2.4" ) ;;
-	    "2.6" ) ;;
-	    *)
-		    log "ERR" "Unhandled kernel version: $KLEVEL ('uname -r' = '$(uname -r)')" >&2
-		    exit 1
-		    ;;
-    esac
-
     # Stop exporting everything -- what we do from here is private.
     set +a
 
@@ -784,6 +790,7 @@ lmt_main_function ()
 						    fi
 					    fi
 
+					    # $BATT/alarm is the design_capacity_warning of a battery.
 					    ALARM_LEVEL=$(cat $BATT/alarm)
 					    if [ "$ALARM_LEVEL" -ne 0 ] ; then
 						    if [ "$REMAINING" -le "$ALARM_LEVEL" ] ; then				
@@ -973,7 +980,12 @@ lmt_main_function ()
 	    if [ "$ENABLE_AUTO_HIBERNATION" -ne 0 -a "$ENOUGH_CHARGE_TO_PREVENT_HIBERNATION" -eq 0 ] ; then
 		    log "VERBOSE" "None of the batteries have a charge above the auto-hibernation level."
 		    log "VERBOSE" "Starting hibernation."
-		    $HIBERNATE_COMMAND
+		    if [ -x $HIBERNATE_COMMAND ]; then
+			    $HIBERNATE_COMMAND
+		    elif [ -f /sys/power/state ]; then
+			    grep -q disk /sys/power/state && echo disk > /sys/power/state
+		    fi
+
 		    # Don't continue -- if things are configured correctly, then we
 		    # will be called on resume.
 		    exit 0			
@@ -1081,17 +1093,15 @@ lmt_main_function ()
 
 lock_retry ()
 {
-    ( count=11;
 	( $FLOCK -n -x -w 1 8 || exit 0;
 	i=10;
 	while [ $i -ge 1 ]
 	do
-		log "VERBOSE" "Couldn't acquire lock. Retrying....\n"
+		log "ERR" "Couldn't acquire lock. Retrying.... PID is $$\n"
 	    $FLOCK -x -w 1 9 && lmt_main_function "$@" && break;
 	    i=$(( $i - 1 ))
 	done
 	) 8>$LMT_REQ_LOCK
-    )
 }
 
 
