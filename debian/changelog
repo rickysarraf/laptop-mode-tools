@@ -1,3 +1,9 @@
+laptop-mode-tools (1.58-1) UNRELEASED; urgency=low
+
+  * New upstream release 
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Thu, 21 Jul 2011 00:46:10 +0530
+
 laptop-mode-tools (1.57-1) unstable; urgency=low
 
   * New Upstream Release
