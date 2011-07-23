@@ -20,7 +20,8 @@ configure-stamp:
 	
 	touch configure-stamp
 
-build: build-arch build-indep
+
+build: build-stamp
 
 build-stamp: configure-stamp 
 	dh_testdir
@@ -81,10 +82,10 @@ install: build
 	install -m755 usr/share/laptop-mode-tools/module-helpers/* $(DESTDIR)/usr/share/laptop-mode-tools/module-helpers
 
 # Build architecture-independent files here.
-binary-arch: build-stamp
+binary-arch: build install
 
 # Build architecture-dependent files here.
-binary-indep: build-stamp
+binary-indep: build install
 	dh_testdir
 	dh_testroot
 	dh_installchangelogs Documentation/revision-history.txt
@@ -97,7 +98,6 @@ binary-indep: build-stamp
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb
-
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install configure get-orig-source
