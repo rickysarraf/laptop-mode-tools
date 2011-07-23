@@ -1,10 +1,22 @@
-laptop-mode-tools (1.58-1) UNRELEASED; urgency=low
+laptop-mode-tools (1.58-1) unstable; urgency=low
 
   * New upstream release 
+    + Initialize the PATH variable within us. This helps when our caller did
+      not have a proper environment
+    + Enable new in-kernel polling mechanism for block devices
+      (Closes: #617705, #574867)
+    + Check for kernel's native suspend functionality
+    + Support execution of complex commands. Thanks to Changaco for the patch
+    + Add new module nmi-watchdog to handle NMI Watchdog related power
+      savings. Thanks to Quentin Denis for the report
+    + Fix error messages during early boot if /usr is on a different
+      partition. (Closes: #624678)
+    + Add support for new Linux 3.x kernels. (Closes: #6628764)
+    + Fix locking problems when battery polling daemon is enabled
   * Install lmt-udev into /lib/udev 
   * Update Standards Version to 3.9.2 (No changes required) 
 
- -- Ritesh Raj Sarraf <rrs@debian.org>  Sat, 23 Jul 2011 16:27:50 +0530
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sat, 23 Jul 2011 23:33:34 +0530
 
 laptop-mode-tools (1.57-1) unstable; urgency=low
 
