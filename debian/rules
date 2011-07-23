@@ -73,6 +73,7 @@ install: build
 	install -m755 etc/power/scripts.d/* $(DESTDIR)/etc/power/scripts.d
 	install -m755 etc/power/event.d/* $(DESTDIR)/etc/power/event.d
 	install -m644 etc/rules/99-laptop-mode.rules $(DESTDIR)/lib/udev/rules.d
+	install -m755 etc/rules/lmt-udev $(DESTDIR)/lib/udev/lmt-udev
 	install -m755 usr/lib/pm-utils/sleep.d/* $(DESTDIR)/usr/lib/pm-utils/sleep.d
 	install -m755 usr/sbin/laptop_mode $(DESTDIR)/usr/sbin
 	install -m755 usr/sbin/lm-syslog-setup $(DESTDIR)/usr/sbin
