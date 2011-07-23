@@ -2,8 +2,9 @@ laptop-mode-tools (1.58-1) UNRELEASED; urgency=low
 
   * New upstream release 
   * Install lmt-udev into /lib/udev 
+  * Update Standards Version to 3.9.2 (No changes required) 
 
- -- Ritesh Raj Sarraf <rrs@debian.org>  Sat, 23 Jul 2011 15:58:09 +0530
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sat, 23 Jul 2011 16:27:50 +0530
 
 laptop-mode-tools (1.57-1) unstable; urgency=low
 

@@ -6,7 +6,7 @@ Homepage: http://www.samwel.tk/laptop_mode/
 Uploaders: Bart Samwel <bart@samwel.tk>
 DM-Upload-Allowed: yes
 Build-Depends: debhelper (>= 5)
-Standards-Version: 3.9.1
+Standards-Version: 3.9.2
 
 Package: laptop-mode-tools
 Architecture: all
