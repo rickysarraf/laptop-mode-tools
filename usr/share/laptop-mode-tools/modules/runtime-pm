@@ -17,13 +17,13 @@ activate_runtime_suspend() {
 }
 
 if [ x$CONTROL_RUNTIME_PM = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_RUNTIME_PM = xauto ]; then
-	log "MSG" "Activating Runtime PM for device type PCI"
+	log "VERBOSE" "Activating Runtime PM for device type PCI"
 	activate_runtime_suspend "/sys/bus/pci/devices"
 
-	log "MSG" "Activating Runtime PM for device type SPI"
+	log "VERBOSE" "Activating Runtime PM for device type SPI"
 	activate_runtime_suspend "/sys/bus/spi/devices"
 
-	log "MSG" "Activating Runtime PM for device type i2c"
+	log "VERBOSE" "Activating Runtime PM for device type i2c"
 	activate_runtime_suspend "/sys/bus/i2c/devices"
 else
 	log "VERBOSE" "Linux Runtime PM disabled."
