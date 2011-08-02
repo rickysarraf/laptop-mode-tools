@@ -1140,4 +1140,4 @@ else
 	log "VERBOSE" "Battery level polling is disabled."
 fi
 
-return 0;
+exit 0;
