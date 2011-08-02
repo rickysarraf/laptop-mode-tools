@@ -1,3 +1,12 @@
+laptop-mode-tools (1.58-3) unstable; urgency=low
+
+  * [c6f2f64] Don't call true which forks a subshell.
+    Thanks to Cristian Ionescu-Idbohrn
+  * [f2d4e70] Use exit instead of return.
+    Thanks to Eric Belanger (Closes: 636251)
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Tue, 02 Aug 2011 23:24:48 +0530
+
 laptop-mode-tools (1.58-2) unstable; urgency=low
 
   * [fa94d77] Check for files instead of kernel version numbers.
