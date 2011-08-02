@@ -1,0 +1,219 @@
+Description: Undocumented upstream changes
+ This patch has been created by dpkg-source during the package build
+ but it might have accumulated changes from several uploads. Please
+ check the changelog to (hopefully) learn more on those changes.
+
+--- /dev/null
++++ laptop-mode-tools-1.58/laptop-mode-tools.preinst
+@@ -0,0 +1,41 @@
++#!/bin/sh
++# preinst script for laptop-mode-tools
++#
++# see: dh_installdeb(1)
++
++set -e
++
++# Remove a no-longer used conffile
++rm_conffile() {
++    local PKGNAME="$1"
++    local CONFFILE="$2"
++
++    [ -e "$CONFFILE" ] || return 0
++
++    local md5sum="$(md5sum $CONFFILE | sed -e 's/ .*//')"
++    local old_md5sum="$(dpkg-query -W -f='${Conffiles}' $PKGNAME | \
++            sed -n -e "\' $CONFFILE ' { s/ obsolete$//; s/.* //; p }")"
++    if [ "$md5sum" != "$old_md5sum" ]; then
++        echo "Obsolete conffile $CONFFILE has been modified by you."
++        echo "Saving as $CONFFILE.dpkg-bak ..."
++        mv -f "$CONFFILE" "$CONFFILE".dpkg-bak
++    else
++        echo "Removing obsolete conffile $CONFFILE ..."
++        rm -f "$CONFFILE"
++    fi
++}
++
++case "$1" in
++install|upgrade)
++    # ideally this clean-up should have been done at the same time
++    # as we stopped shipping the file, but since we had releases in
++    # between we will compare with the version shipping this clean-up
++    # instead of the first version not shipping the file
++    if dpkg --compare-versions "$2" lt "1.51-2"; then
++        rm_conffile laptop-mode-tools "/etc/pm/sleep.d/99laptop-mode"
++    fi
++esac
++
++#DEBHELPER#
++
++exit 0
+--- laptop-mode-tools-1.58.orig/etc/init.d/laptop-mode
++++ laptop-mode-tools-1.58/etc/init.d/laptop-mode
+@@ -6,63 +6,54 @@
+ #
+ # config:  /etc/laptop-mode/laptop-mode.conf
+ 
++### BEGIN INIT INFO
++# Provides:          laptop-mode
++# Should-Start:      $all
++# Required-Start:    $remote_fs
++# Required-Stop:     $remote_fs
++# Default-Start:     2 3 4 5
++# Default-Stop:      0 1 6
++# Short-Description: Enable laptop-mode-tools power management functions
++# Description:       Enable laptop-mode-tools power management functions
++### END INIT INFO
++
++
+ test -f /usr/sbin/laptop_mode || exit 0
+ 
+-if [ -f /lib/lsb/init-functions ] ; then
+-  . /lib/lsb/init-functions
+-else
+-  log_success_msg()
+-  {
+-    logger -t LAPTOP-MODE -p daemon.info -- $*
+-    echo "$*"
+-  }
+-  log_failure_msg()
+-  {
+-    logger -t LAPTOP-MODE -p daemon.notice -- $*
+-    echo "$*"
+-  }
+-fi
++. /lib/lsb/init-functions
+ 
+ # Enable laptop mode when the system is booted when running on battery.
+ 
+ case $1 in
+   start)
++    log_action_begin_msg "Enabling laptop mode"
+     mkdir -p /var/run/laptop-mode-tools
+     touch /var/run/laptop-mode-tools/enabled
+-    if RESULT=`/usr/sbin/laptop_mode auto` ; then
+-      log_success_msg "$RESULT"
+-    else
+-      log_failure_msg "$RESULT"
+-    fi
++    RESULT=`/usr/sbin/laptop_mode init auto`
++    log_action_end_msg $? "$RESULT"
+     ;;
+ 
+   restart|reload|force-reload)
+     # Full restart: first stop laptop mode completely (to restore default mount options etc.)
++    log_action_begin_msg "Disabling laptop mode"
+     mkdir -p /var/run/laptop-mode-tools
+-    rm -f /var/run/laptop-mode-tools/enabled    
+-    if RESULT=`/usr/sbin/laptop_mode stop` ; then
+-      log_success_msg "$RESULT"
+-    else
+-      log_failure_msg "$RESULT"
+-    fi
++    rm -f /var/run/laptop-mode-tools/enabled
++    RESULT=`/usr/sbin/laptop_mode init stop`
++    log_action_end_msg $? "$RESULT"
+ 
+     # Now remove files containing stored status, re-enable, and start it up again.
+-    rm -f /var/run/laptop-mode-tools/*
++    log_action_begin_msg "Enabling laptop mode"
++    rm -f /var/run/laptop-mode-tools/*
+     touch /var/run/laptop-mode-tools/enabled
+-    if RESULT=`/usr/sbin/laptop_mode auto force` ; then
+-      log_success_msg "$RESULT"
+-    else
+-      log_failure_msg "$RESULT"
+-    fi
++    RESULT=`/usr/sbin/laptop_mode init auto force`
++    log_action_end_msg $? "$RESULT"
+     ;;
+ 
+   stop)
++    log_action_begin_msg "Disabling laptop mode"
+     rm -f /var/run/laptop-mode-tools/enabled
+-    if RESULT=`/usr/sbin/laptop_mode stop` ; then
+-      log_success_msg "$RESULT"
+-    else
+-      log_failure_msg "$RESULT"
+-    fi
++    RESULT=`/usr/sbin/laptop_mode init stop`
++    log_action_end_msg $? "$RESULT"
+     ;;
+ 
+   status)
+--- laptop-mode-tools-1.58.orig/etc/power/scripts.d/laptop-mode
++++ laptop-mode-tools-1.58/etc/power/scripts.d/laptop-mode
+@@ -28,7 +28,7 @@ if [ -w /proc/sys/vm/laptop_mode ]; then
+         $LMODE "stop"
+         ;;
+       resume)
+-        /etc/init.d/laptop-mode restart
++        $LMODE "auto" "force"
+         ;;        
+     esac
+ elif [ -x logger ]; then	
+--- laptop-mode-tools-1.58.orig/usr/share/laptop-mode-tools/modules/laptop-mode
++++ laptop-mode-tools-1.58/usr/share/laptop-mode-tools/modules/laptop-mode
+@@ -187,21 +187,18 @@ if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS"
+ 		set_sysctl /proc/sys/fs/xfs/xfsbufd_centisecs     3000
+ 	fi
+ 
+-	case "$KLEVEL" in
+-		"2.4")
+-			log "VERBOSE" "Adjusting 2.4 kernel parameters to enable laptop mode."
+-			set_sysctl /proc/sys/vm/laptop_mode   1
+-			set_sysctl /proc/sys/vm/bdflush       "30 500 0 0 $AGE $AGE 60 20 0"
+-			;;
+-		"2.6")
+-			log "VERBOSE" "Adjusting 2.6 kernel parameters to enable laptop mode."
+-			set_sysctl /proc/sys/vm/laptop_mode		  "$LM_SECONDS_BEFORE_SYNC"
+-			set_sysctl /proc/sys/vm/dirty_writeback_centisecs "$AGE"
+-			set_sysctl /proc/sys/vm/dirty_expire_centisecs    "$AGE"
+-			set_sysctl /proc/sys/vm/dirty_ratio		  "$LM_DIRTY_RATIO"
+-			set_sysctl /proc/sys/vm/dirty_background_ratio    "$LM_DIRTY_BACKGROUND_RATIO"
+-			;;
+-	esac
++	if [ -f /proc/sys/vm/bdflush ]; then
++		log "VERBOSE" "Adjusting 2.4 kernel parameters to enable laptop mode."
++		set_sysctl /proc/sys/vm/laptop_mode   1
++		set_sysctl /proc/sys/vm/bdflush       "30 500 0 0 $AGE $AGE 60 20 0"
++	else
++		log "VERBOSE" "Adjusting 2.6+ kernel parameters to enable laptop mode."
++		set_sysctl /proc/sys/vm/laptop_mode		  "$LM_SECONDS_BEFORE_SYNC"
++		set_sysctl /proc/sys/vm/dirty_writeback_centisecs "$AGE"
++		set_sysctl /proc/sys/vm/dirty_expire_centisecs    "$AGE"
++		set_sysctl /proc/sys/vm/dirty_ratio		  "$LM_DIRTY_RATIO"
++		set_sysctl /proc/sys/vm/dirty_background_ratio    "$LM_DIRTY_BACKGROUND_RATIO"
++	fi
+ 	if [ $CONTROL_MOUNT_OPTIONS -eq 1 ]; then
+ 		log "VERBOSE" "Remounting filesystems."
+ 		# The -r flag makes 'read' preserve backslashes read from
+@@ -316,19 +313,16 @@ else
+ 		set_sysctl /proc/sys/fs/xfs/xfssyncd_centisecs    $((100*$DEF_XFS_SYNC_INTERVAL))
+ 		set_sysctl /proc/sys/fs/xfs/xfsbufd_centisecs     $((100*$DEF_XFS_BUFD_INTERVAL))
+ 	fi
+-	case "$KLEVEL" in
+-		"2.4")
+-			log "VERBOSE" "Adjusting 2.4 kernel parameters to disable laptop mode."
+-			set_sysctl /proc/sys/vm/bdflush "30 500 0 0 $U_AGE $B_AGE 60 20 0"
+-			;;
+-		"2.6")
+-			log "VERBOSE" "Adjusting 2.6 kernel parameters to disable laptop mode."
+-			set_sysctl /proc/sys/vm/dirty_writeback_centisecs   "$U_AGE"
+-			set_sysctl /proc/sys/vm/dirty_expire_centisecs      "$B_AGE"
+-			set_sysctl /proc/sys/vm/dirty_ratio		    "$NOLM_DIRTY_RATIO"
+-			set_sysctl /proc/sys/vm/dirty_background_ratio	    "$NOLM_DIRTY_BACKGROUND_RATIO"
+-			;;
+-	esac
++	if [ -f /proc/sys/vm/bdflush ]; then
++		log "VERBOSE" "Adjusting 2.4 kernel parameters to disable laptop mode."
++		set_sysctl /proc/sys/vm/bdflush "30 500 0 0 $U_AGE $B_AGE 60 20 0"
++	else
++		log "VERBOSE" "Adjusting 2.6+ kernel parameters to disable laptop mode."
++		set_sysctl /proc/sys/vm/dirty_writeback_centisecs   "$U_AGE"
++		set_sysctl /proc/sys/vm/dirty_expire_centisecs      "$B_AGE"
++		set_sysctl /proc/sys/vm/dirty_ratio		    "$NOLM_DIRTY_RATIO"
++		set_sysctl /proc/sys/vm/dirty_background_ratio	    "$NOLM_DIRTY_BACKGROUND_RATIO"
++	fi
+ 	if [ $CONTROL_MOUNT_OPTIONS -eq 1 ] ; then
+ 		log "VERBOSE" "Remounting filesystems."
+ 		# The -r flag makes 'read' preserve backslashes read from
