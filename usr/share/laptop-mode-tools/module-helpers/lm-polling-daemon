@@ -10,7 +10,7 @@
 # risks data loss).
 INTERVAL=150
 
-while ( true ) ; do
+while :; do
 	sleep $INTERVAL
 
 	/usr/sbin/laptop_mode auto
