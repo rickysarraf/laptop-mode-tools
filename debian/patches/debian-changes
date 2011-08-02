@@ -217,3 +217,22 @@ Description: Undocumented upstream changes
  	if [ $CONTROL_MOUNT_OPTIONS -eq 1 ] ; then
  		log "VERBOSE" "Remounting filesystems."
  		# The -r flag makes 'read' preserve backslashes read from
+--- laptop-mode-tools-1.58.orig/usr/sbin/laptop_mode
++++ laptop-mode-tools-1.58/usr/sbin/laptop_mode
+@@ -1140,4 +1140,4 @@ else
+ 	log "VERBOSE" "Battery level polling is disabled."
+ fi
+ 
+-return 0;
++exit 0;
+--- laptop-mode-tools-1.58.orig/usr/share/laptop-mode-tools/module-helpers/lm-polling-daemon
++++ laptop-mode-tools-1.58/usr/share/laptop-mode-tools/module-helpers/lm-polling-daemon
+@@ -10,7 +10,7 @@
+ # risks data loss).
+ INTERVAL=150
+ 
+-while ( true ) ; do
++while :; do
+ 	sleep $INTERVAL
+ 
+ 	/usr/sbin/laptop_mode auto
