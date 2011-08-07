@@ -1121,7 +1121,7 @@ lock_retry ()
 
 # We do a special run of battery polling daemon here so that it does not get
 # plagued by the lock. We need the polling daemon to be independent of any locks
-if [ x$ENABLE_BATTERY_LEVEL_POLLING = x1 ] ; then
+if [ x$ENABLE_BATTERY_LEVEL_POLLING = x1 ] && [ x$BLACKLIST_IN_FLOCK = x1 ]; then
 	log "VERBOSE" "Battery level polling is enabled."
 	if [ x$ON_AC = x1 ] ; then
 		log "VERBOSE" "On AC, stopping the polling daemon."
