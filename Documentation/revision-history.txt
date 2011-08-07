@@ -1,3 +1,11 @@
+1.59 - Mon Aug  8 00:56:48 IST 2011 
+    * really don't call batt-poll-daemon inside from the flock instance
+    * USB auto-suspend whitelist
+    * Add myself as the maintainer
+    * Don't call true which forks a subshell
+    * Use exit instead of return
+    * Check for files instead of kernel version numbers.
+
 1.58 - Sat Jul 23 23:21:22 IST 2011
     * Initialize the PATH variable within us. This helps when our caller did not have a
       proper environment
