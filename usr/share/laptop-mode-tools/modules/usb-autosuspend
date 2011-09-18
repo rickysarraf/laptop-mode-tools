@@ -45,16 +45,16 @@ listed_by_type() {
 
 # Checks whether a device is blacklisted by either ID or driver type
 blacklisted() {
-	listed_by_id $1 $AUTOSUSPEND_USBID_BLACKLIST\
-	|| listed_by_type $1 $AUTOSUSPEND_USBTYPE_BLACKLIST\
+	listed_by_id $1 "$AUTOSUSPEND_USBID_BLACKLIST"\
+	|| listed_by_type $1 "$AUTOSUSPEND_USBTYPE_BLACKLIST"\
 	|| return 1
 	return 0
 }
 
 # Checks whether a device is whitelisted by either ID or driver type
 whitelisted() {
-	listed_by_id $1 $AUTOSUSPEND_USBID_WHITELIST\
-	|| listed_by_type $1 $AUTOSUSPEND_USBTYPE_WHITELIST\
+	listed_by_id $1 "$AUTOSUSPEND_USBID_WHITELIST"\
+	|| listed_by_type $1 "$AUTOSUSPEND_USBTYPE_WHITELIST"\
 	|| return 1
 	return 0
 }
