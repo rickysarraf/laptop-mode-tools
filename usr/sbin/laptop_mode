@@ -147,6 +147,7 @@ export PATH="${PATH}":/bin:/sbin:/usr/bin:/usr/sbin
 # So, Event-2 acquire LMT_REQ_LOCK and waits to acquire LMT_INVOC_LOCK (which is acquire by Event-1)
 LMT_REQ_LOCK="/var/lock/lmt-req.lock"
 LMT_INVOC_LOCK="/var/lock/lmt-invoc.lock"
+LMT_BATTPOLL_LOCK="/var/lock/lmt-battpoll.lock"
 FLOCK=`which flock`
 
 checkint ()
@@ -1118,7 +1119,7 @@ lock_retry ()
   ) 9<>$LMT_INVOC_LOCK
 ) &
 
-
+( $FLOCK -n -x -w 1 7 || exit 0;
 # We do a special run of battery polling daemon here so that it does not get
 # plagued by the lock. We need the polling daemon to be independent of any locks
 if [ x$ENABLE_BATTERY_LEVEL_POLLING = x1 ] && [ x$BLACKLIST_IN_FLOCK = x1 ]; then
@@ -1139,5 +1140,7 @@ if [ x$ENABLE_BATTERY_LEVEL_POLLING = x1 ] && [ x$BLACKLIST_IN_FLOCK = x1 ]; the
 else
 	log "VERBOSE" "Battery level polling is disabled."
 fi
+) 7>$LMT_BATTPOLL_LOCK
 
+echo "ON_AC is: $ON_AC"
 exit 0;
