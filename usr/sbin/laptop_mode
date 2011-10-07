@@ -1098,28 +1098,44 @@ lmt_load_config
 
 lock_retry ()
 {
-	( $FLOCK -n -x -w 1 8 || exit 0;
+if $FLOCK -n -x -w 1 8; then
 	i=10;
 	while [ $i -ge 1 ]
 	do
-		log "ERR" "Couldn't acquire lock. Retrying.... PID is $$\n"
-	    $FLOCK -x -w 1 9 && lmt_main_function "$@" && break;
-	    i=$(( $i - 1 ))
+	    	$FLOCK -x -w 1 9 && lmt_main_function "$@" && break;
+		log "VERBOSE" "Couldn't acquire lock on descriptor 9 in lock_retry(). Retrying.... PID is $$\n"
+	    	i=$(( $i - 1 ))
 	done
-	) 8>$LMT_REQ_LOCK
+else
+	exit 0;
+fi
 }
 
 
 # Check and acquire locks and then exec.
-(
-    ( $FLOCK -n -x -w 1 8; ) 8>$LMT_REQ_LOCK
-) & (
-  (
-        ($FLOCK -n -x -w 1 9 && lmt_main_function "$@";) || lock_retry "$@"
-  ) 9<>$LMT_INVOC_LOCK
-) &
+exec 8>$LMT_REQ_LOCK;
+if $FLOCK -n -x -w 1 8; then
+	log "VERBOSE" "Prelim lock acquisition on descriptor 8 with pid $$";
+else
+	log "VERBOSE" "Couldn't acquire prelim lock on descriptor 8 with pid $$";
+fi
 
-( $FLOCK -n -x -w 1 7 || exit 0;
+
+exec 9>$LMT_INVOC_LOCK;
+if $FLOCK -n -x -w 1 9; then
+	$FLOCK -u 8; ## Release the invoc lock;
+	log "VERBOSE" "Prelim lock acquisition on descriptor 9 with pid $$";
+	log "VERBOSE" "Now invoking lmt_main_function with arguments -- $@";
+	lmt_main_function "$@";
+else
+	log "VERBOSE" "Couldn't acquire prelim lock on descriptor 9 with pid $$";
+	log "VERBOSE" "Now invoking lock_retry with arguments -- $@";
+	lock_retry "$@";
+fi
+
+$FLOCK -u 8;
+$FLOCK -u 9;
+
 # We do a special run of battery polling daemon here so that it does not get
 # plagued by the lock. We need the polling daemon to be independent of any locks
 if [ x$ENABLE_BATTERY_LEVEL_POLLING = x1 ] && [ x$BLACKLIST_IN_FLOCK = x1 ]; then
@@ -1130,17 +1146,23 @@ if [ x$ENABLE_BATTERY_LEVEL_POLLING = x1 ] && [ x$BLACKLIST_IN_FLOCK = x1 ]; the
 		# In AC mode we disable the polling daemon.
 		killall -q lm-polling-daemon
 	else
-		if ! pidof -x lm-polling-daemon ; then
-			log "VERBOSE" "On battery and there was no polling daemon yet, starting the polling daemon."
+		exec 7>$LMT_BATTPOLL_LOCK;
+		if $FLOCK -n -x -w 1 7; then
+			log "VERBOSE" "Lock acquisition on descriptor 7 succeeded with pid $$";
+			if ! pidof -x lm-polling-daemon ; then
+				log "VERBOSE" "On battery and there was no polling daemon yet, starting the polling daemon."
 			
-			# If there is no polling daemon, we start one.
-			/usr/share/laptop-mode-tools/module-helpers/lm-polling-daemon < /dev/null > /dev/null 2> /dev/null &
+				# If there is no polling daemon, we start one.
+				/usr/share/laptop-mode-tools/module-helpers/lm-polling-daemon < /dev/null > /dev/null 2> /dev/null &
+			fi
+		else
+			log "VERBOSE" "Lock acquisition on descriptor 7 failed with pid $$";
+			exit 0;
 		fi
 	fi
 else
 	log "VERBOSE" "Battery level polling is disabled."
 fi
-) 7>$LMT_BATTPOLL_LOCK
 
 echo "ON_AC is: $ON_AC"
 exit 0;
