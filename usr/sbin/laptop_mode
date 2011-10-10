@@ -604,6 +604,7 @@ lmt_main_function ()
 
     INIT=0          # Display info in init script format?
     FORCE=0         # Force reapplying the current state?
+    INITSCRIPT_STOP=0	# Track stop command from init script. Consumer is lm-polling daemon
     while [ "$1" != "" ] ; do
 	    case "$1" in 
 		    init) INIT=1 ;;
@@ -611,7 +612,7 @@ lmt_main_function ()
 		    # Old options. We always do "auto" for any option now, but
 		    # we still have to accept the options.
 		    start) ;;
-		    stop) ;;
+		    stop) INITSCRIPT_STOP=1 ;;
 		    auto) ;;
 		    modules=*)
 			    MODULES=$1
@@ -1122,6 +1123,13 @@ if [ x$ENABLE_BATTERY_LEVEL_POLLING = x1 ] && [ x$BLACKLIST_IN_FLOCK = x1 ]; the
 			fi
 		else
 			log "VERBOSE" "Lock acquisition on descriptor 7 failed with pid $$";
+		fi
+
+		# If we are called from the init script with the stop command, lm-polling-daemon
+		# should be killed.
+		if [ x$INITSCRIPT_STOP = x1 ]; then
+			log "VERBOSE" "On Battery, but init script stop is called. Killing lm-polling-daemon"
+			killall -q lm-polling-daemon
 		fi
 	else
 		log "ERR" "Unknown ON_AC state: $ON_AC";
