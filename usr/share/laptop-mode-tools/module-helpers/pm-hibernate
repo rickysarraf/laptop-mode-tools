@@ -1,4 +1,1 @@
-#!/bin/sh
-
-sync;
-echo "disk" > /sys/power/state
+pm-helper

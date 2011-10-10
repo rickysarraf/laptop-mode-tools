@@ -1,4 +1,1 @@
-#!/bin/sh
-
-sync;
-echo "mem" > /sys/power/state
+pm-helper
