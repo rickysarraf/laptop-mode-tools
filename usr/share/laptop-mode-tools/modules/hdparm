@@ -16,6 +16,10 @@ is_capable() {
 	local dev=${1#/dev/}
 	local MEDIA=
 	local BUS=
+	
+	if ! [ -e $1 ]; then
+		return 1;
+	fi
 
 	# If we are running udev, this is the most portable way
 	# It assumes more or less recent udev (> 070)
