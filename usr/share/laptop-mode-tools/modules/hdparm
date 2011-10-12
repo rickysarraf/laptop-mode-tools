@@ -17,6 +17,7 @@ is_capable() {
 	local MEDIA=
 	local BUS=
 	
+	# Make sure the drive exists before checking anything.
 	if ! [ -e $1 ]; then
 		return 1;
 	fi
