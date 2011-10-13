@@ -24,4 +24,5 @@ elif [ x$DISK = x1 ]; then
 	echo "disk" > /sys/power/state
 else
 	## Nothing to do.
+	echo ;
 fi
