@@ -95,6 +95,9 @@ fi
 
 
 %changelog
+* Fri Oct 14 2011 Ritesh Raj Sarraf <rrs@researchut.com> - 1.60-1
+- Updated to release 1.60.
+
 * Mon Aug  8 2011 Ritesh Raj Sarraf <rrs@researchut.com> - 1.59-1
 - Updated to release 1.59.
 
