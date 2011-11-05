@@ -1,10 +1,49 @@
-Description: Undocumented upstream changes
- This patch has been created by dpkg-source during the package build
- but it might have accumulated changes from several uploads. Please
- check the changelog to (hopefully) learn more on those changes.
+Description: <short summary of the patch>
+ TODO: Put a short summary on the line above and replace this paragraph
+ with a longer explanation of this change. Complete the meta-information
+ with other relevant fields (see below for details). To make it easier, the
+ information below has been extracted from the changelog. Adjust it or drop
+ it.
+ .
+ laptop-mode-tools (1.60-1) unstable; urgency=low
+ .
+   * [709f521] New Upstream Release
+     (Closes: 647564)
+     - [8389588] Change Intel HDA Audio's default power save timeout to 2 seconds
+     - [cc40bd1] usb autosuspend black-/whitelist arg in quotes.
+       Thanks to Simon Que
+     - [5a4e08a] add readme-debugging.txt
+     - [be147e0] Helper tools to provide suspend/hibernate functionality
+     - [49afd31] Kill lm-polling-daemon when init stop is called
+     - [68b0ff5] Add pm-helper tool to take care of suspend / hibernate.
+     - [c7e3038] Use native hibernation helper tool from LMT
+     - [a569b29] Check for block device's existence.
+       Thanks to Simon Que (Chromium Project)
+     - [ab704b2] Use proper device for iwconfig.
+       Thanks to bs.net (Closes: 639388)
+   * [8fa914a] Drop some of the Recommends to Suggests.
+     Thanks to Clea F. Rees (Closes: #640155)
+   * [75c51b3] Drop duplicate changelog
+Author: Ritesh Raj Sarraf <rrs@debian.org>
+Bug-Debian: http://bugs.debian.org/639388
+Bug-Debian: http://bugs.debian.org/640155
+Bug-Debian: http://bugs.debian.org/647564
+
+---
+The information above should follow the Patch Tagging Guidelines, please
+checkout http://dep.debian.net/deps/dep3/ to learn about the format. Here
+are templates for supplementary fields that you might want to add:
+
+Origin: <vendor|upstream|other>, <url of original patch>
+Bug: <url in upstream bugtracker>
+Bug-Debian: http://bugs.debian.org/<bugnumber>
+Bug-Ubuntu: https://launchpad.net/bugs/<bugnumber>
+Forwarded: <no|not-needed|url proving that it has been forwarded>
+Reviewed-By: <name and email of someone who approved the patch>
+Last-Update: <YYYY-MM-DD>
 
 --- /dev/null
-+++ laptop-mode-tools-1.58/laptop-mode-tools.preinst
++++ laptop-mode-tools-1.60/laptop-mode-tools.preinst
 @@ -0,0 +1,41 @@
 +#!/bin/sh
 +# preinst script for laptop-mode-tools
@@ -47,8 +86,8 @@ Description: Undocumented upstream changes
 +#DEBHELPER#
 +
 +exit 0
---- laptop-mode-tools-1.58.orig/etc/init.d/laptop-mode
-+++ laptop-mode-tools-1.58/etc/init.d/laptop-mode
+--- laptop-mode-tools-1.60.orig/etc/init.d/laptop-mode
++++ laptop-mode-tools-1.60/etc/init.d/laptop-mode
 @@ -6,63 +6,54 @@
  #
  # config:  /etc/laptop-mode/laptop-mode.conf
@@ -140,8 +179,8 @@ Description: Undocumented upstream changes
      ;;
  
    status)
---- laptop-mode-tools-1.58.orig/etc/power/scripts.d/laptop-mode
-+++ laptop-mode-tools-1.58/etc/power/scripts.d/laptop-mode
+--- laptop-mode-tools-1.60.orig/etc/power/scripts.d/laptop-mode
++++ laptop-mode-tools-1.60/etc/power/scripts.d/laptop-mode
 @@ -28,7 +28,7 @@ if [ -w /proc/sys/vm/laptop_mode ]; then
          $LMODE "stop"
          ;;
@@ -151,88 +190,3 @@ Description: Undocumented upstream changes
          ;;        
      esac
  elif [ -x logger ]; then	
---- laptop-mode-tools-1.58.orig/usr/share/laptop-mode-tools/modules/laptop-mode
-+++ laptop-mode-tools-1.58/usr/share/laptop-mode-tools/modules/laptop-mode
-@@ -187,21 +187,18 @@ if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS"
- 		set_sysctl /proc/sys/fs/xfs/xfsbufd_centisecs     3000
- 	fi
- 
--	case "$KLEVEL" in
--		"2.4")
--			log "VERBOSE" "Adjusting 2.4 kernel parameters to enable laptop mode."
--			set_sysctl /proc/sys/vm/laptop_mode   1
--			set_sysctl /proc/sys/vm/bdflush       "30 500 0 0 $AGE $AGE 60 20 0"
--			;;
--		"2.6")
--			log "VERBOSE" "Adjusting 2.6 kernel parameters to enable laptop mode."
--			set_sysctl /proc/sys/vm/laptop_mode		  "$LM_SECONDS_BEFORE_SYNC"
--			set_sysctl /proc/sys/vm/dirty_writeback_centisecs "$AGE"
--			set_sysctl /proc/sys/vm/dirty_expire_centisecs    "$AGE"
--			set_sysctl /proc/sys/vm/dirty_ratio		  "$LM_DIRTY_RATIO"
--			set_sysctl /proc/sys/vm/dirty_background_ratio    "$LM_DIRTY_BACKGROUND_RATIO"
--			;;
--	esac
-+	if [ -f /proc/sys/vm/bdflush ]; then
-+		log "VERBOSE" "Adjusting 2.4 kernel parameters to enable laptop mode."
-+		set_sysctl /proc/sys/vm/laptop_mode   1
-+		set_sysctl /proc/sys/vm/bdflush       "30 500 0 0 $AGE $AGE 60 20 0"
-+	else
-+		log "VERBOSE" "Adjusting 2.6+ kernel parameters to enable laptop mode."
-+		set_sysctl /proc/sys/vm/laptop_mode		  "$LM_SECONDS_BEFORE_SYNC"
-+		set_sysctl /proc/sys/vm/dirty_writeback_centisecs "$AGE"
-+		set_sysctl /proc/sys/vm/dirty_expire_centisecs    "$AGE"
-+		set_sysctl /proc/sys/vm/dirty_ratio		  "$LM_DIRTY_RATIO"
-+		set_sysctl /proc/sys/vm/dirty_background_ratio    "$LM_DIRTY_BACKGROUND_RATIO"
-+	fi
- 	if [ $CONTROL_MOUNT_OPTIONS -eq 1 ]; then
- 		log "VERBOSE" "Remounting filesystems."
- 		# The -r flag makes 'read' preserve backslashes read from
-@@ -316,19 +313,16 @@ else
- 		set_sysctl /proc/sys/fs/xfs/xfssyncd_centisecs    $((100*$DEF_XFS_SYNC_INTERVAL))
- 		set_sysctl /proc/sys/fs/xfs/xfsbufd_centisecs     $((100*$DEF_XFS_BUFD_INTERVAL))
- 	fi
--	case "$KLEVEL" in
--		"2.4")
--			log "VERBOSE" "Adjusting 2.4 kernel parameters to disable laptop mode."
--			set_sysctl /proc/sys/vm/bdflush "30 500 0 0 $U_AGE $B_AGE 60 20 0"
--			;;
--		"2.6")
--			log "VERBOSE" "Adjusting 2.6 kernel parameters to disable laptop mode."
--			set_sysctl /proc/sys/vm/dirty_writeback_centisecs   "$U_AGE"
--			set_sysctl /proc/sys/vm/dirty_expire_centisecs      "$B_AGE"
--			set_sysctl /proc/sys/vm/dirty_ratio		    "$NOLM_DIRTY_RATIO"
--			set_sysctl /proc/sys/vm/dirty_background_ratio	    "$NOLM_DIRTY_BACKGROUND_RATIO"
--			;;
--	esac
-+	if [ -f /proc/sys/vm/bdflush ]; then
-+		log "VERBOSE" "Adjusting 2.4 kernel parameters to disable laptop mode."
-+		set_sysctl /proc/sys/vm/bdflush "30 500 0 0 $U_AGE $B_AGE 60 20 0"
-+	else
-+		log "VERBOSE" "Adjusting 2.6+ kernel parameters to disable laptop mode."
-+		set_sysctl /proc/sys/vm/dirty_writeback_centisecs   "$U_AGE"
-+		set_sysctl /proc/sys/vm/dirty_expire_centisecs      "$B_AGE"
-+		set_sysctl /proc/sys/vm/dirty_ratio		    "$NOLM_DIRTY_RATIO"
-+		set_sysctl /proc/sys/vm/dirty_background_ratio	    "$NOLM_DIRTY_BACKGROUND_RATIO"
-+	fi
- 	if [ $CONTROL_MOUNT_OPTIONS -eq 1 ] ; then
- 		log "VERBOSE" "Remounting filesystems."
- 		# The -r flag makes 'read' preserve backslashes read from
---- laptop-mode-tools-1.58.orig/usr/sbin/laptop_mode
-+++ laptop-mode-tools-1.58/usr/sbin/laptop_mode
-@@ -1140,4 +1140,4 @@ else
- 	log "VERBOSE" "Battery level polling is disabled."
- fi
- 
--return 0;
-+exit 0;
---- laptop-mode-tools-1.58.orig/usr/share/laptop-mode-tools/module-helpers/lm-polling-daemon
-+++ laptop-mode-tools-1.58/usr/share/laptop-mode-tools/module-helpers/lm-polling-daemon
-@@ -10,7 +10,7 @@
- # risks data loss).
- INTERVAL=150
- 
--while ( true ) ; do
-+while :; do
- 	sleep $INTERVAL
- 
- 	/usr/sbin/laptop_mode auto
