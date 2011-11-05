@@ -16,8 +16,9 @@ laptop-mode-tools (1.60-1) unstable; urgency=low
       Thanks to bs.net (Closes: 639388)
   * [8fa914a] Drop some of the Recommends to Suggests.
     Thanks to Clea F. Rees (Closes: #640155)
+  * [75c51b3] Drop duplicate changelog
 
- -- Ritesh Raj Sarraf <rrs@debian.org>  Sat, 05 Nov 2011 12:24:48 +0530
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sat, 05 Nov 2011 12:59:34 +0530
 
 laptop-mode-tools (1.58-3) unstable; urgency=low
 
