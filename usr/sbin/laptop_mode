@@ -35,7 +35,7 @@ set -a
 
 # The laptop mode tools version number. Extracted by the installer makefile
 # as well, so don't change the format!
-LMTVERSION=1.58
+LMTVERSION=1.60
 
 # This script is loaded from multiple scripts to set the config defaults
 # and to read the configuration on top of those. Only when the command is
@@ -147,6 +147,7 @@ export PATH="${PATH}":/bin:/sbin:/usr/bin:/usr/sbin
 # So, Event-2 acquire LMT_REQ_LOCK and waits to acquire LMT_INVOC_LOCK (which is acquire by Event-1)
 LMT_REQ_LOCK="/var/lock/lmt-req.lock"
 LMT_INVOC_LOCK="/var/lock/lmt-invoc.lock"
+LMT_BATTPOLL_LOCK="/var/lock/lmt-battpoll.lock"
 FLOCK=`which flock`
 
 checkint ()
@@ -443,6 +444,69 @@ lmt_load_config ()
     if [ "$NOLM_HD_IDLE_TIMEOUT_SECONDS" != "" ] ; then
 	    NOLM_HD_IDLE_TIMEOUT=$(seconds_to_hdparm_S $NOLM_HD_IDLE_TIMEOUT_SECONDS)
     fi
+
+
+
+    # Determine the power state.
+
+    # First try /sys/class/power_supply/*
+    FOUND_SYS_CLASS_POWER_SUPPLY_AC=0
+    export ON_AC=0
+    for POWER_SUPPLY in /sys/class/power_supply/* ; do
+	    if [ -f $POWER_SUPPLY/type ] ; then
+		    if [ "$(cat $POWER_SUPPLY/type)" = "Mains" ] ;then
+			    log "VERBOSE" "Determining power state from $POWER_SUPPLY/online."
+			    FOUND_SYS_CLASS_POWER_SUPPLY_AC=1
+			    if [ "$(cat $POWER_SUPPLY/online)" = 1 ] ; then
+				    ON_AC=1
+			    fi
+		    fi
+	    fi
+    done
+
+    if [ $FOUND_SYS_CLASS_POWER_SUPPLY_AC = 1 ] ; then
+	    # Already found it!
+	    log "VERBOSE" "Not trying other options, already found a power supply."
+    elif [ -d /proc/acpi/ac_adapter ] ; then
+	    log "VERBOSE" "Determining power state from /proc/acpi/ac_adapter."
+	    ADAPTERS_FOUND=0
+	    ON_AC=0
+	    for ADAPTER in /proc/acpi/ac_adapter/* ; do
+		    if [ -f $ADAPTER/state ] ; then
+			    ADAPTERS_FOUND=1
+			    STATUS=`awk '/^state: / { print $2 }' $ADAPTER/state`
+			    if [ "$STATUS" = "on-line" ] ; then
+				    ON_AC=1
+			    fi
+		    fi
+	    done
+	    if [ "$ADAPTERS_FOUND" -eq 0 ] ; then
+		    ON_AC=1
+	    fi
+    elif [ -f /proc/pmu/info ] ; then
+	    log "VERBOSE" "Determining power state from /proc/pmu/info."
+	    if ( grep -q "^AC Power.*0$" /proc/pmu/info ) ; then
+		    log "VERBOSE" "/proc/pmu/info indicates absence of AC power."
+		    ON_AC=0
+	    else
+		    # It is possible that there is no AC Power = 1 in the file,
+		    # but we always assume AC power when we're not sure.
+		    ON_AC=1
+		    log "VERBOSE" "/proc/pmu/info indicates presence of AC power."
+	    fi
+    elif [ -f /proc/apm ] ; then
+	    log "VERBOSE" "Determining power state from /proc/apm."
+	    read D1 D2 D3 APM_AC_STATE D0 </proc/apm
+	    if [ "$APM_AC_STATE" = "0x00" ] ; then
+		    ON_AC=0
+	    else
+		    ON_AC=1
+	    fi
+    else
+	    log "VERBOSE" "No /sys/class/power_supply, ACPI, APM or PMU power management information found -- assuming AC power is present."
+	    ON_AC=1
+    fi
+
 }
 
 
@@ -540,6 +604,7 @@ lmt_main_function ()
 
     INIT=0          # Display info in init script format?
     FORCE=0         # Force reapplying the current state?
+    INITSCRIPT_STOP=0	# Track stop command from init script. Consumer is lm-polling daemon
     while [ "$1" != "" ] ; do
 	    case "$1" in 
 		    init) INIT=1 ;;
@@ -547,7 +612,7 @@ lmt_main_function ()
 		    # Old options. We always do "auto" for any option now, but
 		    # we still have to accept the options.
 		    start) ;;
-		    stop) ;;
+		    stop) INITSCRIPT_STOP=1 ;;
 		    auto) ;;
 		    modules=*)
 			    MODULES=$1
@@ -571,66 +636,6 @@ lmt_main_function ()
     STATE=enabled
     if [ "$ENABLE_LAPTOP_MODE_ON_BATTERY" -eq 0 -a "$ENABLE_LAPTOP_MODE_ON_AC" -eq 0 -a "$ENABLE_LAPTOP_MODE_WHEN_LID_CLOSED" -eq 0 ] ; then
 	    STATE=disabled
-    fi
-
-    # Determine the power state.
-
-    # First try /sys/class/power_supply/*
-    FOUND_SYS_CLASS_POWER_SUPPLY_AC=0
-    ON_AC=0
-    for POWER_SUPPLY in /sys/class/power_supply/* ; do
-	    if [ -f $POWER_SUPPLY/type ] ; then
-		    if [ "$(cat $POWER_SUPPLY/type)" = "Mains" ] ;then
-			    log "VERBOSE" "Determining power state from $POWER_SUPPLY/online."
-			    FOUND_SYS_CLASS_POWER_SUPPLY_AC=1
-			    if [ "$(cat $POWER_SUPPLY/online)" = 1 ] ; then
-				    ON_AC=1
-			    fi
-		    fi
-	    fi
-    done
-
-    if [ $FOUND_SYS_CLASS_POWER_SUPPLY_AC = 1 ] ; then
-	    # Already found it!
-	    log "VERBOSE" "Not trying other options, already found a power supply."
-    elif [ -d /proc/acpi/ac_adapter ] ; then
-	    log "VERBOSE" "Determining power state from /proc/acpi/ac_adapter."
-	    ADAPTERS_FOUND=0
-	    ON_AC=0
-	    for ADAPTER in /proc/acpi/ac_adapter/* ; do
-		    if [ -f $ADAPTER/state ] ; then
-			    ADAPTERS_FOUND=1
-			    STATUS=`awk '/^state: / { print $2 }' $ADAPTER/state`
-			    if [ "$STATUS" = "on-line" ] ; then
-				    ON_AC=1
-			    fi
-		    fi
-	    done
-	    if [ "$ADAPTERS_FOUND" -eq 0 ] ; then
-		    ON_AC=1
-	    fi
-    elif [ -f /proc/pmu/info ] ; then
-	    log "VERBOSE" "Determining power state from /proc/pmu/info."
-	    if ( grep -q "^AC Power.*0$" /proc/pmu/info ) ; then
-		    log "VERBOSE" "/proc/pmu/info indicates absence of AC power."
-		    ON_AC=0
-	    else
-		    # It is possible that there is no AC Power = 1 in the file,
-		    # but we always assume AC power when we're not sure.
-		    ON_AC=1
-		    log "VERBOSE" "/proc/pmu/info indicates presence of AC power."
-	    fi
-    elif [ -f /proc/apm ] ; then
-	    log "VERBOSE" "Determining power state from /proc/apm."
-	    read D1 D2 D3 APM_AC_STATE D0 </proc/apm
-	    if [ "$APM_AC_STATE" = "0x00" ] ; then
-		    ON_AC=0
-	    else
-		    ON_AC=1
-	    fi
-    else
-	    log "VERBOSE" "No /sys/class/power_supply, ACPI, APM or PMU power management information found -- assuming AC power is present."
-	    ON_AC=1
     fi
 
 
@@ -1095,49 +1100,83 @@ lmt_main_function ()
 
 lmt_load_config
 
-lock_retry ()
-{
-	( $FLOCK -n -x -w 1 8 || exit 0;
-	i=10;
-	while [ $i -ge 1 ]
-	do
-		log "ERR" "Couldn't acquire lock. Retrying.... PID is $$\n"
-	    $FLOCK -x -w 1 9 && lmt_main_function "$@" && break;
-	    i=$(( $i - 1 ))
-	done
-	) 8>$LMT_REQ_LOCK
-}
-
-
-# Check and acquire locks and then exec.
-(
-    ( $FLOCK -n -x -w 1 8; ) 8>$LMT_REQ_LOCK
-) & (
-  (
-        ($FLOCK -n -x -w 1 9 && lmt_main_function "$@";) || lock_retry "$@"
-  ) 9<>$LMT_INVOC_LOCK
-) &
-
-
 # We do a special run of battery polling daemon here so that it does not get
-# plagued by the lock. We need the polling daemon to be independent of any locks
-if [ x$ENABLE_BATTERY_LEVEL_POLLING = x1 ] ; then
+# plagued by the lock. We need the polling daemon to be independent of the REQ and INVOC locks.
+# Polling daemon should *only* have inherited a lock on LMT_BATTPOLL_LOCK. Any other inheritance
+# for it is a BUG.
+if [ x$ENABLE_BATTERY_LEVEL_POLLING = x1 ] && [ x$BLACKLIST_IN_FLOCK = x1 ]; then
 	log "VERBOSE" "Battery level polling is enabled."
 	if [ x$ON_AC = x1 ] ; then
 		log "VERBOSE" "On AC, stopping the polling daemon."
 
 		# In AC mode we disable the polling daemon.
 		killall -q lm-polling-daemon
-	else
-		if ! pidof -x lm-polling-daemon ; then
-			log "VERBOSE" "On battery and there was no polling daemon yet, starting the polling daemon."
+	elif [ x$ON_AC = x0 ]; then
+		exec 7>$LMT_BATTPOLL_LOCK;
+		if $FLOCK -n -x -w 1 7; then
+			log "VERBOSE" "Lock acquisition on descriptor 7 succeeded with pid $$";
+			if ! pidof -x lm-polling-daemon ; then
+				log "VERBOSE" "On battery and there was no polling daemon yet, starting the polling daemon."
 			
-			# If there is no polling daemon, we start one.
-			/usr/share/laptop-mode-tools/module-helpers/lm-polling-daemon < /dev/null > /dev/null 2> /dev/null &
+				# If there is no polling daemon, we start one.
+				/usr/share/laptop-mode-tools/module-helpers/lm-polling-daemon < /dev/null > /dev/null 2> /dev/null &
+			fi
+		else
+			log "VERBOSE" "Lock acquisition on descriptor 7 failed with pid $$";
 		fi
+
+		# If we are called from the init script with the stop command, lm-polling-daemon
+		# should be killed.
+		if [ x$INITSCRIPT_STOP = x1 ]; then
+			log "VERBOSE" "On Battery, but init script stop is called. Killing lm-polling-daemon"
+			killall -q lm-polling-daemon
+		fi
+	else
+		log "ERR" "Unknown ON_AC state: $ON_AC";
 	fi
 else
 	log "VERBOSE" "Battery level polling is disabled."
 fi
+
+lock_retry ()
+{
+if $FLOCK -n -x -w 1 8; then
+	i=10;
+	while [ $i -ge 1 ]
+	do
+	    	$FLOCK -x -w 1 9 && lmt_main_function "$@" && break;
+		log "VERBOSE" "Couldn't acquire lock on descriptor 9 in lock_retry(). Retrying.... PID is $$\n"
+	    	i=$(( $i - 1 ))
+	done
+else
+	exit 0;
+fi
+}
+
+
+# Check and acquire locks and then exec.
+exec 8>$LMT_REQ_LOCK;
+if $FLOCK -n -x -w 1 8; then
+	log "VERBOSE" "Prelim lock acquisition on descriptor 8 with pid $$";
+else
+	log "VERBOSE" "Couldn't acquire prelim lock on descriptor 8 with pid $$";
+fi
+
+
+exec 9>$LMT_INVOC_LOCK;
+if $FLOCK -n -x -w 1 9; then
+	$FLOCK -u 8; ## Release the invoc lock;
+	log "VERBOSE" "Prelim lock acquisition on descriptor 9 with pid $$";
+	log "VERBOSE" "Now invoking lmt_main_function with arguments -- $@";
+	lmt_main_function "$@";
+else
+	log "VERBOSE" "Couldn't acquire prelim lock on descriptor 9 with pid $$";
+	log "VERBOSE" "Now invoking lock_retry with arguments -- $@";
+	lock_retry "$@";
+fi
+
+$FLOCK -u 8;
+$FLOCK -u 9;
+
 
 exit 0;

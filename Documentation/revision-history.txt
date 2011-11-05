@@ -1,3 +1,21 @@
+1.60 - Fri Oct 14 13:08:09 IST 2011
+    * Use proper device reference for iwconfig (Debian BTS: #639388)
+    * Check for block device's existence. Thanks to Simon Que
+    * Add suspend/resume helper tools: pm-helper, pm-suspend, pm-hibernate
+    * What laptop-mode-tools is stopped from init, also kill polling daemon
+    * Reliable and much better locking mechanics
+    * Make polling dameon lock safe
+    * Make lmt-udev distro neutral. Thanks to Simon Que
+    * Change Intel HDA Audio's default power save timeout to 2 seconds
+
+1.59 - Mon Aug  8 00:56:48 IST 2011 
+    * really don't call batt-poll-daemon inside from the flock instance
+    * USB auto-suspend whitelist
+    * Add myself as the maintainer
+    * Don't call true which forks a subshell
+    * Use exit instead of return
+    * Check for files instead of kernel version numbers.
+
 1.58 - Sat Jul 23 23:21:22 IST 2011
     * Initialize the PATH variable within us. This helps when our caller did not have a
       proper environment
