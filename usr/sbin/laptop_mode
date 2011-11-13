@@ -798,8 +798,23 @@ lmt_main_function ()
 						    fi
 					    fi
 
-					    # $BATT/alarm is the design_capacity_warning of a battery.
-					    ALARM_LEVEL=$(cat $BATT/alarm)
+                                            if [ -f $BATT/alarm ]; then
+                                                # $BATT/alarm is the design_capacity_warning of a battery.
+                                                ALARM_LEVEL=$(cat $BATT/alarm)
+                                            elif [ -f $BATT/energy_full ]; then
+                                                # On Arm, it has been reported that there's no design_capacity_warning.
+                                                # The design_capacity_warning is 5% of the energy_full value
+                                                ENERGY_FULL=$(cat $BATT/energy_full)
+                                                ALARM_LEVEL=$(expr $ENERGY_FULL \* 5 / 100)
+                                            else
+                                                # If nothing is available, we don't want to touch hibernation.
+                                                # We'll rather report it
+                                                log "ERR" "You seem to have a broken battery"
+                                                log "ERR" "Cannot determine design_capacity_warning"
+                                                log "ERR" "Disabling hibernation"
+                                                ENOUGH_CHARGE=1
+                                            fi
+ 
 					    if [ "$ALARM_LEVEL" -ne 0 ] ; then
 						    if [ "$REMAINING" -le "$ALARM_LEVEL" ] ; then				
 							    # Restore the state we had before checking this battery, so that
