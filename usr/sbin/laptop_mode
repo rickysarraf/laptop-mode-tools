@@ -230,7 +230,7 @@ lmt_load_config ()
     # to modular configuration files, and to support existing laptop-mode.conf
     # files from earlier versions, we source the modular configuration files FIRST.
     if [ -d /etc/laptop-mode/conf.d ] ; then
-	    for CONF in /etc/laptop-mode/conf.d/*.conf ; do
+	    for CONF in /etc/laptop-mode/conf.d/*.conf /etc/laptop-mode/conf.d/board-specific/*.conf; do
 		    if [ -r "$CONF" ] ; then
 			    . "$CONF"
 			    #Handle individual module debug settings
