@@ -1098,13 +1098,15 @@ lmt_main_function ()
 		    SCRIPT_DEBUG=$SCRIPT; # We do this because in start-stop-programs module a $SCRIPT variable is used. That
 					  # changes the whole meaning when passed to disableDebug ()
 		    enableDebug $SCRIPT_DEBUG;
-		    . $SCRIPT
+		    (. $SCRIPT) &
 		    disableDebug $SCRIPT_DEBUG;
 	    else
 		    log "VERBOSE" "Module $SCRIPT is not executable or is to be skipped."
 	    fi
     done
 
+    # Wait for the forks to complete
+    wait
 
     exit 0
 
