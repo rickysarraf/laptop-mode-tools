@@ -1,0 +1,190 @@
+Description: Upstream changes introduced in version 1.55-1
+ This patch has been created by dpkg-source during the package build.
+ Here's the last changelog entry, hopefully it gives details on why
+ those changes were made:
+ .
+ laptop-mode-tools (1.55-1) unstable; urgency=low
+ .
+   * Change address to my official Debian address
+   * New Upstream Release
+     + On Intel HD Audio, revert power saving changes when switching back to AC.
+       Thanks to Christoph Langguth for the report and the patch
+     + Install the pm-utils hook as 01laptop-mode to ensure proper execution in
+       reverse ordering
+     + Add wireless-power module, for generic non-Intel wireless interfaces that
+       support the iwconfig "power" option.
+     + Fixed upgrade path for configurations which didn't have the LM/NOLM
+       options in the Intel SATA Power Management module config.
+     + Add flush-* to ignored programs for lm-profiler, because it is the
+       successor to pdflush.
+     + Fix WoL regression introduced by DISABLE_ETHERNET_ON_BATTERY. Thanks
+       to Matthias Dienstbier for the report and the patch
+     + Update comments in wireless-iwl-power.conf. (Debian BTS: #580730)
+     + Check for old hook in pm-utils and remove it
+     + Update manpage for all missing modules and options.
+   * Switch source format to 3.0 (quilt)
+ .
+ The person named in the Author field signed this changelog entry.
+Author: Ritesh Raj Sarraf <rrs@debian.org>
+
+---
+The information above should follow the Patch Tagging Guidelines, please
+checkout http://dep.debian.net/deps/dep3/ to learn about the format. Here
+are templates for supplementary fields that you might want to add:
+
+Origin: <vendor|upstream|other>, <url of original patch>
+Bug: <url in upstream bugtracker>
+Bug-Debian: http://bugs.debian.org/<bugnumber>
+Bug-Ubuntu: https://launchpad.net/bugs/<bugnumber>
+Forwarded: <no|not-needed|url proving that it has been forwarded>
+Reviewed-By: <name and email of someone who approved the patch>
+Last-Update: <YYYY-MM-DD>
+
+--- /dev/null
++++ laptop-mode-tools-1.55/laptop-mode-tools.preinst
+@@ -0,0 +1,41 @@
++#!/bin/sh
++# preinst script for laptop-mode-tools
++#
++# see: dh_installdeb(1)
++
++set -e
++
++# Remove a no-longer used conffile
++rm_conffile() {
++    local PKGNAME="$1"
++    local CONFFILE="$2"
++
++    [ -e "$CONFFILE" ] || return 0
++
++    local md5sum="$(md5sum $CONFFILE | sed -e 's/ .*//')"
++    local old_md5sum="$(dpkg-query -W -f='${Conffiles}' $PKGNAME | \
++            sed -n -e "\' $CONFFILE ' { s/ obsolete$//; s/.* //; p }")"
++    if [ "$md5sum" != "$old_md5sum" ]; then
++        echo "Obsolete conffile $CONFFILE has been modified by you."
++        echo "Saving as $CONFFILE.dpkg-bak ..."
++        mv -f "$CONFFILE" "$CONFFILE".dpkg-bak
++    else
++        echo "Removing obsolete conffile $CONFFILE ..."
++        rm -f "$CONFFILE"
++    fi
++}
++
++case "$1" in
++install|upgrade)
++    # ideally this clean-up should have been done at the same time
++    # as we stopped shipping the file, but since we had releases in
++    # between we will compare with the version shipping this clean-up
++    # instead of the first version not shipping the file
++    if dpkg --compare-versions "$2" lt "1.51-2"; then
++        rm_conffile laptop-mode-tools "/etc/pm/sleep.d/99laptop-mode"
++    fi
++esac
++
++#DEBHELPER#
++
++exit 0
+--- laptop-mode-tools-1.55.orig/etc/init.d/laptop-mode
++++ laptop-mode-tools-1.55/etc/init.d/laptop-mode
+@@ -6,63 +6,54 @@
+ #
+ # config:  /etc/laptop-mode/laptop-mode.conf
+ 
++### BEGIN INIT INFO
++# Provides:          laptop-mode
++# Should-Start:      $all
++# Required-Start:    $remote_fs
++# Required-Stop:     $remote_fs
++# Default-Start:     2 3 4 5
++# Default-Stop:      0 1 6
++# Short-Description: Enable laptop-mode-tools power management functions
++# Description:       Enable laptop-mode-tools power management functions
++### END INIT INFO
++
++
+ test -f /usr/sbin/laptop_mode || exit 0
+ 
+-if [ -f /lib/lsb/init-functions ] ; then
+-  . /lib/lsb/init-functions
+-else
+-  log_success_msg()
+-  {
+-    logger -t LAPTOP-MODE -p daemon.info -- $*
+-    echo "$*"
+-  }
+-  log_failure_msg()
+-  {
+-    logger -t LAPTOP-MODE -p daemon.notice -- $*
+-    echo "$*"
+-  }
+-fi
++. /lib/lsb/init-functions
+ 
+ # Enable laptop mode when the system is booted when running on battery.
+ 
+ case $1 in
+   start)
++    log_action_begin_msg "Enabling laptop mode"
+     mkdir -p /var/run/laptop-mode-tools
+     touch /var/run/laptop-mode-tools/enabled
+-    if RESULT=`/usr/sbin/laptop_mode auto` ; then
+-      log_success_msg "$RESULT"
+-    else
+-      log_failure_msg "$RESULT"
+-    fi
++    RESULT=`/usr/sbin/laptop_mode init auto`
++    log_action_end_msg $? "$RESULT"
+     ;;
+ 
+   restart|reload|force-reload)
+     # Full restart: first stop laptop mode completely (to restore default mount options etc.)
++    log_action_begin_msg "Disabling laptop mode"
+     mkdir -p /var/run/laptop-mode-tools
+-    rm -f /var/run/laptop-mode-tools/enabled    
+-    if RESULT=`/usr/sbin/laptop_mode stop` ; then
+-      log_success_msg "$RESULT"
+-    else
+-      log_failure_msg "$RESULT"
+-    fi
++    rm -f /var/run/laptop-mode-tools/enabled
++    RESULT=`/usr/sbin/laptop_mode init stop`
++    log_action_end_msg $? "$RESULT"
+ 
+     # Now remove files containing stored status, re-enable, and start it up again.
+-    rm -f /var/run/laptop-mode-tools/*
++    log_action_begin_msg "Enabling laptop mode"
++    rm -f /var/run/laptop-mode-tools/*
+     touch /var/run/laptop-mode-tools/enabled
+-    if RESULT=`/usr/sbin/laptop_mode auto force` ; then
+-      log_success_msg "$RESULT"
+-    else
+-      log_failure_msg "$RESULT"
+-    fi
++    RESULT=`/usr/sbin/laptop_mode init auto force`
++    log_action_end_msg $? "$RESULT"
+     ;;
+ 
+   stop)
++    log_action_begin_msg "Disabling laptop mode"
+     rm -f /var/run/laptop-mode-tools/enabled
+-    if RESULT=`/usr/sbin/laptop_mode stop` ; then
+-      log_success_msg "$RESULT"
+-    else
+-      log_failure_msg "$RESULT"
+-    fi
++    RESULT=`/usr/sbin/laptop_mode init stop`
++    log_action_end_msg $? "$RESULT"
+     ;;
+ 
+   status)
+--- laptop-mode-tools-1.55.orig/etc/power/scripts.d/laptop-mode
++++ laptop-mode-tools-1.55/etc/power/scripts.d/laptop-mode
+@@ -28,7 +28,7 @@ if [ -w /proc/sys/vm/laptop_mode ]; then
+         $LMODE "stop"
+         ;;
+       resume)
+-        /etc/init.d/laptop-mode restart
++        $LMODE "auto" "force"
+         ;;        
+     esac
+ elif [ -x logger ]; then	

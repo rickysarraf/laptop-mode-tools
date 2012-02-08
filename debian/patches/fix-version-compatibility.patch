@@ -1,0 +1,93 @@
+fix compatibility with 3.x kernels.
+Fixes debian bug: 647563
+Index: laptop-mode-tools-1.55/usr/sbin/laptop_mode
+===================================================================
+--- laptop-mode-tools-1.55.orig/usr/sbin/laptop_mode	2010-05-26 21:24:44.000000000 +0530
++++ laptop-mode-tools-1.55/usr/sbin/laptop_mode	2012-02-08 18:09:49.274735907 +0530
+@@ -493,15 +493,6 @@
+ 			}
+ )"
+ 
+-case "$KLEVEL" in
+-	"2.4" ) ;;
+-	"2.6" ) ;;
+-	*)
+-		log "ERR" "Unhandled kernel version: $KLEVEL ('uname -r' = '$(uname -r)')" >&2
+-		exit 1
+-		;;
+-esac
+-
+ # Stop exporting everything -- what we do from here is private.
+ set +a
+ 
+Index: laptop-mode-tools-1.55/usr/share/laptop-mode-tools/modules/laptop-mode
+===================================================================
+--- laptop-mode-tools-1.55.orig/usr/share/laptop-mode-tools/modules/laptop-mode	2010-05-26 21:24:44.000000000 +0530
++++ laptop-mode-tools-1.55/usr/share/laptop-mode-tools/modules/laptop-mode	2012-02-08 18:14:26.728111733 +0530
+@@ -187,21 +187,19 @@
+ 		set_sysctl /proc/sys/fs/xfs/xfsbufd_centisecs     3000
+ 	fi
+ 
+-	case "$KLEVEL" in
+-		"2.4")
+-			log "VERBOSE" "Adjusting 2.4 kernel parameters to enable laptop mode."
+-			set_sysctl /proc/sys/vm/laptop_mode   1
+-			set_sysctl /proc/sys/vm/bdflush       "30 500 0 0 $AGE $AGE 60 20 0"
+-			;;
+-		"2.6")
+-			log "VERBOSE" "Adjusting 2.6 kernel parameters to enable laptop mode."
+-			set_sysctl /proc/sys/vm/laptop_mode		  "$LM_SECONDS_BEFORE_SYNC"
+-			set_sysctl /proc/sys/vm/dirty_writeback_centisecs "$AGE"
+-			set_sysctl /proc/sys/vm/dirty_expire_centisecs    "$AGE"
+-			set_sysctl /proc/sys/vm/dirty_ratio		  "$LM_DIRTY_RATIO"
+-			set_sysctl /proc/sys/vm/dirty_background_ratio    "$LM_DIRTY_BACKGROUND_RATIO"
+-			;;
+-	esac
++        if [ -f /proc/sys/vm/bdflush ]; then
++                log "VERBOSE" "Adjusting 2.4 kernel parameters to enable laptop mode."
++                set_sysctl /proc/sys/vm/laptop_mode   1
++                set_sysctl /proc/sys/vm/bdflush       "30 500 0 0 $AGE $AGE 60 20 0"
++        else
++                log "VERBOSE" "Adjusting 2.6+ kernel parameters to enable laptop mode."
++                set_sysctl /proc/sys/vm/laptop_mode               "$LM_SECONDS_BEFORE_SYNC"
++                set_sysctl /proc/sys/vm/dirty_writeback_centisecs "$AGE"
++                set_sysctl /proc/sys/vm/dirty_expire_centisecs    "$AGE"
++                set_sysctl /proc/sys/vm/dirty_ratio               "$LM_DIRTY_RATIO"
++                set_sysctl /proc/sys/vm/dirty_background_ratio    "$LM_DIRTY_BACKGROUND_RATIO"
++        fi
++
+ 	if [ $CONTROL_MOUNT_OPTIONS -eq 1 ]; then
+ 		log "VERBOSE" "Remounting filesystems."
+ 		# The -r flag makes 'read' preserve backslashes read from
+@@ -316,19 +314,18 @@
+ 		set_sysctl /proc/sys/fs/xfs/xfssyncd_centisecs    $((100*$DEF_XFS_SYNC_INTERVAL))
+ 		set_sysctl /proc/sys/fs/xfs/xfsbufd_centisecs     $((100*$DEF_XFS_BUFD_INTERVAL))
+ 	fi
+-	case "$KLEVEL" in
+-		"2.4")
+-			log "VERBOSE" "Adjusting 2.4 kernel parameters to disable laptop mode."
+-			set_sysctl /proc/sys/vm/bdflush "30 500 0 0 $U_AGE $B_AGE 60 20 0"
+-			;;
+-		"2.6")
+-			log "VERBOSE" "Adjusting 2.6 kernel parameters to disable laptop mode."
+-			set_sysctl /proc/sys/vm/dirty_writeback_centisecs   "$U_AGE"
+-			set_sysctl /proc/sys/vm/dirty_expire_centisecs      "$B_AGE"
+-			set_sysctl /proc/sys/vm/dirty_ratio		    "$NOLM_DIRTY_RATIO"
+-			set_sysctl /proc/sys/vm/dirty_background_ratio	    "$NOLM_DIRTY_BACKGROUND_RATIO"
+-			;;
+-	esac
++
++        if [ -f /proc/sys/vm/bdflush ]; then
++                log "VERBOSE" "Adjusting 2.4 kernel parameters to disable laptop mode."
++                set_sysctl /proc/sys/vm/bdflush "30 500 0 0 $U_AGE $B_AGE 60 20 0"
++        else
++                log "VERBOSE" "Adjusting 2.6+ kernel parameters to disable laptop mode."
++                set_sysctl /proc/sys/vm/dirty_writeback_centisecs   "$U_AGE"
++                set_sysctl /proc/sys/vm/dirty_expire_centisecs      "$B_AGE"
++                set_sysctl /proc/sys/vm/dirty_ratio                 "$NOLM_DIRTY_RATIO"
++                set_sysctl /proc/sys/vm/dirty_background_ratio      "$NOLM_DIRTY_BACKGROUND_RATIO"
++        fi
++
+ 	if [ $CONTROL_MOUNT_OPTIONS -eq 1 ] ; then
+ 		log "VERBOSE" "Remounting filesystems."
+ 		# The -r flag makes 'read' preserve backslashes read from

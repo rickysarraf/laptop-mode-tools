@@ -1,0 +1,5 @@
+The orig tarball has been downloaded from:
+http://samwel.tk/laptop_mode/packages/tarball
+
+debian/rules has a get-orig-source target which
+will fetch the tarball from the upstream page.
