@@ -315,7 +315,6 @@ else
 	fi
 	if [ -f /proc/sys/vm/bdflush ]; then
 		log "VERBOSE" "Adjusting 2.4 kernel parameters to disable laptop mode."
-		set_sysctl /proc/sys/vm/laptop_mode   1
 		set_sysctl /proc/sys/vm/bdflush "30 500 0 0 $U_AGE $B_AGE 60 20 0"
 	else
 		log "VERBOSE" "Adjusting 2.6+ kernel parameters to disable laptop mode."
