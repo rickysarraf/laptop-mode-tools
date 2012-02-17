@@ -22,6 +22,14 @@ is_capable() {
 		return 1;
 	fi
 
+	if [ -n "$(hdparm -I $1 | grep SSD)" ]; then
+		# If the device is a SSD, it is not capable of power management.
+		if [ "$2" = "POWERMGMT" ]; then
+			log "VERBOSE" "$1 is a SSD, not capable of power management"
+			return 1
+		fi
+	fi
+
 	# If we are running udev, this is the most portable way
 	# It assumes more or less recent udev (> 070)
 	if [ $HAVE_UDEVINFO -ne 0 ] ; then
