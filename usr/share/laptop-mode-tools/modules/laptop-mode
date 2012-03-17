@@ -233,12 +233,34 @@ if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 1 ] ; then
 			esac
 			case " $PARTITIONS " in
 				*" auto "*)
+
+					# If we have a device referenced by a persistent device naming scheme, it does
+					# not get covered in the previous heuristics. So, if we reach here, we would
+					# want to do a check for it too.
+					
 					log "VERBOSE" "Checking $DEV against HD because PARTITIONS contains \"auto\"."
+					log "VERBOSE" "$DEV\n"
+					case $DEV in *"/dev/disk/by-"*)
+						log "VERBOSE" "$DEV has a persistent device naming. Extracting real name\n"
+						REAL_DEV=`readlink -f $DEV`
+						;;
+					esac
+
 					for THISHD in $HD ; do
 						log "VERBOSE" "   Considering $THISHD."
 						case " $DEV" in *"$THISHD"*)
 							DO=1
 							log "VERBOSE" "   $DEV contains $THISHD, which is in HD, so we will remount it."
+							break
+							;;
+						esac
+						
+						log "VERBOSE" "Considering the persistent device names\n"
+						case " $REAL_DEV" in *"$THISHD"*)
+							DO=1
+							log "VERBOSE" "   $REALDEV contains $THISHD, which is in HD, so we will remount it."
+							log "VERBOSE" "Chaning dev to real_dev\n"
+							DEV=$REAL_DEV
 							break
 							;;
 						esac
@@ -351,12 +373,33 @@ else
 			esac
 			case " $PARTITIONS " in
 				*" auto "*)
+					# If we have a device referenced by a persistent device naming scheme, it does
+					# not get covered in the previous heuristics. So, if we reach here, we would
+					# want to do a check for it too.
+					
+					log "VERBOSE" "Checking $DEV against HD because PARTITIONS contains \"auto\"."
+					case " $DEV" in *"/dev/disk/by-"*)
+						log "VERBOSE" "$DEV has a persistent device naming. Extracting real name\n"
+						REAL_DEV=`readlink -f $DEV`
+						;;
+					esac
+
 					log "VERBOSE" "Checking $DEV against HD because PARTITIONS contains \"auto\"."
 					for THISHD in $HD ; do
 						log "VERBOSE" "   Considering $THISHD."
 						case " $DEV" in *"$THISHD"*)
 							DO=1
 							log "VERBOSE" "   $DEV contains $THISHD, which is in HD, so we will remount it."
+							break
+							;;
+						esac
+
+						log "VERBOSE" "Considering the persistent device names\n"
+						case " $REAL_DEV" in *"$THISHD"*)
+							DO=1
+							log "VERBOSE" "   $REALDEV contains $THISHD, which is in HD, so we will remount it."
+							log "VERBOSE" "Chaning dev to real_dev\n"
+							DEV=$REAL_DEV
 							break
 							;;
 						esac
