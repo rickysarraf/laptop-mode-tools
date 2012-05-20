@@ -80,6 +80,7 @@ fi
 %{_sysconfdir}/power/event.d/*
 %{_usr}/sbin/*
 %{_usr}/share/laptop-mode-tools/modules/*
+%{_usr}/share/laptop-mode-tools/module-helpers/*
 %{_usr}/lib/pm-utils/sleep.d/*
 
 
@@ -88,7 +89,7 @@ fi
 %dir %{_usr}/sbin
 %dir %{_usr}/lib/pm-utils/sleep.d
 %dir %{_usr}/share/laptop-mode-tools/modules
-%dir %{_usr}/share/laptop-mode-tools/module-helpers/*
+%dir %{_usr}/share/laptop-mode-tools/module-helpers
 %dir %{_sysconfdir}/apm/event.d
 %dir %{_sysconfdir}/power/scripts.d
 %dir %{_sysconfdir}/power/event.d
