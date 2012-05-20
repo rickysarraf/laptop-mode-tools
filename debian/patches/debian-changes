@@ -5,29 +5,23 @@ Description: <short summary of the patch>
  information below has been extracted from the changelog. Adjust it or drop
  it.
  .
- laptop-mode-tools (1.60-1) unstable; urgency=low
+ laptop-mode-tools (1.61-1) unstable; urgency=low
  .
-   * [709f521] New Upstream Release
-     (Closes: 647564)
-     - [8389588] Change Intel HDA Audio's default power save timeout to 2 seconds
-     - [cc40bd1] usb autosuspend black-/whitelist arg in quotes.
-       Thanks to Simon Que
-     - [5a4e08a] add readme-debugging.txt
-     - [be147e0] Helper tools to provide suspend/hibernate functionality
-     - [49afd31] Kill lm-polling-daemon when init stop is called
-     - [68b0ff5] Add pm-helper tool to take care of suspend / hibernate.
-     - [c7e3038] Use native hibernation helper tool from LMT
-     - [a569b29] Check for block device's existence.
-       Thanks to Simon Que (Chromium Project)
-     - [ab704b2] Use proper device for iwconfig.
-       Thanks to bs.net (Closes: 639388)
-   * [8fa914a] Drop some of the Recommends to Suggests.
-     Thanks to Clea F. Rees (Closes: #640155)
-   * [75c51b3] Drop duplicate changelog
+   [ Ritesh Raj Sarraf ]
+   * [3f9ea15] Removed laptop-mode-tools.preinst
+   * [8bd5355] update debian/patches/debian-changes
+   * [16bc3f5] calculate design_capacity_warning on machines/arches where it
+     is not readiliy available
+   * [28b8d23] Add support for non-deafult customized settings.
+     Thanks to Simon Que - Chromium Project
+   * [7a99e68] Add parallel execution for the modules
+   * [0ab6ef0] Handle devices with persistent device naming
+     (Closes: #664267)
+ .
+   [ Simon Que ]
+   * [f3de2d6] hdparm skips SSDs for power management
 Author: Ritesh Raj Sarraf <rrs@debian.org>
-Bug-Debian: http://bugs.debian.org/639388
-Bug-Debian: http://bugs.debian.org/640155
-Bug-Debian: http://bugs.debian.org/647564
+Bug-Debian: http://bugs.debian.org/664267
 
 ---
 The information above should follow the Patch Tagging Guidelines, please
@@ -42,8 +36,8 @@ Forwarded: <no|not-needed|url proving that it has been forwarded>
 Reviewed-By: <name and email of someone who approved the patch>
 Last-Update: <YYYY-MM-DD>
 
---- laptop-mode-tools-1.60.orig/etc/init.d/laptop-mode
-+++ laptop-mode-tools-1.60/etc/init.d/laptop-mode
+--- laptop-mode-tools-1.61.orig/etc/init.d/laptop-mode
++++ laptop-mode-tools-1.61/etc/init.d/laptop-mode
 @@ -6,63 +6,54 @@
  #
  # config:  /etc/laptop-mode/laptop-mode.conf
@@ -135,8 +129,8 @@ Last-Update: <YYYY-MM-DD>
      ;;
  
    status)
---- laptop-mode-tools-1.60.orig/etc/power/scripts.d/laptop-mode
-+++ laptop-mode-tools-1.60/etc/power/scripts.d/laptop-mode
+--- laptop-mode-tools-1.61.orig/etc/power/scripts.d/laptop-mode
++++ laptop-mode-tools-1.61/etc/power/scripts.d/laptop-mode
 @@ -28,7 +28,7 @@ if [ -w /proc/sys/vm/laptop_mode ]; then
          $LMODE "stop"
          ;;
