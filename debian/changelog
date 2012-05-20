@@ -1,3 +1,21 @@
+laptop-mode-tools (1.61-1) unstable; urgency=low
+
+  [ Ritesh Raj Sarraf ]
+  * [3f9ea15] Removed laptop-mode-tools.preinst
+  * [8bd5355] update debian/patches/debian-changes
+  * [16bc3f5] calculate design_capacity_warning on machines/arches where it
+    is not readiliy available
+  * [28b8d23] Add support for non-deafult customized settings.
+    Thanks to Simon Que - Chromium Project
+  * [7a99e68] Add parallel execution for the modules
+  * [0ab6ef0] Handle devices with persistent device naming
+    (Closes: #664267)
+
+  [ Simon Que ]
+  * [f3de2d6] hdparm skips SSDs for power management
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sun, 20 May 2012 15:29:03 +0530
+
 laptop-mode-tools (1.60-1) unstable; urgency=low
 
   * [709f521] New Upstream Release
