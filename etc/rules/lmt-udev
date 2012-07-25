@@ -7,11 +7,11 @@
 		wait_for_file /usr/sbin/laptop_mode
 		exec /usr/sbin/laptop_mode "$@"
 	else
-		local file=$1
-		local timeout=$2
+		file=$1
+		timeout=$2
 		[ "$timeout" ] || timeout=120
 
-		local count=$timeout
+		count=$timeout
 		while [ $count != 0 ]; do
 			[ -e "/usr/sbin/laptop_mode" ] && exec /usr/sbin/laptop_mode "$@" && return 0
 			sleep 1
