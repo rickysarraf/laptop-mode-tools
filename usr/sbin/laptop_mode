@@ -256,11 +256,6 @@ lmt_load_config ()
 	    exit 1
     fi
 
-    if [ x$ENABLE_LAPTOP_MODE_TOOLS = x0 ]; then
-	    log "MSG" "laptop-mode-tools is disabled in config file. Exiting"
-	    exit 0;
-    fi
-
     # Add a simple bash debug mode switch
     if [ "$DEBUG" -eq 1 ]; then
 	set -vx;
@@ -635,6 +630,10 @@ lmt_main_function ()
 
     mkdir -p /var/run/laptop-mode-tools
 
+    if [ x$ENABLE_LAPTOP_MODE_TOOLS = x1 ]; then
+	    touch /var/run/laptop-mode-tools/enabled
+    fi
+
     # Used to display laptop mode state later on. This is the enabled/disabled 
     # state for laptop mode processing, it tells us nothing about whether laptop
     # mode is actually _active_.
@@ -688,16 +687,22 @@ lmt_main_function ()
 
     # If the init script has not been run or has been run with the "stop"
     # argument, then we should never start laptop mode.
-    if [ ! -f /var/run/laptop-mode-tools/enabled ] ; then
+    if [ ! -f /var/run/laptop-mode-tools/enabled -o x$INITSCRIPT_STOP = x1 ] ; then
 	    log "VERBOSE" "Laptop mode disabled because /var/run/laptop-mode-tools/enabled is missing."
 	    STATE=disabled
     fi
 
-    if [ "$ACTIVATE" -eq 1 -a -f /etc/default/laptop-mode ] ; then
-	    . /etc/default/laptop-mode
-	    if ! ( echo "$ENABLE_LAPTOP_MODE" |grep y ) ; then
+    if [ "$ACTIVATE" -eq 1 ]; then
+	    if [ -f /etc/default/laptop-mode ] ; then
+	    	. /etc/default/laptop-mode
+	    	if ! ( echo "$ENABLE_LAPTOP_MODE" |egrep -i "(y|1)" ) ; then
 		    log "VERBOSE" "Not starting laptop mode because it is disabled in /etc/default/laptop-mode."
 		    STATE=disabled
+	    	fi
+	    fi
+	    if [ x$ENABLE_LAPTOP_MODE_TOOLS = x0 ]; then
+		log "VERBOSE" "Not starting laptop mode because it is disabled in /etc/laptop-mode/laptop-mode.conf"
+		STATE=disabled
 	    fi
     fi
 
