@@ -693,13 +693,6 @@ lmt_main_function ()
     fi
 
     if [ "$ACTIVATE" -eq 1 ]; then
-	    if [ -f /etc/default/laptop-mode ] ; then
-	    	. /etc/default/laptop-mode
-	    	if ! ( echo "$ENABLE_LAPTOP_MODE" |egrep -i "(y|1)" ) ; then
-		    log "VERBOSE" "Not starting laptop mode because it is disabled in /etc/default/laptop-mode."
-		    STATE=disabled
-	    	fi
-	    fi
 	    if [ x$ENABLE_LAPTOP_MODE_TOOLS = x0 ]; then
 		log "VERBOSE" "Not starting laptop mode because it is disabled in /etc/laptop-mode/laptop-mode.conf"
 		STATE=disabled
