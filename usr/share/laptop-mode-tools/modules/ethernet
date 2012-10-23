@@ -111,16 +111,6 @@ if [ x$CONTROL_ETHERNET = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_ETHE
 
 		# Handle throttling
 		if [ x$THROTTLE_ETHERNET = x1 ] ; then
-			# Handle auto-negotiation
-			ret=`ethtool -s $DEVICE autoneg off 2>&1`
-                        exit_status=$?;
-                        log "VERBOSE" "$ret";
-			if [ $exit_status -eq 0 ]; then
-				log "VERBOSE" "Switched auto-negotiation to off for $DEVICE"
-			else
-				log "VERBOSE" "Could not set auto-negotiation to off for $DEVICE"
-			fi
-
 			# Handle Speed Throttling
 			ret=`ethtool -s $DEVICE speed $THROTTLE_SPEED 2>&1`
                         exit_status=$?;
@@ -131,16 +121,6 @@ if [ x$CONTROL_ETHERNET = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_ETHE
 				log "VERBOSE" "Could not throttle speed for $DEVICE"
 			fi
 		else
-			# Handle auto-negotiation
-			ret=`ethtool -s $DEVICE autoneg on 2>&1`
-                        exit_status=$?;
-                        log "VERBOSE" "$ret";
-			if [ $exit_status -eq 0 ]; then
-				log "VERBOSE" "Switched auto-negotiation to on for $DEVICE"
-			else
-				log "VERBOSE" "Could not set auto-negotiation to on for $DEVICE"
-			fi
-
 			# Handle Speed Throttling
 			ret=`ethtool -s $DEVICE speed $MAX_SPEED 2>&1`
                         exit_status=$?;
