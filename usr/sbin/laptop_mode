@@ -516,7 +516,7 @@ lmt_main_function ()
     if [ "$1" = "status" ] ; then
 	    # Display a status report.
 	    log "STATUS" "Mounts:"
-	    mount | sed "s/^/   /"
+	    mount | grep ^/dev | sed "s/^/   /"
 	    log "STATUS" " "
 	    log "STATUS" "Drive power status:"
 	    for disk in $HD; do
