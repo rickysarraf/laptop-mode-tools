@@ -207,7 +207,7 @@ if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 1 ] ; then
 			# Now expand the escapes, inside quotes to preserve the spaces :)
 			MP="$(echo $MP)"
 			case "$FST" in 
-				rootfs|unionfs|tmpfs|squashfs|sysfs|usbfs|proc|devpts)
+				rootfs|unionfs|tmpfs|squashfs|sysfs|usbfs|proc|devpts|devtmpfs|cgroup|fuse)
 				  	continue
 					;;
 			esac
