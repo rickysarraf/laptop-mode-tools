@@ -229,8 +229,12 @@ lmt_load_config ()
     # Source config. Some config settings have been moved from the main config file
     # to modular configuration files, and to support existing laptop-mode.conf
     # files from earlier versions, we source the modular configuration files FIRST.
-    if [ -d /etc/laptop-mode/conf.d ] ; then
-	    for CONF in /etc/laptop-mode/conf.d/*.conf /etc/laptop-mode/conf.d/board-specific/*.conf; do
+    CONF_DIR=""
+    test -d /etc/laptop-mode/conf.d && CONF_DIR="$CONF_DIR /etc/laptop-mode/conf.d"
+    test -d /etc/laptop-mode/conf.d/board-specific && CONF_DIR="$CONF_DIR /etc/laptop-mode/conf.d/board-specific"
+
+    for PER_DIR in $CONF_DIR; do
+	    for CONF in $PER_DIR; do
 		    if [ -r "$CONF" ] ; then
 			    . "$CONF"
 			    #Handle individual module debug settings
@@ -243,7 +247,8 @@ lmt_load_config ()
 			    log "MSG" "Warning: Configuration file $CONF is not readable, skipping."
 		    fi
 	    done
-    fi
+    done
+
     if [ -r /etc/laptop-mode/laptop-mode.conf ] ; then
 	    . /etc/laptop-mode/laptop-mode.conf
     else
