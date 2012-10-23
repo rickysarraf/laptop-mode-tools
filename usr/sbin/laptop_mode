@@ -630,14 +630,15 @@ lmt_main_function ()
 
     mkdir -p /var/run/laptop-mode-tools
 
-    if [ x$ENABLE_LAPTOP_MODE_TOOLS = x1 ]; then
-	    touch /var/run/laptop-mode-tools/enabled
-    fi
-
     # Used to display laptop mode state later on. This is the enabled/disabled 
     # state for laptop mode processing, it tells us nothing about whether laptop
     # mode is actually _active_.
-    STATE=enabled
+    STATE=disabled
+    if [ x$ENABLE_LAPTOP_MODE_TOOLS = x1 ]; then
+	touch /var/run/laptop-mode-tools/enabled
+	STATE=enabled
+    fi
+
     if [ "$ENABLE_LAPTOP_MODE_ON_BATTERY" -eq 0 -a "$ENABLE_LAPTOP_MODE_ON_AC" -eq 0 -a "$ENABLE_LAPTOP_MODE_WHEN_LID_CLOSED" -eq 0 ] ; then
 	    STATE=disabled
     fi
