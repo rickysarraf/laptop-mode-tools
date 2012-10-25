@@ -133,7 +133,11 @@ control_mount_options() {
 		MP="$(echo $MP)"
 
 		case "$FST" in 
-			rootfs|unionfs|tmpfs|squashfs|sysfs|usbfs|proc|devpts|devtmpfs|cgroup|fuse*)
+			ext*|reiserfs|xfs)
+				log "VERBOSE" "$FST mount options apply"
+				;;
+			*)
+				log "VERBOSE" "$FST skipped for LMT"
 				continue
 				;;
 		esac
