@@ -114,6 +114,193 @@ set_sysctl() {
 }
 
 
+
+#
+#
+# [Re]Mount the devices/partitions that need to be controlled
+# Parameter: BOOL
+#
+#
+control_mount_options() {
+
+	DO=0
+
+	log "VERBOSE" "Remounting filesystems."
+	# The -r flag makes 'read' preserve backslashes read from
+	# mtab. Spaces are represented by \040 in mtab. (also UTF-8)
+	cat /etc/mtab | while read -r DEV MP FST OPTS DUMP PASS ; do
+		# Now expand the escapes, inside quotes to preserve the spaces :)
+		MP="$(echo $MP)"
+
+		case "$FST" in 
+			rootfs|unionfs|tmpfs|squashfs|sysfs|usbfs|proc|devpts|devtmpfs|cgroup|fuse*)
+				continue
+				;;
+		esac
+					
+		case " $PARTITIONS " in
+			*" $DEV "*)
+				DO=1
+				log "VERBOSE" "$DEV found in PARTITIONS."
+				;;
+			*)
+				log "VERBOSE" "$DEV not found in PARTITIONS."
+				;;
+		esac
+		case " $PARTITIONS " in
+			*" $MP "*)
+				DO=1
+				log "VERBOSE" "$MP found in PARTITIONS."
+				;;
+			*)
+				log "VERBOSE" "$MP not found in PARTITIONS."
+				;;
+		esac
+		case " $PARTITIONS " in
+			*" auto "*)
+
+				# If we have a device referenced by a persistent device naming scheme, it does
+				# not get covered in the previous heuristics. So, if we reach here, we would
+				# want to do a check for it too.
+					
+				log "VERBOSE" "Checking $DEV against HD because PARTITIONS contains \"auto\"."
+				case $DEV in
+					*"/dev/disk/by-"*)
+					log "VERBOSE" "$DEV has a persistent device naming. Extracting real name\n"
+					REAL_DEV=`readlink -f $DEV`
+					;;
+
+					*) REAL_DEV=0
+					;;
+				esac
+
+				log "VERBOSE" "Checking $DEV against HD because PARTITIONS contains \"auto\"."
+				for THISHD in $HD ; do
+					log "VERBOSE" "   Considering $THISHD."
+					case " $DEV" in *"$THISHD"*)
+						DO=1
+						log "VERBOSE" "   $DEV contains $THISHD, which is in HD, so we will remount it."
+						break
+						;;
+					esac
+					log "VERBOSE" "Considering the persistent device names\n"
+					case " $REAL_DEV" in *"$THISHD"*)
+						DO=1
+						log "VERBOSE" "   $REALDEV contains $THISHD, which is in HD, so we will remount it."
+						log "VERBOSE" "Chaning dev to real_dev\n"
+						DEV=$REAL_DEV
+						break
+						;;
+					esac
+				done
+				;;
+		esac
+
+		if [ "$DO" -ne 0 ] ; then
+
+			if [ $1 -ne 1 ]; then
+				# Enable ON_AC mount options
+
+				# Reset commit and atime options to defaults.
+				log "VERBOSE" "Original options: $OPTS"
+				if [ "$FST" = 'unknown' ]; then
+					log "VERBOSE" "Deducing fstype for $MP."
+					FST=$(deduce_fstype $MP)
+					log "VERBOSE" "Deduced fstype for $MP as $FST."
+				fi
+				
+				# Strip stuff like ext3,ext2 into just ext3.
+				log "VERBOSE" "Reducing file system type."
+				FST=${FST%%,*}
+				
+				# Retrieve original non-laptop mode mount options and restore them.
+				# If the file that stores them doesn't exist, then laptop mode
+				# has never been started.
+				if [ "$WAS_ACTIVE" -ne 0 -a -f /var/run/laptop-mode-tools/nolm-mountopts ] ; then						
+					SAVED_OPTS=`grep "^$DEV " /var/run/laptop-mode-tools/nolm-mountopts`
+					SAVED_OPTS=${SAVED_OPTS#* } # trim device name
+				
+					case "$FST" in
+						"ext3"|"reiserfs"|"ext4dev"|"ext4")								
+							PARSEDOPTS="$(replace_numeric_mount_option commit commit=0 $SAVED_OPTS $OPTS)"
+							PARSEDOPTS="$(replace_atime_mount_option $SAVED_OPTS $PARSEDOPTS)"
+							log "VERBOSE" "Executing: mount $DEV $MP -t $FST -o remount,$PARSEDOPTS"
+							mount $DEV "$MP" -t $FST -o remount,$PARSEDOPTS
+							;;
+						*)
+							PARSEDOPTS="$(replace_atime_mount_option $SAVED_OPTS $OPTS)"
+							log "VERBOSE" "Executing: mount $DEV $MP -t $FST -o remount,$PARSEDOPTS"
+							mount $DEV "$MP" -t $FST -o remount,$PARSEDOPTS
+							;;
+					esac
+				else
+					log "VERBOSE" "No saved mount options, so apparently we never remounted this filesystem during this session."
+					log "VERBOSE" "Not remounting."
+				fi
+				if [ -b $DEV -a "$CONTROL_READAHEAD" -ne 0 ] ; then
+					log "VERBOSE" "Executing: /sbin/blockdev $READAHEAD_OPTION $(($NOLM_READAHEAD * 2)) $DEV"
+					log "VERBOSE" "`/sbin/blockdev $READAHEAD_OPTION $(($NOLM_READAHEAD * 2)) $DEV 2>&1`"
+				fi
+				
+			else
+				# Enable power saving mount options
+
+				log "VERBOSE" "Original options: $OPTS"
+				if [ "$WAS_ACTIVE" -eq 0 ] ; then
+					# Coming from inactive state: save last known mount options for the device.
+					log "VERBOSE" "Updating /var/run/laptop-mode-tools/nolm-mountopts." 
+					if [ -f /var/run/laptop-mode-tools/nolm-mountopts ] ; then 
+						sed -i "s|^$DEV .*$||" /var/run/laptop-mode-tools/nolm-mountopts
+					fi
+					echo $DEV $OPTS >> /var/run/laptop-mode-tools/nolm-mountopts
+				else
+					log "VERBOSE" "Not updating /var/run/laptop-mode-tools/nolm-mountopts because laptop mode was already active."
+				fi
+
+				if [ "$FST" = 'unknown' ]; then
+					log "VERBOSE" "Deducing fstype for $MP."
+					FST=$(deduce_fstype $MP)
+					log "VERBOSE" "Deduced fstype for $MP as $FST."
+				fi
+				# Strip stuff like ext3,ext2 into just ext3.
+				log "VERBOSE" "Reducing file system type." 
+				FST=${FST%%,*}
+
+				case "$FST" in
+					"ext3"|"reiserfs"|"ext4dev"|"ext4")
+						log "VERBOSE" "Removing commit mount option from original options." 
+						PARSEDOPTS="$(remove_numeric_mount_option commit "$OPTS")"
+						log "VERBOSE" "Executing: mount $DEV $MP -t $FST -o remount,$PARSEDOPTS,commit=$MAX_LOST_WORK_SECONDS$NOATIME_OPT"
+						if (! mount $DEV "$MP" -t $FST -o remount,$PARSEDOPTS,commit=$MAX_LOST_WORK_SECONDS$NOATIME_OPT) ; then
+							if [ "$FST" = "ext3" -a "$MP" = "/" ] ; then
+								echo "BIG FAT WARNING: Your root filesystem mounted as ext3 seems to lack support for"
+								echo "the commit mount option. This usually means that your root filesystem is"
+								echo "mounted as ext2 because there is no ext3 support in the kernel at boot time,"
+								echo "usually because you compiled ext3 as a module and don't load it in an initrd."
+								echo "Note that on recent 2.6 kernels, /proc/mounts shows the correct fs type for"
+								echo "the device /dev/root. You can check your actual root filesystem mount type"
+								echo "there. To fix the problem, either make ext3 available at boot time by compiling"
+								echo "it statically into the kernel, or configure the correct filesystem type in"
+								echo "/etc/fstab."
+							fi
+						fi
+						;;
+					*)
+						log "VERBOSE" "Executing: mount $DEV $MP -t $FST -o remount,$OPTS$NOATIME_OPT"
+						mount $DEV "$MP" -t $FST -o remount,$OPTS$NOATIME_OPT
+						;;
+				esac
+				if [ -b $DEV -a "$CONTROL_READAHEAD" -ne 0 ] ; then
+					log "VERBOSE" "Executing: /sbin/blockdev $READAHEAD_OPTION $(($LM_READAHEAD * 2)) $DEV"
+					log "VERBOSE" "`/sbin/blockdev $READAHEAD_OPTION $(($LM_READAHEAD * 2)) $DEV 2>&1`"
+				fi
+				
+			fi
+		fi
+	done
+}
+
+
 if [ "$CONTROL_READAHEAD" -ne 0 ] ; then
 	if /sbin/blockdev --help 2>&1 | grep -Fq -- '--setfra' ; then
 		READAHEAD_OPTION=--setfra					
@@ -200,123 +387,7 @@ if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 1 ] ; then
 		set_sysctl /proc/sys/vm/dirty_background_ratio    "$LM_DIRTY_BACKGROUND_RATIO"
 	fi
 	if [ $CONTROL_MOUNT_OPTIONS -eq 1 ]; then
-		log "VERBOSE" "Remounting filesystems."
-		# The -r flag makes 'read' preserve backslashes read from
-		# mtab. Spaces are represented by \040 in mtab. (also UTF-8)
-		cat /etc/mtab | while read -r DEV MP FST OPTS DUMP PASS ; do
-			# Now expand the escapes, inside quotes to preserve the spaces :)
-			MP="$(echo $MP)"
-			case "$FST" in 
-				rootfs|unionfs|tmpfs|squashfs|sysfs|usbfs|proc|devpts|devtmpfs|cgroup|fuse)
-				  	continue
-					;;
-			esac
-					
-			DO=0
-			
-			case " $PARTITIONS " in
-				*" $DEV "*)
-					DO=1
-					log "VERBOSE" "$DEV found in PARTITIONS."
-					;;
-				*)
-					log "VERBOSE" "$DEV not found in PARTITIONS."
-					;;
-			esac
-			case " $PARTITIONS " in
-				*" $MP "*)
-					DO=1
-					log "VERBOSE" "$MP found in PARTITIONS."
-					;;
-				*)
-					log "VERBOSE" "$MP not found in PARTITIONS."
-			esac
-			case " $PARTITIONS " in
-				*" auto "*)
-
-					# If we have a device referenced by a persistent device naming scheme, it does
-					# not get covered in the previous heuristics. So, if we reach here, we would
-					# want to do a check for it too.
-					
-					log "VERBOSE" "Checking $DEV against HD because PARTITIONS contains \"auto\"."
-					log "VERBOSE" "$DEV\n"
-					case $DEV in *"/dev/disk/by-"*)
-						log "VERBOSE" "$DEV has a persistent device naming. Extracting real name\n"
-						REAL_DEV=`readlink -f $DEV`
-						;;
-					esac
-
-					for THISHD in $HD ; do
-						log "VERBOSE" "   Considering $THISHD."
-						case " $DEV" in *"$THISHD"*)
-							DO=1
-							log "VERBOSE" "   $DEV contains $THISHD, which is in HD, so we will remount it."
-							break
-							;;
-						esac
-						
-						log "VERBOSE" "Considering the persistent device names\n"
-						case " $REAL_DEV" in *"$THISHD"*)
-							DO=1
-							log "VERBOSE" "   $REALDEV contains $THISHD, which is in HD, so we will remount it."
-							log "VERBOSE" "Chaning dev to real_dev\n"
-							DEV=$REAL_DEV
-							break
-							;;
-						esac
-					done
-					;;
-			esac
-			if [ "$DO" -ne 0 ] ; then
-				log "VERBOSE" "Original options: $OPTS"
-				if [ "$WAS_ACTIVE" -eq 0 ] ; then
-					# Coming from inactive state: save last known mount options for the device.
-					log "VERBOSE" "Updating /var/run/laptop-mode-tools/nolm-mountopts." 
-					if [ -f /var/run/laptop-mode-tools/nolm-mountopts ] ; then 
-						sed -i "s|^$DEV .*$||" /var/run/laptop-mode-tools/nolm-mountopts
-					fi
-					echo $DEV $OPTS >> /var/run/laptop-mode-tools/nolm-mountopts
-				else
-					log "VERBOSE" "Not updating /var/run/laptop-mode-tools/nolm-mountopts because laptop mode was already active."
-				fi
-				if [ "$FST" = 'unknown' ]; then
-					log "VERBOSE" "Deducing fstype for $MP."
-					FST=$(deduce_fstype $MP)
-					log "VERBOSE" "Deduced fstype for $MP as $FST."
-				fi
-				# Strip stuff like ext3,ext2 into just ext3.
-				log "VERBOSE" "Reducing file system type." 
-				FST=${FST%%,*}
-				case "$FST" in
-					"ext3"|"reiserfs"|"ext4dev"|"ext4")
-						log "VERBOSE" "Removing commit mount option from original options." 
-						PARSEDOPTS="$(remove_numeric_mount_option commit "$OPTS")"
-						log "VERBOSE" "Executing: mount $DEV $MP -t $FST -o remount,$PARSEDOPTS,commit=$MAX_LOST_WORK_SECONDS$NOATIME_OPT"
-						if (! mount $DEV "$MP" -t $FST -o remount,$PARSEDOPTS,commit=$MAX_LOST_WORK_SECONDS$NOATIME_OPT) ; then
-							if [ "$FST" = "ext3" -a "$MP" = "/" ] ; then
-								echo "BIG FAT WARNING: Your root filesystem mounted as ext3 seems to lack support for"
-								echo "the commit mount option. This usually means that your root filesystem is"
-								echo "mounted as ext2 because there is no ext3 support in the kernel at boot time,"
-								echo "usually because you compiled ext3 as a module and don't load it in an initrd."
-								echo "Note that on recent 2.6 kernels, /proc/mounts shows the correct fs type for"
-								echo "the device /dev/root. You can check your actual root filesystem mount type"
-								echo "there. To fix the problem, either make ext3 available at boot time by compiling"
-								echo "it statically into the kernel, or configure the correct filesystem type in"
-								echo "/etc/fstab."
-							fi
-						fi
-						;;
-					*)
-						log "VERBOSE" "Executing: mount $DEV $MP -t $FST -o remount,$OPTS$NOATIME_OPT"
-						mount $DEV "$MP" -t $FST -o remount,$OPTS$NOATIME_OPT
-						;;
-				esac
-				if [ -b $DEV -a "$CONTROL_READAHEAD" -ne 0 ] ; then
-					log "VERBOSE" "Executing: /sbin/blockdev $READAHEAD_OPTION $(($LM_READAHEAD * 2)) $DEV"
-					log "VERBOSE" "`/sbin/blockdev $READAHEAD_OPTION $(($LM_READAHEAD * 2)) $DEV 2>&1`"
-				fi
-			fi
-		done
+		control_mount_options $ACTIVATE_WITH_POSSIBLE_DATA_LOSS
 	fi
 else
 	# DEACTIVATE w.r.t. kernel options and mount point settings
@@ -345,110 +416,8 @@ else
 		set_sysctl /proc/sys/vm/dirty_ratio		    "$NOLM_DIRTY_RATIO"
 		set_sysctl /proc/sys/vm/dirty_background_ratio	    "$NOLM_DIRTY_BACKGROUND_RATIO"
 	fi
-	if [ $CONTROL_MOUNT_OPTIONS -eq 1 ] ; then
-		log "VERBOSE" "Remounting filesystems."
-		# The -r flag makes 'read' preserve backslashes read from
-		# mtab. Spaces are represented by \040 in mtab. (also UTF-8)
-		cat /etc/mtab | while read -r DEV MP FST OPTS DUMP PASS ; do
-			# Now expand the escapes, inside quotes to preserve the spaces :)
-			MP="$(echo $MP)"
-			DO=0
-			case " $PARTITIONS " in
-				*" $DEV "*)
-					DO=1
-					log "VERBOSE" "$DEV found in PARTITIONS."
-					;;
-				*)
-					log "VERBOSE" "$DEV not found in PARTITIONS."
-					;;
-			esac
-			case " $PARTITIONS " in
-				*" $MP "*)
-					DO=1
-					log "VERBOSE" "$MP found in PARTITIONS."
-					;;
-				*)
-					log "VERBOSE" "$MP not found in PARTITIONS."
-					;;
-			esac
-			case " $PARTITIONS " in
-				*" auto "*)
-					# If we have a device referenced by a persistent device naming scheme, it does
-					# not get covered in the previous heuristics. So, if we reach here, we would
-					# want to do a check for it too.
-					
-					log "VERBOSE" "Checking $DEV against HD because PARTITIONS contains \"auto\"."
-					case " $DEV" in *"/dev/disk/by-"*)
-						log "VERBOSE" "$DEV has a persistent device naming. Extracting real name\n"
-						REAL_DEV=`readlink -f $DEV`
-						;;
-					esac
-
-					log "VERBOSE" "Checking $DEV against HD because PARTITIONS contains \"auto\"."
-					for THISHD in $HD ; do
-						log "VERBOSE" "   Considering $THISHD."
-						case " $DEV" in *"$THISHD"*)
-							DO=1
-							log "VERBOSE" "   $DEV contains $THISHD, which is in HD, so we will remount it."
-							break
-							;;
-						esac
-
-						log "VERBOSE" "Considering the persistent device names\n"
-						case " $REAL_DEV" in *"$THISHD"*)
-							DO=1
-							log "VERBOSE" "   $REALDEV contains $THISHD, which is in HD, so we will remount it."
-							log "VERBOSE" "Chaning dev to real_dev\n"
-							DEV=$REAL_DEV
-							break
-							;;
-						esac
-					done
-					;;
-			esac
-			if [ "$DO" -ne 0 ] ; then
-				# Reset commit and atime options to defaults.
-				log "VERBOSE" "Original options: $OPTS"
-				if [ "$FST" = 'unknown' ]; then
-					log "VERBOSE" "Deducing fstype for $MP."
-					FST=$(deduce_fstype $MP)
-					log "VERBOSE" "Deduced fstype for $MP as $FST."
-				fi
-				
-				# Strip stuff like ext3,ext2 into just ext3.
-				log "VERBOSE" "Reducing file system type."
-				FST=${FST%%,*}
-				
-				# Retrieve original non-laptop mode mount options and restore them.
-				# If the file that stores them doesn't exist, then laptop mode
-				# has never been started.
-				if [ "$WAS_ACTIVE" -ne 0 -a -f /var/run/laptop-mode-tools/nolm-mountopts ] ; then						
-					SAVED_OPTS=`grep "^$DEV " /var/run/laptop-mode-tools/nolm-mountopts`
-					SAVED_OPTS=${SAVED_OPTS#* } # trim device name
-				
-					case "$FST" in
-						"ext3"|"reiserfs"|"ext4dev"|"ext4")								
-							PARSEDOPTS="$(replace_numeric_mount_option commit commit=0 $SAVED_OPTS $OPTS)"
-							PARSEDOPTS="$(replace_atime_mount_option $SAVED_OPTS $PARSEDOPTS)"
-							log "VERBOSE" "Executing: mount $DEV $MP -t $FST -o remount,$PARSEDOPTS"
-							mount $DEV "$MP" -t $FST -o remount,$PARSEDOPTS
-							;;
-						*)
-							PARSEDOPTS="$(replace_atime_mount_option $SAVED_OPTS $OPTS)"
-							log "VERBOSE" "Executing: mount $DEV $MP -t $FST -o remount,$PARSEDOPTS"
-							mount $DEV "$MP" -t $FST -o remount,$PARSEDOPTS
-							;;
-					esac
-				else
-					log "VERBOSE" "No saved mount options, so apparently we never remounted this filesystem during this session."
-					log "VERBOSE" "Not remounting."
-				fi
-				if [ -b $DEV -a "$CONTROL_READAHEAD" -ne 0 ] ; then
-					log "VERBOSE" "Executing: /sbin/blockdev $READAHEAD_OPTION $(($NOLM_READAHEAD * 2)) $DEV"
-					log "VERBOSE" "`/sbin/blockdev $READAHEAD_OPTION $(($NOLM_READAHEAD * 2)) $DEV 2>&1`"
-				fi
-			fi
-		done
+	if [ $CONTROL_MOUNT_OPTIONS -eq 1 ]; then
+		control_mount_options $ACTIVATE_WITH_POSSIBLE_DATA_LOSS
 	fi
 fi
 
