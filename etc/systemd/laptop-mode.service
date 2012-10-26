@@ -1,0 +1,15 @@
+[Unit]
+Description=Laptop Mode Tools
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStartPre=/usr/bin/install -d /var/run/laptop-mode-tools ; /usr/bin/touch /var/run/laptop-mode-tools/enabled
+ExecStart=/usr/sbin/laptop_mode auto
+ExecStop=/usr/sbin/laptop_mode stop
+ExecStopPost=/bin/rm -f /var/run/laptop-mode-tools/enabled
+StandardOutput=tty
+StandardError=tty
+
+[Install]
+WantedBy=multi-user.target
