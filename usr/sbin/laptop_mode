@@ -35,7 +35,7 @@ set -a
 
 # The laptop mode tools version number. Extracted by the installer makefile
 # as well, so don't change the format!
-LMTVERSION=1.61
+LMTVERSION=1.62
 
 # This script is loaded from multiple scripts to set the config defaults
 # and to read the configuration on top of those. Only when the command is
@@ -190,12 +190,12 @@ if [ x$LOG_TO_SYSLOG = x1 ]; then
 fi
 
 if [ "$1" = "VERBOSE" ]; then
-    $LM_VERBOSE &&  echo "$2" >/dev/fd/2;
+    $LM_VERBOSE &&  echo "$2" >>/dev/fd/2;
 elif [ "$1" = "ERR" ]; then
-    echo "$2" >/dev/fd/2;
+    echo "$2" >>/dev/fd/2;
 else
     # Message of type MSG and STATUS can go to stdout.
-    echo "$2" >/dev/fd/1;
+    echo "$2" >>/dev/fd/1;
 fi
 }
 
@@ -229,8 +229,12 @@ lmt_load_config ()
     # Source config. Some config settings have been moved from the main config file
     # to modular configuration files, and to support existing laptop-mode.conf
     # files from earlier versions, we source the modular configuration files FIRST.
-    if [ -d /etc/laptop-mode/conf.d ] ; then
-	    for CONF in /etc/laptop-mode/conf.d/*.conf /etc/laptop-mode/conf.d/board-specific/*.conf; do
+    CONF_DIR=""
+    test -d /etc/laptop-mode/conf.d && CONF_DIR="$CONF_DIR /etc/laptop-mode/conf.d"
+    test -d /etc/laptop-mode/conf.d/board-specific && CONF_DIR="$CONF_DIR /etc/laptop-mode/conf.d/board-specific"
+
+    for PER_DIR in $CONF_DIR; do
+	    for CONF in $PER_DIR/*; do
 		    if [ -r "$CONF" ] ; then
 			    . "$CONF"
 			    #Handle individual module debug settings
@@ -243,17 +247,13 @@ lmt_load_config ()
 			    log "MSG" "Warning: Configuration file $CONF is not readable, skipping."
 		    fi
 	    done
-    fi
+    done
+
     if [ -r /etc/laptop-mode/laptop-mode.conf ] ; then
 	    . /etc/laptop-mode/laptop-mode.conf
     else
 	    log "ERR" "$0: Configuration file /etc/laptop-mode/laptop-mode.conf not present or not readable."
 	    exit 1
-    fi
-
-    if [ x$ENABLE_LAPTOP_MODE_TOOLS = x0 ]; then
-	    log "MSG" "laptop-mode-tools is disabled in config file. Exiting"
-	    exit 0;
     fi
 
     # Add a simple bash debug mode switch
@@ -507,16 +507,13 @@ lmt_load_config ()
 	    ON_AC=1
     fi
 
-}
+    
 
-
-# The main workhorse.
-lmt_main_function ()
-{
+    # Evaluate options passed to laptop_mode in here
     if [ "$1" = "status" ] ; then
 	    # Display a status report.
 	    log "STATUS" "Mounts:"
-	    mount | sed "s/^/   /"
+	    mount | grep ^/dev | sed "s/^/   /"
 	    log "STATUS" " "
 	    log "STATUS" "Drive power status:"
 	    for disk in $HD; do
@@ -627,13 +624,25 @@ lmt_main_function ()
 	    esac
 	    shift
     done
+  fi
+}
+
+
+# The main workhorse.
+lmt_main_function ()
+{
 
     mkdir -p /var/run/laptop-mode-tools
 
     # Used to display laptop mode state later on. This is the enabled/disabled 
     # state for laptop mode processing, it tells us nothing about whether laptop
     # mode is actually _active_.
-    STATE=enabled
+    STATE=disabled
+    if [ x$ENABLE_LAPTOP_MODE_TOOLS = x1 ]; then
+	touch /var/run/laptop-mode-tools/enabled
+	STATE=enabled
+    fi
+
     if [ "$ENABLE_LAPTOP_MODE_ON_BATTERY" -eq 0 -a "$ENABLE_LAPTOP_MODE_ON_AC" -eq 0 -a "$ENABLE_LAPTOP_MODE_WHEN_LID_CLOSED" -eq 0 ] ; then
 	    STATE=disabled
     fi
@@ -683,16 +692,15 @@ lmt_main_function ()
 
     # If the init script has not been run or has been run with the "stop"
     # argument, then we should never start laptop mode.
-    if [ ! -f /var/run/laptop-mode-tools/enabled ] ; then
+    if [ ! -f /var/run/laptop-mode-tools/enabled -o x$INITSCRIPT_STOP = x1 ] ; then
 	    log "VERBOSE" "Laptop mode disabled because /var/run/laptop-mode-tools/enabled is missing."
 	    STATE=disabled
     fi
 
-    if [ "$ACTIVATE" -eq 1 -a -f /etc/default/laptop-mode ] ; then
-	    . /etc/default/laptop-mode
-	    if ! ( echo "$ENABLE_LAPTOP_MODE" |grep y ) ; then
-		    log "VERBOSE" "Not starting laptop mode because it is disabled in /etc/default/laptop-mode."
-		    STATE=disabled
+    if [ "$ACTIVATE" -eq 1 ]; then
+	    if [ x$ENABLE_LAPTOP_MODE_TOOLS = x0 ]; then
+		log "VERBOSE" "Not starting laptop mode because it is disabled in /etc/laptop-mode/laptop-mode.conf"
+		STATE=disabled
 	    fi
     fi
 
@@ -1032,14 +1040,13 @@ lmt_main_function ()
 	    read WAS_ACTIVE WAS_ON_AC WAS_ACTIVATE_WITH_POSSIBLE_DATA_LOSS WAS_STATE < /var/run/laptop-mode-tools/state
 	    if [ "$WAS_STATE" != "" ] ; then
 		    if [ "$WAS_ACTIVE" -eq "$ACTIVATE" -a "$WAS_ON_AC" -eq "$ON_AC" -a "$WAS_ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -a "$WAS_STATE" = "$STATE" -a "$FORCE" -eq 0 ] ; then
-			    log "MSG" "$STATE, "
 			    if [ "$WAS_ACTIVE" -eq 1 ] ; then
-				    log "MSG" "active [unchanged]"
+				    log "MSG" "$STATE, active [unchanged]"
 				    if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 0 ] ; then
 					    log "MSG" " (Data-loss sensitive features disabled.)"
 				    fi
 			    else
-				    log "MSG" "not active [unchanged]"
+				    log "MSG" "$STATE, not active [unchanged]"
 			    fi
 			    exit 0
 		    fi
@@ -1105,17 +1112,13 @@ lmt_main_function ()
 	    fi
     done
 
-    # Wait for the forks to complete
-    wait
-
     exit 0
 
     # This fi closes the if for "readconfig". If I would have indented this one
     # I would have indented the whole file. :)
-    fi
 }
 
-lmt_load_config
+lmt_load_config "$@";
 
 # We do a special run of battery polling daemon here so that it does not get
 # plagued by the lock. We need the polling daemon to be independent of the REQ and INVOC locks.
@@ -1127,7 +1130,7 @@ if [ x$ENABLE_BATTERY_LEVEL_POLLING = x1 ] && [ x$BLACKLIST_IN_FLOCK = x1 ]; the
 		log "VERBOSE" "On AC, stopping the polling daemon."
 
 		# In AC mode we disable the polling daemon.
-		killall -q lm-polling-daemon
+		killall -g -q lm-polling-daemon
 	elif [ x$ON_AC = x0 ]; then
 		exec 7>$LMT_BATTPOLL_LOCK;
 		if $FLOCK -n -x -w 1 7; then
@@ -1146,7 +1149,7 @@ if [ x$ENABLE_BATTERY_LEVEL_POLLING = x1 ] && [ x$BLACKLIST_IN_FLOCK = x1 ]; the
 		# should be killed.
 		if [ x$INITSCRIPT_STOP = x1 ]; then
 			log "VERBOSE" "On Battery, but init script stop is called. Killing lm-polling-daemon"
-			killall -q lm-polling-daemon
+			killall -g -q lm-polling-daemon
 		fi
 	else
 		log "ERR" "Unknown ON_AC state: $ON_AC";

@@ -3,7 +3,7 @@
 
 Summary: Tools for power savings based on battery/AC status
 Name: laptop-mode-tools
-Version: 1.61
+Version: 1.62
 Release: 1
 License: GPL
 Group: System Environment/Base
@@ -74,27 +74,34 @@ fi
 %config(noreplace) %{_sysconfdir}/laptop-mode/
 %config %{_initrddir}/laptop-mode
 /lib/udev/lmt-udev
+/lib/systemd/system/laptop-mode.service
 
 %{_sysconfdir}/apm/event.d/*
 %{_sysconfdir}/power/scripts.d/*
 %{_sysconfdir}/power/event.d/*
 %{_usr}/sbin/*
 %{_usr}/share/laptop-mode-tools/modules/*
+%{_usr}/share/laptop-mode-tools/module-helpers/*
 %{_usr}/lib/pm-utils/sleep.d/*
+%{_usr}/lib/tmpfiles.d/laptop-mode.conf
 
 
 %dir %{_sysconfdir}/acpi/events
 %dir %{_sysconfdir}/acpi/actions
 %dir %{_usr}/sbin
 %dir %{_usr}/lib/pm-utils/sleep.d
+%dir %{_usr}/lib/tmpfiles.d
 %dir %{_usr}/share/laptop-mode-tools/modules
-%dir %{_usr}/share/laptop-mode-tools/module-helpers/*
+%dir %{_usr}/share/laptop-mode-tools/module-helpers
 %dir %{_sysconfdir}/apm/event.d
 %dir %{_sysconfdir}/power/scripts.d
 %dir %{_sysconfdir}/power/event.d
 
 
 %changelog
+* Tue Oct 30 2012 Ritesh Raj Sarraf <rrs@researchut.com> - 1.62-1
+- Updated to release 1.62.
+
 * Thu May 17 2012 Ritesh Raj Sarraf <rrs@researchut.com> - 1.61-1
 - Updated to release 1.61.
 

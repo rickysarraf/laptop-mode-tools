@@ -55,10 +55,12 @@ install: build
 	install -m755 -d $(DESTDIR)/usr/sbin
 	install -m755 -d $(DESTDIR)/usr/share/laptop-mode-tools/modules
 	install -m755 -d $(DESTDIR)/usr/share/laptop-mode-tools/module-helpers
+	install -m755 -d $(DESTDIR)/usr/lib/tmpfiles.d
 	install -m755 -d $(DESTDIR)/etc/apm/event.d
 	install -m755 -d $(DESTDIR)/etc/power/scripts.d
 	install -m755 -d $(DESTDIR)/etc/power/event.d
 	install -m755 -d $(DESTDIR)/lib/udev/rules.d
+	install -m755 -d $(DESTDIR)/lib/systemd/system
 	install -m755 -d $(DESTDIR)/usr/lib/pm-utils/sleep.d
 	install -m755 -d $(DESTDIR)/etc/laptop-mode/batt-start
 	install -m755 -d $(DESTDIR)/etc/laptop-mode/batt-stop
@@ -67,6 +69,7 @@ install: build
 	install -m755 -d $(DESTDIR)/etc/laptop-mode/nolm-ac-start
 	install -m755 -d $(DESTDIR)/etc/laptop-mode/nolm-ac-stop
 	install -m755 -d $(DESTDIR)/etc/laptop-mode/conf.d
+	install -m755 -d $(DESTDIR)/etc/laptop-mode/conf.d/board-specific
 	install -m755 -d $(DESTDIR)/etc/laptop-mode/modules
 	install -m644 etc/laptop-mode/laptop-mode.conf $(DESTDIR)/etc/laptop-mode/laptop-mode.conf
 	install -m644 etc/laptop-mode/conf.d/* $(DESTDIR)/etc/laptop-mode/conf.d
@@ -77,6 +80,8 @@ install: build
 	install -m755 etc/power/event.d/* $(DESTDIR)/etc/power/event.d
 	install -m644 etc/rules/99-laptop-mode.rules $(DESTDIR)/lib/udev/rules.d
 	install -m755 etc/rules/lmt-udev $(DESTDIR)/lib/udev/lmt-udev
+	install -m644 etc/systemd/laptop-mode.service $(DESTDIR)/lib/systemd/system/laptop-mode.service
+	install -m644 etc/systemd/laptop-mode.conf.tmpfiles $(DESTDIR)/usr/lib/tmpfiles.d/laptop-mode.conf
 	install -m755 usr/lib/pm-utils/sleep.d/* $(DESTDIR)/usr/lib/pm-utils/sleep.d
 	install -m755 usr/sbin/laptop_mode $(DESTDIR)/usr/sbin
 	install -m755 usr/sbin/lm-syslog-setup $(DESTDIR)/usr/sbin

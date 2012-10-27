@@ -1,9 +1,27 @@
-laptop-mode-tools (1.61-2) unstable; urgency=low
+laptop-mode-tools (1.62-1) experimental; urgency=low
 
-  * [225fd1e] Disable ethernet based on multiple reports of driver failure
-    (Closes: #677638)
+  * New Upstream Release
+  * [8302c24] Fix spec file for RPM syntax
+  * [fcf6a8c] Append to stdout/stderr to avoid truncating file logs.
+    Thanks to Bjørn Mork (Closes: #668611)
+  * [c54ef01] Fix shell vaiable declaration.
+    Thanks to Robert Milasan
+  * [98fc714] Fix reading config files
+  * [2ae260f] Clean up reliance on "enabled" file.
+    Thanks to Jasmine Hassan (Closes: #690748)
+  * [18e8e70] we never seemed to have shipped a defaults config file
+  * [9abc752] cleaner output when asking status. Thanks Jasmine Hassan
+  * [c6816f7] Organize state/STATE tracking so that we get actual results
+  * [1b99b55] Trim mount point display. Thanks to Jasmine Hassan
+  * [a5446b3] Do not touch autonegotiation settings
+  * [5318b69] Add systemd support
+  * [87850ac] Use -g with killall. This will kill the spawned process too
+  * [d3009eb] Re-order the argument parsing code out of lmt_main_function()
+    because we need it when we need to kill the polling daemon
+  * [213c78b] Handle creation of enabled file through systemd's tmpfiles.d
+    framework
 
- -- Ritesh Raj Sarraf <rrs@debian.org>  Sat, 15 Dec 2012 20:34:11 +0530
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sat, 27 Oct 2012 14:50:49 +0530
 
 laptop-mode-tools (1.61-1) unstable; urgency=low
 
