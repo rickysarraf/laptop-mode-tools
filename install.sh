@@ -110,6 +110,7 @@ $INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode/nolm-ac-start"
 $INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode/nolm-ac-stop"
 $INSTALL -d -m 755 "$DESTDIR/usr/share/laptop-mode-tools/modules"
 $INSTALL -d -m 755 "$DESTDIR/usr/share/laptop-mode-tools/module-helpers"
+$INSTALL -d -m 755 "$DESTDIR/usr/lib/tmpfiles.d"
 $INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode/conf.d"
 $INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode/conf.d/board-specific"
 $INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode/modules"
@@ -210,6 +211,11 @@ fi
 # systemd service
 if ( ! $INSTALL -D -m 644 etc/systemd/laptop-mode.service "$DESTDIR/lib/systemd/system/laptop-mode.service" ) ; then
 	echo "$0: Failed to install systemd service into /lib/systemd/system/ Installation failed."
+fi
+
+# and systemd's tmpfiles.d
+if ( ! $INSTALL -D -m 644 etc/systemd/laptop-mode.conf.tmpfiles "$DESTDIR/usr/lib/tmpfiles.d/laptop-mode.conf" ) ; then
+	echo "$0: Failed to install systemd tmpfiles into /usr/lib/tmpfiles.d/ Installation failed."
 fi
 
 ACPI_DONE=0

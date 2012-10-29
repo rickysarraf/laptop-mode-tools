@@ -1,0 +1,4 @@
+# systemd tmpfiles for Laptop Mode Tools
+
+D /run/laptop-mode-tools
+F /run/laptop-mode-tools/enabled
