@@ -1130,7 +1130,7 @@ if [ x$ENABLE_BATTERY_LEVEL_POLLING = x1 ] && [ x$BLACKLIST_IN_FLOCK = x1 ]; the
 		log "VERBOSE" "On AC, stopping the polling daemon."
 
 		# In AC mode we disable the polling daemon.
-		killall -q lm-polling-daemon
+		killall -g -q lm-polling-daemon
 	elif [ x$ON_AC = x0 ]; then
 		exec 7>$LMT_BATTPOLL_LOCK;
 		if $FLOCK -n -x -w 1 7; then
@@ -1149,7 +1149,7 @@ if [ x$ENABLE_BATTERY_LEVEL_POLLING = x1 ] && [ x$BLACKLIST_IN_FLOCK = x1 ]; the
 		# should be killed.
 		if [ x$INITSCRIPT_STOP = x1 ]; then
 			log "VERBOSE" "On Battery, but init script stop is called. Killing lm-polling-daemon"
-			killall -q lm-polling-daemon
+			killall -g -q lm-polling-daemon
 		fi
 	else
 		log "ERR" "Unknown ON_AC state: $ON_AC";
