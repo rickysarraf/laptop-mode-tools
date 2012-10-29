@@ -1108,9 +1108,6 @@ lmt_main_function ()
 	    fi
     done
 
-    # Wait for the forks to complete
-    wait
-
     exit 0
 
     # This fi closes the if for "readconfig". If I would have indented this one
