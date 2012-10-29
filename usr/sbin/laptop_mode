@@ -507,12 +507,9 @@ lmt_load_config ()
 	    ON_AC=1
     fi
 
-}
+    
 
-
-# The main workhorse.
-lmt_main_function ()
-{
+    # Evaluate options passed to laptop_mode in here
     if [ "$1" = "status" ] ; then
 	    # Display a status report.
 	    log "STATUS" "Mounts:"
@@ -627,6 +624,13 @@ lmt_main_function ()
 	    esac
 	    shift
     done
+  fi
+}
+
+
+# The main workhorse.
+lmt_main_function ()
+{
 
     mkdir -p /var/run/laptop-mode-tools
 
@@ -1112,10 +1116,9 @@ lmt_main_function ()
 
     # This fi closes the if for "readconfig". If I would have indented this one
     # I would have indented the whole file. :)
-    fi
 }
 
-lmt_load_config
+lmt_load_config "$@";
 
 # We do a special run of battery polling daemon here so that it does not get
 # plagued by the lock. We need the polling daemon to be independent of the REQ and INVOC locks.
