@@ -1,0 +1,744 @@
+laptop-mode-tools (1.62-1) UNRELEASED; urgency=low
+
+  * New devel release 
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sat, 27 Oct 2012 14:50:49 +0530
+
+laptop-mode-tools (1.61-1) unstable; urgency=low
+
+  [ Ritesh Raj Sarraf ]
+  * [3f9ea15] Removed laptop-mode-tools.preinst
+  * [8bd5355] update debian/patches/debian-changes
+  * [16bc3f5] calculate design_capacity_warning on machines/arches where it
+    is not readiliy available
+  * [28b8d23] Add support for non-deafult customized settings.
+    Thanks to Simon Que - Chromium Project
+  * [7a99e68] Add parallel execution for the modules
+  * [0ab6ef0] Handle devices with persistent device naming
+    (Closes: #664267)
+
+  [ Simon Que ]
+  * [f3de2d6] hdparm skips SSDs for power management
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sun, 20 May 2012 15:29:03 +0530
+
+laptop-mode-tools (1.60-1) unstable; urgency=low
+
+  * [709f521] New Upstream Release
+    (Closes: 647564)
+    - [8389588] Change Intel HDA Audio's default power save timeout to 2 seconds
+    - [cc40bd1] usb autosuspend black-/whitelist arg in quotes.
+      Thanks to Simon Que
+    - [5a4e08a] add readme-debugging.txt
+    - [be147e0] Helper tools to provide suspend/hibernate functionality
+    - [49afd31] Kill lm-polling-daemon when init stop is called
+    - [68b0ff5] Add pm-helper tool to take care of suspend / hibernate.
+    - [c7e3038] Use native hibernation helper tool from LMT
+    - [a569b29] Check for block device's existence.
+      Thanks to Simon Que (Chromium Project)
+    - [ab704b2] Use proper device for iwconfig.
+      Thanks to bs.net (Closes: 639388)
+  * [8fa914a] Drop some of the Recommends to Suggests.
+    Thanks to Clea F. Rees (Closes: #640155)
+  * [75c51b3] Drop duplicate changelog
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sat, 05 Nov 2011 12:59:34 +0530
+
+laptop-mode-tools (1.58-3) unstable; urgency=low
+
+  * [c6f2f64] Don't call true which forks a subshell.
+    Thanks to Cristian Ionescu-Idbohrn
+  * [f2d4e70] Use exit instead of return.
+    Thanks to Eric Belanger (Closes: 636251)
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Tue, 02 Aug 2011 23:24:48 +0530
+
+laptop-mode-tools (1.58-2) unstable; urgency=low
+
+  * [fa94d77] Check for files instead of kernel version numbers.
+    Thanks to Ben Hutchings (Closes: 632311)
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sun, 31 Jul 2011 20:45:13 +0530
+
+laptop-mode-tools (1.58-1) unstable; urgency=low
+
+  * New upstream release 
+    + Initialize the PATH variable within us. This helps when our caller did
+      not have a proper environment
+    + Enable new in-kernel polling mechanism for block devices
+      (Closes: #617705, #574867)
+    + Check for kernel's native suspend functionality
+    + Support execution of complex commands. Thanks to Changaco for the patch
+    + Add new module nmi-watchdog to handle NMI Watchdog related power
+      savings. Thanks to Quentin Denis for the report
+    + Fix error messages during early boot if /usr is on a different
+      partition. (Closes: #624678)
+    + Add support for new Linux 3.x kernels. (Closes: #6628764)
+    + Fix locking problems when battery polling daemon is enabled
+  * Install lmt-udev into /lib/udev 
+  * Update Standards Version to 3.9.2 (No changes required) 
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sat, 23 Jul 2011 23:33:34 +0530
+
+laptop-mode-tools (1.57-1) unstable; urgency=low
+
+  * New Upstream Release
+    + Pass calling application's arguments to the main function. Thanks to
+      Radek for the report and the patch
+    + Use governor policy from the config file. Thanks to Michael Orlov for
+      the report.
+    + Enable ENABLE_AUTO_MODULES by default. When a user installs the package,
+      the first immediate expectation is to see some changes
+    + USB suspend interface has changed with kernels 2.6.35 and above.
+      (Closes: #589000)
+    + Add support for Linux Runtime Power Management (Closes: #592661)
+    + On many other distributions, wireless-tools packages is still old and
+      does not return proper exit status on failures. Thanks to Luca Landolfi
+      for the patch.
+    + Add support to blacklist USB Devices by types. Thanks to Simon Que for
+      the patch
+    + Re-initialize dev_path before the next iteration. Thanks to Faustus for
+      the bug report and the patch (LP: #662924)
+    + ENABLE_LAPTOP_MODE_TOOLS was ignore because of wrong check. Thanks to
+      Matus Harvan for reporting this. (Closes: #602278)
+    + Add support to invoke laptop-mode-tools with hotplug events. This
+      currently only has support for the usb-autosuspend module.
+      Thanks to Simon Que for the patch
+    + Add locking support using flock. (Closes: #566613)
+    + Add 99-laptop-mode.rules to trap multiple kernel events
+  * Drop pm-utils from recommends since it conflicts with us (Closes: #614024) 
+  * Bump Standards Version to 3.9.1 (No changes required) 
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sun, 27 Feb 2011 13:28:48 +0530
+
+laptop-mode-tools (1.55-1) unstable; urgency=low
+
+  * Change address to my official Debian address
+  * New Upstream Release
+    + On Intel HD Audio, revert power saving changes when switching back to AC.
+      Thanks to Christoph Langguth for the report and the patch
+    + Install the pm-utils hook as 01laptop-mode to ensure proper execution in
+      reverse ordering
+    + Add wireless-power module, for generic non-Intel wireless interfaces that
+      support the iwconfig "power" option.
+    + Fixed upgrade path for configurations which didn't have the LM/NOLM
+      options in the Intel SATA Power Management module config.
+    + Add flush-* to ignored programs for lm-profiler, because it is the
+      successor to pdflush.
+    + Fix WoL regression introduced by DISABLE_ETHERNET_ON_BATTERY. Thanks
+      to Matthias Dienstbier for the report and the patch
+    + Update comments in wireless-iwl-power.conf. (Debian BTS: #580730)
+    + Check for old hook in pm-utils and remove it
+    + Update manpage for all missing modules and options.
+  * Switch source format to 3.0 (quilt) 
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sat, 05 Jun 2010 13:54:09 +0530
+
+laptop-mode-tools (1.54-1) unstable; urgency=low
+
+  * New Upstream Release
+    + Add new exec-commands module
+    + Fix wireless-iwl module activation
+    + Add generic interface for ignore_nice_load
+    + Document cpufreq frequency scaling behavior for older P4 processors
+    + Add support for bluetooth on IBM Thinkpads using the thinkpad_acpi driver
+    + Don't spam syslog if VERBOSE_OUTPUT is not enabled (Closes: #567766)
+  * Add ${misc:Depends} to make it lintian clean
+  * Update Standards Version to 3.8.4 (No changes required) 
+
+ -- Ritesh Raj Sarraf <rrs@researchut.com>  Wed, 17 Mar 2010 16:38:32 +0530
+
+laptop-mode-tools (1.53-1) unstable; urgency=low
+
+  * New Upstream Release 
+    + Add global enable/disable switch for laptop-mode-tools
+    + Add scheduler power saving module for SMT processors. Thanks to John
+      Reilly.
+    + Add a new "Auto Modules" mode which enables all modules whitelisted as
+      auto with a single configuration setting, ENABLE_AUTO_MODULES.
+    + Add LM/NOLM option for Intel SATA Power Management
+    + Do a check before trying to write to the SuperHE Control File
+
+ -- Ritesh Raj Sarraf <rrs@researchut.com>  Thu, 07 Jan 2010 16:59:22 +0530
+
+laptop-mode-tools (1.52-1) unstable; urgency=low
+
+  * New Upstream Release
+    + Initialize DEBUG to 0 by default. THanks to Matthijs Kooijman for
+      pointing it out. (Closes: #546371)
+    + Add an option to completely disable ethernet devices when on battery.
+    + Introduce hooks to enable debug mode for individual modules
+    + Use iwconfig to determine device type for iwlwifi devices also
+    + Collect the correct exit code for iwconfig execution.
+    + Use iwconfig in wireless-iwl-power. Thanks to Darren Hoo for spotting it
+    + Handle spaces in mount point names. Thanks to Louis Simard for the patch
+    + Clarify about Global Debug mode and Module Specific Debug mode.
+    + Fix incorrect variable reference in video-out module. Thanks to Hans
+      Werner for noticing that.
+  * laptop-mode-tools.preinst: remove (and backup) the obsolete
+    /etc/pm/sleep.d/99laptop-mode config file. Thanks to Tormod
+    Volden for the fix. (LP: #384875)
+
+ -- Ritesh Raj Sarraf <rrs@researchut.com>  Thu, 08 Oct 2009 15:05:44 +0530
+
+laptop-mode-tools (1.51-1) unstable; urgency=low
+
+  * New Upstream Release
+    + Add option to blacklist usb devices by their device id.
+      Thanks to ich@phuk.ath.cx for the patch
+    + Trigger timer change for power mgmt by doing a device open/close
+      The open/close operation can fail if the audio device is busy.
+      Since this failure is non-fatal (worst case is that the timer changes
+      don't get activated), we don't bother if it was successful or not.
+    + Add support for EeePC FSB Control. Thanks to James Rayner
+    + Update iwlwifi power modes. Thanks to Clemens Buchacher
+      (Closes: #540639)
+    + Use the standard pm-hibernate script from pm-utils for hibernation
+      (Closes: #541447)
+    + Check if wireless device is disabled before attempting to power
+      configure it. Thanks to Clemens Buchacher. (Closes: #541997)
+    + On speed change, an ethernet device can lose connectivity. Document
+      that in the config file.
+  * debian/watch
+    + Scan for the correct link in watch file.
+  * debian/control
+    + Add Recommends for pm-utils. Closes: #541447
+    + Format the description
+    + Update Standards Version to 3.8.3 (No changes required)
+  * debian/rules
+    + Add a get-orig-source target. It can fetch the relevant source tarball
+      parsing the changelog
+  * Change one line description since laptop-mode-tools does more than what
+    the old description had
+  * Add a README.source file explaining on how to get the source
+
+ -- Ritesh Raj Sarraf <rrs@researchut.com>  Wed, 02 Sep 2009 15:31:19 +0530
+
+laptop-mode-tools (1.50-1) unstable; urgency=low
+
+  * New Upstream Release 1.50:
+    + Ship pm-utils hooks in /usr/lib/ and not in /etc/pm/
+      Distributions will always want to have customized settings in /etc
+      and default upstream settings in /usr/lib. See LP: #384875
+    + Fix incorrect explanation of Intel HDA Power Savings. Closes: #532733.
+    + Don't clutter screen with print messages.
+    + Add patch from Mulyadi Santosa that adds ability to lm-profiler to
+      show read/write frequency of each collected program. Thank you.
+    + Enhance usb-autosuspend module to be executed under conditions. Also
+      explain the weirdness of broken usb drivers. Closes: # 535051
+    + Do the test comparision of integeres using string operators.
+      Closes: #535650.
+    + Run pidof with the -x Script Mode switch. Thanks Matthijs Kooijman
+    + Disconnect descriptors when backgrounding a script. Thanks Matthijs
+      Kooijman
+    + Add option to run in shell debug mode
+    + Add a spec file to generate an RPM package
+  * Update Standards Version to 3.8.2 (No Changes Required) 
+
+ -- Ritesh Raj Sarraf <rrs@researchut.com>  Mon, 27 Jul 2009 16:48:56 +0530
+
+laptop-mode-tools (1.49-1) unstable; urgency=low
+
+  * New Upstream Release 1.49:
+    + Fix syntax error in laptop_mode. Closes: #528835.
+    + New feature to log messages to syslog. LP: #370005.
+    + Improved Intel HDA Powersaving module. Can now be enabled in
+      different (BATT,LM,NOLM) modes.
+    + Reload Power Management Daemons during installation. Thanks to Wido
+      for pointing out the problem.
+    + Update runlevel priority to 99 to ensure laptop-mode is started late
+      enough while its dependency daemon are starting. LP: #369807
+    + Put a proper check for Hal Polling. Thanks Vincent Panel.
+    + Fix typo error in Wake-On-Lan module.
+    + Add check on iwconfig to determine an ipw based wireless device.
+      Fixes: LP #369113
+  * Handle Power Management Daemons to restart during package
+    post-installation.
+  * debian/control
+    + Add wireless-tools under Recommends since laptop-mode-tools depends on
+    it for the wireless powersaving module.
+    + Add Bart Samwel <bart@samwel.tk> to Uploaders.
+  * debian/rules
+    + Cleanup some commented lines.
+
+ -- Ritesh Raj Sarraf <rrs@researchut.com>  Thu, 04 Jun 2009 13:28:58 +0530
+
+laptop-mode-tools (1.48-1) unstable; urgency=low
+
+  * New upstream release 1.48:
+    + Fix udevinfo call. Newer udev has deprecated the usage of
+      udevinfo in favor of 'udevadm info' Closes: #522043.
+    + Fix ethernet throttling. Throttle speed to a user specified
+      speed or probe speed from the device Closes: #519426.
+    + Restore ethernet speed to user specified speed or MAX speed
+      when switching back to AC.
+    + Fix manpage error.
+  * Build-Depend on debhelper version 5.
+  * Add Homepage field.
+  * Bump Standards Version to 3.8.1
+  * Take maintenance from Bart Samwel
+  * Recommend net-tools for ethernet speed detection.
+
+ -- Ritesh Raj Sarraf <rrs@researchut.com>  Sat, 25 Apr 2009 18:01:51 +0530
+
+laptop-mode-tools (1.47-1) unstable; urgency=low
+
+  * New upstream release 1.47:
+    * Fix typo in usb-autosuspend module. Closes: #513078.
+    * Support ext4 file system. The mount options on these file systems
+    * are now adapted for laptop mode as well.
+
+ -- Bart Samwel <bart@samwel.tk>  Mon, 26 Jan 2009 20:53:58 +0100
+
+laptop-mode-tools (1.46-1) unstable; urgency=low
+
+  * New upstream version 1.46:
+    * Fix inverted LM_VERBOSE. Closes: #510294.
+    * Improve error handling in lcd-brightness module. Closes: #507640.
+    * Add usb-autosuspend module. Closes: #506839.
+    * Improve hal-polling defaults and comments. Closes: #495364.
+    * Add intel-hda-powersave module for Intel HDA audio chipsets.
+    * Prefer PMU over APM if available, to avoid the delay involved in 
+      the APM emulation layer.
+    * Support iwlagn driver which replaced iwl4965 in Linux 2.6.27.
+      Closes: #502022.
+    * Set sched_mc_power_savings to 2 instead of 1, for more power savings.
+    * Integrate with pm-utils. Closes: #481766.
+    * Improve reliability of dpms-standby module display handling.
+    * Add battery-level-polling module, for systems without reliable ACPI
+      battery events. Closes: #495208.
+  * Recommend ethtool. Closes: #497343.
+  * Depend on psmisc. Closes: #497345.
+  * Fix lintian warning on pbbuttonsd integration.
+  * Set proper permissions on directories created for laptop mode tools;
+    relax permissions on installed files so that others can read them.
+
+ -- Bart Samwel <bart@samwel.tk>  Sun, 25 Jan 2009 23:05:09 +0100
+
+laptop-mode-tools (1.45-1) unstable; urgency=low
+
+  * New upstream version 1.45.
+  * New upstream version 1.44:
+    * Strip non-numeric suffixes from kernel minor version number.
+      Closes: #488950.
+    * Remove spurious error message on machines that don't have 
+      /sys/class/power_supply. Closes: #490167.
+    * Fix incorrect path to laptop-mode.conf in the laptop-mode.conf(8)
+      manual page. Closes: #488261.
+    * Add sched-mc-power-savings module. Closes: #490587.
+
+ -- Bart Samwel <bart@samwel.tk>  Tue, 15 Jul 2008 12:47:01 +0200
+
+laptop-mode-tools (1.43-1) unstable; urgency=low
+
+  * New upstream version 1.43:
+    * Don't use temp file in init script, that doesn't work if /tmp is
+      mounted readonly. Closes: #480946.
+    * Fix IPW2100 power management so that power management mode stays
+      enabled even on AC. If we don't do this, we can't control the
+      transmit power at all because we let the chipset handle it.
+      Closes: #481180.
+    * Replace *_ENABLE_HAL_POLLING settings by *_DISABLE_HAL_POLLING.
+      More intuitive that way. The old settings were also interpreted
+      in reverse. The backward compatibility layer actually *fixes that*
+      because it was a bug, so behaviour will change for 1.42
+      installations. Closes: #482307.
+    * Get rid of bashism in laptop-mode module.
+  * Put URL on separate line in README. Closes: #486467.
+  * Set DM-Upload-Allowed field to yes.
+  * Fix bashism in lm-profiler script. Closes: #480606
+
+ -- Bart Samwel <bart@samwel.tk>  Sun, 22 Jun 2008 16:34:17 +0200
+
+laptop-mode-tools (1.42-1) unstable; urgency=low
+
+  * New upstream version 1.42:
+    * Remove "echo -e" bashism in lm-profiler. Closes: #480606.
+    * Allow different names for AC adapter in /sys/class/power_supply.
+      Closes: #478937.
+    * Add "hal-polling" module to control HAL polling of CD/DVD drives. (Taken
+      from powertop tips.) Closes: #438782.
+    * Add "bluetooth" module to disable bluetooth in battery mode.  (Taken from
+      powertop tips.)
+
+ -- Bart Samwel <bart@samwel.tk>  Mon, 12 May 2008 15:05:00 +0200
+
+laptop-mode-tools (1.41-1) unstable; urgency=high
+
+  * New upstream version 1.41:
+    * Support energy_* in /sys/class/power_supply interface. Closes: #477118.
+    * Rename module "core" to "laptop-mode". Closes: #477310.
+    * Add missing assignment to ACTIVATE_WITH_POSSIBLE_DATA_LOSS.
+      Closes: #477172.
+
+ -- Bart Samwel <bart@samwel.tk>  Tue, 22 Apr 2008 22:10:00 +0200
+
+laptop-mode-tools (1.40-1) unstable; urgency=high
+
+  * Upgrade standards version to 3.7.3.
+  * Add hal to recommends due to upstream changes.
+  * New upstream version 1.40:
+    * Add support for getting lid button state from HAL instead of from
+      /proc/acpi. 
+    * Support /sys/class/power_supply interface to determine battery levels.
+      Closes: #475926
+    * Add generic support for config file swapping. Closes: #475304
+    * Add module for iwlwifi power management. Closes: #475407
+    * Fully modularized configuration.
+
+ -- Bart Samwel <bart@samwel.tk>  Tue, 15 Apr 2008 18:35:00 +0200
+
+laptop-mode-tools (1.36-1) unstable; urgency=low
+
+  * New upstream version 1.36.
+  * Init script LSB header: depend on remote_fs instead of local_fs.
+    Closes: #468657.
+  * Remove ^M from /etc/init.d/laptop-mode. Closes: #459422.
+  * Change package description to say "X11" instead of "X Windows".
+    Closes: #464066.
+  * Get rid of empty /usr/bin directory in package. (lintian warning)
+
+ -- Bart Samwel <bart@samwel.tk>  Sun, 2 Mar 2008 17:15:00 +0200
+
+laptop-mode-tools (1.35-1) unstable; urgency=low
+
+  * New upstream version 1.35.
+  * Listen to more ACPI events for AC adapters. Closes: #448101.
+  * Better error messages when laptop_mode status is called by a non-root user.
+    Closes: #428162.
+  * Clean up temp file from init script, and properly quote messages so that
+    they are displayed in full. Closes: #442321, 427292.
+  * Set READAHEAD setting correctly on Linux 2.4. Closes: #355492.
+  * Set HD power management default values to 254 instead of 255.
+    Closes: #451589.
+  * Update homepage location in debian/copyright. Closes: #445455.
+  * Fix bug in manual page for lm-profiler.conf. Closes: #450431.
+  * Don't adjust LCD brightness to the same value as before. Closes: #440115.
+  * Modules moved to /usr/share/laptop-mode-tools/modules to improve FHS
+    compliance.
+
+ -- Bart Samwel <bart@samwel.tk>  Sun, 18 Nov 2007 16:33:00 +0200
+
+laptop-mode-tools (1.34-1) unstable; urgency=low
+
+  * New upstream version 1.34.
+  * (Closes: #425387) Ignore_nice_load now set also for governors other than
+    ondemand.
+  * (Closes: #425957) Got rid of error message when CPU frequency governor is
+    not compiled as a module.
+  * (Closes: #425551) Support for Intel IPW3945, IPW2200, IPW2100 wireless
+    power setting.
+  * Modular configuration file in /etc/laptop-mode/conf.d.
+  * First version of a modularized architecture.
+  * Support for custom modules in /etc/laptop-mode/modules.
+
+ -- Bart Samwel <bart@samwel.tk>  Mon, 28 May 2007 17:15:00 +0100
+
+laptop-mode-tools (1.33-1) unstable; urgency=low
+
+  * New upstream version 1.33.
+  * (Closes: #394557) PARTITIONS configuration setting now supports wildcards
+    (thanks to Mikko Rapeli).
+  * (Closes: #398179) When using pbbuttonsd, laptop-mode is now automatically
+    reinitialized on resume.
+  * (Closes: #389218) CPU frequency settings are now applied to all cores, not
+    just the first one. (This was actually already fixed in 1.32, this
+    changelog entry is for the record.)
+  * (Closes: #423853) Laptop mode init script sequence number increased, so
+    that *-stop and *-start scripts are done after all other init scripts have
+    completed.
+  * (Closes: #416445) A new option allows for controlling the ignore_nice_load
+    setting of the ondemand and conservative CPU frequency governors.
+  * Backported Ubuntu's diff that supports the acpi-support package.
+
+ -- Bart Samwel <bart@samwel.tk>  Sat, 19 May 2007 20:00:00 +0100
+
+laptop-mode-tools (1.32-1) unstable; urgency=low
+
+  * New upstream version 1.32.
+  * (Closes: #366220) Modprobe frequency governor before using it.
+  * (Closes: #370118) Correctly restore mount options.
+  * (Closes: #384899) Added LSB logging for init script. Added dependency to lsb-base.
+
+ -- Bart Samwel <bart@samwel.tk>  Fri, 6 Oct 2006 12:00:00 +0200
+
+laptop-mode-tools (1.31-1) unstable; urgency=low
+
+  * New upstream version 1.31.
+  * (Closes: #354751) Depended on gawk, now works with any awk.
+  * (Closes: #356553) Add /dev/mapper/* to default partitions list.
+  * (Closes: #362261) Strip ^M from various files.
+
+ -- Bart Samwel <bart@samwel.tk>  Sun, 17 Apr 2006 03:00:00 +0200
+
+laptop-mode-tools (1.30-1) unstable; urgency=low
+
+  * New upstream version 1.30.
+  * Included FAQ and revision history as text documentation as well.
+  * (Closes: #353567) Writecache was disabled when laptop mode was
+    disabled. Thanks to Chung-chieh Shan (AKA Ken) for the patch.
+
+ -- Bart Samwel <bart@samwel.tk>  Thu, 23 Feb 2006 19:20:00 +0200
+
+laptop-mode-tools (1.27-1) unstable; urgency=low
+
+  * New upstream version 1.27.
+  * Additional fixes for #350518 and #351351.
+  * (Closes: #353028) In laptop-mode.conf, the fastest processor speed
+    was called "highest" while it should have been "fastest".
+  * (Closes: #351597) Fixed incorrect references to "X-Windows". Not in
+    the revision history because that is history, and history can't be
+    changed. :-)
+  * (Closes: #353027, #352647) Data loss sensitive features not disabled
+    when battery reports a discharge rate.
+  * Included FAQ and revision history as documentation.
+
+ -- Bart Samwel <bart@samwel.tk>  Sat, 18 Feb 2006 12:45:00 +0200
+
+laptop-mode-tools (1.23-1) unstable; urgency=low
+
+  * New upstream version 1.23.
+  * (Closes: #350518) Fixed auto-hibernation.
+  * (Closes: #350520) Cleared up relationship between CONTROL_CPU_FREQUENCY
+    and the CPU governor settings in the laptop-mode.conf manpage.
+  * (Closes: #350983) Fixed media detection code that uses udevinfo.
+  * (Closes: #351351) Fixed handling of double battery slots.
+
+ -- Bart Samwel <bart@samwel.tk>  Sat, 04 Feb 2006 13:30:00 +0200
+
+laptop-mode-tools (1.22-1) unstable; urgency=low
+
+  * New upstream version 1.22.
+  * (Closes: #350278) Fixed typo that broke terminal powerdown control.
+  * (Closes: #350280) Create batt-start/stop etc. config directories
+    in proper place (/etc/laptop-mode) instead of below the root.
+
+ -- Bart Samwel <bart@samwel.tk>  Sat, 28 Jan 2006 16:45:00 +0200
+
+laptop-mode-tools (1.21-1) unstable; urgency=low
+
+  * New upstream version 1.21.
+  * Fixed some installation issues.
+  * Fixed package description.
+  * Fixed kernel version detection.
+  * Restart service on upgrade.
+
+ -- Bart Samwel <bart@samwel.tk>  Thu, 26 Jan 2006 14:40:00 +0200
+
+laptop-mode-tools (1.20-1) unstable; urgency=low
+
+  * New upstream version 1.20.
+  * (Closes: #345417) When stopping laptop-mode-tools, the syslog.conf is 
+    always restored as a normal file. Only when the laptop-mode service is
+    started is the syslog.conf replaced by a link (of course only when
+    CONTROL_SYSLOG_CONF is enabled).
+  * (Closes: #341057) Typo fixed.
+  * (Closes: #348923) Laptop mode's output no longer truncates acpid's log
+    file. More of a bug in acpid, but it's nice to have it fixed.
+  * (Closes: #341322) Modified BIT FAT WARNING to indicate solution better.
+  * (Closes: #343967) Incorporated patch that should make DPMS standby
+    control work properly.
+  * (Closes: #345521) Fixed incorrect path in log message.
+  * (Closes: #345523) Fixed typo in config Shoudl -> Should.
+  * (Closes: #345808) Default for CONTROL_NOATIME set to 0.
+  * Create batt-start/stop, lm-ac-start/stop and nolm-ac-start/stop
+    directories at install time.
+  * Adjusted package description so that newer features are also mentioned.
+  * Support for sdparm (SCSI drives) added.
+  * Added dependency on sdparm.
+  * Removed dependency on powermgmt-base, as the package doesn't make use of
+    on_ac_power anymore.
+
+ -- Bart Samwel <bart@samwel.tk>  Wed, 25 Jan 2006 16:50:00 +0200
+
+laptop-mode-tools (1.11-1) unstable; urgency=low
+
+  * New upstream version 1.11.
+  * (Closes: #328118) Unset VERBOSE before starting.
+  * (Closes: #328432) Check if block device is block device before
+    treating it as such.
+  * (Closes: #335492, #326433) Check if /var/run/laptop-mode-nolm-mount-opts 
+    exists before using it.
+  * (Closes: #325186) Change default for CONTROL_HD_POWERMGMT to 0, because
+    it causes system crashes on some hardware.
+  * (Closes: #328028) Check if hdparm is installed before using it.
+  * (Closes: #324457) Fit config file in 80-character screen.
+  * (Closes: #327028) Check whether requested state matches old state,
+    and do nothing if so.
+  * (Closes: #336294) Send error output of hdparm to /dev/null.
+  * (Closes: #323623) CPU frequency governor and minimum frequency control.
+  * (Closes: #324137) Add lm-profiler, accompanying config file
+    lm-profiler.conf, and several subdirectories to /etc/laptop-mode for
+    controlling daemons.
+
+ -- Bart Samwel <bart@samwel.tk>  Sat, 29 Oct 2005 16:40:00 +0200
+
+laptop-mode-tools (1.10-1) unstable; urgency=low
+
+  * New upstream version 1.10.
+  * (Closes: #321877) Typo fixed.
+  * (Closes: #323019) Default for HD powermgmt NOLM was wrong.
+  * (Closes: #322867) Verbose output was incorrectly enabled by default.
+
+ -- Bart Samwel <bart@samwel.tk>  Sun, 14 Aug 2005 12:46:00 +0200
+
+laptop-mode-tools (1.09-1) unstable; urgency=low
+ 
+  * New upstream version 1.09.
+  * Closing a number of bugs that ought to have been closed by
+    1.06 which was never uploaded.
+  * (Closes: #274836) Disables write caches by default when laptop mode is
+    enabled.
+  * (Closes: #315451) Support for fallbacks in file system types, e.g.
+    "ext3,ext2".
+  * (Closes: #317554) apmd AND acpid dependency replaced by apmd OR acpid.
+  * (Closes: #322144) init script output not sent to /dev/null anymore.
+ 
+ -- Bart Samwel <bart@samwel.tk>  Tue, 09 Aug 2005 21:22:00 +0200
+
+laptop-mode-tools (1.08-1) unstable; urgency=low
+ 
+  * New upstream version 1.08.
+ 
+ -- Bart Samwel <bart@samwel.tk>  Thu, 04 Aug 2005 15:43:00 +0200
+
+laptop-mode-tools (1.07-1) unstable; urgency=low
+ 
+  * New upstream version 1.07.
+  * Fixes breakage caused by 1.06 release.
+ 
+ -- Bart Samwel <bart@samwel.tk>  Fri, 29 Jul 2005 19:18:00 +0200
+ 
+laptop-mode-tools (1.06-1) unstable; urgency=low
+
+  * New upstream version 1.06.
+  * (Closes: #274836) Disables write caches by default when laptop mode is
+    enabled.
+  * (Closes: #315451) Support for fallbacks in file system types, e.g.
+    "ext3,ext2".
+  * (Closes: #317554) apmd AND acpid dependency replaced by apmd OR acpid.
+
+ -- Bart Samwel <bart@samwel.tk>  Thu, 28 Jul 2005 13:07:00 +0200
+
+laptop-mode-tools (1.05-1) unstable; urgency=low
+
+  * New upstream version 1.05.
+  * (Closes: #294064) No longer fails when ACPI ac_adapter did not have a 
+    power state.
+  * (Closes: #271362) All power management daemons are now Recommended, as
+    a result of the addition of integration with pbbuttonsd and pmud.
+  * (Closes: #290441) Restart acpid after installing / uninstalling.
+  * (Closes: #291594) Integration with pbbuttonsd has changed, please
+    reopen bug if the problem persists.
+  * (Closes: #302550, #302571, #273386) Native pbbuttonsd and pmud integration.
+  * (Closes: #282291) READAHEAD default is now 3072 or 3MB.
+  * (Closes: #288128) Typos in config file fixed.
+  
+ -- Bart Samwel <bart@samwel.tk>  Sun, 10 Apr 2005 17:00:00 +0200
+
+laptop-mode-tools (1.04-1) unstable; urgency=medium
+
+  * New upstream version 1.04.
+  * (Closes: #278673) Fix PMU power detection logic.
+  * (Closes: #274383) Support / in mount options.
+  * (Closes: #279051, #279053) General manpage cleanup.
+  * (Closes: #278960) Add syslogd config switching support (no manpage yet,
+    see config file and run /usr/sbin/lm-syslog-setup).
+
+ -- Bart Samwel <bart@samwel.tk>  Tue, 9 Nov 2004 23:46:00 +0200
+
+laptop-mode-tools (1.03-1) unstable; urgency=low
+
+  * New upstream version 1.03.
+  * (Closes: #278456) Works on APM again. Thanks Chung-chieh Shan!
+  * (Closes: #278145) This bug was already resolved by 1.01, by the
+    AC_HD_WITH_LM/AC_HD_WITHOUT_LM split.
+  * (Closes: #278144) Fixed the incorrect description of a default
+    in the config file.
+
+ -- Bart Samwel <bart@samwel.tk>  Wed, 27 Oct 2004 08:38:00 +0200
+
+laptop-mode-tools (1.01-2) unstable; urgency=low
+
+  * Re-upload, this time without mistakenly overriding the maintainer
+    field, so that bugs are properly closed.
+
+ -- Chris Hanson <cph@debian.org>  Tue, 26 Oct 2004 00:13:18 -0400
+
+laptop-mode-tools (1.01-1) unstable; urgency=low
+
+  * New upstream version 1.01.
+  * (Closes: #270501) ACPI_WITHOUT_AC_EVENTS calls other script with correct
+    path now.
+  * (Closes: #271127) Added dependency on hdparm.
+  * (Closes: #273104) -B option made configurable using new configuration
+    settings BATT_HDPARM_POWERMGMT, AC_HDPARM_POWERMGMT_WITH_LM and
+    AC_HDPARM_POWERMGMT_WITHOUT_LM. Also, switched the order in which -B
+    and -S options are applied, so that the -S option always overrules any
+    effect -B has on the -S setting. -B can also be disabled using the
+    DO_HDPARM_POWERMGMT option.
+  * (Closes: #272912) Updated config file and manual page with correct
+    default values.
+
+ -- Bart Samwel <bart@samwel.tk>  Sun, 3 Oct 2004 14:42:00 +0200
+
+laptop-mode-tools (1.00-1) unstable; urgency=low
+
+  * New upstream version 1.00.
+  * (Closes: #267043) Configuration flag ACPI_WITHOUT_AC_EVENTS added.
+  * (Closes: #269667) /var/run/laptop-mode-enabled controls laptop mode, so
+    that it is never started when /etc/init.d/laptop-mode has been stopped.
+
+ -- Bart Samwel <bart@samwel.tk>  Wed, 18 Aug 2004 20:44:00 +0200
+
+laptop-mode-tools (0.99-2) unstable; urgency=low
+
+  * Included changelog entries to close bugs in correct format.
+  * Added powermgmt-base to dependencies.
+  * Removed unneeded dependencies.
+  * (Closes: #266706) DO_CPU is no more ignored.
+  * (Closes: #266512) on_ac_power is now used to detect power source.
+  * (Closes: #266643) Fixed division by 0 in lm_battery.sh.
+
+ -- Bart Samwel <bart@samwel.tk>  Wed, 18 Aug 2004 20:44:00 +0200
+
+laptop-mode-tools (0.99-1) unstable; urgency=low
+
+  * New upstream version 0.99.
+  * Fixes #266706.
+
+ -- Bart Samwel <bart@samwel.tk>  Wed, 18 Aug 2004 20:44:00 +0200
+
+laptop-mode-tools (0.98-1) unstable; urgency=low
+
+  * New upstream version 0.98.
+  * Fixes #266512 and #266643.
+
+ -- Bart Samwel <bart@samwel.tk>  Wed, 18 Aug 2004 20:44:00 +0200
+
+laptop-mode-tools (0.97-1) unstable; urgency=low
+
+  * New upstream version 0.97.
+
+ -- Bart Samwel <bart@samwel.tk>  Sat, 13 Aug 2004 14:06:00 +0200
+
+laptop-mode-tools (0.95-1) unstable; urgency=low
+
+  * Move Debian stuff out of upstream into separate diff. This changelog
+    will only report the Debian-related fixes from now on.
+
+ -- Bart Samwel <bart@samwel.tk>  Sat, 31 Jul 2004 17:05:00 +0200
+
+laptop-mode-tools (0.94-2) unstable; urgency=low
+
+  * Fix feedback from lintian.
+
+ -- Bart Samwel <bart@samwel.tk>  Thu, 29 Jul 2004 17:22:00 +0200
+
+laptop-mode-tools (0.94-1) unstable; urgency=low
+
+  * Initial release.
+  * Debianization included in upstream package.
+
+ -- Bart Samwel <bart@samwel.tk>  Thu, 29 Jul 2004 01:01:32 +0200
+

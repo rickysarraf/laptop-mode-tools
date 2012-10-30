@@ -1,0 +1,18 @@
+This package was debianized by Bart Samwel <bart@samwel.tk> on
+Thu, 29 Jul 2004 01:01:32 +0200.
+
+The upstream author is Bart Samwel, who has also done the debianization.
+
+The website for the upstream package (including debianization) is
+
+http://www.samwel.tk/laptop_mode/
+
+Copyright (c) 2004 by Bart Samwel, Kiko Piris, Micha Feigin, Andrew Morton, 
+Herve Eychenne, Dax Kelson, Jan Topinski
+
+License:
+
+You are free to distribute this software under the terms of
+the GNU General Public License.
+On Debian systems, the complete text of the GNU General Public
+License can be found in the file `/usr/share/common-licenses/GPL'.

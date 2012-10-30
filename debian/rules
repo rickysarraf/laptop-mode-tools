@@ -1,0 +1,111 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+# Based on a sample debian/rules that uses debhelper.
+# GNU copyright 1997 to 1999 by Joey Hess.
+# Modifications Copyright 2008 by Bart Samwel
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+DEB_UPSTREAM_VERSION=$(shell dpkg-parsechangelog | sed -rne 's,^Version: ([^-]+).*,\1,p')
+get-orig-source:
+	uscan --force-download --rename --repack\
+		--download-version=$(DEB_UPSTREAM_VERSION) --destdir=.
+
+configure: configure-stamp
+configure-stamp:
+	dh_testdir
+	
+	# Nothing to do.
+	
+	touch configure-stamp
+
+
+build: build-arch build-indep
+	
+build-arch: build-stamp
+build-indep: build-stamp
+
+build-stamp: configure-stamp 
+	dh_testdir
+	cp etc/init.d/laptop-mode debian/laptop-mode-tools.laptop-mode.init
+	touch build-stamp
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f debian/laptop-mode-tools.laptop-mode.init
+	rm -f build-stamp configure-stamp
+	dh_clean 
+
+DESTDIR=$(CURDIR)/debian/laptop-mode-tools
+
+INSTALL=install -o root -g root
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k 
+	dh_installdirs
+
+	# Add here commands to install the package into debian/laptop-mode-tools.
+	install -m755 -d $(DESTDIR)/etc/laptop-mode
+	install -m755 -d $(DESTDIR)/etc/acpi/events
+	install -m755 -d $(DESTDIR)/etc/acpi/actions
+	install -m755 -d $(DESTDIR)/usr/sbin
+	install -m755 -d $(DESTDIR)/usr/share/laptop-mode-tools/modules
+	install -m755 -d $(DESTDIR)/usr/share/laptop-mode-tools/module-helpers
+	install -m755 -d $(DESTDIR)/usr/lib/tmpfiles.d
+	install -m755 -d $(DESTDIR)/etc/apm/event.d
+	install -m755 -d $(DESTDIR)/etc/power/scripts.d
+	install -m755 -d $(DESTDIR)/etc/power/event.d
+	install -m755 -d $(DESTDIR)/lib/udev/rules.d
+	install -m755 -d $(DESTDIR)/lib/systemd/system
+	install -m755 -d $(DESTDIR)/usr/lib/pm-utils/sleep.d
+	install -m755 -d $(DESTDIR)/etc/laptop-mode/batt-start
+	install -m755 -d $(DESTDIR)/etc/laptop-mode/batt-stop
+	install -m755 -d $(DESTDIR)/etc/laptop-mode/lm-ac-start
+	install -m755 -d $(DESTDIR)/etc/laptop-mode/lm-ac-stop
+	install -m755 -d $(DESTDIR)/etc/laptop-mode/nolm-ac-start
+	install -m755 -d $(DESTDIR)/etc/laptop-mode/nolm-ac-stop
+	install -m755 -d $(DESTDIR)/etc/laptop-mode/conf.d
+	install -m755 -d $(DESTDIR)/etc/laptop-mode/conf.d/board-specific
+	install -m755 -d $(DESTDIR)/etc/laptop-mode/modules
+	install -m644 etc/laptop-mode/laptop-mode.conf $(DESTDIR)/etc/laptop-mode/laptop-mode.conf
+	install -m644 etc/laptop-mode/conf.d/* $(DESTDIR)/etc/laptop-mode/conf.d
+	install -m755 etc/acpi/actions/* $(DESTDIR)/etc/acpi/actions
+	install -m644 etc/acpi/events/* $(DESTDIR)/etc/acpi/events
+	install -m755 etc/apm/event.d/* $(DESTDIR)/etc/apm/event.d
+	install -m755 etc/power/scripts.d/* $(DESTDIR)/etc/power/scripts.d
+	install -m755 etc/power/event.d/* $(DESTDIR)/etc/power/event.d
+	install -m644 etc/rules/99-laptop-mode.rules $(DESTDIR)/lib/udev/rules.d
+	install -m755 etc/rules/lmt-udev $(DESTDIR)/lib/udev/lmt-udev
+	install -m644 etc/systemd/laptop-mode.service $(DESTDIR)/lib/systemd/system/laptop-mode.service
+	install -m644 etc/systemd/laptop-mode.conf.tmpfiles $(DESTDIR)/usr/lib/tmpfiles.d/laptop-mode.conf
+	install -m755 usr/lib/pm-utils/sleep.d/* $(DESTDIR)/usr/lib/pm-utils/sleep.d
+	install -m755 usr/sbin/laptop_mode $(DESTDIR)/usr/sbin
+	install -m755 usr/sbin/lm-syslog-setup $(DESTDIR)/usr/sbin
+	install -m755 usr/sbin/lm-profiler $(DESTDIR)/usr/sbin
+	install -m755 usr/share/laptop-mode-tools/modules/* $(DESTDIR)/usr/share/laptop-mode-tools/modules
+	install -m755 usr/share/laptop-mode-tools/module-helpers/* $(DESTDIR)/usr/share/laptop-mode-tools/module-helpers
+
+# Build architecture-independent files here.
+binary-arch: build install
+
+# Build architecture-dependent files here.
+binary-indep: build install
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs Documentation/revision-history.txt
+	dh_installdocs
+	dh_installinit --name laptop-mode -- defaults 99
+	dh_installman man/*
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install configure get-orig-source
