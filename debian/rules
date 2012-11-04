@@ -69,7 +69,6 @@ install: build
 	install -m755 -d $(DESTDIR)/etc/laptop-mode/nolm-ac-start
 	install -m755 -d $(DESTDIR)/etc/laptop-mode/nolm-ac-stop
 	install -m755 -d $(DESTDIR)/etc/laptop-mode/conf.d
-	install -m755 -d $(DESTDIR)/etc/laptop-mode/conf.d/board-specific
 	install -m755 -d $(DESTDIR)/etc/laptop-mode/modules
 	install -m644 etc/laptop-mode/laptop-mode.conf $(DESTDIR)/etc/laptop-mode/laptop-mode.conf
 	install -m644 etc/laptop-mode/conf.d/* $(DESTDIR)/etc/laptop-mode/conf.d
