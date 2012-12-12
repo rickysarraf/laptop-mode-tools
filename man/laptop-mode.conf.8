@@ -538,7 +538,18 @@ Enabling this module lowers down one hw-pmu counter.
 .IP "\fBCONTROL_NMI_WATCHDOG\fP" 10
 If this option is enabled, laptop mode tools will automatically disable the
 NMI Watchdog timer when on battery. This module is part of auto modules. Thus enabling
-auto modules setting will activate this module automatically
+auto modules setting will activate this module automatically.
+
+.SS "\fI/etc/laptop-mode/conf.d/pci-aspm.conf\fP"
+
+The pcie-aspm module allows you to enable the PCI Express (PCIe) Active State
+Power Management (ASPM).
+
+.IP "\fBCONTROL_PCI_ASPM\fP" 10
+If this option is enabled, laptop mode tools will enable PCI ASPM powersave
+mode when on battery. This module is part of auto modules. Thus enabling
+auto modules setting will activate this module automatically. PCIe ASPM may
+require that the pcie_aspm=force kernel option is enabled.
 
 .SS "\fI/etc/laptop-mode/conf.d/runtime-pm.conf\fP"
 
