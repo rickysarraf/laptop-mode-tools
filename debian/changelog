@@ -1,3 +1,10 @@
+laptop-mode-tools (1.61-2) unstable; urgency=low
+
+  * [225fd1e] Disable ethernet based on multiple reports of driver failure
+    (Closes: #677638)
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sat, 15 Dec 2012 20:34:11 +0530
+
 laptop-mode-tools (1.61-1) unstable; urgency=low
 
   [ Ritesh Raj Sarraf ]
