@@ -10,18 +10,8 @@
 # risks data loss).
 INTERVAL=150
 
-while ( true ) ; do
+while :; do
 	sleep $INTERVAL
 
-	# Don't terminate during the call to laptop_mode; wait until afterwards
-	# to keep a stable situation.
-	MUSTQUIT=0
-	trap 'MUSTQUIT=1' TERM QUIT
-	
 	/usr/sbin/laptop_mode auto
-	
-	if [ $MUSTQUIT -eq 1 ] ; then
-		exit 0
-	fi		
-	trap - TERM
 done

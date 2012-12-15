@@ -1,8 +1,116 @@
-laptop-mode-tools (1.55-2) stable-proposed-updates; urgency=low
+laptop-mode-tools (1.61-2) unstable; urgency=low
 
-  * Fix compatibility with 3.x kernels (Closes: #647563)
+  * [225fd1e] Disable ethernet based on multiple reports of driver failure
+    (Closes: #677638)
 
- -- Ritesh Raj Sarraf <rrs@debian.org>  Wed, 08 Feb 2012 18:14:39 +0530
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sat, 15 Dec 2012 20:34:11 +0530
+
+laptop-mode-tools (1.61-1) unstable; urgency=low
+
+  [ Ritesh Raj Sarraf ]
+  * [3f9ea15] Removed laptop-mode-tools.preinst
+  * [8bd5355] update debian/patches/debian-changes
+  * [16bc3f5] calculate design_capacity_warning on machines/arches where it
+    is not readiliy available
+  * [28b8d23] Add support for non-deafult customized settings.
+    Thanks to Simon Que - Chromium Project
+  * [7a99e68] Add parallel execution for the modules
+  * [0ab6ef0] Handle devices with persistent device naming
+    (Closes: #664267)
+
+  [ Simon Que ]
+  * [f3de2d6] hdparm skips SSDs for power management
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sun, 20 May 2012 15:29:03 +0530
+
+laptop-mode-tools (1.60-1) unstable; urgency=low
+
+  * [709f521] New Upstream Release
+    (Closes: 647564)
+    - [8389588] Change Intel HDA Audio's default power save timeout to 2 seconds
+    - [cc40bd1] usb autosuspend black-/whitelist arg in quotes.
+      Thanks to Simon Que
+    - [5a4e08a] add readme-debugging.txt
+    - [be147e0] Helper tools to provide suspend/hibernate functionality
+    - [49afd31] Kill lm-polling-daemon when init stop is called
+    - [68b0ff5] Add pm-helper tool to take care of suspend / hibernate.
+    - [c7e3038] Use native hibernation helper tool from LMT
+    - [a569b29] Check for block device's existence.
+      Thanks to Simon Que (Chromium Project)
+    - [ab704b2] Use proper device for iwconfig.
+      Thanks to bs.net (Closes: 639388)
+  * [8fa914a] Drop some of the Recommends to Suggests.
+    Thanks to Clea F. Rees (Closes: #640155)
+  * [75c51b3] Drop duplicate changelog
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sat, 05 Nov 2011 12:59:34 +0530
+
+laptop-mode-tools (1.58-3) unstable; urgency=low
+
+  * [c6f2f64] Don't call true which forks a subshell.
+    Thanks to Cristian Ionescu-Idbohrn
+  * [f2d4e70] Use exit instead of return.
+    Thanks to Eric Belanger (Closes: 636251)
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Tue, 02 Aug 2011 23:24:48 +0530
+
+laptop-mode-tools (1.58-2) unstable; urgency=low
+
+  * [fa94d77] Check for files instead of kernel version numbers.
+    Thanks to Ben Hutchings (Closes: 632311)
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sun, 31 Jul 2011 20:45:13 +0530
+
+laptop-mode-tools (1.58-1) unstable; urgency=low
+
+  * New upstream release 
+    + Initialize the PATH variable within us. This helps when our caller did
+      not have a proper environment
+    + Enable new in-kernel polling mechanism for block devices
+      (Closes: #617705, #574867)
+    + Check for kernel's native suspend functionality
+    + Support execution of complex commands. Thanks to Changaco for the patch
+    + Add new module nmi-watchdog to handle NMI Watchdog related power
+      savings. Thanks to Quentin Denis for the report
+    + Fix error messages during early boot if /usr is on a different
+      partition. (Closes: #624678)
+    + Add support for new Linux 3.x kernels. (Closes: #6628764)
+    + Fix locking problems when battery polling daemon is enabled
+  * Install lmt-udev into /lib/udev 
+  * Update Standards Version to 3.9.2 (No changes required) 
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sat, 23 Jul 2011 23:33:34 +0530
+
+laptop-mode-tools (1.57-1) unstable; urgency=low
+
+  * New Upstream Release
+    + Pass calling application's arguments to the main function. Thanks to
+      Radek for the report and the patch
+    + Use governor policy from the config file. Thanks to Michael Orlov for
+      the report.
+    + Enable ENABLE_AUTO_MODULES by default. When a user installs the package,
+      the first immediate expectation is to see some changes
+    + USB suspend interface has changed with kernels 2.6.35 and above.
+      (Closes: #589000)
+    + Add support for Linux Runtime Power Management (Closes: #592661)
+    + On many other distributions, wireless-tools packages is still old and
+      does not return proper exit status on failures. Thanks to Luca Landolfi
+      for the patch.
+    + Add support to blacklist USB Devices by types. Thanks to Simon Que for
+      the patch
+    + Re-initialize dev_path before the next iteration. Thanks to Faustus for
+      the bug report and the patch (LP: #662924)
+    + ENABLE_LAPTOP_MODE_TOOLS was ignore because of wrong check. Thanks to
+      Matus Harvan for reporting this. (Closes: #602278)
+    + Add support to invoke laptop-mode-tools with hotplug events. This
+      currently only has support for the usb-autosuspend module.
+      Thanks to Simon Que for the patch
+    + Add locking support using flock. (Closes: #566613)
+    + Add 99-laptop-mode.rules to trap multiple kernel events
+  * Drop pm-utils from recommends since it conflicts with us (Closes: #614024) 
+  * Bump Standards Version to 3.9.1 (No changes required) 
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sun, 27 Feb 2011 13:28:48 +0530
 
 laptop-mode-tools (1.55-1) unstable; urgency=low
 

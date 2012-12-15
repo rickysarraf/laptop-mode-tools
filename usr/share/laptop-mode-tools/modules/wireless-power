@@ -20,8 +20,10 @@ findWifiIfs () {
 		IFNAME=`basename $SYSDEVICE`
 
                 # Check if it is a wireless device
-                $IWCONFIG $IFNAME >/dev/null 2>&1;
-                ret=$?;
+		#
+		# Inverting return values, we get "0" for wireless device, 
+		# and "1" for non-wireless device.
+		($IWCONFIG $IFNAME 2>&1 | grep -q "no wireless extensions.") && ret=1 || ret=0
                 if [ "$ret" = "0" ]; then
 			# Yes, it is a wireless device.
 			if [ -h $SYSDEVICE/device/driver ]; then
@@ -73,12 +75,12 @@ if [ x$CONTROL_WIRELESS_POWER_SAVING = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x
 	for IF in $WIFI_IFNAMES ; do
 		if [ $ON_AC -eq 1 ] ; then
 			log "VERBOSE" "On AC power: setting power saving mode for $IF to $WIRELESS_AC_POWER_SAVING_ONOFF."
-			if ( ! iwconfig $IF power $WIRELESS_AC_POWER_SAVING_ONOFF ) ; then
+			if ( ! $IWCONFIG $IF power $WIRELESS_AC_POWER_SAVING_ONOFF ) ; then
 				log "ERR" "Failed."
 			fi
 		else
 			log "VERBOSE" "On battery: setting power saving mode for $IF to $WIRELESS_BATT_POWER_SAVING_ONOFF."
-			if ( ! iwconfig $IF power $WIRELESS_BATT_POWER_SAVING_ONOFF ) ; then
+			if ( ! $IWCONFIG $IF power $WIRELESS_BATT_POWER_SAVING_ONOFF ) ; then
 				log "ERR" "Failed."
 			fi
 		fi

@@ -6,12 +6,13 @@ Homepage: http://www.samwel.tk/laptop_mode/
 Uploaders: Bart Samwel <bart@samwel.tk>
 DM-Upload-Allowed: yes
 Build-Depends: debhelper (>= 5)
-Standards-Version: 3.8.4
+Standards-Version: 3.9.2
 
 Package: laptop-mode-tools
 Architecture: all
 Depends: ${misc:Depends}, lsb-base (>= 3.0-10), util-linux (>= 2.13), psmisc
-Recommends: acpid | apmd | pbbuttonsd | pmud, hdparm, sdparm, hal, ethtool, net-tools, wireless-tools, pm-utils
+Recommends: hdparm, sdparm, ethtool, net-tools, wireless-tools, udev
+Suggests: acpid | apmd | pbbuttonsd | pmud, hal
 Conflicts: noflushd
 Description: Tools for Power Savings based on battery/AC status
  Laptop mode is a Linux kernel feature that allows your laptop to save 

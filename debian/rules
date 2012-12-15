@@ -21,7 +21,10 @@ configure-stamp:
 	touch configure-stamp
 
 
-build: build-stamp
+build: build-arch build-indep
+	
+build-arch: build-stamp
+build-indep: build-stamp
 
 build-stamp: configure-stamp 
 	dh_testdir
@@ -55,6 +58,7 @@ install: build
 	install -m755 -d $(DESTDIR)/etc/apm/event.d
 	install -m755 -d $(DESTDIR)/etc/power/scripts.d
 	install -m755 -d $(DESTDIR)/etc/power/event.d
+	install -m755 -d $(DESTDIR)/lib/udev/rules.d
 	install -m755 -d $(DESTDIR)/usr/lib/pm-utils/sleep.d
 	install -m755 -d $(DESTDIR)/etc/laptop-mode/batt-start
 	install -m755 -d $(DESTDIR)/etc/laptop-mode/batt-stop
@@ -71,6 +75,8 @@ install: build
 	install -m755 etc/apm/event.d/* $(DESTDIR)/etc/apm/event.d
 	install -m755 etc/power/scripts.d/* $(DESTDIR)/etc/power/scripts.d
 	install -m755 etc/power/event.d/* $(DESTDIR)/etc/power/event.d
+	install -m644 etc/rules/99-laptop-mode.rules $(DESTDIR)/lib/udev/rules.d
+	install -m755 etc/rules/lmt-udev $(DESTDIR)/lib/udev/lmt-udev
 	install -m755 usr/lib/pm-utils/sleep.d/* $(DESTDIR)/usr/lib/pm-utils/sleep.d
 	install -m755 usr/sbin/laptop_mode $(DESTDIR)/usr/sbin
 	install -m755 usr/sbin/lm-syslog-setup $(DESTDIR)/usr/sbin

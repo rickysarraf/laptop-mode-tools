@@ -1,3 +1,68 @@
+1.61 - Thu May 17 17:44:26 IST 2012
+    * Handle devices with persistent device naming. This fixes the issues where
+      you don't have a disk referenced by a block name, the commit= value was
+      completely skipped
+    * Fix issue where hdparm skips SSDs for power management
+    * Add parallel execution for the modules. In theory this should speeden up the
+      execution. See git commit log comments for details
+    * Add support for non-deafult customized settings
+    * calculate design_capacity_warning on machines/arches where it is not readily
+      available
+
+1.60 - Fri Oct 14 13:08:09 IST 2011
+    * Use proper device reference for iwconfig (Debian BTS: #639388)
+    * Check for block device's existence. Thanks to Simon Que
+    * Add suspend/resume helper tools: pm-helper, pm-suspend, pm-hibernate
+    * What laptop-mode-tools is stopped from init, also kill polling daemon
+    * Reliable and much better locking mechanics
+    * Make polling dameon lock safe
+    * Make lmt-udev distro neutral. Thanks to Simon Que
+    * Change Intel HDA Audio's default power save timeout to 2 seconds
+
+1.59 - Mon Aug  8 00:56:48 IST 2011 
+    * really don't call batt-poll-daemon inside from the flock instance
+    * USB auto-suspend whitelist
+    * Add myself as the maintainer
+    * Don't call true which forks a subshell
+    * Use exit instead of return
+    * Check for files instead of kernel version numbers.
+
+1.58 - Sat Jul 23 23:21:22 IST 2011
+    * Initialize the PATH variable within us. This helps when our caller did not have a
+      proper environment
+    * Enable new in-kernel polling mechanism for block devices (Debian BTS: #617705, #574867)
+    * Check for kernel's native suspend functionality
+    * Support execution of complex commands. Thanks to Changaco for the patch
+    * Add new module nmi-watchdog to handle NMI Watchdog related power savings. Thanks to
+      Quentin Denis for the report
+    * Fix error messages during early boot if /usr is on a different partition.
+      (Debian BTS: #624678)
+    * Add support for new Linux 3.x kernels. (Debian BTS: #6628764)
+    * Fix locking problems when battery polling daemon is enabled
+
+1.57 - Sun Feb 27 12:50:19 IST 2011
+    * Pass calling application's arguments to the main function. Thanks to Radek for the 
+      report and the patch
+    * Use governor policy from the config file. Thanks to Michael Orlov for the report.
+
+1.56 - Mon Feb 14 23:57:50 IST 2011
+    * Enable ENABLE_AUTO_MODULES by default. When a user installs the package,
+      the first immediate expectation is to see some changes
+    * USB suspend interface has changed with kernels 2.6.35 and above.
+      (Debian BTS: #589000)
+    * Add support for Linux Runtime Power Management (Debian BTS: #592661)
+    * On many other distributions, wireless-tools packages is still old and does not
+      return proper exit status on failures. Thanks to Luca Landolfi for the patch.
+    * Add support to blacklist USB Devices by types. Thanks to Simon Que for the patch
+    * Re-initialize dev_path before the next iteration. Thanks to Faustus for the bug
+      report and the patch (LP: #662924)
+    * ENABLE_LAPTOP_MODE_TOOLS was ignore because of wrong check. Thanks to Matus Harvan
+      for reporting this. (Debian BTS: #602278)
+    * Add support to invoke laptop-mode-tools with hotplug events. This currently only has
+      support for the usb-autosuspend module. Thanks to Simon Que for the patch
+    * Add locking support using flock. (Debian BTS: #566613)
+    * Add 99-laptop-mode.rules to trap multiple kernel events
+
 1.55 - Wed May 26 21:22:33 IST 2010
     * On Intel HD Audio, revert power saving changes when switching back to AC.
       Thanks to Christoph Langguth for the report and the patch

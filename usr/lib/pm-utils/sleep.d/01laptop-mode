@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# 99laptop-mode: Re-apply laptop mode tools settings
+# 01laptop-mode: Re-apply laptop mode tools settings
 
 if [ -f /etc/pm/sleep.d/99laptop-mode ]; then
     continue

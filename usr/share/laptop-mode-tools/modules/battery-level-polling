@@ -5,17 +5,23 @@
 
 if [ x$ENABLE_BATTERY_LEVEL_POLLING = x1 ] ; then
 	log "VERBOSE" "Battery level polling is enabled."
-	if [ x$ON_AC = x1 ] ; then
-		log "VERBOSE" "On AC, stopping the polling daemon."
 
-		# In AC mode we disable the polling daemon.
-		killall -q lm-polling-daemon
+	if [ x$BLACKLIST_IN_FLOCK = x1 ]; then
+		log "VERBOSE" "Battery polling daemon blacklisted in flock"
 	else
-		if ! pidof -x lm-polling-daemon ; then
-			log "VERBOSE" "On battery and there was no polling daemon yet, starting the polling daemon."
+		if [ x$ON_AC = x1 ] ; then
+			log "VERBOSE" "On AC, stopping the polling daemon."
+
+			# In AC mode we disable the polling daemon.
+			killall -q lm-polling-daemon
+		else
+			if ! pidof -x lm-polling-daemon ; then
+				log "VERBOSE" "On battery and there was no polling daemon yet, starting the polling daemon."
 			
-			# If there is no polling daemon, we start one.
-			/usr/share/laptop-mode-tools/module-helpers/lm-polling-daemon < /dev/null > /dev/null 2> /dev/null &
+				# If there is no polling daemon, we start one.
+				#/usr/share/laptop-mode-tools/module-helpers/lm-polling-daemon < /dev/null > /dev/null 2> /dev/null &
+				/usr/share/laptop-mode-tools/module-helpers/lm-polling-daemon &
+			fi
 		fi
 	fi
 else

@@ -1,0 +1,28 @@
+#! /bin/sh
+# 
+# Laptop mode tools module: NMI Watchdog timer power savings
+#
+
+if [ x$CONTROL_NMI_WATCHDOG = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_NMI_WATCHDOG = xauto ]; then
+	if [ $ON_AC -eq 1 ]; then
+		log "VERBOSE" "On AC power: setting NMI Watchdog Timer to 1"
+		if [ -w /proc/sys/kernel/nmi_watchdog ]; then
+			echo 1 > /proc/sys/kernel/nmi_watchdog
+			log "VERBOSE" "NMI Watchdog timer enabled"
+		else
+			log "VERBOSE" "NMI Watchdog timer is not available"
+		fi
+	else
+		log "VERBOSE" "On battery: setting NMI Watchdog timer to 0"
+		if [ -w /proc/sys/kernel/nmi_watchdog ]; then
+			echo 0 > /proc/sys/kernel/nmi_watchdog
+			log "VERBOSE" "NMI Watchdog timer disabled"
+		else
+			log "VERBOSE" "NMI Watchdog timer is not available"
+		fi
+
+	fi
+else
+	log "VERBOSE" "NMI Watchdog timer power savings module is disabled"
+fi
+

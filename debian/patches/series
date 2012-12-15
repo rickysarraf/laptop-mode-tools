@@ -1,2 +1,2 @@
-debian-changes-1.55-1
-fix-version-compatibility.patch
+disable-ethernet-e1000e.patch
+debian-changes

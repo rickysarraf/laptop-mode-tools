@@ -3,7 +3,7 @@
 
 Summary: Tools for power savings based on battery/AC status
 Name: laptop-mode-tools
-Version: 1.53
+Version: 1.61
 Release: 1
 License: GPL
 Group: System Environment/Base
@@ -70,8 +70,10 @@ fi
 %doc %{_mandir}/man8/lm-syslog-setup.8
 %config %{_sysconfdir}/acpi/actions/lm_*.sh
 %config %{_sysconfdir}/acpi/events/lm_*
+%config %{_sysconfdir}/udev/rules.d/99-laptop-mode.rules
 %config(noreplace) %{_sysconfdir}/laptop-mode/
 %config %{_initrddir}/laptop-mode
+/lib/udev/lmt-udev
 
 %{_sysconfdir}/apm/event.d/*
 %{_sysconfdir}/power/scripts.d/*
@@ -79,6 +81,7 @@ fi
 %{_usr}/sbin/*
 %{_usr}/share/laptop-mode-tools/modules/*
 %{_usr}/lib/pm-utils/sleep.d/*
+
 
 %dir %{_sysconfdir}/acpi/events
 %dir %{_sysconfdir}/acpi/actions
@@ -92,19 +95,37 @@ fi
 
 
 %changelog
-* Wed May 26 21:22:33 IST 2010 Ritesh Raj Sarraf <rrs@researchut.com> - 1.55-1
+* Thu May 17 2012 Ritesh Raj Sarraf <rrs@researchut.com> - 1.61-1
+- Updated to release 1.61.
+
+* Fri Oct 14 2011 Ritesh Raj Sarraf <rrs@researchut.com> - 1.60-1
+- Updated to release 1.60.
+
+* Mon Aug  8 2011 Ritesh Raj Sarraf <rrs@researchut.com> - 1.59-1
+- Updated to release 1.59.
+
+* Sat Jul 23 2011 Ritesh Raj Sarraf <rrs@researchut.com> - 1.58-1
+- Updated to release 1.58.
+
+* Sun Feb 27 2011 Ritesh Raj Sarraf <rrs@researchut.com> - 1.57-1
+- Updated to release 1.57.
+
+* Mon Feb 14 2011 Ritesh Raj Sarraf <rrs@researchut.com> - 1.56-1
+- Updated to release 1.56.
+
+* Wed May 26 2010 Ritesh Raj Sarraf <rrs@researchut.com> - 1.55-1
 - Updated to release 1.55.
 
-* Wed Mar 10 16:09:34 IST 2010 Ritesh Raj Sarraf <rrs@researchut.com> - 1.54-1
+* Wed Mar 10 2010 Ritesh Raj Sarraf <rrs@researchut.com> - 1.54-1
 - Updated to release 1.54.
 
-* Sat Jan  2 23:42:50 IST 2010 Ritesh Raj Sarraf <rrs@researchut.com> - 1.53-1
+* Sat Jan  2 2010 Ritesh Raj Sarraf <rrs@researchut.com> - 1.53-1
 - Updated to release 1.53.
 
-* Thu Oct  8 14:12:23 IST 2009 Ritesh Raj Sarraf <rrs@researchut.com> - 1.52-1
+* Thu Oct  8 2009 Ritesh Raj Sarraf <rrs@researchut.com> - 1.52-1
 - Updated to release 1.52.
 
-* Tue Sep  1 20:53:28 IST 2009 Ritesh Raj Sarraf <rrs@researchut.com> - 1.51-1
+* Tue Sep  1 2009 Ritesh Raj Sarraf <rrs@researchut.com> - 1.51-1
 - Updated to release 1.51.
 
 * Fri Jul 24 2009 Ritesh Raj Sarraf <rrs@researchut.com> - 1.50-1
