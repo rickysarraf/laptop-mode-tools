@@ -42,8 +42,8 @@ Forwarded: <no|not-needed|url proving that it has been forwarded>
 Reviewed-By: <name and email of someone who approved the patch>
 Last-Update: <YYYY-MM-DD>
 
---- laptop-mode-tools-1.60.orig/etc/init.d/laptop-mode
-+++ laptop-mode-tools-1.60/etc/init.d/laptop-mode
+--- laptop-mode-tools-1.61.orig/etc/init.d/laptop-mode
++++ laptop-mode-tools-1.61/etc/init.d/laptop-mode
 @@ -6,63 +6,54 @@
  #
  # config:  /etc/laptop-mode/laptop-mode.conf
@@ -135,8 +135,8 @@ Last-Update: <YYYY-MM-DD>
      ;;
  
    status)
---- laptop-mode-tools-1.60.orig/etc/power/scripts.d/laptop-mode
-+++ laptop-mode-tools-1.60/etc/power/scripts.d/laptop-mode
+--- laptop-mode-tools-1.61.orig/etc/power/scripts.d/laptop-mode
++++ laptop-mode-tools-1.61/etc/power/scripts.d/laptop-mode
 @@ -28,7 +28,7 @@ if [ -w /proc/sys/vm/laptop_mode ]; then
          $LMODE "stop"
          ;;
