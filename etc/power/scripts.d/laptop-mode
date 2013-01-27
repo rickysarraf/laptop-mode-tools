@@ -28,7 +28,7 @@ if [ -w /proc/sys/vm/laptop_mode ]; then
         $LMODE "stop"
         ;;
       resume)
-        $LMODE "auto" "force"
+        /etc/init.d/laptop-mode restart
         ;;        
     esac
 elif [ -x logger ]; then	
