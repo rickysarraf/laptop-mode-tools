@@ -670,19 +670,19 @@ lmt_main_function ()
     fi
 
     if [ "$ENABLE_LAPTOP_MODE_WHEN_LID_CLOSED" -ne 0 -a "$ACTIVATE" -eq 0 ] ; then
-	    if [ -x "`which hal-find-by-property`" ] ; then
-		    HAL_LID_BUTTON=$(hal-find-by-property --key "button.type" --string "lid")
-	    fi
-	    if [ "$HAL_LID_BUTTON" != "" ] ; then
-		    HAL_LID_BUTTON_STATE=$(hal-get-property --udi $(hal-find-by-property --key "button.type" --string "lid") --key "button.state.value")
-		    if [ "$HAL_LID_BUTTON_STATE" = "true" ] ; then
-			    log "VERBOSE" "Setting action to \"start\" because the lid is closed (says HAL)."
-			    ACTIVATE=1			
-		    fi
-	    elif [ -f /proc/acpi/button/lid/*/state ] ; then
+	    if [ -f /proc/acpi/button/lid/*/state ] ; then
 		    if ( grep -q "closed" /proc/acpi/button/lid/*/state ) ; then
 			    log "VERBOSE" 'Setting action to "start" because the lid is closed (says /proc/acpi/button/lid/*/state).'
 			    ACTIVATE=1
+		    fi
+	    elif ( which hal-find-by-property >/dev/null ) ; then
+		    HAL_LID_BUTTON=$($HAL_FIND_BY_PROPERTY --key "button.type" --string "lid")
+		    if [ "$HAL_LID_BUTTON" != "" ] ; then
+		    	HAL_LID_BUTTON_STATE=$(hal-get-property --udi $(hal-find-by-property --key "button.type" --string "lid") --key "button.state.value")
+		    	if [ "$HAL_LID_BUTTON_STATE" = "true" ] ; then
+			    log "VERBOSE" "Setting action to \"start\" because the lid is closed (says HAL)."
+			    ACTIVATE=1			
+		    	fi
 		    fi
 	    else
 		    log "MSG" "Warning: ENABLE_LAPTOP_MODE_WHEN_LID_CLOSED is set, but there is no file"
