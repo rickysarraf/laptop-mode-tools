@@ -98,6 +98,10 @@ If this option is enabled, the data loss sensitive features of laptop mode are
 disabled when the battery reports its state as "critical". This option is only
 supported on ACPI.
 
+.IP "\fBDISABLE_BATTERY_ALARM_CHECK\fP" 10 
+If this option is enabled, the alarm values are ignored from the battery. This
+is helpful if you have a broken battery which is reporting false alarms.
+
 .IP "\fBHD\fP" 10 
 The hard drives which laptop mode should operate upon. If you have multiple
 hard drives, you should list them all in this option, separated by spaces, for
