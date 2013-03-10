@@ -823,7 +823,7 @@ lmt_main_function ()
                                                 ENOUGH_CHARGE=1
                                             fi
  
-					    if [ "$ALARM_LEVEL" -ne 0 ] ; then
+					    if [ "$ALARM_LEVEL" -ne 0 ] && [ "$DISABLE_BATTERY_ALARM_CHECK" -ne 1 ]; then
 						    if [ "$REMAINING" -le "$ALARM_LEVEL" ] ; then				
 							    # Restore the state we had before checking this battery, so that
 							    # this battery does not count as having enough charge.
