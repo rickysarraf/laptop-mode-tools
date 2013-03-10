@@ -4,6 +4,27 @@
 #
 
 if [ x$CONTROL_ETHERNET = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_ETHERNET = xauto ]; then
+
+	# Let's check the binaries firts
+	if [ -x /sbin/ethtool ]; then
+		ETHTOOL=/sbin/ethtool
+	elif [ -x /usr/sbin/ethtool ]; then
+		ETHTOOL=/usr/sbin/ethtool
+	else
+		log "VERBOSE" "ethtool is not installed"
+		ETHTOOL=/bin/false
+	fi
+
+	if [ -x /sbin/mii-tool ]; then
+		MIITOOL=/sbin/mii-tool
+	elif [ -x /usr/sbin/mii-tool ]; then
+		MIITOOL=/usr/sbin/mii-tool
+	else
+		log "VERBOSE" "mii-tool is not installed"
+		MIITOOL=/bin/false
+	fi
+
+
 	if [ $ON_AC -eq 1 ]; then
 		if [ "$ACTIVATE" -eq 1 ]; then
 			THROTTLE_ETHERNET="$LM_AC_THROTTLE_ETHERNET"
@@ -71,7 +92,7 @@ if [ x$CONTROL_ETHERNET = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_ETHE
 
 		# Wakeup-on-LAN handling
 		if [ x$DISABLE_WAKEUP_ON_LAN = x1 ] ; then
-			ret=`ethtool -s $DEVICE wol d 2>&1`
+			ret=`$ETHTOOL -s $DEVICE wol d 2>&1`
                         exit_status=$?;
 			log "VERBOSE" "$ret"
 			if [ $exit_status -eq 0 ]; then			
@@ -82,7 +103,7 @@ if [ x$CONTROL_ETHERNET = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_ETHE
 		fi
 		
 		# Determine speed
-		speed=`mii-tool -v $DEVICE 2>/dev/null | grep capabilities | tr ' ' '\n' |\
+		speed=`$MIITOOL -v $DEVICE 2>/dev/null | grep capabilities | tr ' ' '\n' |\
                         sort -n | sed -ne '/^1.*/p' | cut -d "b" -f1`
                 if [ -z "$speed" ]; then
                         speed=0;
@@ -112,7 +133,7 @@ if [ x$CONTROL_ETHERNET = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_ETHE
 		# Handle throttling
 		if [ x$THROTTLE_ETHERNET = x1 ] ; then
 			# Handle Speed Throttling
-			ret=`ethtool -s $DEVICE speed $THROTTLE_SPEED 2>&1`
+			ret=`$ETHTOOL -s $DEVICE speed $THROTTLE_SPEED 2>&1`
                         exit_status=$?;
                         log "VERBOSE" "$ret";
 			if [ $exit_status -eq 0 ]; then
@@ -122,7 +143,7 @@ if [ x$CONTROL_ETHERNET = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_ETHE
 			fi
 		else
 			# Handle Speed Throttling
-			ret=`ethtool -s $DEVICE speed $MAX_SPEED 2>&1`
+			ret=`$ETHTOOL -s $DEVICE speed $MAX_SPEED 2>&1`
                         exit_status=$?;
                         log "VERBOSE" "$ret";
 			if [ $exit_status -eq 0 ]; then
