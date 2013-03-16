@@ -98,6 +98,10 @@ If this option is enabled, the data loss sensitive features of laptop mode are
 disabled when the battery reports its state as "critical". This option is only
 supported on ACPI.
 
+.IP "\fBDISABLE_BATTERY_ALARM_CHECK\fP" 10 
+If this option is enabled, the alarm values are ignored from the battery. This
+is helpful if you have a broken battery which is reporting false alarms.
+
 .IP "\fBHD\fP" 10 
 The hard drives which laptop mode should operate upon. If you have multiple
 hard drives, you should list them all in this option, separated by spaces, for
@@ -528,6 +532,8 @@ power saving mode.
 If this option is enabled, laptop mode tools will automatically enable the
 AC97 power saving settings. The power saving settings are always enabled, not
 only on battery power.
+Note: On some machines it has been reported that the AC97 power savings triggers
+the annoying click sound during power state transitions
 
 
 .SS "\fI/etc/laptop-mode/conf.d/nmi-watchdog.conf\fP"
@@ -538,7 +544,18 @@ Enabling this module lowers down one hw-pmu counter.
 .IP "\fBCONTROL_NMI_WATCHDOG\fP" 10
 If this option is enabled, laptop mode tools will automatically disable the
 NMI Watchdog timer when on battery. This module is part of auto modules. Thus enabling
-auto modules setting will activate this module automatically
+auto modules setting will activate this module automatically.
+
+.SS "\fI/etc/laptop-mode/conf.d/pci-aspm.conf\fP"
+
+The pcie-aspm module allows you to enable the PCI Express (PCIe) Active State
+Power Management (ASPM).
+
+.IP "\fBCONTROL_PCI_ASPM\fP" 10
+If this option is enabled, laptop mode tools will enable PCI ASPM powersave
+mode when on battery. This module is part of auto modules. Thus enabling
+auto modules setting will activate this module automatically. PCIe ASPM may
+require that the pcie_aspm=force kernel option is enabled.
 
 .SS "\fI/etc/laptop-mode/conf.d/runtime-pm.conf\fP"
 

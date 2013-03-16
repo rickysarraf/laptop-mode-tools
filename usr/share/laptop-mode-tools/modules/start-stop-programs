@@ -4,6 +4,22 @@
 #
 
 if [ x$CONTROL_START_STOP = x1 ] ; then
+
+
+   #
+   # Release the locks. The global locks of LMT get inherited by all sub-processes
+   # which, further, gets inherited by all programs that are run as part of this
+   # module, including daemon. By releasing the lock for this shell process, we ensure
+   # that the daemons will not hold lock to the LMT locks.
+   #
+
+   # TODO: Variablize the lock descriptors and then use them instead
+   log "VERBOSE" "Prepare to release locks for descriptors 8 & 9"
+   exec 8>&-
+   exec 9>&-
+   log "VERBOSE" "Released locks for descriptors 8 & 9"
+             
+
    #
    # Undo the previous state.
    #

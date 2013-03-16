@@ -28,6 +28,7 @@
 #
 
 [ -z "$MAN_D" ] && MAN_D="/usr/man"
+[ -z "$LIB_D" ] && LIB_D="/lib"
 
 if [ -z "$ACPI" ] ; then
 	ACPI=auto
@@ -112,11 +113,10 @@ $INSTALL -d -m 755 "$DESTDIR/usr/share/laptop-mode-tools/modules"
 $INSTALL -d -m 755 "$DESTDIR/usr/share/laptop-mode-tools/module-helpers"
 $INSTALL -d -m 755 "$DESTDIR/usr/lib/tmpfiles.d"
 $INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode/conf.d"
-$INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode/conf.d/board-specific"
 $INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode/modules"
 $INSTALL -d -m 755 "$DESTDIR/usr/sbin"
-$INSTALL -d -m 755 "$DESTDIR/lib/udev"
-$INSTALL -d -m 755 "$DESTDIR/lib/systemd/system"
+$INSTALL -d -m 755 "$DESTDIR/$LIB_D/udev"
+$INSTALL -d -m 755 "$DESTDIR/$LIB_D/systemd/system"
 $INSTALL -d -m 755 "$DESTDIR/$MAN_D/man8"
 
 ALREADY_EXISTED=0
@@ -201,16 +201,18 @@ fi
 if ( ! $INSTALL -D -m 644 etc/rules/99-laptop-mode.rules "$DESTDIR/etc/udev/rules.d/99-laptop-mode.rules" ) ; then
     echo "$0: Failed to install udev rule into /etc/udev/rules.d/ Installation failed."
     exit 23
+else
+    sed -i -e "s|@LIB_D@|$LIB_D|g" $DESTDIR/etc/udev/rules.d/99-laptop-mode.rules >/dev/null 2>&1
 fi
 
 # udev helper tool
-if ( ! $INSTALL -D -m 755 etc/rules/lmt-udev "$DESTDIR/lib/udev/lmt-udev" ) ; then
-	echo "$0: Failed to install udev helper tool into /lib/udev/ Installation failed."
+if ( ! $INSTALL -D -m 755 etc/rules/lmt-udev "$DESTDIR/$LIB_D/udev/lmt-udev" ) ; then
+	echo "$0: Failed to install udev helper tool into $LIB_D/udev Installation failed."
 fi
 
 # systemd service
-if ( ! $INSTALL -D -m 644 etc/systemd/laptop-mode.service "$DESTDIR/lib/systemd/system/laptop-mode.service" ) ; then
-	echo "$0: Failed to install systemd service into /lib/systemd/system/ Installation failed."
+if ( ! $INSTALL -D -m 644 etc/systemd/laptop-mode.service "$DESTDIR/$LIB_D/systemd/system/laptop-mode.service" ) ; then
+	echo "$0: Failed to install systemd service into $LIB_D/systemd/system/ Installation failed."
 fi
 
 # and systemd's tmpfiles.d

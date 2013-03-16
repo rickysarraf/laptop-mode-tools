@@ -63,6 +63,7 @@ if [ x$CONTROL_IWL_POWER = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_IWL
 		IWPRIV=/usr/sbin/iwpriv
 	else
 		log "VERBOSE" "iwpriv is not installed"
+		IWPRIV=/bin/false
 	fi
 	if [ -x /sbin/iwconfig ] ; then
 		IWCONFIG=/sbin/iwconfig
@@ -70,6 +71,7 @@ if [ x$CONTROL_IWL_POWER = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_IWL
 		IWCONFIG=/usr/sbin/iwconfig
 	else
 		log "VERBOSE" "iwconfig is not installed"
+		IWCONFIG=/bin/false
 	fi
 
 	WIFI_IFNAMES=""
