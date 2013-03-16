@@ -196,22 +196,6 @@ control_mount_options() {
 						break
 						;;
 					esac
-
-					# If the disk is an SSD, we skip any of these file system's mount based power savings
-					SYSFS_DEV=/sys/block/"`basename $THISHD`"
-					
-					if [ -f $SYSFS_DEV/queue/rotational ]; then
-						IS_ROTATIONAL=`cat $SYSFS_DEV/queue/rotational`
-					else
-						log "VERBOSE" "Disk $THISHD does not support the rotational interface"
-						# We'll apply the traditional drive assumptions here.
-						IS_ROTATIONAL=1
-					fi
-
-					if [ "$IS_ROTATIONAL" -eq 0 ]; then
-						log "VERBOSE" "Disk $THISHD is a NAND (SSD / Flash) Device. Skipping mount power savings"
-						DO=0
-					fi
 				done
 				;;
 		esac
