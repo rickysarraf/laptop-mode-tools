@@ -30,6 +30,9 @@
 [ -z "$MAN_D" ] && MAN_D="/usr/man"
 [ -z "$LIB_D" ] && LIB_D="/lib"
 [ -z "$UDEV_D" ] && UDEV_D="$LIB_D/udev"
+[ -z "$SYSTEMD" ] && SYSTEMD="yes"
+[ -z "$SYSTEMD_UNIT_D" ] && SYSTEMD_UNIT_D="$LIB_D/systemd/system"
+[ -z "$TMPFILES_D" ] && TMPFILES_D="$LIB_D/tmpfiles.d"
 
 if [ -z "$ACPI" ] ; then
 	ACPI=auto
@@ -112,12 +115,10 @@ $INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode/nolm-ac-start"
 $INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode/nolm-ac-stop"
 $INSTALL -d -m 755 "$DESTDIR/usr/share/laptop-mode-tools/modules"
 $INSTALL -d -m 755 "$DESTDIR/usr/share/laptop-mode-tools/module-helpers"
-$INSTALL -d -m 755 "$DESTDIR/usr/lib/tmpfiles.d"
 $INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode/conf.d"
 $INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode/modules"
 $INSTALL -d -m 755 "$DESTDIR/usr/sbin"
 $INSTALL -d -m 755 "$DESTDIR/$UDEV_D/rules.d"
-$INSTALL -d -m 755 "$DESTDIR/$LIB_D/systemd/system"
 $INSTALL -d -m 755 "$DESTDIR/$MAN_D/man8"
 
 ALREADY_EXISTED=0
@@ -209,14 +210,19 @@ if ( ! $INSTALL -D -m 755 etc/rules/lmt-udev "$DESTDIR/$UDEV_D/lmt-udev" ) ; the
 	echo "$0: Failed to install udev helper tool into $UDEV_D Installation failed."
 fi
 
-# systemd service
-if ( ! $INSTALL -D -m 644 etc/systemd/laptop-mode.service "$DESTDIR/$LIB_D/systemd/system/laptop-mode.service" ) ; then
-	echo "$0: Failed to install systemd service into $LIB_D/systemd/system/ Installation failed."
-fi
+if [ "${SYSTEMD}" = "yes" ]; then
+	$INSTALL -d -m 755 "$DESTDIR/$SYSTEMD_UNIT_D"
+	$INSTALL -d -m 755 "$DESTDIR/$TMPFILES_D"
 
-# and systemd's tmpfiles.d
-if ( ! $INSTALL -D -m 644 etc/systemd/laptop-mode.conf.tmpfiles "$DESTDIR/usr/lib/tmpfiles.d/laptop-mode.conf" ) ; then
-	echo "$0: Failed to install systemd tmpfiles into /usr/lib/tmpfiles.d/ Installation failed."
+	# systemd service
+	if ( ! $INSTALL -D -m 644 etc/systemd/laptop-mode.service "$DESTDIR/$SYSTEMD_UNIT_D/laptop-mode.service" ) ; then
+		echo "$0: Failed to install systemd service into $SYSTEMD_UNIT_D Installation failed."
+	fi
+
+	# and systemd's tmpfiles.d
+	if ( ! $INSTALL -D -m 644 etc/systemd/laptop-mode.conf.tmpfiles "$DESTDIR/${TMPFILES_D}/laptop-mode.conf" ) ; then
+		echo "$0: Failed to install systemd tmpfiles into ${TMPFILES_D} Installation failed."
+	fi
 fi
 
 ACPI_DONE=0
