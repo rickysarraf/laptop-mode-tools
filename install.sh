@@ -202,7 +202,7 @@ if ( ! $INSTALL -D -m 644 etc/rules/99-laptop-mode.rules "$DESTDIR/etc/udev/rule
     echo "$0: Failed to install udev rule into /etc/udev/rules.d/ Installation failed."
     exit 23
 else
-    sed -i -e "s|@LIB_D@|$LIB_D|g" $DESTDIR/etc/udev/rules.d/99-laptop-mode.rules >/dev/null 2>&1
+    sed -i -e "s|@LIB_D@|$LIB_D|g" $DESTDIR/etc/udev/rules.d/99-laptop-mode.rules
 fi
 
 # udev helper tool
