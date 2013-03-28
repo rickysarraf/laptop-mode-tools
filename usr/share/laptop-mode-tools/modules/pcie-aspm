@@ -7,7 +7,7 @@ if [ x$CONTROL_PCIE_ASPM = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_PCI
     if [ $ON_AC -eq 1 ]; then
         log "VERBOSE" "On AC power: setting pcie_aspm to default"
         if [ -f /sys/module/pcie_aspm/parameters/policy ]; then
-            echo default > /sys/module/pcie_aspm/parameters/policy
+            echo default > /sys/module/pcie_aspm/parameters/policy 2>/dev/null
             if [ $? -eq 0 ]; then
                 log "VERBOSE" "PCIe ASPM set to 'default'"
             else
@@ -19,7 +19,7 @@ if [ x$CONTROL_PCIE_ASPM = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_PCI
     else
         log "VERBOSE" "On battery: setting pcie_aspm to powersave"
         if [ -f /sys/module/pcie_aspm/parameters/policy ]; then
-            echo powersave > /sys/module/pcie_aspm/parameters/policy
+            echo powersave > /sys/module/pcie_aspm/parameters/policy 2>/dev/null
             if [ $? -eq 0 ]; then
                 log "VERBOSE" "PCIe ASPM set to 'powersave'"
             else
