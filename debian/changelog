@@ -1,3 +1,9 @@
+laptop-mode-tools (1.63-1) UNRELEASED; urgency=low
+
+  * [ba00340] Imported Upstream version 1.63
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sat, 30 Mar 2013 16:05:51 +0530
+
 laptop-mode-tools (1.62-1) experimental; urgency=low
 
   * New Upstream Release
