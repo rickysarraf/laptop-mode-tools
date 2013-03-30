@@ -1,0 +1,25 @@
+#!/bin/sh -e
+# /usr is not guaranteed to be mounted when udev starts
+
+(
+	if [ -e /lib/udev/hotplug.functions ]; then
+		. /lib/udev/hotplug.functions
+		wait_for_file /usr/sbin/laptop_mode
+		exec /usr/sbin/laptop_mode "$@"
+	else
+		local file=$1
+		local timeout=$2
+		[ "$timeout" ] || timeout=120
+
+		local count=$timeout
+		while [ $count != 0 ]; do
+			[ -e "/usr/sbin/laptop_mode" ] && exec /usr/sbin/laptop_mode "$@" && return 0
+			sleep 1
+			count=$(($count - 1))
+		done
+
+		mesg "$file did not appear before the timeout!"
+		exit 1
+	fi
+
+) &

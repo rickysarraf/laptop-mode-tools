@@ -33,6 +33,7 @@ if [ x$CONTROL_ETHERNET = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_ETHE
 	for DEVICE in $ETHERNET_DEVICES ; do
                 DISABLED=0
                 path=`readlink -f /sys/class/net/$DEVICE`
+		dev_path=""
                 log "VERBOSE" "ethernet: $path"
                 if ! [ -z $path ]; then
                         if [ -d $path/device ]; then

@@ -1,0 +1,28 @@
+#!/bin/sh
+
+
+MEM=0;
+DISK=0;
+
+target=`basename $0 | cut -d '-' -f2`
+
+
+case "$target" in
+	suspend) MEM=1 ;;
+	hibernate) DISK=1 ;;
+	*) echo "Unrecognized command"
+		 exit 1 ;;
+esac
+	
+# Sync buffers first.
+sync;
+
+# Freezer on preference
+if [ x$MEM = x1 ]; then
+	echo "mem" > /sys/power/state
+elif [ x$DISK = x1 ]; then
+	echo "disk" > /sys/power/state
+else
+	## Nothing to do.
+	echo ;
+fi

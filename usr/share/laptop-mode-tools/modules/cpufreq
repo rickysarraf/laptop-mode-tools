@@ -96,9 +96,9 @@ if [ x$CONTROL_CPU_FREQUENCY = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL
 
 	# For kernels 2.6.32 and above, the sysfs interface for OnDemand per-core power savings has changed.
 	# Instead of per-core, the new interface is generic and a single one
-	if [ -f "/sys/devices/system/cpu/cpufreq/ondemand/ignore_nice_load" ]; then
+	if [ -f "/sys/devices/system/cpu/cpufreq/$THIS_CPU_GOVERNOR/ignore_nice_load" ]; then
 		log "VERBOSE" "Setting CPU ignore_nice_load for all cpus"
-		set_sysctl /sys/devices/system/cpu/cpufreq/ondemand/ignore_nice_load $CPU_IGNORE_NICE_LOAD
+		set_sysctl /sys/devices/system/cpu/cpufreq/$THIS_CPU_GOVERNOR/ignore_nice_load $CPU_IGNORE_NICE_LOAD
 	else
 		log "VERBOSE" "No generic CPU ignore_nice_load interface available"
 	fi

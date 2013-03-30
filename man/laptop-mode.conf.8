@@ -68,7 +68,7 @@ Set this to 1 if you would like to execute the entire laptop-mode program in deb
 
 .IP "\fBENABLE_AUTO_MODULES\fP" 10 
 Set this to 1 to enable all laptop mode tools modules that are termed safe to be enabled and are marked auto.
-With this option alone, you can enable all auto modules. Incase you need to fine-control the behavior of individual modules, you can modify them accordingly. Default is 0
+With this option alone, you can enable all auto modules. Incase you need to fine-control the behavior of individual modules, you can modify them accordingly. Default is 1
 
 
 .IP "\fBENABLE_LAPTOP_MODE_ON_BATTERY\fP" 10 
@@ -528,6 +528,26 @@ power saving mode.
 If this option is enabled, laptop mode tools will automatically enable the
 AC97 power saving settings. The power saving settings are always enabled, not
 only on battery power.
+
+
+.SS "\fI/etc/laptop-mode/conf.d/nmi-watchdog.conf\fP"
+
+The nmi-watchdog module allows you to enable the NMI Watchdog timer power savings.
+Enabling this module lowers down one hw-pmu counter.
+
+.IP "\fBCONTROL_NMI_WATCHDOG\fP" 10
+If this option is enabled, laptop mode tools will automatically disable the
+NMI Watchdog timer when on battery. This module is part of auto modules. Thus enabling
+auto modules setting will activate this module automatically
+
+.SS "\fI/etc/laptop-mode/conf.d/runtime-pm.conf\fP"
+
+The runtime-pm module allows you to enable the Runtime Power Management
+framework for the Linux kernel.
+.IP "\fBCONTROL_RUNTIME_PM\fP" 10
+If this option is enabled, laptop mode tools will automatically enable the
+Kernel's Runtime Power Management settings. The power saving settings are always
+enabled, not only on battery power.
 
 
 .SS "\fI/etc/laptop-mode/conf.d/intel-hda-powersave.conf\fP"
