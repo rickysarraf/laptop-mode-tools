@@ -1,6 +1,12 @@
-laptop-mode-tools (1.63-1) UNRELEASED; urgency=low
+laptop-mode-tools (1.63-1) experimental; urgency=low
 
   * [ba00340] Imported Upstream version 1.63
+  * [dad16df] Disable ethernet based on multiple reports of driver failure
+  * [6573fe0] clean series file
+  * [efce0f7] Do not ship the board-specific/ folder in default installs
+  * [9534fbe] Convert debian/copyright to format 1.0
+  * [857918c] Update Standards Version to 3.9.4
+  * [1c821a8] Clean-up and add new patch for initscript LSB Headers
 
  -- Ritesh Raj Sarraf <rrs@debian.org>  Sat, 30 Mar 2013 16:05:51 +0530
 
