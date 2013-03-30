@@ -27,6 +27,7 @@ if [ x$CONTROL_IPW_POWER = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_IPW
 		IWPRIV=/usr/sbin/iwpriv
 	else
 		log "VERBOSE" "iwpriv is not installed"
+		IWPRIV=/bin/false
 	fi
 	if [ -x /sbin/iwconfig ] ; then
 		IWCONFIG=/sbin/iwconfig
@@ -34,6 +35,7 @@ if [ x$CONTROL_IPW_POWER = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_IPW
 		IWCONFIG=/usr/sbin/iwconfig
 	else
 		log "VERBOSE" "iwconfig is not installed"
+		IWCONFIG=/bin/false
 	fi
 
 	SET_I3945_AC_PARMS="set_power $IPW3945_AC_POWER"

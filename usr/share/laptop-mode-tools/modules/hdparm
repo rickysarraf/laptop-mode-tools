@@ -22,12 +22,19 @@ is_capable() {
 		return 1;
 	fi
 
-	if [ -n "$(hdparm -I $1 | grep SSD)" ]; then
-		# If the device is a SSD, it is not capable of power management.
-		if [ "$2" = "POWERMGMT" ]; then
-			log "VERBOSE" "$1 is a SSD, not capable of power management"
-			return 1
-		fi
+	# If the disk is an SSD, we skip any of the power mgmt features, for now.
+	SYSFS_DEV=/sys/block/$dev
+	if [ -f $SYSFS_DEV/queue/rotational ]; then
+		IS_ROTATIONAL=`cat $SYSFS_DEV/queue/rotational`
+	else
+		log "VERBOSE" "Disk $THISHD does not support the rotational interface"
+		# We'll apply the traditional drive assumptions here.
+		IS_ROTATIONAL=1
+	fi
+
+	if [ "$IS_ROTATIONAL" -eq 0 ]; then
+		log "VERBOSE" "Disk $THISHD is a NAND (SSD / Flash) Device. Not apply power management savings" 
+		return 1
 	fi
 
 	# If we are running udev, this is the most portable way

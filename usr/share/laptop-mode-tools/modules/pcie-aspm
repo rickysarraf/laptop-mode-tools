@@ -1,0 +1,35 @@
+#! /bin/sh
+#
+# Laptop mode tools module: PCIe Active State Power Management
+#
+
+if [ x$CONTROL_PCIE_ASPM = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_PCIE_ASPM = xauto ]; then
+    if [ $ON_AC -eq 1 ]; then
+        log "VERBOSE" "On AC power: setting pcie_aspm to default"
+        if [ -f /sys/module/pcie_aspm/parameters/policy ]; then
+            echo default > /sys/module/pcie_aspm/parameters/policy
+            if [ $? -eq 0 ]; then
+                log "VERBOSE" "PCIe ASPM set to 'default'"
+            else
+                log "VERBOSE" "PCIe ASPM tweaking is prohibited by the kernel"
+            fi
+        else
+            log "VERBOSE" "PCIe ASPM is not available"
+        fi
+    else
+        log "VERBOSE" "On battery: setting pcie_aspm to powersave"
+        if [ -f /sys/module/pcie_aspm/parameters/policy ]; then
+            echo powersave > /sys/module/pcie_aspm/parameters/policy
+            if [ $? -eq 0 ]; then
+                log "VERBOSE" "PCIe ASPM set to 'powersave'"
+            else
+                log "VERBOSE" "PCIe ASPM tweaking is prohibited by the kernel"
+            fi
+        else
+            log "VERBOSE" "PCIe ASPM is not available"
+        fi
+    fi
+else
+    log "VERBOSE" "PCIe ASPM power savings module is disabled"
+fi
+

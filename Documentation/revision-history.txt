@@ -1,3 +1,13 @@
+1.63 - Sat Mar 23 15:01:31 IST 2013
+    * Kick the power savings back in, as soon as the stick is unplugged
+    * Release lock descriptors in start-stop-programs module. Thanks Renat Sabitov
+    * Add option to disable alarm level check. This is helpful if you have a
+      broken battery reporting incorrect states. Thanks Mike Roddewig
+    * Check for external helper application's presence. And if not available,
+      handle it. Thanks Alain Kalker
+    * Added PCIe ASPM module. Thanks Martin Wimpress
+    * Do not ship the board-specific/ folder in default installs
+
 1.62 - Tue Oct 30 16:45:46 IST 2012
     * Add systemd support
     * Be specific on what file systems we want to handle. Given the wide range of
