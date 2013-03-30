@@ -1,0 +1,26 @@
+#! /bin/sh
+# 
+# Laptop mode tools module: Intel AC97 integrated audio power saving mode.
+#
+
+if [ x$CONTROL_AC97_POWER = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_AC97_POWER = xauto ]; then
+	if [ -w /sys/module/snd_ac97_codec/parameters/power_save ]; then
+		echo 1 > /sys/module/snd_ac97_codec/parameters/power_save
+		log "VERBOSE" "AC97 power save mode enabled."
+                if [ -c /dev/dsp ]; then
+                        # This can fail if the audio device is busy.
+                        # Since this failure is non-fatal (worst case is that the timer changes
+                        # don't get activated), we don't bother if it was successful or not
+                        #(exec 2>/dev/null; echo 1 > /dev/dsp;)
+                        # Better way
+                        echo 1 2>/dev/null >/dev/dsp
+                        log "VERBOSE" "Initialize timer change by close/open /dev/dsp"
+                fi
+	else
+		log "VERBOSE" "AC97 power saving is not available. Perhaps CONFIG_SND_AC97_POWER_SAVE option"
+		log "VERBOSE" "is not set in the kernel config, or the snd_ac97_codec module is not loaded."
+	fi
+else
+	log "VERBOSE" "AC97 audio power setting is disabled."
+fi
+

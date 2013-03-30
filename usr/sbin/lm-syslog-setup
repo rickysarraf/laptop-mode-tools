@@ -1,0 +1,14 @@
+#! /bin/sh
+
+set -e
+
+if [ ! -f /etc/laptop-mode/laptop-mode.conf -o ! -f /usr/sbin/laptop_mode ] ; then
+  echo Laptop mode does not seem to be installed.
+  exit 1
+fi
+
+echo "lm-syslog-setup is no longer supported. Please use the module"
+echo "configuration-file-control, which provides similar funcionality. It is"
+echo "configured using the file:"
+echo "    /etc/laptop-mode/conf.d/configuration-file-control.conf."
+

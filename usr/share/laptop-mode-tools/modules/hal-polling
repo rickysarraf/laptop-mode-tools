@@ -1,0 +1,42 @@
+#! /bin/sh
+#
+# Laptop mode tools module: change HAL polling mode
+#
+
+# Some backward compatibility for version 1.42
+if [ ! x$BATT_ENABLE_HAL_POLLING  = x ] ; then
+	if [ x$BATT_ENABLE_HAL_POLLING  = x1 ] ; then
+		BATT_DISABLE_HAL_POLLING=0
+	else
+		BATT_DISABLE_HAL_POLLING=1
+	fi
+fi
+
+if [ ! x$AC_ENABLE_HAL_POLLING  = x ] ; then
+	if [ x$AC_ENABLE_HAL_POLLING  = x1 ] ; then
+		AC_DISABLE_HAL_POLLING=0
+	else
+		AC_DISABLE_HAL_POLLING=1
+	fi
+fi
+
+
+if [ x$CONTROL_HAL_POLLING = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_HAL_POLLING = xauto ]; then
+	DISABLE_HAL_POLLING=$BATT_DISABLE_HAL_POLLING
+	if [ $ON_AC -eq 1 ] ; then
+		DISABLE_HAL_POLLING=$AC_DISABLE_HAL_POLLING
+	fi
+	if [ x$DISABLE_HAL_POLLING = x1 ] ; then
+		DISABLE_HAL_POLLING_CMD="hal-disable-polling --device"
+	else
+		DISABLE_HAL_POLLING_CMD="hal-disable-polling --enable-polling --device"
+	fi
+
+	for DEV in $HAL_POLLING_DEVICES ; do
+		if [ -b "$DEV" ] ; then
+			$DISABLE_HAL_POLLING_CMD "$DEV"
+			log "VERBOSE" "Executing command $DISABLE_HAL_POLLING_CMD on device $DEV"
+		fi
+	done
+fi
+

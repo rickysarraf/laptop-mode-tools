@@ -1,0 +1,2 @@
+event=ac_adapter.*
+action=/etc/acpi/actions/lm_ac_adapter.sh

@@ -1,0 +1,57 @@
+.TH "LM-PROFILER" "8" 
+.SH "NAME" 
+.I /usr/sbin/lm-profiler
+\- laptop mode profiler 
+.SH "SYNOPSIS" 
+.B /usr/sbin/lm-profiler
+.SH "DESCRIPTION" 
+This manual page documents briefly the 
+.I /usr/sbin/lm-profiler
+command. lm-profiler is a tool for profiling disk operations. It is a part of
+laptop mode tools and
+is useful only in relation to rest of laptop mode tools. It helps you to
+detect programs and services that use up system resources and that cause
+disk activity, and it allows you to disable them when laptop mode is active.
+
+When you start lm-profiler, it will execute a "profiling run", which can
+take some time. Start lm-profiler when you are working on batteries,
+preferably, because that will allow it to analyze the actual situation that
+it is supposed to optimize. During the profiling run, you can use your system
+normally; however, any disk activity caused by your actions will end up in
+the profiler's results. When the profiling run is finished, you will be
+presented with a list of programs that deserve your attention, either because
+they listen on a network (which is not usually useful when you are working
+offline) or because they caused disk activity in a disk-spindown-unfriendly
+pattern. When lm-profiler can guess an init script that belongs to a program,
+it presents you with the opportunity to disable the program when you are
+working on battery. It does this by placing a link to the init script in
+/etc/laptop-mode/batt-stop. Any programs that lm-profiler cannot find an
+init script for is simply reported, so that you can stop the
+program manually if you want to.
+.PP
+.B WARNING ABOUT DISABLING PROGRAMS:
+It may not be safe to disable some programs. They may be needed for proper
+operation of your system. Disable services only if you know what they do
+and why you don't need them.
+.SH "FILES"
+.IP "\fI/etc/lm-profiler.conf\fP" 
+lm-profiler retrieves its profiling rules from this file.
+
+.SH "SEE ALSO" 
+.PP
+lm-profiler.conf(8).
+.PP
+laptop-mode.conf(8).
+.PP
+daemons.conf(8). 
+.SH "AUTHOR" 
+This manual page was written by Bart Samwel (bart@samwel.tk) and
+Jan Polacek (jerome@ucw.cz) for the 
+.B Debian
+system (but may be used by others).  Permission is 
+granted to copy, distribute and/or modify this document under 
+the terms of the GNU General Public License, Version 2 any  
+later version published by the Free Software Foundation. 
+ 
+On Debian systems, the complete text of the GNU General Public 
+License can be found in /usr/share/common-licenses/GPL. 

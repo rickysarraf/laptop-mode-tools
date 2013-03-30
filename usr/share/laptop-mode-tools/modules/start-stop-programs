@@ -1,0 +1,125 @@
+#! /bin/sh
+#
+# Laptop mode tools module: start and stop programs
+#
+
+if [ x$CONTROL_START_STOP = x1 ] ; then
+   #
+   # Undo the previous state.
+   #
+   if [ -f /var/run/laptop-mode-tools/start-stop-undo-actions ] ; then
+	cat /var/run/laptop-mode-tools/start-stop-undo-actions | \
+		while read SCRIPT STARTSTOPACTION ; do
+			$SCRIPT $STARTSTOPACTION
+		done
+   fi
+
+   #
+   # Apply the new state, if LMT is enabled.
+   #
+   if [ "$STATE" = "enabled" ]; then
+	# Empty undo file first. We write the actions we take
+	# into this file, so that we can undo them at the
+	# next state change. Note: we actually
+	# write the actions to the file in reverse order,
+	# so we can execute the commands easily afterwards.
+	echo > /var/run/laptop-mode-tools/start-stop-undo-actions 
+		
+	   
+	if [ $ON_AC -eq 1 ] ; then
+		if [ "$ACTIVATE" -eq 1 ] ; then		
+			START_STOP_DIR_PREFIX=/etc/laptop-mode/lm-ac
+			START_SERVICES="$LM_AC_START"
+			STOP_SERVICES="$LM_AC_STOP"			
+		else
+			START_STOP_DIR_PREFIX=/etc/laptop-mode/nolm-ac
+			START_SERVICES="$NOLM_AC_START"
+			STOP_SERVICES="$NOLM_AC_STOP"			
+		fi
+	else
+		START_STOP_DIR_PREFIX=/etc/laptop-mode/batt
+		START_SERVICES="$BATT_START"
+		STOP_SERVICES="$BATT_STOP"
+	fi
+	START_DIR="$START_STOP_DIR_PREFIX"-start
+	STOP_DIR="$START_STOP_DIR_PREFIX"-stop
+	if [ -d "$STOP_DIR" ] ; then
+		for SCRIPT in "$STOP_DIR"/* ; do
+			if [ -e "$SCRIPT" ] ; then
+				log "VERBOSE" "Stopping $SCRIPT"
+				"$SCRIPT" stop
+				# Dereference any links. When people configure
+				# the directories with links and then they remove
+				# links while laptop mode is active, the "undo"
+				# will fail if we don't dereference the links
+				# before storing them.
+				LINKTARGET=`readlink -f "$SCRIPT"`
+				sed -i "1i $LINKTARGET start" /var/run/laptop-mode-tools/start-stop-undo-actions
+			fi
+		done
+	fi
+	if [ -d "$START_DIR" ] ; then
+		for SCRIPT in "$START_DIR"/* ; do
+			if [ -e "$SCRIPT" ] ; then
+				log "VERBOSE" "Starting $SCRIPT"
+				"$SCRIPT" start
+				LINKTARGET=`readlink -f "$SCRIPT"`
+				sed -i "1i $LINKTARGET stop" /var/run/laptop-mode-tools/start-stop-undo-actions
+			fi
+		done
+	fi
+
+
+	log "VERBOSE" "START_SERVICES = $START_SERVICES"
+	log "VERBOSE" "STOP_SERVICES = $STOP_SERVICES"
+	if [ "$START_SERVICES" != "" -o "$STOP_SERVICES" != "" ] ; then
+		log "MSG" "Starting/stopping services"
+	
+		# Determine how we can start/restart services.
+		if ( which invoke-rc.d > /dev/null ) ; then
+			# Debian uses invoke-rc.d
+			RCPROG="invoke-rc.d "
+			INITSCRIPT=laptop-mode
+		elif ( which service > /dev/null ) ; then
+			# RedHat uses service
+			RCPROG="service "
+			INITSCRIPT=laptop-mode
+		else
+			# Any other -- we start the init script it ourselves.
+
+			# Try non-link directories first, then try links. This helps if one of
+			# the locations is linked to another, which is the case on some distros.
+			if [ -d /etc/rc.d/init.d -a ! -L /etc/rc.d/init.d ] ; then
+				INIT_D=/etc/rc.d/init.d
+			elif [ -d /etc/rc.d -a ! -L /etc/rc.d -a ! -d /etc/rc.d/init.d ] ; then
+				INIT_D=/etc/rc.d
+			elif [ -d /etc/init.d -a ! -L /etc/init.d ] ; then
+				INIT_D=/etc/init.d
+			elif [ -d /etc/rc.d/init.d ] ; then
+				INIT_D=/etc/rc.d/init.d
+			elif [ -d /etc/rc.d ] ; then
+				INIT_D=/etc/rc.d
+			elif [ -d /etc/init.d ] ; then
+				INIT_D=/etc/init.d
+			else
+				log "ERR" "Cannot determine location of init scripts."
+				exit 1
+			fi
+
+			RCPROG="$INIT_D/"
+		fi
+
+		for SERVICE in $STOP_SERVICES ; do
+			log "VERBOSE" "Stopping service $SERVICE."
+			$RCPROG$SERVICE stop
+			sed -i "1i $RCPROG$SERVICE start" /var/run/laptop-mode-tools/start-stop-undo-actions
+		done
+		for SERVICE in $START_SERVICES ; do
+			log "VERBOSE" "Starting service $SERVICE."
+			$RCPROG$SERVICE start
+			sed -i "1i $RCPROG$SERVICE stop" /var/run/laptop-mode-tools/start-stop-undo-actions
+		done
+	fi
+   fi
+fi
+

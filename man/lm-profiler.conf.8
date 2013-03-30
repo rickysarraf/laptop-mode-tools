@@ -1,0 +1,77 @@
+.TH "LM-PROFILER.CONF" "8" 
+.SH "NAME" 
+.I /etc/laptop-mode/lm-profiler.conf
+\- Configuration file for \fIlm-profiler\fP, a profiler for laptop-mode-tools.
+.SH "DESCRIPTION" 
+.PP 
+This manual page documents the options that can be set in the 
+.I /etc/laptop-mode/lm-profiler.conf
+configuration file.  For a description of what lm-profiler does, see the
+lm-profiler(8) manpage.
+
+.SH "SETTINGS" 
+.PP 
+The syntax of options is \fBOPTION=value\fP. 
+
+.PP
+The following settings are available in \fIlm-profiler.conf\fP: 
+
+.IP "\fBVERBOSE_OUTPUT\fP" 10
+Set this to 1 if you want to see a lot of output when you run lm-profiler, 
+and 0 if you don't want this. Useful for debugging purposes. (Currently
+does nothing.)
+
+.IP "\fBPROFILE_RUN_LENGTH\fP" 10 
+The length of a profiling run, in seconds. This should be a while, so that
+lm-profiler can gather enough information. The default is 10 minutes (600
+seconds).
+
+.IP "\fBACTIVITY_INTERVAL_MIN\fP" 10 
+.IP "\fBACTIVITY_INTERVAL_MAX\fP" 10 
+The behaviour that you want to avoid when you have your hard
+drive spun down, is disk accesses that are spread out over time, because
+your hard drive will have to spin up for each access. lm-profiler detects
+when applications perform disk accesses that are at least some time apart
+(otherwise they can be considered part of the same access) but not TOO
+far apart (otherwise they are no problem). These settings configure what
+lm-profiler considers "at least some time apart" and "too far apart",
+respectively, in seconds.
+
+.IP "\fBRECOMMEND_DEFAULT_SERVICES\fP" 10 
+.IP "\fBDEFAULT_SERVICES\fP" 10
+If \fBRECOMMEND_DEFAULT_SERVICES\fP is set to 1 (enabled), then lm-profiler will always
+suggest turning off the services listed in \fBDEFAULT_SERVICES\fP (separated by
+spaces).
+ 
+.IP "\fBIGNORE_PROGRAMS\fP" 10 
+Programs listed in this option, separated by spaces, will be ignored for
+disk activity profiling. The default settings (which can be referenced
+as \fB$DEF_IGNORE_PROGRAMS\fP) include common utility programs and all programs
+used by lm-profiler itself.
+
+.IP "\fBRECOMMEND_NETWORK_SERVICES\fP" 10 
+When this option is enabled (value 1), lm-profiler will detect any services
+that are listening on network ports, and it will suggest that you disable
+them.
+
+.IP "\fBIGNORE_NETWORK_SERVICES\fP" 10 
+Services listed in this configuration option (separated by spaces) are not
+suggested as a network service by lm-profiler. The default values can be
+accessed as \fB$DEF_IGNORE_NETWORK_SERVICES\fP.
+ 
+
+.SH "SEE ALSO" 
+.PP 
+lm-profiler(8).
+.PP
+laptop_mode(8).
+.PP
+laptop-mode.conf(8).
+.SH "AUTHOR" 
+.PP 
+This manual page was written by Bart Samwel (bart@samwel.tk). Permission is 
+granted to copy, distribute and/or modify this document under 
+the terms of the GNU General Public License, Version 2 any  
+later version published by the Free Software Foundation. 
+ 
+.\" created by instant / docbook-to-man, Tue 09 Nov 2004, 23:14 

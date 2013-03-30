@@ -1,0 +1,80 @@
+#! /bin/sh
+#
+# chkconfig: - 99 99
+# description: Starts and stops "laptop-mode" - tweaks system behavior
+#              to extend battery life.
+#
+# config:  /etc/laptop-mode/laptop-mode.conf
+
+test -f /usr/sbin/laptop_mode || exit 0
+
+if [ -f /lib/lsb/init-functions ] ; then
+  . /lib/lsb/init-functions
+else
+  log_success_msg()
+  {
+    logger -t LAPTOP-MODE -p daemon.info -- $*
+    echo "$*"
+  }
+  log_failure_msg()
+  {
+    logger -t LAPTOP-MODE -p daemon.notice -- $*
+    echo "$*"
+  }
+fi
+
+# Enable laptop mode when the system is booted when running on battery.
+
+case $1 in
+  start)
+    mkdir -p /var/run/laptop-mode-tools
+    touch /var/run/laptop-mode-tools/enabled
+    if RESULT=`/usr/sbin/laptop_mode auto` ; then
+      log_success_msg "$RESULT"
+    else
+      log_failure_msg "$RESULT"
+    fi
+    ;;
+
+  restart|reload|force-reload)
+    # Full restart: first stop laptop mode completely (to restore default mount options etc.)
+    mkdir -p /var/run/laptop-mode-tools
+    rm -f /var/run/laptop-mode-tools/enabled    
+    if RESULT=`/usr/sbin/laptop_mode stop` ; then
+      log_success_msg "$RESULT"
+    else
+      log_failure_msg "$RESULT"
+    fi
+
+    # Now remove files containing stored status, re-enable, and start it up again.
+    rm -f /var/run/laptop-mode-tools/*
+    touch /var/run/laptop-mode-tools/enabled
+    if RESULT=`/usr/sbin/laptop_mode auto force` ; then
+      log_success_msg "$RESULT"
+    else
+      log_failure_msg "$RESULT"
+    fi
+    ;;
+
+  stop)
+    rm -f /var/run/laptop-mode-tools/enabled
+    if RESULT=`/usr/sbin/laptop_mode stop` ; then
+      log_success_msg "$RESULT"
+    else
+      log_failure_msg "$RESULT"
+    fi
+    ;;
+
+  status)
+    echo "Laptop mode status:"
+    echo
+    /usr/sbin/laptop_mode status
+    ;;
+    
+  *)
+    echo "Usage: $0 {stop|start|restart|reload|force-reload|status}" >&2
+    exit 2
+    ;;
+esac
+
+exit 0

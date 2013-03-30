@@ -1,0 +1,39 @@
+#!/bin/sh
+
+# This file is part of laptop-mode-tools.
+#
+# Adaptation for laptop mode is Copyright (c) 2004 Bart Samwel
+# Copyright (c) 2000-2002 Massachusetts Institute of Technology
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or (at
+# your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+# 02111-1307, USA.
+
+set -e
+
+LMODE=/usr/sbin/laptop_mode
+
+[ -x "${LMODE}" ] || exit 0
+
+if [ "${1}" = "start" ]; then
+    ${LMODE} auto
+elif [ "${1}" = "resume" ] && [ "${2}" != "standby" ]; then
+    ${LMODE} auto
+elif [ "${1},${2}" = "change,power" ]; then
+    ${LMODE} auto
+elif [ "${1}" = "stop" ]; then
+    ${LMODE} stop
+
+fi
+exit 0

@@ -1,0 +1,153 @@
+#! /bin/sh
+# 
+# Laptop mode tools module: power saving for IPW3945, IPW2200 and IPW2100 using
+#                           the Intel ipw drivers.
+#
+#
+# This script relies upon the name of the driver.
+#
+# Original source: http://ubuntuforums.org/showthread.php?t=419772
+
+if [ x$CONTROL_IPW_POWER = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_IPW_POWER = xauto ]; then
+
+	# Provide defaults for config file settings
+	[ "$IPW3945_AC_POWER" ]   || IPW3945_AC_POWER=6
+	[ "$IPW3945_BATT_POWER" ] || IPW3945_BATT_POWER=7
+	[ "$IPW2100_AC_POWER" ]   || IPW3945_AC_POWER=0
+	[ "$IPW2100_BATT_POWER" ] || IPW3945_BATT_POWER=5
+
+	I3945_DRIVERNAME=ipw3945
+	I2200_DRIVERNAME=ipw2200
+	I2100_DRIVERNAME=ipw2100
+
+	# find executables
+	if [ -x /sbin/iwpriv ] ; then
+		IWPRIV=/sbin/iwpriv
+	elif [ -x /usr/sbin/iwpriv ] ; then
+		IWPRIV=/usr/sbin/iwpriv
+	else
+		log "VERBOSE" "iwpriv is not installed"
+	fi
+	if [ -x /sbin/iwconfig ] ; then
+		IWCONFIG=/sbin/iwconfig
+	elif [ -x /usr/sbin/iwconfig ] ; then
+		IWCONFIG=/usr/sbin/iwconfig
+	else
+		log "VERBOSE" "iwconfig is not installed"
+	fi
+
+	SET_I3945_AC_PARMS="set_power $IPW3945_AC_POWER"
+	SET_I3945_BAT_PARMS="set_power $IPW3945_BATT_POWER"
+
+	SET_I2200_AC_PARMS="power off"
+	SET_I2200_BAT_PARMS="power on"
+
+	# Note the fact that we're setting "power on" on both AC and battery.
+	# This is due to the fact that the second statement will have no effect
+	# if we turn power management off completely, and some laptops will
+	# reportedly get very hot if you turn off power management on the
+	# IPW2100.
+	SET_I2100_AC_PARMS_1="power on"
+	SET_I2100_BAT_PARMS_1="power on"
+	SET_I2100_AC_PARMS_2="set_power $IPW2100_AC_POWER"
+	SET_I2100_BAT_PARMS_2="set_power $IPW2100_BATT_POWER"
+
+
+	#
+	# Find all the wireless devices using the supplied driver names.
+	# Place the interface names on the list WIFI_IFNAMES.
+	#
+	findWifiIfsByDriver() {
+		local DEVICE;
+		local LINK_TARGET;
+                local ENABLED;
+		WIFI_IFNAMES=""
+
+		for DEVICE in /sys/class/net/*; do
+			if [ -d $DEVICE/wireless -a -h $DEVICE/device/driver ]; then
+				# See if the driver for $DEVICE matches the supplied one by checking the link to
+				# the driver.
+				LINK_TARGET=`readlink $DEVICE/device/driver`
+				LINK_TARGET=${LINK_TARGET##*/}
+                                ENABLED=`cat $DEVICE/device/enable`
+
+				if [ $ENABLED -eq 1 -a "$LINK_TARGET" = "$1" ]; then
+					# add the interface name to the list
+		    		        WIFI_IFNAMES="$WIFI_IFNAMES ${DEVICE##*/}"
+                                else
+                                        log "VERBOSE" "$DEVICE doesn't seem to be enabled. Radio Switched off?";
+				fi
+                        else
+                                # LP: #369113
+                                # Kernel's 2.6.29 and above have been reported to be missing
+                                # the $DEVICE/wireless folder.
+                                dev=`basename $DEVICE`
+                                $IWCONFIG $dev >/dev/null 2>&1;
+                                ret=$?;
+                                if [ "$ret" = "0" ]; then
+					# add the interface name to the list
+		    		        WIFI_IFNAMES="$WIFI_IFNAMES ${DEVICE##*/}"
+                                fi
+			fi
+		done
+	}
+
+
+	#
+	# Set all the adaptors using the supplied driver into the supplied
+	# power saving mode
+	#
+	# $1 - driver name
+	# $2 - power command
+	# $3 - power command arguments
+	#
+	setWifiPwrSave () {
+		local DEVICE;
+		findWifiIfsByDriver $1;
+
+		for DEVICE in $WIFI_IFNAMES; do
+			log "VERBOSE" "Wireless power saving: $2 $DEVICE $3"
+			$2 $DEVICE $3
+		done
+	}
+
+	intel3945_BatPwrSave () {
+		setWifiPwrSave "$I3945_DRIVERNAME" "$IWPRIV" "$SET_I3945_BAT_PARMS"
+	}
+
+	intel3945_AcPwrSave () {
+		setWifiPwrSave "$I3945_DRIVERNAME" "$IWPRIV" "$SET_I3945_AC_PARMS"
+	}
+
+	intel2200_BatPwrSave () {
+		setWifiPwrSave "$I2200_DRIVERNAME" "$IWCONFIG" "$SET_I2200_BAT_PARMS"
+	}
+
+	intel2200_AcPwrSave () {
+		setWifiPwrSave "$I2200_DRIVERNAME" "$IWCONFIG" "$SET_I2200_AC_PARMS"
+	}
+
+	intel2100_BatPwrSave () {
+		setWifiPwrSave "$I2100_DRIVERNAME" "$IWCONFIG" "$SET_I2100_BAT_PARMS_1"
+		setWifiPwrSave "$I2100_DRIVERNAME" "$IWPRIV" "$SET_I2100_BAT_PARMS_2"
+	}
+
+	intel2100_AcPwrSave () {
+		setWifiPwrSave "$I2100_DRIVERNAME" "$IWCONFIG" "$SET_I2100_AC_PARMS_1"
+		setWifiPwrSave "$I2100_DRIVERNAME" "$IWPRIV" "$SET_I2100_BAT_PARMS_2"
+	}
+
+
+	if [ $ON_AC -eq 1 ] ; then
+		[ -d /sys/module/$I3945_DRIVERNAME ] && intel3945_AcPwrSave
+		[ -d /sys/module/$I2200_DRIVERNAME ] && intel2200_AcPwrSave
+		[ -d /sys/module/$I2100_DRIVERNAME ] && intel2100_AcPwrSave
+	else
+		[ -d /sys/module/$I3945_DRIVERNAME ] && intel3945_BatPwrSave
+		[ -d /sys/module/$I2200_DRIVERNAME ] && intel2200_BatPwrSave
+		[ -d /sys/module/$I2100_DRIVERNAME ] && intel2100_BatPwrSave
+	fi
+else
+	log "VERBOSE" "Intel IPW Wireless power setting is disabled."
+fi
+
