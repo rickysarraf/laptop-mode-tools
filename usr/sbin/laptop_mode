@@ -35,7 +35,7 @@ set -a
 
 # The laptop mode tools version number. Extracted by the installer makefile
 # as well, so don't change the format!
-LMTVERSION=1.62
+LMTVERSION=1.63
 
 # This script is loaded from multiple scripts to set the config defaults
 # and to read the configuration on top of those. Only when the command is
@@ -508,6 +508,9 @@ lmt_load_config ()
     fi
 
     
+    INIT=0          # Display info in init script format?
+    FORCE=0         # Force reapplying the current state?
+    INITSCRIPT_STOP=0	# Track stop command from init script. Consumer is lm-polling daemon
 
     # Evaluate options passed to laptop_mode in here
     if [ "$1" = "status" ] ; then
@@ -599,9 +602,6 @@ lmt_load_config ()
 	    exit 1
     fi
 
-    INIT=0          # Display info in init script format?
-    FORCE=0         # Force reapplying the current state?
-    INITSCRIPT_STOP=0	# Track stop command from init script. Consumer is lm-polling daemon
     while [ "$1" != "" ] ; do
 	    case "$1" in 
 		    init) INIT=1 ;;
