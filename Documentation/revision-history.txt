@@ -1,3 +1,17 @@
+1.62 - Tue Oct 30 16:45:46 IST 2012
+    * Add systemd support
+    * Be specific on what file systems we want to handle. Given the wide range of
+      file systems Linux has, we don't want to consider them all as not all of them
+      fall under the power saving scenarios.
+    * Factor out some common code
+    * Do not touch autonegotiation settings. Fiddling with auto-negotiation settings
+      can cause more problems and the standards expect them to be always on
+    * Trim mount point display
+    * Organize state/STATE tracking so that we get actual results.
+    * cleaner output when asking status. Thanks Jasmine Hassan
+    * Append to stdout/stderr to avoid truncating file logs
+    * Fix spec file for RPM syntax
+    
 1.61 - Thu May 17 17:44:26 IST 2012
     * Handle devices with persistent device naming. This fixes the issues where
       you don't have a disk referenced by a block name, the commit= value was

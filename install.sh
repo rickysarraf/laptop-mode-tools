@@ -110,10 +110,13 @@ $INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode/nolm-ac-start"
 $INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode/nolm-ac-stop"
 $INSTALL -d -m 755 "$DESTDIR/usr/share/laptop-mode-tools/modules"
 $INSTALL -d -m 755 "$DESTDIR/usr/share/laptop-mode-tools/module-helpers"
+$INSTALL -d -m 755 "$DESTDIR/usr/lib/tmpfiles.d"
 $INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode/conf.d"
 $INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode/conf.d/board-specific"
 $INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode/modules"
 $INSTALL -d -m 755 "$DESTDIR/usr/sbin"
+$INSTALL -d -m 755 "$DESTDIR/lib/udev"
+$INSTALL -d -m 755 "$DESTDIR/lib/systemd/system"
 $INSTALL -d -m 755 "$DESTDIR/$MAN_D/man8"
 
 ALREADY_EXISTED=0
@@ -203,6 +206,16 @@ fi
 # udev helper tool
 if ( ! $INSTALL -D -m 755 etc/rules/lmt-udev "$DESTDIR/lib/udev/lmt-udev" ) ; then
 	echo "$0: Failed to install udev helper tool into /lib/udev/ Installation failed."
+fi
+
+# systemd service
+if ( ! $INSTALL -D -m 644 etc/systemd/laptop-mode.service "$DESTDIR/lib/systemd/system/laptop-mode.service" ) ; then
+	echo "$0: Failed to install systemd service into /lib/systemd/system/ Installation failed."
+fi
+
+# and systemd's tmpfiles.d
+if ( ! $INSTALL -D -m 644 etc/systemd/laptop-mode.conf.tmpfiles "$DESTDIR/usr/lib/tmpfiles.d/laptop-mode.conf" ) ; then
+	echo "$0: Failed to install systemd tmpfiles into /usr/lib/tmpfiles.d/ Installation failed."
 fi
 
 ACPI_DONE=0
