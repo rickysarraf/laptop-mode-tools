@@ -1,18 +1,26 @@
-This package was debianized by Bart Samwel <bart@samwel.tk> on
-Thu, 29 Jul 2004 01:01:32 +0200.
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: laptop-mode-tools
+Upstream-Contact: Ritesh Raj Sarraf <rrs@researchut.com
+Source: http://samwel.tk/laptop_mode/
 
-The upstream author is Bart Samwel, who has also done the debianization.
+Files: *
+Copyright: 2004-2010 Bart Samwel
+           2004 Kiko Piris
+           2004 Micha Feigin
+           2004 Andrew Morton
+           2004 Herve Eychenne
+           2004 Dax Kelson
+           2004 Jan Topinski
+	   2010-2013 Ritesh Raj Sarraf
+License: GPL
 
-The website for the upstream package (including debianization) is
+Files: debian/*
+Copyright: 2004-2010 Bart Samwel
+	   2010-2013 Ritesh Raj Sarraf
+License: GPL
 
-http://www.samwel.tk/laptop_mode/
-
-Copyright (c) 2004 by Bart Samwel, Kiko Piris, Micha Feigin, Andrew Morton, 
-Herve Eychenne, Dax Kelson, Jan Topinski
-
-License:
-
-You are free to distribute this software under the terms of
-the GNU General Public License.
-On Debian systems, the complete text of the GNU General Public
-License can be found in the file `/usr/share/common-licenses/GPL'.
+License: GPL
+ You are free to distribute this software under the terms of
+ the GNU General Public License.
+ On Debian systems, the complete text of the GNU General Public
+ License can be found in the file `/usr/share/common-licenses/GPL'.
