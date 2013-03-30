@@ -1,3 +1,25 @@
+laptop-mode-tools (1.63-1) UNRELEASED; urgency=low
+
+  [ Ritesh Raj Sarraf ]
+  * [6ed6b9d] Prepare for 1.63 release
+  * [58ae052] add $LIB_D so it can give the possibility to install
+    udev/system files in different location. Thanks to Robert Milasan
+  * [16da1ab] Check for external helper application's presence. And
+    if not available, handle it. Thanks to Alain Kalker
+  * [fedcb18] Re-order the check because HAL is deprecated.
+    Thanks to Pacho Ramos
+  * [7c17073] Add option to disable alarm level check.
+    Thanks to Mike Roddewig (Closes: #701785)
+  * [7323848] Add manpage for setting DISABLE_BATTERY_ALARM_CHECK
+  * [c35769f] Update manpage about AC97 annoying click sound.
+    Thanks to David Smith (Closes: #686243)
+  * [15121c2] Release lock descriptors in start-stop-programs module.
+    Thanks to Renta Sabitov
+  * [5ffc559] Kick the power savings back in, as soon as the stick is unplugged
+  * [d99d454] Convert debian/copyright to format 1.0 
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sat, 30 Mar 2013 14:49:51 +0530
+
 laptop-mode-tools (1.62-1) experimental; urgency=low
 
   * New Upstream Release
