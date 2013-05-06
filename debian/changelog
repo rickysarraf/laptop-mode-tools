@@ -1,3 +1,9 @@
+laptop-mode-tools (1.63-2) unstable; urgency=low
+
+  * Upload to unstable
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Mon, 06 May 2013 10:37:25 +0530
+
 laptop-mode-tools (1.63-1) experimental; urgency=low
 
   * [ba00340] Imported Upstream version 1.63
