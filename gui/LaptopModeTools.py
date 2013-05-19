@@ -17,9 +17,19 @@ class LaptopModeToolsMainWindow(QtGui.QDialog):
         QtCore.QObject.connect(self.ui.pushButtonDiscard, QtCore.SIGNAL("clicked()"),
                         self.reject )
         
-        
+    def addCheckBox(self, name, location):
+            checkBox = "checkBox" + str(name)
+            self.ui.checkBox = QtGui.QCheckBox(self)
+            self.ui.checkBox.setGeometry(QtCore.QRect(220, location, 21, 21))
+            self.ui.checkBox.setText("")
+            self.ui.checkBox.setObjectName(checkBox)
+                
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
     myapp = LaptopModeToolsMainWindow()
+    location = 170
+    for string in "Strings":
+            myapp.addCheckBox(string, location)
+            location += 30
     myapp.show()
     sys.exit(app.exec_())
