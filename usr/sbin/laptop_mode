@@ -234,7 +234,7 @@ lmt_load_config ()
     test -d /etc/laptop-mode/conf.d/board-specific && CONF_DIR="$CONF_DIR /etc/laptop-mode/conf.d/board-specific"
 
     for PER_DIR in $CONF_DIR; do
-	    for CONF in $PER_DIR/*; do
+	    for CONF in $PER_DIR/*.conf; do
 		    if [ -r "$CONF" ] ; then
 			    . "$CONF"
 			    #Handle individual module debug settings
