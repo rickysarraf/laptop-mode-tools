@@ -1,6 +1,6 @@
 from PyQt4 import QtGui, QtCore
 
-import os, sys
+import os, sys, shutil
 
 try:
         _fromUtf8 = QtCore.QString.fromUtf8
@@ -29,6 +29,8 @@ class MainWidget(QtGui.QWidget):
                 self.findConfig(CONFIG_DIR)
                 
                 self.checkBoxList = {}
+                self.configBool = None
+                
                 for eachOption in self.configOptions.keys():
                         
                         self.readConfig(eachOption, self.configOptions)
@@ -80,12 +82,22 @@ class MainWidget(QtGui.QWidget):
                 for eachWriteOption in self.configOptions.keys():
                         checkBoxName = "checkBox_" + eachWriteOption
                         if self.checkBoxList[checkBoxName].isChecked() is True:
-                                print "Hola!!"
+                                self.populateValues(self.configOptions[eachWriteOption], 1)
                         else:
-                                print "Howdy!!"
+                                self.populateValues(self.configOptions[eachWriteOption], 0)
 
-        def populateValues(self):
-                pass
+        def populateValues(self, path, value):
+                readHandle = open(path, 'r')
+                writeHandle = open(path + ".tmp", 'w')
+                for line in readHandle.readlines():
+                        if line.startswith(CONTROL_IDENTIFIER):
+                                newline = line.split("=")[0] + "=" + str(value)
+                                writeHandle.write(newline)
+                        else:
+                                writeHandle.write(line)
+                readHandle.close()
+                writeHandle.close()
+                shutil.move(path + ".tmp", path)
         
         def retranslateUi(self):
                 self.setWindowTitle(QtGui.QApplication.translate("MainWidget", "Laptop Mode Tools Configuration Tool", None, QtGui.QApplication.UnicodeUTF8))
@@ -108,8 +120,7 @@ class MainWidget(QtGui.QWidget):
                         
         def readConfig(self, key, configOptionsDict):
                 self.tooltip = ''
-                self.configBool = None
-                
+                                
                 if key is None or configOptionsDict is None:
                         return False
                 
@@ -123,8 +134,9 @@ class MainWidget(QtGui.QWidget):
                                 self.tooltip = self.tooltip + line.lstrip(COMMENT_IDENTIFIER)
                         elif line.startswith(CONTROL_IDENTIFIER):
                                 boolValue = line.split("=")[1]
+                                boolValue = boolValue.rstrip("\n") ### Bloody boolValue could inherit the '\n' new line
                                 
-                                if boolValue is 1 or "\"auto\"" in boolValue:
+                                if boolValue == str(1) or "\"auto\"" in boolValue:
                                         self.configBool = True
                                 else:
                                         self.configBool = False
