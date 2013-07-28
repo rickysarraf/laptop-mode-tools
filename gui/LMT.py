@@ -65,7 +65,7 @@ class MainWidget(QtGui.QWidget):
                         
                 self.label = QtGui.QLabel(self)
                 self.label.setObjectName("label")
-                self.label.setGeometry(QtCore.QRect(400, 50, 61, 16))
+                self.label.setGeometry(QtCore.QRect(25, 50, 400, 16))
                 self.label.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Maximum)
                 
                 self.setGeometry(100, 100, 800, 600)
@@ -104,7 +104,7 @@ class MainWidget(QtGui.QWidget):
                 self.setWindowTitle(QtGui.QApplication.translate("MainWidget", "Laptop Mode Tools Configuration Tool", None, QtGui.QApplication.UnicodeUTF8))
                 self.pushButtonApply.setText(QtGui.QApplication.translate("MainWidget", "Apply", None, QtGui.QApplication.UnicodeUTF8))
                 self.pushButtonDiscard.setText(QtGui.QApplication.translate("MainWidget", "Exit", None, QtGui.QApplication.UnicodeUTF8))
-                self.label.setText(QtGui.QApplication.translate("MainWidget", "LMT Option", None, QtGui.QApplication.UnicodeUTF8))
+                self.label.setText(QtGui.QApplication.translate("MainWidget", "Laptop Mode Tools - Module Configuration", None, QtGui.QApplication.UnicodeUTF8))
                 
         def findConfig(self, configDir):
                 if configDir is None:
