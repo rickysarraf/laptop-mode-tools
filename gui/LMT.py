@@ -55,16 +55,19 @@ class MainWidget(QtGui.QWidget):
                 
                 self.pushButtonApply = QtGui.QPushButton(self)
                 self.pushButtonApply.setGeometry(QtCore.QRect(411, 550, 61, 27))
-                self.pushButtonApply.setText("Apply")
                 self.pushButtonApply.setObjectName(_fromUtf8("pushButtonApply"))
+                self.pushButtonApply.setToolTip(_fromUtf8("Apply checked changes"))
+                
                 self.pushButtonDiscard = QtGui.QPushButton(self)
                 self.pushButtonDiscard.setGeometry(QtCore.QRect(341, 550, 61, 27))
                 self.pushButtonDiscard.setObjectName(_fromUtf8("pushButtonDiscard"))
+                self.pushButtonDiscard.setToolTip(_fromUtf8("Exit application"))
                         
-                self.label_2 = QtGui.QLabel(self)
-                self.label_2.setObjectName("label")
-                self.label_2.setGeometry(QtCore.QRect(400, 50, 61, 16))
-                self.label_2.setText(QtGui.QApplication.translate("MainWidget", "LMT", None, QtGui.QApplication.UnicodeUTF8))
+                self.label = QtGui.QLabel(self)
+                self.label.setObjectName("label")
+                self.label.setGeometry(QtCore.QRect(400, 50, 61, 16))
+                self.label.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Maximum)
+                
                 
                 self.setGeometry(100, 100, 800, 600)
                 
@@ -102,9 +105,8 @@ class MainWidget(QtGui.QWidget):
         def retranslateUi(self):
                 self.setWindowTitle(QtGui.QApplication.translate("MainWidget", "Laptop Mode Tools Configuration Tool", None, QtGui.QApplication.UnicodeUTF8))
                 self.pushButtonApply.setText(QtGui.QApplication.translate("MainWidget", "Apply", None, QtGui.QApplication.UnicodeUTF8))
-                self.pushButtonDiscard.setText(QtGui.QApplication.translate("MainWidget", "Discard", None, QtGui.QApplication.UnicodeUTF8))
-                #self.label.setText(QtGui.QApplication.translate("MainWidget", "LMT Option", None, QtGui.QApplication.UnicodeUTF8))
-                #self.label_2.setText(QtGui.QApplication.translate("MainWidget", "Enabled", None, QtGui.QApplication.UnicodeUTF8))
+                self.pushButtonDiscard.setText(QtGui.QApplication.translate("MainWidget", "Exit", None, QtGui.QApplication.UnicodeUTF8))
+                self.label.setText(QtGui.QApplication.translate("MainWidget", "LMT Option", None, QtGui.QApplication.UnicodeUTF8))
                 
         
         def findConfig(self, configDir):
