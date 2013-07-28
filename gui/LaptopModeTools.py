@@ -20,9 +20,11 @@ class LaptopModeToolsMainWindow(QtGui.QDialog):
     def addCheckBox(self, name, location):
             checkBox = "checkBox" + str(name)
             self.ui.checkBox = QtGui.QCheckBox(self)
-            self.ui.checkBox.setGeometry(QtCore.QRect(220, location, 21, 21))
-            self.ui.checkBox.setText("")
             self.ui.checkBox.setObjectName(checkBox)
+            self.ui.checkBox.setGeometry(QtCore.QRect(220, location, 21, 21))
+            self.ui.checkBox.setText("abc")
+            self.ui.checkBox.setToolTip("abc")
+            
                 
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
