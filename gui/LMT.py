@@ -8,6 +8,7 @@ except AttributeError:
         _fromUtf8 = lambda s: s
         
 COMMENT_IDENTIFIER = "#__COMMENT"
+CONTROL_IDENTIFIER = "CONTROL_"
 
 class MainWidget(QtGui.QWidget):
         def __init__(self, parent=None):
@@ -26,42 +27,27 @@ class MainWidget(QtGui.QWidget):
                 self.configOptions = {}
                 self.findConfig('/etc/laptop-mode/conf.d/')
                 
-                self.test = {}
+                self.checkBoxList = {}
                 for eachOption in self.configOptions.keys():
                         
                         self.readConfig(eachOption, self.configOptions)
-                        
                         self.subLayout = QtGui.QHBoxLayout()
-#                         self.subLayout.addWidget(QtGui.QLabel("Enable module %s" % eachOption, self))
-#                         self.subLayout.setObjectName("Label" + eachOption)
-#                         self.subLayout.addWidget(QtGui.QCheckBox(self))
-#                         self.subLayout.setObjectName("CheckBox" + eachOption)
-#                         self.subLayout.addStretch(1)
                         
-                        self.checkBoxNamee = "checkBox" + "_" + eachOption
-                        print self.checkBoxNamee
-                        self.test[self.checkBoxNamee] = QtGui.QCheckBox(self.checkBoxNamee, self)
-                        self.test[self.checkBoxNamee].setObjectName(self.checkBoxNamee)
-                        self.test[self.checkBoxNamee].setText("Enable module %s" % eachOption)
-                        print self.test[self.checkBoxNamee]
+                        self.checkBoxName = "checkBox" + "_" + eachOption
+                        self.checkBoxList[self.checkBoxName] = QtGui.QCheckBox(self.checkBoxName, self)
+                        self.checkBoxList[self.checkBoxName].setObjectName(self.checkBoxName)
+                        self.checkBoxList[self.checkBoxName].setText("Enable module %s" % eachOption)
                         
                         if self.tooltip is not '':
-                                self.test[self.checkBoxNamee].setToolTip(self.tooltip)
-                                #self.subLayout.CheckBoxruntimepm.setToolTip(self.tooltip)
+                                self.checkBoxList[self.checkBoxName].setToolTip(self.tooltip)
                         else:
-                                self.test[self.checkBoxNamee].setToolTip("Configuration settings for %s" % eachOption)
-                                print eachOption
-                                #self.subLayout.CheckBox+"%s".setToolTip(self.tooltip) % (eachOption)
+                                self.checkBoxList[self.checkBoxName].setToolTip("Configuration settings for %s" % eachOption)
                                 
                         if self.configBool is True:
-                                self.test[self.checkBoxNamee].setChecked(True)
+                                self.checkBoxList[self.checkBoxName].setChecked(True)
                         
-                        
-                        self.subLayout.addWidget(self.test[self.checkBoxNamee])
-                        
+                        self.subLayout.addWidget(self.checkBoxList[self.checkBoxName])
                         self.vbox.addLayout(self.subLayout)
-                print self.subLayout.count()
-                print self.vbox.count()
                 self.scrollArea.setWidget(self.window)
                 
                 self.pushButtonApply = QtGui.QPushButton(self)
@@ -92,8 +78,7 @@ class MainWidget(QtGui.QWidget):
         def writeConfig(self):
                 for eachWriteOption in self.configOptions.keys():
                         checkBoxName = "checkBox_" + eachWriteOption
-                        print checkBoxName
-                        if self.test[checkBoxName].isChecked() is True:
+                        if self.checkBoxList[checkBoxName].isChecked() is True:
                                 print "Hola!!"
                         else:
                                 print "Howdy!!"
@@ -135,7 +120,7 @@ class MainWidget(QtGui.QWidget):
                 for line in fileHandle.readlines():
                         if line.startswith(COMMENT_IDENTIFIER):
                                 self.tooltip = self.tooltip + line.lstrip(COMMENT_IDENTIFIER)
-                        elif line.startswith("CONTROL_"):
+                        elif line.startswith(CONTROL_IDENTIFIER):
                                 boolValue = line.split("=")[1]
                                 
                                 if boolValue is 1 or "\"auto\"" in boolValue:
