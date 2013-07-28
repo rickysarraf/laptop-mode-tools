@@ -105,15 +105,15 @@ class MainWidget(QtGui.QWidget):
                         else:
                                 pass
                         
-        def readConfig(self, key, dict):
+        def readConfig(self, key, configOptionsDict):
                 self.tooltip = ''
                 self.configBool = None
                 
-                if key is None or dict is None:
+                if key is None or configOptionsDict is None:
                         return False
                 
                 try:
-                        fileHandle = open(dict[key], 'r')
+                        fileHandle = open(configOptionsDict[key], 'r')
                 except:
                         return False
                 
