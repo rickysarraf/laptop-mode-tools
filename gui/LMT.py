@@ -68,7 +68,6 @@ class MainWidget(QtGui.QWidget):
                 self.label.setGeometry(QtCore.QRect(400, 50, 61, 16))
                 self.label.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Maximum)
                 
-                
                 self.setGeometry(100, 100, 800, 600)
                 
                 # Connect the clicked signal of the Ok button to it's slot
@@ -79,7 +78,6 @@ class MainWidget(QtGui.QWidget):
                                 sys.exit )
                 
                 self.retranslateUi()
-                
                 
         def writeConfig(self):
                 for eachWriteOption in self.configOptions.keys():
@@ -108,7 +106,6 @@ class MainWidget(QtGui.QWidget):
                 self.pushButtonDiscard.setText(QtGui.QApplication.translate("MainWidget", "Exit", None, QtGui.QApplication.UnicodeUTF8))
                 self.label.setText(QtGui.QApplication.translate("MainWidget", "LMT Option", None, QtGui.QApplication.UnicodeUTF8))
                 
-        
         def findConfig(self, configDir):
                 if configDir is None:
                         return False
@@ -146,9 +143,6 @@ class MainWidget(QtGui.QWidget):
                 # This will ensure that even if we don't read any string, tooltip doesn't fail
                 self.tooltip = self.tooltip + ''             
 
-
-import resources_rc
-                
 if __name__=="__main__":
         from sys import argv, exit
         a=QtGui.QApplication(argv)
