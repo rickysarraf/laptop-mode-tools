@@ -9,6 +9,7 @@ except AttributeError:
         
 COMMENT_IDENTIFIER = "#__COMMENT"
 CONTROL_IDENTIFIER = "CONTROL_"
+CONFIG_DIR = "/var/tmp/laptop-mode/conf.d"
 
 class MainWidget(QtGui.QWidget):
         def __init__(self, parent=None):
@@ -25,7 +26,7 @@ class MainWidget(QtGui.QWidget):
                 self.vbox = QtGui.QVBoxLayout(self.window)
                 
                 self.configOptions = {}
-                self.findConfig('/etc/laptop-mode/conf.d/')
+                self.findConfig(CONFIG_DIR)
                 
                 self.checkBoxList = {}
                 for eachOption in self.configOptions.keys():
