@@ -94,6 +94,7 @@ class MainWidget(QtGui.QWidget):
                         if line.startswith(CONTROL_IDENTIFIER):
                                 newline = line.split("=")[0] + "=" + str(value)
                                 writeHandle.write(newline)
+				writeHandle.write("\n") ### You need this newline, otherwise the next line gets overlapped here
                         else:
                                 writeHandle.write(line)
                 readHandle.close()
