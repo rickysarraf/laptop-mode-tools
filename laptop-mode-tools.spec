@@ -70,11 +70,11 @@ fi
 %doc %{_mandir}/man8/lm-syslog-setup.8
 %config %{_sysconfdir}/acpi/actions/lm_*.sh
 %config %{_sysconfdir}/acpi/events/lm_*
-%config %{_sysconfdir}/udev/rules.d/99-laptop-mode.rules
 %config(noreplace) %{_sysconfdir}/laptop-mode/
 %config %{_initrddir}/laptop-mode
 /lib/udev/lmt-udev
 /lib/systemd/system/laptop-mode.service
+/lib/udev/rules.d/99-laptop-mode.rules
 
 %{_sysconfdir}/apm/event.d/*
 %{_sysconfdir}/power/scripts.d/*

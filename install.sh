@@ -33,7 +33,7 @@
 [ -z "$UDEV_D" ] && UDEV_D="$LIB_D/udev"
 [ -z "$SYSTEMD" ] && SYSTEMD="yes"
 [ -z "$SYSTEMD_UNIT_D" ] && SYSTEMD_UNIT_D="$LIB_D/systemd/system"
-[ -z "$TMPFILES_D" ] && TMPFILES_D="$LIB_D/tmpfiles.d"
+[ -z "$TMPFILES_D" ] && TMPFILES_D="$ULIB_D/tmpfiles.d"
 
 if [ -z "$ACPI" ] ; then
 	ACPI=auto
