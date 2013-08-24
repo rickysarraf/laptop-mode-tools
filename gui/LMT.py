@@ -146,6 +146,10 @@ class MainWidget(QtGui.QWidget):
 
 if __name__=="__main__":
         from sys import argv, exit
+
+	if os.geteuid() != 0:
+		print "Need Admin/root privileges."
+		sys.exit(1)
         a=QtGui.QApplication(argv)
         win=MainWidget()
         win.show()
