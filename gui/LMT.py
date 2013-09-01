@@ -11,6 +11,16 @@ COMMENT_IDENTIFIER = "#__COMMENT"
 CONTROL_IDENTIFIER = "CONTROL_"
 CONFIG_DIR = "/var/tmp/laptop-mode/conf.d"
 
+class Log():
+	def debug(self, str):
+		sys.stderr.write(str + "\n")
+
+	def msg(self, str):
+		sys.stdout.write(str + "\n")
+
+	def err(self, str):
+		sys.stderr.write(str + "\n")
+		
 class MainWidget(QtGui.QWidget):
         def __init__(self, parent=None):
                 QtGui.QWidget.__init__(self, parent)
@@ -160,8 +170,10 @@ class MainWidget(QtGui.QWidget):
 if __name__=="__main__":
         from sys import argv, exit
 
+	log = Log()
+
 	if os.geteuid() != 0:
-		print "Need Admin/root privileges."
+		log.err("Need Admin/root privileges.")
 		sys.exit(1)
         a=QtGui.QApplication(argv)
         win=MainWidget()
