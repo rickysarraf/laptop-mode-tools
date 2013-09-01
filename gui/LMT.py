@@ -80,26 +80,39 @@ class MainWidget(QtGui.QWidget):
                 self.retranslateUi()
                 
         def writeConfig(self):
+		finalResult = True
                 for eachWriteOption in self.configOptions.keys():
                         checkBoxName = "checkBox_" + eachWriteOption
                         if self.checkBoxList[checkBoxName].isChecked() is True:
-                                self.populateValues(self.configOptions[eachWriteOption], 1)
+                                ret = self.populateValues(self.configOptions[eachWriteOption], 1)
                         else:
-                                self.populateValues(self.configOptions[eachWriteOption], 0)
+                                ret = self.populateValues(self.configOptions[eachWriteOption], 0)
+			
+			if ret is False:
+				finalResult = False
+
+		if finalResult is False:
+			QtGui.QMessageBox.critical(self, "Error", "Couldn't apply all requested settings")
+		else:
+			QtGui.QMessageBox.information(self, "Success", "Applied all requested settings")
 
         def populateValues(self, path, value):
-                readHandle = open(path, 'r')
-                writeHandle = open(path + ".tmp", 'w')
-                for line in readHandle.readlines():
-                        if line.startswith(CONTROL_IDENTIFIER):
-                                newline = line.split("=")[0] + "=" + str(value)
-                                writeHandle.write(newline)
-				writeHandle.write("\n") ### You need this newline, otherwise the next line gets overlapped here
-                        else:
-                                writeHandle.write(line)
-                readHandle.close()
-                writeHandle.close()
-                shutil.move(path + ".tmp", path)
+		try:
+                	readHandle = open(path, 'r')
+                	writeHandle = open(path + ".tmp", 'w')
+                	for line in readHandle.readlines():
+                        	if line.startswith(CONTROL_IDENTIFIER):
+                                	newline = line.split("=")[0] + "=" + str(value)
+                                	writeHandle.write(newline)
+					writeHandle.write("\n") ### You need this newline, otherwise the next line gets overlapped here
+                        	else:
+                                	writeHandle.write(line)
+                	readHandle.close()
+                	writeHandle.close()
+                	shutil.move(path + ".tmp", path)
+			return True
+		except:
+			return False
         
         def retranslateUi(self):
                 self.setWindowTitle(QtGui.QApplication.translate("MainWidget", "Laptop Mode Tools Configuration Tool", None, QtGui.QApplication.UnicodeUTF8))
