@@ -9,7 +9,7 @@ except AttributeError:
         
 COMMENT_IDENTIFIER = "#__COMMENT"
 CONTROL_IDENTIFIER = "CONTROL_"
-CONFIG_DIR = "/var/tmp/laptop-mode/conf.d"
+CONFIG_DIR = "/etc/laptop-mode/conf.d"
 
 class Log():
 	def debug(self, str):
