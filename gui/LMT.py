@@ -99,6 +99,7 @@ class MainWidget(QtGui.QWidget):
                                 ret = self.populateValues(self.configOptions[eachWriteOption], 0)
 			
 			if ret is False:
+				log.debug("Couldn't apply setting for %s" % checkBoxName)
 				finalResult = False
 
 		if finalResult is False:
@@ -122,6 +123,7 @@ class MainWidget(QtGui.QWidget):
                 	shutil.move(path + ".tmp", path)
 			return True
 		except:
+			log.debug("Failed in populateValues() when operating on %s" % path)
 			return False
         
         def retranslateUi(self):
