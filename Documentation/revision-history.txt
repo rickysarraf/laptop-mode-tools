@@ -1,3 +1,14 @@
+1.64 - Sun Sep  1 13:15:02 IST 2013
+    * Don't touch USB Controller power settings. The individual devices, when plugged
+      in, while on battery, inherit the power settings from the USB controller
+    * start-stop-programs: add support for systemd. Thanks to Alexander Mezin
+    * Replace hardcoded path to udevadm with "which udevadm". Thanks to Alexander Mezin
+    * Honor .conf files only. Thanks to Sven Köhler
+    * Make '/usr/lib' path configurable. This is especially useful for systems that use
+      /usr/lib64, or /lib64 directly. Thanks to Nicolas Braud-Santoni
+    * Don't call killall with the -g argument. Thanks to Murray Campbell
+    * Fix RPM Spec file build errors
+
 1.63 - Sat Mar 23 15:01:31 IST 2013
     * Kick the power savings back in, as soon as the stick is unplugged
     * Release lock descriptors in start-stop-programs module. Thanks Renat Sabitov
