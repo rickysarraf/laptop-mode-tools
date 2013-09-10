@@ -61,7 +61,7 @@ fi
 %files
 %defattr(-, root, root, 0755)
 
-%doc COPYING Documentation/*.txt README
+%doc COPYING Documentation/*.txt README.md
 %docdir %{_mandir}
 %doc %{_mandir}/man8/laptop-mode.conf.8
 %doc %{_mandir}/man8/laptop_mode.8
