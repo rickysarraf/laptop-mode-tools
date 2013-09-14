@@ -29,10 +29,11 @@
 
 [ -z "$MAN_D" ] && MAN_D="/usr/man"
 [ -z "$LIB_D" ] && LIB_D="/lib"
+[ -z "$ULIB_D" ] && ULIB_D="/usr/lib"
 [ -z "$UDEV_D" ] && UDEV_D="$LIB_D/udev"
 [ -z "$SYSTEMD" ] && SYSTEMD="yes"
 [ -z "$SYSTEMD_UNIT_D" ] && SYSTEMD_UNIT_D="$LIB_D/systemd/system"
-[ -z "$TMPFILES_D" ] && TMPFILES_D="$LIB_D/tmpfiles.d"
+[ -z "$TMPFILES_D" ] && TMPFILES_D="$ULIB_D/tmpfiles.d"
 
 if [ -z "$ACPI" ] ; then
 	ACPI=auto
@@ -188,15 +189,15 @@ fi
 
 # Install pm-utils hook only if pm-utils config dir is present, or force the
 # install if we have a DESTDIR.
-if [ -n "$DESTDIR" -o -d "$DESTDIR/usr/lib/pm-utils/sleep.d" ] ; then
-	if ( ! $INSTALL -D -m 755 usr/lib/pm-utils/sleep.d/01laptop-mode "$DESTDIR/usr/lib/pm-utils/sleep.d/01laptop-mode" ) ; then
-		echo "$0: Failed to install 01-laptop-mode into /usr/lib/pm-utils/sleep.d. Installation failed."
+if [ -n "$DESTDIR" -o -d "$DESTDIR/$ULIB_D/pm-utils/sleep.d" ] ; then
+	if ( ! $INSTALL -D -m 755 usr/lib/pm-utils/sleep.d/01laptop-mode "$DESTDIR/$ULIB_D/pm-utils/sleep.d/01laptop-mode" ) ; then
+		echo "$0: Failed to install 01-laptop-mode into $ULIB_D/pm-utils/sleep.d. Installation failed."
 		exit 36
 	fi
 fi
 
-if [ -f "$DESTDIR/usr/lib/pm-utils/sleep.d/99laptop-mode" ]; then
-	rm -f $DESTDIR/usr/lib/pm-utils/sleep.d/99laptop-mode;
+if [ -f "$DESTDIR/$ULIB_D/pm-utils/sleep.d/99laptop-mode" ]; then
+	rm -f $DESTDIR/$ULIB_D/pm-utils/sleep.d/99laptop-mode;
 fi
 
 # udev rule

@@ -13,9 +13,13 @@ getXuser() {
 			user=`ps -o user --no-headers $startx`
 		fi
 	fi
+
+	export XAUTHORITY=""
 	if [ x"$user" != x"" ]; then
-        	userhome=`getent passwd $user | cut -d: -f6`
-        	export XAUTHORITY=$userhome/.Xauthority
+        	xauthdir=`getent passwd $user | cut -d: -f6`
+		if [ -f "$xauthdir/.Xauthority" ]; then
+        		export XAUTHORITY=$xauthdir/.Xauthority
+		fi
 	else
 		export XAUTHORITY=""
 	fi

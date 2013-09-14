@@ -35,7 +35,7 @@ set -a
 
 # The laptop mode tools version number. Extracted by the installer makefile
 # as well, so don't change the format!
-LMTVERSION=1.63
+LMTVERSION=1.64
 
 # This script is loaded from multiple scripts to set the config defaults
 # and to read the configuration on top of those. Only when the command is
@@ -234,7 +234,7 @@ lmt_load_config ()
     test -d /etc/laptop-mode/conf.d/board-specific && CONF_DIR="$CONF_DIR /etc/laptop-mode/conf.d/board-specific"
 
     for PER_DIR in $CONF_DIR; do
-	    for CONF in $PER_DIR/*; do
+	    for CONF in $PER_DIR/*.conf; do
 		    if [ -r "$CONF" ] ; then
 			    . "$CONF"
 			    #Handle individual module debug settings
@@ -454,7 +454,7 @@ lmt_load_config ()
     export ON_AC=0
     for POWER_SUPPLY in /sys/class/power_supply/* ; do
 	    if [ -f $POWER_SUPPLY/type ] ; then
-		    if [ "$(cat $POWER_SUPPLY/type)" = "Mains" ] ;then
+		    if [ "$(cat $POWER_SUPPLY/type)" != "Battery" ] ;then
 			    log "VERBOSE" "Determining power state from $POWER_SUPPLY/online."
 			    FOUND_SYS_CLASS_POWER_SUPPLY_AC=1
 			    if [ "$(cat $POWER_SUPPLY/online)" = 1 ] ; then
@@ -1130,7 +1130,7 @@ if [ x$ENABLE_BATTERY_LEVEL_POLLING = x1 ] && [ x$BLACKLIST_IN_FLOCK = x1 ]; the
 		log "VERBOSE" "On AC, stopping the polling daemon."
 
 		# In AC mode we disable the polling daemon.
-		killall -g -q lm-polling-daemon
+		killall -q lm-polling-daemon
 	elif [ x$ON_AC = x0 ]; then
 		exec 7>$LMT_BATTPOLL_LOCK;
 		if $FLOCK -n -x -w 1 7; then
@@ -1149,7 +1149,7 @@ if [ x$ENABLE_BATTERY_LEVEL_POLLING = x1 ] && [ x$BLACKLIST_IN_FLOCK = x1 ]; the
 		# should be killed.
 		if [ x$INITSCRIPT_STOP = x1 ]; then
 			log "VERBOSE" "On Battery, but init script stop is called. Killing lm-polling-daemon"
-			killall -g -q lm-polling-daemon
+			killall -q lm-polling-daemon
 		fi
 	else
 		log "ERR" "Unknown ON_AC state: $ON_AC";
