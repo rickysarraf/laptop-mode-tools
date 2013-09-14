@@ -92,7 +92,14 @@ if [ x$CONTROL_START_STOP = x1 ] ; then
 		log "MSG" "Starting/stopping services"
 	
 		# Determine how we can start/restart services.
-		if ( which invoke-rc.d > /dev/null ) ; then
+
+		STARTCMD='$RCPROG$SERVICE start'
+		STOPCMD='$RCPROG$SERVICE stop'
+		if ( ps -e | grep " systemd$" > /dev/null ) ; then
+			# Systemd
+			STARTCMD='systemctl start $SERVICE'
+			STOPCMD='systemctl stop $SERVICE'
+		elif ( which invoke-rc.d > /dev/null ) ; then
 			# Debian uses invoke-rc.d
 			RCPROG="invoke-rc.d "
 			INITSCRIPT=laptop-mode
@@ -127,13 +134,13 @@ if [ x$CONTROL_START_STOP = x1 ] ; then
 
 		for SERVICE in $STOP_SERVICES ; do
 			log "VERBOSE" "Stopping service $SERVICE."
-			$RCPROG$SERVICE stop
-			sed -i "1i $RCPROG$SERVICE start" /var/run/laptop-mode-tools/start-stop-undo-actions
+			eval $STOPCMD
+			sed -i "1i $(eval echo $STARTCMD)" /var/run/laptop-mode-tools/start-stop-undo-actions
 		done
 		for SERVICE in $START_SERVICES ; do
 			log "VERBOSE" "Starting service $SERVICE."
-			$RCPROG$SERVICE start
-			sed -i "1i $RCPROG$SERVICE stop" /var/run/laptop-mode-tools/start-stop-undo-actions
+			eval $STARTCMD
+			sed -i "1i $(eval echo $STOPCMD)" /var/run/laptop-mode-tools/start-stop-undo-actions
 		done
 	fi
    fi

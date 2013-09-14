@@ -41,7 +41,7 @@ is_capable() {
 	# It assumes more or less recent udev (> 070)
 	if [ $HAVE_UDEVINFO -ne 0 ] ; then
 		log "VERBOSE" "Querying $1 media type using udevinfo: "
-		if [ -x /sbin/udevadm ]; then
+		if [ -x "$(which udevadm 2> /dev/null)" ]; then
 			eval "$(udevadm info -q env -n $1 | egrep '(ID_TYPE=|ID_BUS=)' )"
 		else
 			eval "$(udevinfo -q env -n $1 | egrep '(ID_TYPE=|ID_BUS=)' )"

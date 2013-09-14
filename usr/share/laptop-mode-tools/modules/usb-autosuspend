@@ -88,12 +88,6 @@ if [ x$CONTROL_USB_AUTOSUSPEND = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTR
     fi
 
     if [ x$SUSPEND_USB_DEVICES = x1 ]; then
-	  if [ -f /sys/module/usbcore/parameters/autosuspend ]; then
-	      echo $AUTOSUSPEND_TIMEOUT > /sys/module/usbcore/parameters/autosuspend
-	      log "VERBOSE" "Enabling autosuspend mode for USBCORE Controller, with timeout $AUTOSUSPEND_TIMEOUT."
-	  else
-	      log "VERBOSE" "Not enabling autosuspend mode for USBCORE Controller. Not Supported"
-	  fi
 
 	  if [ "$DEVICE_LIST" != "" ]; then
 		for usb_device in $DEVICE_LIST; do
@@ -136,13 +130,6 @@ if [ x$CONTROL_USB_AUTOSUSPEND = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTR
 	  fi
     else
 	  AUTOSUSPEND_TIMEOUT=0
-	  if [ -f /sys/module/usbcore/parameters/autosuspend ]; then
-	      echo $AUTOSUSPEND_TIMEOUT > /sys/module/usbcore/parameters/autosuspend
-	      log "VERBOSE" "Disabling autosuspend mode for USBCORE Controller, with timeout $AUTOSUSPEND_TIMEOUT."
-	  else
-	      log "VERBOSE" "Not disabling autosuspend mode for USBCORE Controller. Not Supported"
-	  fi
-
 	  if [ "$DEVICE_LIST" != "" ]; then
 	      for usb_device in $DEVICE_LIST;
 	      do
