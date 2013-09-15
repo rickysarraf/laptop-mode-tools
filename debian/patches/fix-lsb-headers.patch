@@ -1,11 +1,11 @@
 Fix for LSB Headers
 Index: laptop-mode-tools/etc/init.d/laptop-mode
 ===================================================================
---- laptop-mode-tools.orig/etc/init.d/laptop-mode	2013-03-30 16:50:53.991541703 +0530
-+++ laptop-mode-tools/etc/init.d/laptop-mode	2013-03-30 16:50:53.983541704 +0530
-@@ -6,6 +6,17 @@
- #
- # config:  /etc/laptop-mode/laptop-mode.conf
+--- laptop-mode-tools.orig/etc/init.d/laptop-mode	2013-09-15 21:46:41.918535300 +0530
++++ laptop-mode-tools/etc/init.d/laptop-mode	2013-09-15 21:46:41.918535300 +0530
+@@ -17,6 +17,17 @@
+ # Description:       Enable laptop-mode-tools power management functions
+ ### END INIT INFO
  
 +### BEGIN INIT INFO
 +# Provides:          laptop-mode
