@@ -1,3 +1,12 @@
+laptop-mode-tools (1.64-1) UNRELEASED; urgency=low
+
+  * [c27e6b2] update installed file name, now README.md
+  * [c44f0ce] Imported Upstream version 1.64
+    (Closes: #686243, #711689)
+  * [5535f60] Add lmt graphical configuration tool
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sun, 15 Sep 2013 21:38:37 +0530
+
 laptop-mode-tools (1.63-2) unstable; urgency=low
 
   * Upload to unstable
