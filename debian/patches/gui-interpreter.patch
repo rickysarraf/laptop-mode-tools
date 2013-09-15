@@ -1,3 +1,4 @@
+Add interpreter details to python script
 Index: laptop-mode-tools/gui/LMT.py
 ===================================================================
 --- laptop-mode-tools.orig/gui/LMT.py	2013-09-15 05:10:39.033669216 +0530
