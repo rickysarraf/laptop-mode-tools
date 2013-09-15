@@ -53,6 +53,7 @@ install: build
 	install -m755 -d $(DESTDIR)/etc/acpi/events
 	install -m755 -d $(DESTDIR)/etc/acpi/actions
 	install -m755 -d $(DESTDIR)/usr/sbin
+	install -m755 -d $(DESTDIR)/usr/share/applications
 	install -m755 -d $(DESTDIR)/usr/share/laptop-mode-tools/modules
 	install -m755 -d $(DESTDIR)/usr/share/laptop-mode-tools/module-helpers
 	install -m755 -d $(DESTDIR)/usr/lib/tmpfiles.d
