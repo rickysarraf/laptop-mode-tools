@@ -1,0 +1,16 @@
+laptop-mode-tools (1.64-1) unstable; urgency=low
+
+  With this version, Laptop Mode Tools introduces a basic graphical
+  configuration tool to enable/disable different modules. The GUI is
+  written in Python/QT4, thus those packages have been added to the
+  Recommends section. If you do not intend to use the graphical 
+  utility, you can choose to not install the Python QT4 recommends
+  .
+  This release will also touch all the configuration files. In case
+  you have heavily modified configuration files, you may want to
+  verify your configuration after the installation is complete
+  .
+  This could also be the right time to migrate your custom settings 
+  to the /etc/laptop-mode/conf.d/board-specific/ folder
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sun, 15 Sep 2013 21:48:20 +0530
