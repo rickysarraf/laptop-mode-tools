@@ -1,0 +1,4 @@
+?package(laptop-mode-tools):\
+        section="Applications/System"\
+        title="Laptop Mode Tools Configuration Tool"\
+        command="/usr/bin/lmt-config-gui"

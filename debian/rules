@@ -87,6 +87,7 @@ install: build
 	install -m755 usr/sbin/lm-profiler $(DESTDIR)/usr/sbin
 	install -m755 usr/share/laptop-mode-tools/modules/* $(DESTDIR)/usr/share/laptop-mode-tools/modules
 	install -m755 usr/share/laptop-mode-tools/module-helpers/* $(DESTDIR)/usr/share/laptop-mode-tools/module-helpers
+	install -m755 gui/LMT.py $(DESTDIR)/usr/sbin/lmt-config-gui
 
 # Build architecture-independent files here.
 binary-arch: build install
