@@ -63,6 +63,16 @@ class MainWidget(QtGui.QWidget):
                         self.vbox.addLayout(self.subLayout)
                 self.scrollArea.setWidget(self.window)
                 
+                self.pushButtonSleep = QtGui.QPushButton(self)
+                self.pushButtonSleep.setGeometry(QtCore.QRect(101, 550, 71, 27))
+                self.pushButtonSleep.setObjectName(_fromUtf8("pushButtonSleep"))
+                self.pushButtonSleep.setToolTip(_fromUtf8("Trigger Suspend to RAM aka Sleep"))
+                
+                self.pushButtonHibernate = QtGui.QPushButton(self)
+                self.pushButtonHibernate.setGeometry(QtCore.QRect(21, 550, 71, 27))
+                self.pushButtonHibernate.setObjectName(_fromUtf8("pushButtonHibernate"))
+                self.pushButtonHibernate.setToolTip(_fromUtf8("Trigger Suspend to Disk aka Hibernate"))
+                
                 self.pushButtonApply = QtGui.QPushButton(self)
                 self.pushButtonApply.setGeometry(QtCore.QRect(411, 550, 61, 27))
                 self.pushButtonApply.setObjectName(_fromUtf8("pushButtonApply"))
@@ -130,6 +140,8 @@ class MainWidget(QtGui.QWidget):
                 self.setWindowTitle(QtGui.QApplication.translate("MainWidget", "Laptop Mode Tools Configuration Tool", None, QtGui.QApplication.UnicodeUTF8))
                 self.pushButtonApply.setText(QtGui.QApplication.translate("MainWidget", "Apply", None, QtGui.QApplication.UnicodeUTF8))
                 self.pushButtonDiscard.setText(QtGui.QApplication.translate("MainWidget", "Exit", None, QtGui.QApplication.UnicodeUTF8))
+                self.pushButtonSleep.setText(QtGui.QApplication.translate("MainWidget", "Sleep", None, QtGui.QApplication.UnicodeUTF8))
+                self.pushButtonHibernate.setText(QtGui.QApplication.translate("MainWidget", "Hibernate", None, QtGui.QApplication.UnicodeUTF8))
                 self.label.setText(QtGui.QApplication.translate("MainWidget", "Laptop Mode Tools - Module Configuration", None, QtGui.QApplication.UnicodeUTF8))
                 
         def findConfig(self, configDir):
