@@ -30,6 +30,17 @@ class MainWidget(QtGui.QWidget):
         def __init__(self, parent=None):
                 QtGui.QWidget.__init__(self, parent)
                 
+		# Set Fixed Layout
+		self.resize(532, 600)
+		sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+		sizePolicy.setHorizontalStretch(0)
+		sizePolicy.setVerticalStretch(0)
+		sizePolicy.setHeightForWidth(self.sizePolicy().hasHeightForWidth())
+		self.setSizePolicy(sizePolicy)
+		self.setMinimumSize(QtCore.QSize(532, 600))
+		self.setMaximumSize(QtCore.QSize(532, 600))
+
+
                 self.layout = QtGui.QVBoxLayout(self)
                 self.layout.setContentsMargins(20,70,20,70)
                 self.layout.setSpacing(0)
