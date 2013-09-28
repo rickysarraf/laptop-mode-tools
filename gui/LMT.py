@@ -30,6 +30,13 @@ class MainWidget(QtGui.QWidget):
         def __init__(self, parent=None):
                 QtGui.QWidget.__init__(self, parent)
                 
+		# Check for root privileges
+		if os.geteuid() != 0:
+			QtGui.QMessageBox.critical(self, "Error", "You need to run with root priviliges\nPlease use kdesudo, gksu or sudo/sux")
+			sys.exit(1)
+		else:
+			QtGui.QMessageBox.warning(self, "Warning", "This tool is running with root priviliges")
+
 		# Set Fixed Layout
 		self.resize(532, 600)
 		sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
@@ -233,10 +240,6 @@ if __name__=="__main__":
         from sys import argv, exit
 
 	log = Log()
-
-	if os.geteuid() != 0:
-		log.err("Need Admin/root privileges.")
-		sys.exit(1)
         a=QtGui.QApplication(argv)
         win=MainWidget()
         win.show()
