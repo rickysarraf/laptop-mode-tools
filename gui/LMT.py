@@ -1,4 +1,9 @@
-from PyQt4 import QtGui, QtCore
+try:
+	from PyQt4 import QtGui, QtCore
+	print "Using PyQT4"
+except ImportError:
+	from PySide import QtGui, QtCore
+	print "Using PySide"
 
 import os, sys, shutil
 
