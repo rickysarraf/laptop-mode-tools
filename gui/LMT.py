@@ -97,12 +97,12 @@ class MainWidget(QtGui.QWidget):
                 self.pushButtonHibernate.setToolTip(_fromUtf8("Trigger Suspend to Disk aka Hibernate"))
                 
                 self.pushButtonApply = QtGui.QPushButton(self)
-                self.pushButtonApply.setGeometry(QtCore.QRect(411, 550, 61, 27))
+                self.pushButtonApply.setGeometry(QtCore.QRect(431, 550, 61, 27))
                 self.pushButtonApply.setObjectName(_fromUtf8("pushButtonApply"))
                 self.pushButtonApply.setToolTip(_fromUtf8("Apply checked changes"))
                 
                 self.pushButtonDiscard = QtGui.QPushButton(self)
-                self.pushButtonDiscard.setGeometry(QtCore.QRect(341, 550, 61, 27))
+                self.pushButtonDiscard.setGeometry(QtCore.QRect(361, 550, 61, 27))
                 self.pushButtonDiscard.setObjectName(_fromUtf8("pushButtonDiscard"))
                 self.pushButtonDiscard.setToolTip(_fromUtf8("Exit application"))
                         
