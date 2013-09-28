@@ -97,8 +97,40 @@ class MainWidget(QtGui.QWidget):
                 QtCore.QObject.connect(self.pushButtonDiscard, QtCore.SIGNAL("clicked()"),
                                 sys.exit )
                 
+                QtCore.QObject.connect(self.pushButtonSleep, QtCore.SIGNAL("clicked()"),
+                                self.sleep )
+                
+                QtCore.QObject.connect(self.pushButtonHibernate, QtCore.SIGNAL("clicked()"),
+                                self.hibernate )
+                
                 self.retranslateUi()
                 
+	def sleep(self):
+		try:
+			sysfsFP = open("/sys/power/state", 'w')
+		except:
+			log.err("Couldn't open kernel interface")
+			return False
+		else:
+			try:
+				sysfsFP.write("mem")
+			except:
+				log.err("Couldn't write to kernel interface")
+				return False
+                
+	def hibernate(self):
+		try:
+			sysfsFP = open("/sys/power/state", 'w')
+		except:
+			log.err("Couldn't open kernel interface")
+			return False
+		else:
+			try:
+				sysfsFP.write("disk")
+			except:
+				log.err("Couldn't write to kernel interface")
+				return False
+
         def writeConfig(self):
 		finalResult = True
                 for eachWriteOption in self.configOptions.keys():
