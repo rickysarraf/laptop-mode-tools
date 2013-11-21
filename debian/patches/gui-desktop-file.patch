@@ -2,12 +2,12 @@
 Index: laptop-mode-tools/gui/laptop-mode-tools.desktop
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ laptop-mode-tools/gui/laptop-mode-tools.desktop	2013-09-15 22:29:52.238478615 +0530
++++ laptop-mode-tools/gui/laptop-mode-tools.desktop	2013-11-21 13:50:38.475963112 +0530
 @@ -0,0 +1,7 @@
 +[Desktop Entry]
 +Type=Application
-+Name=Laptop Mode Tools Configuration Tool
-+GenericName=Laptop Mode Tools Configuration Tool
-+Exec=lmt-config-gui
++Name=Laptop Mode Tools Configuration
++GenericName=Laptop Mode Tools Configuration
++Exec=/usr/sbin/lmt-config-gui
 +Categories=System;
-+Comment=Tool to enable/disable Laptop Mode Tools settings
++Comment=Enable/disable Laptop Mode Tools settings
