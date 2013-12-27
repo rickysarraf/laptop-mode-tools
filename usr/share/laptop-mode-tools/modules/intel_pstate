@@ -35,5 +35,5 @@ if [ x$CONTROL_INTEL_PSTATE = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_
 	fi
 	set_intel_pstate_param max_perf_pct "$INTEL_PSTATE_PERF_MAX_PCT"
 	set_intel_pstate_param min_perf_pct "$INTEL_PSTATE_PERF_MIN_PCT"
-	set_intel_pstate_param no_turbo "$INTEL_PSTATE_PERF_NO_TURBO"
+	set_intel_pstate_param no_turbo "$INTEL_PSTATE_NO_TURBO"
 fi
