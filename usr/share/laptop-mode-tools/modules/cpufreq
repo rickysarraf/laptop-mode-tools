@@ -46,7 +46,7 @@ if [ x$CONTROL_CPU_FREQUENCY = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL
 	fi
 	for THISCPU in /sys/devices/system/cpu/* ; do
 		if [ -f "$THISCPU/cpufreq/scaling_driver" ] &&
-		   [ "$(cat $THISCPU/cpufreq/scaling_driver)" == "intel_pstate" ]
+		   [ "$(cat $THISCPU/cpufreq/scaling_driver)" = "intel_pstate" ]
 		then
 			continue # intel_pstate is a bit different - so it should be handled by its own module
 		fi
