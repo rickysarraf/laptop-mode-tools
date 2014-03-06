@@ -1164,7 +1164,7 @@ if $FLOCK -n -x -w 1 8; then
 	i=10;
 	while [ $i -ge 1 ]
 	do
-	    	$FLOCK -x -w 1 9 && lmt_main_function "$@" && break;
+	    	$FLOCK -x -w 1 9 && lmt_load_config "$@" && lmt_main_function "$@" && break;
 		log "VERBOSE" "Couldn't acquire lock on descriptor 9 in lock_retry(). Retrying.... PID is $$\n"
 	    	i=$(( $i - 1 ))
 	done
@@ -1188,6 +1188,7 @@ if $FLOCK -n -x -w 1 9; then
 	$FLOCK -u 8; ## Release the invoc lock;
 	log "VERBOSE" "Prelim lock acquisition on descriptor 9 with pid $$";
 	log "VERBOSE" "Now invoking lmt_main_function with arguments -- $@";
+	lmt_load_config "$@";
 	lmt_main_function "$@";
 else
 	log "VERBOSE" "Couldn't acquire prelim lock on descriptor 9 with pid $$";
