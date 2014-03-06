@@ -45,6 +45,11 @@ if [ x$CONTROL_CPU_FREQUENCY = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL
 		CPU_IGNORE_NICE_LOAD="$BATT_CPU_IGNORE_NICE_LOAD"
 	fi
 	for THISCPU in /sys/devices/system/cpu/* ; do
+		if [ -f "$THISCPU/cpufreq/scaling_driver" ] &&
+		   [ "$(cat $THISCPU/cpufreq/scaling_driver)" = "intel_pstate" ]
+		then
+			continue # intel_pstate is a bit different - so it should be handled by its own module
+		fi
 		if [ -e $THISCPU/cpufreq/cpuinfo_min_freq ]; then
 			THIS_CPU_MAXFREQ="$CPU_MAXFREQ"
 			THIS_CPU_MINFREQ="$CPU_MINFREQ"
