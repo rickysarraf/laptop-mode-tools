@@ -24,7 +24,7 @@ findWifiIfsByDriver () {
 			# the driver.
 			LINK_TARGET=`readlink $DEVICE/device/driver`
 			LINK_TARGET=${LINK_TARGET##*/}
-			ENABLED=`cat $DEVICE/device/enable` 
+			ENABLED=`cat $DEVICE/device/enabled`
 			
 			if [ $ENABLED -eq 1 -a "$LINK_TARGET" = "$1" ] ; then
 				# add the interface name to the list
