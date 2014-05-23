@@ -24,7 +24,7 @@ findWifiIfsByDriver () {
 			# the driver.
 			LINK_TARGET=`readlink $DEVICE/device/driver`
 			LINK_TARGET=${LINK_TARGET##*/}
-			ENABLED=`cat $DEVICE/device/enable` 
+			ENABLED=`cat $DEVICE/device/enabled`
 			
 			if [ $ENABLED -eq 1 -a "$LINK_TARGET" = "$1" ] ; then
 				# add the interface name to the list
@@ -78,6 +78,7 @@ if [ x$CONTROL_IWL_POWER = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_IWL
 	[ -d /sys/module/iwl3945 ] && findWifiIfsByDriver iwl3945
 	[ -d /sys/module/iwl4965 ] && findWifiIfsByDriver iwl4965
 	[ -d /sys/module/iwlagn ] && findWifiIfsByDriver iwlagn
+	[ -d /sys/module/iwlwifi ] && findWifiIfsByDriver iwlwifi
 	for IF in $WIFI_IFNAMES ; do
 		if [ $ON_AC -eq 1 ] ; then
 			log "VERBOSE" "On AC power: setting power level for $IF to $IWL_AC_POWER."
