@@ -3,6 +3,8 @@
 # Laptop mode tools module: Ethernet power saving tweaks.
 #
 
+source /usr/share/laptop-mode-tools/module-helpers/sysfs-pci
+
 if [ x$CONTROL_ETHERNET = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_ETHERNET = xauto ]; then
 
 	# Let's check the binaries firts
@@ -63,15 +65,15 @@ if [ x$CONTROL_ETHERNET = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_ETHE
                         fi
                 fi
 
-                if ! [ -z $dev_path ] && [ -f $dev_path/enabled ]; then
+                if [ -e "$dev_path" ]; then
                         if [ x$DISABLE_ETHERNET = x1 ]; then
-                                if [ -f $dev_path/enabled ]; then
+                                if isDeviceEnabled $dev_path; then
                                         echo 0 > $dev_path/enabled 2>/dev/null
                                         log "VERBOSE" "ethernet: Disabling ethernet device $DEVICE"
                                         DISABLED=1
                                 fi
                         elif [ x$DISABLE_ETHERNET = x0 ]; then
-                                if [ -f $dev_path/enabled ]; then
+                                if ! isDeviceEnabled $dev_path; then
                                         echo 1 > $dev_path/enabled 2>/dev/null
                                         log "VERBOSE" "ethernet: Re-enabling ethernet device $DEVICE"
                                         DISABLED=0

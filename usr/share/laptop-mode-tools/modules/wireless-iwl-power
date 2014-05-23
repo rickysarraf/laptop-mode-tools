@@ -9,6 +9,8 @@
 # This script relies upon the name of the driver.
 #
 
+source /usr/share/laptop-mode-tools/module-helpers/sysfs-pci
+
 #
 # Find all the wireless devices using the supplied driver names.
 # Place the interface names on the list WIFI_IFNAMES.
@@ -24,7 +26,7 @@ findWifiIfsByDriver () {
 			# the driver.
 			LINK_TARGET=`readlink $DEVICE/device/driver`
 			LINK_TARGET=${LINK_TARGET##*/}
-			ENABLED=`cat $DEVICE/device/enabled`
+			isDeviceEnabled $DEVICE/device && ENABLED=1 || ENABLED=0
 			
 			if [ $ENABLED -eq 1 -a "$LINK_TARGET" = "$1" ] ; then
 				# add the interface name to the list
