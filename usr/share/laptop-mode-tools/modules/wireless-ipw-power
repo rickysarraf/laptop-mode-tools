@@ -8,6 +8,8 @@
 #
 # Original source: http://ubuntuforums.org/showthread.php?t=419772
 
+source /usr/share/laptop-mode-tools/module-helpers/sysfs-pci
+
 if [ x$CONTROL_IPW_POWER = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_IPW_POWER = xauto ]; then
 
 	# Provide defaults for config file settings
@@ -71,7 +73,7 @@ if [ x$CONTROL_IPW_POWER = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_IPW
 				# the driver.
 				LINK_TARGET=`readlink $DEVICE/device/driver`
 				LINK_TARGET=${LINK_TARGET##*/}
-                                ENABLED=`cat $DEVICE/device/enable`
+				isDeviceEnabled $DEVICE/device && ENABLED=1 || ENABLED=0
 
 				if [ $ENABLED -eq 1 -a "$LINK_TARGET" = "$1" ]; then
 					# add the interface name to the list

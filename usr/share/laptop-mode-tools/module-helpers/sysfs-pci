@@ -1,0 +1,14 @@
+#! /bin/sh
+
+isDeviceEnabled() {
+    devpath=$1
+    enabled=1
+
+    if [ -f "$devpath/enable" ]; then
+        [ `cat $devpath/enable` = 1 ] && enabled=0
+    fi
+    if [ -f "$devpath/enabled" ]; then
+        [ `cat $devpath/enabled` = "1" ] && enabled=0
+    fi
+    return $enabled
+}
