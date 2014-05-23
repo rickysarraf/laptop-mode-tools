@@ -1,0 +1,20 @@
+#! /bin/sh
+
+readDeviceEnabled() {
+    devpath=$1
+
+    file=$devpath/enable
+    [ -f "$devpath/enabled" ] && file=$devpath/enabled
+
+    [ -r $file ] && cat $file
+}
+
+writeDeviceEnabled() {
+    devpath=$1
+    enabled=$2
+
+    file=$devpath/enable
+    [ -f "$devpath/enabled" ] && file=$devpath/enabled
+
+    [ -w $file ] && echo $enabled > $file
+}
