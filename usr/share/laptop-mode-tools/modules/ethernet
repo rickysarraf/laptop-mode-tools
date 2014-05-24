@@ -63,19 +63,24 @@ if [ x$CONTROL_ETHERNET = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_ETHE
                         fi
                 fi
 
-                if ! [ -z $dev_path ] && [ -f $dev_path/enabled ]; then
+		dev_enable_path=
+                if [ x$dev_path != x ]; then
+			if [ -f $dev_path/enabled ]; then
+				dev_enable_path=$dev_path/enabled
+			elif [ -f $dev_path/enable ]; then
+				dev_enable_path=$dev_path/enable
+			fi
+		fi
+
+                if [ x$dev_enable_path != x ]; then
                         if [ x$DISABLE_ETHERNET = x1 ]; then
-                                if [ -f $dev_path/enabled ]; then
-                                        echo 0 > $dev_path/enabled 2>/dev/null
-                                        log "VERBOSE" "ethernet: Disabling ethernet device $DEVICE"
-                                        DISABLED=1
-                                fi
+				echo 0 > $dev_enable_path 2>/dev/null
+				log "VERBOSE" "ethernet: Disabling ethernet device $DEVICE"
+				DISABLED=1
                         elif [ x$DISABLE_ETHERNET = x0 ]; then
-                                if [ -f $dev_path/enabled ]; then
-                                        echo 1 > $dev_path/enabled 2>/dev/null
-                                        log "VERBOSE" "ethernet: Re-enabling ethernet device $DEVICE"
-                                        DISABLED=0
-                                fi
+				echo 1 > $dev_enable_path 2>/dev/null
+				log "VERBOSE" "ethernet: Re-enabling ethernet device $DEVICE"
+				DISABLED=0
                         elif [ x$DISABLE_ETHERNET = x2 ]; then
                                 DISABLED=0 # Be safe. :-)
                         else

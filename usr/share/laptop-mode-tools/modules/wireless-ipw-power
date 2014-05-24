@@ -71,7 +71,7 @@ if [ x$CONTROL_IPW_POWER = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_IPW
 				# the driver.
 				LINK_TARGET=`readlink $DEVICE/device/driver`
 				LINK_TARGET=${LINK_TARGET##*/}
-                                ENABLED=`cat $DEVICE/device/enable`
+				ENABLED=`[ -r $DEVICE/device/enabled ] && cat $DEVICE/device/enabled || cat $DEVICE/device/enable`
 
 				if [ $ENABLED -eq 1 -a "$LINK_TARGET" = "$1" ]; then
 					# add the interface name to the list
