@@ -1,0 +1,22 @@
+#! /bin/sh
+
+getDeviceEnabledPath() {
+    devpath=$1
+
+    RETVAL=$devpath/enable
+    [ -f "$devpath/enabled" ] && RETVAL=$devpath/enabled
+}
+
+readDeviceEnabled() {
+    getDeviceEnabledPath $1
+    file=$RETVAL
+
+    [ -r $file ] && cat $file
+}
+
+writeDeviceEnabled() {
+    getDeviceEnabledPath $1
+    file=$RETVAL
+
+    [ -w $file ] && echo $2 > $file
+}

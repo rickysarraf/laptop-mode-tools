@@ -3,6 +3,8 @@
 # Laptop mode tools module: Ethernet power saving tweaks.
 #
 
+source /usr/share/laptop-mode-tools/module-helpers/sysfs-pci
+
 if [ x$CONTROL_ETHERNET = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_ETHERNET = xauto ]; then
 
 	# Let's check the binaries firts
@@ -54,7 +56,7 @@ if [ x$CONTROL_ETHERNET = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_ETHE
 	for DEVICE in $ETHERNET_DEVICES ; do
                 DISABLED=0
                 path=`readlink -f /sys/class/net/$DEVICE`
-		dev_path=""
+                dev_path=""
                 log "VERBOSE" "ethernet: $path"
                 if ! [ -z $path ]; then
                         if [ -d $path/device ]; then
@@ -63,32 +65,24 @@ if [ x$CONTROL_ETHERNET = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_ETHE
                         fi
                 fi
 
-                if ! [ -z $dev_path ] && [ -f $dev_path/enabled ]; then
-                        if [ x$DISABLE_ETHERNET = x1 ]; then
-                                if [ -f $dev_path/enabled ]; then
-                                        echo 0 > $dev_path/enabled 2>/dev/null
-                                        log "VERBOSE" "ethernet: Disabling ethernet device $DEVICE"
-                                        DISABLED=1
-                                fi
-                        elif [ x$DISABLE_ETHERNET = x0 ]; then
-                                if [ -f $dev_path/enabled ]; then
-                                        echo 1 > $dev_path/enabled 2>/dev/null
-                                        log "VERBOSE" "ethernet: Re-enabling ethernet device $DEVICE"
-                                        DISABLED=0
-                                fi
-                        elif [ x$DISABLE_ETHERNET = x2 ]; then
-                                DISABLED=0 # Be safe. :-)
-                        else
-                                DISABLED=0 # Same here. Be safe. :-)
-                                           # For all other cases also, just disable it.
-                        fi
-                else
-                        log "VERBOSE" "$DEVICE does not seem to be supporting enable/disable"
+
+                getDeviceEnabledPath $dev_path
+                dev_enabled_path=$RETVAL
+
+                DISABLED=0 # Be safe. :-)
+                if [ -w "$dev_enabled_path" ]; then
+                    if [ x$DISABLE_ETHERNET = x1 ]; then
+                            writeDeviceEnabled $dev_path 0
+                            log "VERBOSE" "ethernet: Disabling ethernet device $DEVICE"
+                            DISABLED=1
+
+                    elif [ x$DISABLE_ETHERNET = x0 ]; then
+                            writeDeviceEnabled $dev_path 1
+                            log "VERBOSE" "ethernet: Re-enabling ethernet device $DEVICE"
+                    fi
                 fi
 
-               if [ x$DISABLED = x1 ]; then
-                       continue
-               fi
+                [ x$DISABLED = x1 ] && continue
 
 		# Wakeup-on-LAN handling
 		if [ x$DISABLE_WAKEUP_ON_LAN = x1 ] ; then
