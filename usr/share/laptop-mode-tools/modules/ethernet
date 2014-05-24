@@ -32,39 +32,39 @@ if [ x$CONTROL_ETHERNET = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_ETHE
 			THROTTLE_ETHERNET="$NOLM_AC_THROTTLE_ETHERNET"
 		fi
 
-                if [ x$DISABLE_ETHERNET_ON_BATTERY = x1 ]; then
-                        # We are ON_AC and Disable feature is requested
-                        # So we might be required to re-enable the device.
-                        DISABLE_ETHERNET=0 #zero would mean that the device needs be re-enabled.
-                else
-                        DISABLE_ETHERNET=2
-                        # IF this is the case, don't touch the device for
-                        # enable/disable
-                fi
+		if [ x$DISABLE_ETHERNET_ON_BATTERY = x1 ]; then
+			# We are ON_AC and Disable feature is requested
+			# So we might be required to re-enable the device.
+			DISABLE_ETHERNET=0 #zero would mean that the device needs be re-enabled.
+		else
+			DISABLE_ETHERNET=2
+			# IF this is the case, don't touch the device for
+			# enable/disable
+		fi
 	else
 		THROTTLE_ETHERNET="$BATT_THROTTLE_ETHERNET"
 
-                if [ x$DISABLE_ETHERNET_ON_BATTERY = x1 ]; then
-                        DISABLE_ETHERNET=1
-                else
-                        DISABLE_ETHERNET=2
-                fi
+		if [ x$DISABLE_ETHERNET_ON_BATTERY = x1 ]; then
+			DISABLE_ETHERNET=1
+		else
+			DISABLE_ETHERNET=2
+		fi
 	fi
-	
+
 	for DEVICE in $ETHERNET_DEVICES ; do
-                DISABLED=0
-                path=`readlink -f /sys/class/net/$DEVICE`
+		DISABLED=0
+		path=`readlink -f /sys/class/net/$DEVICE`
 		dev_path=""
-                log "VERBOSE" "ethernet: $path"
-                if ! [ -z $path ]; then
-                        if [ -d $path/device ]; then
-                          dev_path=`readlink -f $path/device`
-                          log "VERBOSE" "ethernet: $dev_path"
-                        fi
-                fi
+		log "VERBOSE" "ethernet: $path"
+		if ! [ -z $path ]; then
+			if [ -d $path/device ]; then
+				dev_path=`readlink -f $path/device`
+				log "VERBOSE" "ethernet: $dev_path"
+			fi
+		fi
 
 		dev_enable_path=
-                if [ x$dev_path != x ]; then
+		if [ x$dev_path != x ]; then
 			if [ -f $dev_path/enabled ]; then
 				dev_enable_path=$dev_path/enabled
 			elif [ -f $dev_path/enable ]; then
@@ -72,33 +72,33 @@ if [ x$CONTROL_ETHERNET = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_ETHE
 			fi
 		fi
 
-                if [ x$dev_enable_path != x ]; then
-                        if [ x$DISABLE_ETHERNET = x1 ]; then
+		if [ x$dev_enable_path != x ]; then
+			if [ x$DISABLE_ETHERNET = x1 ]; then
 				echo 0 > $dev_enable_path 2>/dev/null
 				log "VERBOSE" "ethernet: Disabling ethernet device $DEVICE"
 				DISABLED=1
-                        elif [ x$DISABLE_ETHERNET = x0 ]; then
+			elif [ x$DISABLE_ETHERNET = x0 ]; then
 				echo 1 > $dev_enable_path 2>/dev/null
 				log "VERBOSE" "ethernet: Re-enabling ethernet device $DEVICE"
 				DISABLED=0
-                        elif [ x$DISABLE_ETHERNET = x2 ]; then
-                                DISABLED=0 # Be safe. :-)
-                        else
-                                DISABLED=0 # Same here. Be safe. :-)
-                                           # For all other cases also, just disable it.
-                        fi
-                else
-                        log "VERBOSE" "$DEVICE does not seem to be supporting enable/disable"
-                fi
+			elif [ x$DISABLE_ETHERNET = x2 ]; then
+				DISABLED=0 # Be safe. :-)
+			else
+				DISABLED=0 # Same here. Be safe. :-)
+				# For all other cases also, just disable it.
+			fi
+		else
+			log "VERBOSE" "$DEVICE does not seem to be supporting enable/disable"
+		fi
 
-               if [ x$DISABLED = x1 ]; then
-                       continue
-               fi
+		if [ x$DISABLED = x1 ]; then
+			continue
+		fi
 
 		# Wakeup-on-LAN handling
 		if [ x$DISABLE_WAKEUP_ON_LAN = x1 ] ; then
 			ret=`$ETHTOOL -s $DEVICE wol d 2>&1`
-                        exit_status=$?;
+			exit_status=$?;
 			log "VERBOSE" "$ret"
 			if [ $exit_status -eq 0 ]; then			
 				log "VERBOSE" "Enabled wakeup-on-LAN for $DEVICE"
@@ -106,13 +106,13 @@ if [ x$CONTROL_ETHERNET = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_ETHE
 				log "VERBOSE" "Could not enable wakeup-on-LAN for $DEVICE"
 			fi
 		fi
-		
+
 		# Determine speed
 		speed=`$MIITOOL -v $DEVICE 2>/dev/null | grep capabilities | tr ' ' '\n' |\
-                        sort -n | sed -ne '/^1.*/p' | cut -d "b" -f1`
-                if [ -z "$speed" ]; then
-                        speed=0;
-                fi
+			sort -n | sed -ne '/^1.*/p' | cut -d "b" -f1`
+		if [ -z "$speed" ]; then
+			speed=0;
+		fi
 		max_s=0;
 		min_s=100000;
 		for s in $speed;
@@ -128,19 +128,19 @@ if [ x$CONTROL_ETHERNET = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_ETHE
 
 		case "$THROTTLE_SPEED" in
 			"slowest")
-			THROTTLE_SPEED=$min_s
-			;;
+				THROTTLE_SPEED=$min_s
+				;;
 			"fastest")
-			THROTTLE_SPEED=$max_s
-			;;
+				THROTTLE_SPEED=$max_s
+				;;
 		esac
 
 		# Handle throttling
 		if [ x$THROTTLE_ETHERNET = x1 ] ; then
 			# Handle Speed Throttling
 			ret=`$ETHTOOL -s $DEVICE speed $THROTTLE_SPEED 2>&1`
-                        exit_status=$?;
-                        log "VERBOSE" "$ret";
+			exit_status=$?;
+			log "VERBOSE" "$ret";
 			if [ $exit_status -eq 0 ]; then
 				log "VERBOSE" "Throttled speed to $THROTTLE_SPEED Mbit for $DEVICE"
 			else
@@ -149,8 +149,8 @@ if [ x$CONTROL_ETHERNET = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_ETHE
 		else
 			# Handle Speed Throttling
 			ret=`$ETHTOOL -s $DEVICE speed $MAX_SPEED 2>&1`
-                        exit_status=$?;
-                        log "VERBOSE" "$ret";
+			exit_status=$?;
+			log "VERBOSE" "$ret";
 			if [ $exit_status -eq 0 ]; then
 				log "VERBOSE" "Restored speed to $MAX_SPEED Mbit for $DEVICE"
 			else

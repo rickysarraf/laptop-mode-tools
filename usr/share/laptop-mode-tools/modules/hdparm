@@ -147,10 +147,10 @@ is_capable() {
 
 # Preparation: determine the tools we have available.
 if [ -x "$(which hdparm 2> /dev/null)" ]; then
-  HDPARM_AVAILABLE=1
+	HDPARM_AVAILABLE=1
 fi
 if [ -x "$(which sdparm 2> /dev/null)" ]; then
-  SDPARM_AVAILABLE=1
+	SDPARM_AVAILABLE=1
 fi
 HAVE_UDEVINFO=0
 if [ -x "$(which udevadm 2> /dev/null)" ]; then

@@ -1,5 +1,5 @@
 #! /bin/sh
-# 
+#
 # Laptop mode tools module, called from /usr/sbin/laptop_mode.
 # Configuration in /etc/laptop-mode/conf.d/wireless-power.conf.
 #
@@ -19,12 +19,12 @@ findWifiIfs () {
 	for SYSDEVICE in /sys/class/net/*; do
 		IFNAME=`basename $SYSDEVICE`
 
-                # Check if it is a wireless device
+		# Check if it is a wireless device
 		#
 		# Inverting return values, we get "0" for wireless device, 
 		# and "1" for non-wireless device.
 		($IWCONFIG $IFNAME 2>&1 | grep -q "no wireless extensions.") && ret=1 || ret=0
-                if [ "$ret" = "0" ]; then
+		if [ "$ret" = "0" ]; then
 			# Yes, it is a wireless device.
 			if [ -h $SYSDEVICE/device/driver ]; then
 				# Read the driver name
@@ -44,7 +44,7 @@ findWifiIfs () {
 				fi
 			fi
 
-                fi
+		fi
 	done
 }
 

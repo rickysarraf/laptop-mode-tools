@@ -4,32 +4,32 @@
 #
 
 if [ x$CONTROL_EXEC_COMMANDS = x1 ]  || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_EXEC_COMMANDS = xauto ]; then
-    if [ $ON_AC -eq 1 ]; then
+	if [ $ON_AC -eq 1 ]; then
 		if [ "$ACTIVATE" -eq 1 ]; then
 			COMMAND_TYPE=LM_AC_EXEC_COMMAND
 		else
 			COMMAND_TYPE=NOLM_AC_EXEC_COMMAND
 		fi
-    else
+	else
 		COMMAND_TYPE=BATT_EXEC_COMMAND
-    fi
+	fi
 
-    # Handle Command Execution
-    COUNTER=0
-    while true;
-    do
-	    COMMAND=\${${COMMAND_TYPE}_${COUNTER}}
-	    COMMAND=$(eval echo $COMMAND)
+	# Handle Command Execution
+	COUNTER=0
+	while true;
+	do
+		COMMAND=\${${COMMAND_TYPE}_${COUNTER}}
+		COMMAND=$(eval echo $COMMAND)
 
-	    if [ $COUNTER -ge 10 ]; then
-		    break;
-	    fi
-	    
-	    log "VERBOSE" "Executing comand $COMMAND"
-	    log "VERBOSE" $(eval $COMMAND)
-	    
-	    COUNTER=`expr $COUNTER + 1`
-    done
+		if [ $COUNTER -ge 10 ]; then
+			break;
+		fi
+
+		log "VERBOSE" "Executing comand $COMMAND"
+		log "VERBOSE" $(eval $COMMAND)
+
+		COUNTER=`expr $COUNTER + 1`
+	done
 else
 	log "VERBOSE" "Module exec-commands is disabled"
 fi

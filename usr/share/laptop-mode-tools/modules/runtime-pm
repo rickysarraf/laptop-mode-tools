@@ -60,93 +60,93 @@ whitelisted() {
 }
 
 if [ x$CONTROL_RUNTIME_AUTOSUSPEND = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_RUNTIME_AUTOSUSPEND = xauto ]; then
-    if [ $ON_AC -eq 1 ]; then
-        if [ "$ACTIVATE" -eq 1 ]; then
-            SUSPEND_RUNTIME_DEVICES="$LM_AC_SUSPEND_RUNTIME"
-        else
-            SUSPEND_RUNTIME_DEVICES="$NOLM_AC_SUSPEND_RUNTIME"
-        fi
-    else
-        SUSPEND_RUNTIME_DEVICES="$BATT_SUSPEND_RUNTIME"
-    fi
+	if [ $ON_AC -eq 1 ]; then
+		if [ "$ACTIVATE" -eq 1 ]; then
+			SUSPEND_RUNTIME_DEVICES="$LM_AC_SUSPEND_RUNTIME"
+		else
+			SUSPEND_RUNTIME_DEVICES="$NOLM_AC_SUSPEND_RUNTIME"
+		fi
+	else
+		SUSPEND_RUNTIME_DEVICES="$BATT_SUSPEND_RUNTIME"
+	fi
 
-    if [ "$DEVICES" != "" ]; then
-	# If a list of devices has been provided, operate on only the
-	# listed devices.
-	DEVICE_LIST=""
-	for DEVICE in $DEVICES; do
-		DEVICE_LIST="$DEVICE_LIST $DEVICE"
-	done
-    else
-	# If no list was provided, operate on all devices
-	DEVICE_LIST=/sys/bus/*/devices/*
-    fi
-
-    if [ x$SUSPEND_RUNTIME_DEVICES = x1 ]; then
-
-	  if [ "$DEVICE_LIST" != "" ]; then
-		for runtime_device in $DEVICE_LIST; do
-
-		  USE_DEVICE=0
-		  if [ x$AUTOSUSPEND_USE_WHITELIST = x1 ]; then
-			if whitelisted $runtime_device; then
-			  USE_DEVICE=1
-			else
-			  log "VERBOSE" "Device $runtime_device not whitelisted, skipping auto suspend."
-			fi
-		  else
-			if ! blacklisted $runtime_device; then
-			  USE_DEVICE=1
-			else
-			  logger "Device $runtime_device is blacklisted, skipping auto suspend."
-			fi
-		  fi
-
-		  if [ x$USE_DEVICE = x1 ]; then
-			  if [ -f $runtime_device/power/autosuspend ]; then
-				  echo $AUTOSUSPEND_TIMEOUT > $runtime_device/power/autosuspend;
-				  log "VERBOSE" "Enabling auto suspend mode for device $runtime_device"
-			  else
-				  log "VERBOSE" "Not enabling auto suspend mode for device $runtime_device"
-			  fi
-
-			  if [ -f $runtime_device/power/control ]; then
-				  echo "auto" > $runtime_device/power/control;
-				  log "VERBOSE" "Enabling auto power level for device $runtime_device."
-			  elif [ -f $runtime_device/power/level ]; then
-				  echo "auto" > $runtime_device/power/level;
-				  log "VERBOSE" "Enabling auto power level for device $runtime_device."
-			  else
-				  log "VERBOSE" "Not enabling auto power level for device $runtime_device"
-			  fi
-		  fi
+	if [ "$DEVICES" != "" ]; then
+		# If a list of devices has been provided, operate on only the
+		# listed devices.
+		DEVICE_LIST=""
+		for DEVICE in $DEVICES; do
+			DEVICE_LIST="$DEVICE_LIST $DEVICE"
 		done
-	  fi
-    else
-	  AUTOSUSPEND_TIMEOUT=0
-	  if [ "$DEVICE_LIST" != "" ]; then
-	      for runtime_device in $DEVICE_LIST;
-	      do
-		  if [ -f $runtime_device/power/autosuspend ]; then
-		      echo $AUTOSUSPEND_TIMEOUT > $runtime_device/power/autosuspend;
-		      log "VERBOSE" "Disabling auto suspend mode for device $runtime_device."
-		  else
-		      log "VERBOSE" "Not disabling auto suspend mode for device $runtime_device"
-		  fi
+	else
+		# If no list was provided, operate on all devices
+		DEVICE_LIST=/sys/bus/*/devices/*
+	fi
 
-		  if [ -f $runtime_device/power/control ]; then
-		      echo "on" > $runtime_device/power/control;
-		      log "VERBOSE" "Enabling ON power level for device $runtime_device."
-		  elif [ -f $runtime_device/power/level ]; then
-		      echo "on" > $runtime_device/power/level;
-		      log "VERBOSE" "Enabling ON power level for device $runtime_device."
-		  else
-		      log "VERBOSE" "Not enabling ON power level for device $runtime_device"
-		  fi
-	      done
-	  fi
-    fi
+	if [ x$SUSPEND_RUNTIME_DEVICES = x1 ]; then
+
+		if [ "$DEVICE_LIST" != "" ]; then
+			for runtime_device in $DEVICE_LIST; do
+
+				USE_DEVICE=0
+				if [ x$AUTOSUSPEND_USE_WHITELIST = x1 ]; then
+					if whitelisted $runtime_device; then
+						USE_DEVICE=1
+					else
+						log "VERBOSE" "Device $runtime_device not whitelisted, skipping auto suspend."
+					fi
+				else
+					if ! blacklisted $runtime_device; then
+						USE_DEVICE=1
+					else
+						logger "Device $runtime_device is blacklisted, skipping auto suspend."
+					fi
+				fi
+
+				if [ x$USE_DEVICE = x1 ]; then
+					if [ -f $runtime_device/power/autosuspend ]; then
+						echo $AUTOSUSPEND_TIMEOUT > $runtime_device/power/autosuspend;
+						log "VERBOSE" "Enabling auto suspend mode for device $runtime_device"
+					else
+						log "VERBOSE" "Not enabling auto suspend mode for device $runtime_device"
+					fi
+
+					if [ -f $runtime_device/power/control ]; then
+						echo "auto" > $runtime_device/power/control;
+						log "VERBOSE" "Enabling auto power level for device $runtime_device."
+					elif [ -f $runtime_device/power/level ]; then
+						echo "auto" > $runtime_device/power/level;
+						log "VERBOSE" "Enabling auto power level for device $runtime_device."
+					else
+						log "VERBOSE" "Not enabling auto power level for device $runtime_device"
+					fi
+				fi
+			done
+		fi
+	else
+		AUTOSUSPEND_TIMEOUT=0
+		if [ "$DEVICE_LIST" != "" ]; then
+			for runtime_device in $DEVICE_LIST;
+			do
+				if [ -f $runtime_device/power/autosuspend ]; then
+					echo $AUTOSUSPEND_TIMEOUT > $runtime_device/power/autosuspend;
+					log "VERBOSE" "Disabling auto suspend mode for device $runtime_device."
+				else
+					log "VERBOSE" "Not disabling auto suspend mode for device $runtime_device"
+				fi
+
+				if [ -f $runtime_device/power/control ]; then
+					echo "on" > $runtime_device/power/control;
+					log "VERBOSE" "Enabling ON power level for device $runtime_device."
+				elif [ -f $runtime_device/power/level ]; then
+					echo "on" > $runtime_device/power/level;
+					log "VERBOSE" "Enabling ON power level for device $runtime_device."
+				else
+					log "VERBOSE" "Not enabling ON power level for device $runtime_device"
+				fi
+			done
+		fi
+	fi
 else
-    log "VERBOSE" "RUNTIME autosuspend is disabled."
+	log "VERBOSE" "RUNTIME autosuspend is disabled."
 fi
 
