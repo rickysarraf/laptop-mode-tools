@@ -64,7 +64,7 @@ if [ x$CONTROL_CONFIG_FILES = x1 ] ; then
 		fi
 	done
 	# Notify daemons of configuration change.
-	for PROGRAM in $CONFIG_FILE_SIGNAL_PROGRAMS ; do	
+	for PROGRAM in $CONFIG_FILE_SIGNAL_PROGRAMS ; do
 		log "VERBOSE" "Sending SIGHUP to all $PROGRAM processes."
 		killall -q -HUP $PROGRAM
 	done

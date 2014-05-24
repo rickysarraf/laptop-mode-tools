@@ -1,5 +1,5 @@
 #! /bin/sh
-# 
+#
 # Laptop mode tools module: Ethernet power saving tweaks.
 #
 
@@ -100,7 +100,7 @@ if [ x$CONTROL_ETHERNET = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_ETHE
 			ret=`$ETHTOOL -s $DEVICE wol d 2>&1`
 			exit_status=$?;
 			log "VERBOSE" "$ret"
-			if [ $exit_status -eq 0 ]; then			
+			if [ $exit_status -eq 0 ]; then
 				log "VERBOSE" "Enabled wakeup-on-LAN for $DEVICE"
 			else
 				log "VERBOSE" "Could not enable wakeup-on-LAN for $DEVICE"

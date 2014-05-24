@@ -15,13 +15,13 @@
 #
 findWifiIfs () {
 	local SYSDEVICE EXCLUDED LINK_TARGET DRIVER IFNAME EXCLUDED_DRIVER;
-	
+
 	for SYSDEVICE in /sys/class/net/*; do
 		IFNAME=`basename $SYSDEVICE`
 
 		# Check if it is a wireless device
 		#
-		# Inverting return values, we get "0" for wireless device, 
+		# Inverting return values, we get "0" for wireless device,
 		# and "1" for non-wireless device.
 		($IWCONFIG $IFNAME 2>&1 | grep -q "no wireless extensions.") && ret=1 || ret=0
 		if [ "$ret" = "0" ]; then
@@ -30,13 +30,13 @@ findWifiIfs () {
 				# Read the driver name
 				LINK_TARGET=`readlink $SYSDEVICE/device/driver`
 				DRIVER=${LINK_TARGET##*/}
-				
+
 				EXCLUDED=0
 				for EXCLUDED_DRIVER in $WIRELESS_POWER_SAVING_EXCLUDE_DRIVERS ; do
 					if [ "$EXCLUDED_DRIVER" = "$DRIVER" ] ; then
 						log "VERBOSE" "Wireless interface $IFNAME excluded for wireless-power by driver name."
 						EXCLUDED=1
-					fi 
+					fi
 				done
 				if [ $EXCLUDED = 0 ] ; then
 					# add the interface name to the list

@@ -1,5 +1,5 @@
 #! /bin/sh
-# 
+#
 # Laptop mode tools module, called from /usr/sbin/laptop_mode.
 # Configuration in /etc/laptop-mode/conf.d/wireless-iwl-power.conf.
 #
@@ -25,7 +25,7 @@ findWifiIfsByDriver () {
 			LINK_TARGET=`readlink $DEVICE/device/driver`
 			LINK_TARGET=${LINK_TARGET##*/}
 			ENABLED=`[ -r $DEVICE/device/enabled ] && cat $DEVICE/device/enabled || cat $DEVICE/device/enable`
-			
+
 			if [ $ENABLED -eq 1 -a "$LINK_TARGET" = "$1" ] ; then
 				# add the interface name to the list
 				WIFI_IFNAMES="$WIFI_IFNAMES ${DEVICE##*/}"
@@ -38,7 +38,7 @@ findWifiIfsByDriver () {
 			# the $DEVICE/wireless folder.
 			dev=`basename $DEVICE`
 
-			# Inverting return values, we get "0" for wireless device, 
+			# Inverting return values, we get "0" for wireless device,
 			# and "1" for non-wireless device.
 			($IWCONFIG $dev 2>&1 | grep -q "no wireless extensions.") && ret=1 || ret=0
 			if [ "$ret" = "0" ]; then
