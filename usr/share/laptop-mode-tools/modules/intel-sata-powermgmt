@@ -1,39 +1,39 @@
 #! /bin/sh
-# 
+#
 # Laptop mode tools module: Power management for Intel SATA controllers
 #
 
 if [ x$CONTROL_INTEL_SATA_POWER = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_INTEL_SATA_POWER = xauto ]; then
-                        SATA_POWER="$LM_AC_ACTIVATE_SATA_POWER"
-	# Set defaults (these settings were added later)	
+	SATA_POWER="$LM_AC_ACTIVATE_SATA_POWER"
+	# Set defaults (these settings were added later)
 	[ "$BATT_ACTIVATE_SATA_POWER" ] || BATT_ACTIVATE_SATA_POWER=1
 	[ "$LM_AC_ACTIVATE_SATA_POWER" ] || LM_AC_ACTIVATE_SATA_POWER=0
 	[ "$NOLM_AC_ACTIVATE_SATA_POWER" ] || NOLM_AC_ACTIVATE_SATA_POWER=0
 
 	# Determine setting
-        if [ $ON_AC -eq 1 ]; then
-                if [ "$ACTIVATE" -eq 1 ]; then
-                        SATA_POWER="$LM_AC_ACTIVATE_SATA_POWER"
-                else
-                        SATA_POWER="$NOLM_AC_ACTIVATE_SATA_POWER"
-                fi
-        else
-                SATA_POWER="$BATT_ACTIVATE_SATA_POWER"
-        fi
+	if [ $ON_AC -eq 1 ]; then
+		if [ "$ACTIVATE" -eq 1 ]; then
+			SATA_POWER="$LM_AC_ACTIVATE_SATA_POWER"
+		else
+			SATA_POWER="$NOLM_AC_ACTIVATE_SATA_POWER"
+		fi
+	else
+		SATA_POWER="$BATT_ACTIVATE_SATA_POWER"
+	fi
 
-        if [ "$SATA_POWER" -eq 1 ]; then
-                SATA_POWER="min_power"
-        else
-                SATA_POWER="max_performance"
-        fi
+	if [ "$SATA_POWER" -eq 1 ]; then
+		SATA_POWER="min_power"
+	else
+		SATA_POWER="max_performance"
+	fi
 
 	for POLICYFILE in /sys/class/scsi_host/*/link_power_management_policy ; do
 		if [ -f $POLICYFILE ] ; then
-                        log "VERBOSE" "Intel SATA link power saving set to $SATA_POWER for $POLICYFILE."
+			log "VERBOSE" "Intel SATA link power saving set to $SATA_POWER for $POLICYFILE."
 			echo $SATA_POWER > $POLICYFILE
 		else
 			log "VERBOSE" "Intel SATA link power saving enabled but not supported by system for $POLICYFILE."
-		fi 
+		fi
 	done
 else
 	log "VERBOSE" "Intel SATA link power saving disabled."

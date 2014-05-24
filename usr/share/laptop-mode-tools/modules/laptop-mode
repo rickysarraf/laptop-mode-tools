@@ -40,8 +40,8 @@ replace_atime_mount_option () {
 	OPTS="$2"
 	PARSEDOPTS="$(remove_fixed_mount_option atime $OPTS)"
 	PARSEDOPTS="$(remove_fixed_mount_option noatime $PARSEDOPTS)"
-	PARSEDOPTS="$(remove_fixed_mount_option relatime $PARSEDOPTS)"	
-	PARSEDOPTS="$(remove_fixed_mount_option norelatime $PARSEDOPTS)"	
+	PARSEDOPTS="$(remove_fixed_mount_option relatime $PARSEDOPTS)"
+	PARSEDOPTS="$(remove_fixed_mount_option norelatime $PARSEDOPTS)"
 
 	case ",$REPLACEMENT_OPTS," in
 	*",relatime,"*)
@@ -60,7 +60,7 @@ replace_atime_mount_option () {
 
 # Find out the state of a numbered option (e.g. "commit=NNN") in
 # a set of options, and use this state to replace the
-# value of the option in another mount options string. 
+# value of the option in another mount options string.
 #
 # Example:
 # replace_numeric_mount_option commit defaults,user=1000,commit=3 defaults,commit=7
@@ -70,9 +70,9 @@ replace_numeric_mount_option () {
 	OPT="$1"
 	DEF_OPT="$2"
 	REPLACEMENT_OPTS="$3"
-	OPTS="$4"	
+	OPTS="$4"
 	PARSEDOPTS="$(remove_numeric_mount_option $OPT $OPTS)"
-	
+
 	if echo ",$REPLACEMENT_OPTS," | grep ",$OPT=[0123456789]+," > /dev/null ; then
 		echo -n "$PARSEDOPTS,$OPT="
 		echo ",$REPLACEMENT_OPTS," | sed \
@@ -132,7 +132,7 @@ control_mount_options() {
 		# Now expand the escapes, inside quotes to preserve the spaces :)
 		MP="$(echo $MP)"
 
-		case "$FST" in 
+		case "$FST" in
 			ext*|reiserfs|xfs)
 				log "VERBOSE" "$FST mount options apply"
 				;;
@@ -141,7 +141,7 @@ control_mount_options() {
 				continue
 				;;
 		esac
-					
+
 		case " $PARTITIONS " in
 			*" $DEV "*)
 				DO=1
@@ -166,7 +166,7 @@ control_mount_options() {
 				# If we have a device referenced by a persistent device naming scheme, it does
 				# not get covered in the previous heuristics. So, if we reach here, we would
 				# want to do a check for it too.
-					
+
 				log "VERBOSE" "Checking $DEV against HD because PARTITIONS contains \"auto\"."
 				case $DEV in
 					*"/dev/disk/by-"*)
@@ -212,20 +212,20 @@ control_mount_options() {
 					FST=$(deduce_fstype $MP)
 					log "VERBOSE" "Deduced fstype for $MP as $FST."
 				fi
-				
+
 				# Strip stuff like ext3,ext2 into just ext3.
 				log "VERBOSE" "Reducing file system type."
 				FST=${FST%%,*}
-				
+
 				# Retrieve original non-laptop mode mount options and restore them.
 				# If the file that stores them doesn't exist, then laptop mode
 				# has never been started.
-				if [ "$WAS_ACTIVE" -ne 0 -a -f /var/run/laptop-mode-tools/nolm-mountopts ] ; then						
+				if [ "$WAS_ACTIVE" -ne 0 -a -f /var/run/laptop-mode-tools/nolm-mountopts ] ; then
 					SAVED_OPTS=`grep "^$DEV " /var/run/laptop-mode-tools/nolm-mountopts`
 					SAVED_OPTS=${SAVED_OPTS#* } # trim device name
-				
+
 					case "$FST" in
-						"ext3"|"reiserfs"|"ext4dev"|"ext4")								
+						"ext3"|"reiserfs"|"ext4dev"|"ext4")
 							PARSEDOPTS="$(replace_numeric_mount_option commit commit=0 $SAVED_OPTS $OPTS)"
 							PARSEDOPTS="$(replace_atime_mount_option $SAVED_OPTS $PARSEDOPTS)"
 							log "VERBOSE" "Executing: mount $DEV $MP -t $FST -o remount,$PARSEDOPTS"
@@ -245,15 +245,15 @@ control_mount_options() {
 					log "VERBOSE" "Executing: /sbin/blockdev $READAHEAD_OPTION $(($NOLM_READAHEAD * 2)) $DEV"
 					log "VERBOSE" "`/sbin/blockdev $READAHEAD_OPTION $(($NOLM_READAHEAD * 2)) $DEV 2>&1`"
 				fi
-				
+
 			else
 				# Enable power saving mount options
 
 				log "VERBOSE" "Original options: $OPTS"
 				if [ "$WAS_ACTIVE" -eq 0 ] ; then
 					# Coming from inactive state: save last known mount options for the device.
-					log "VERBOSE" "Updating /var/run/laptop-mode-tools/nolm-mountopts." 
-					if [ -f /var/run/laptop-mode-tools/nolm-mountopts ] ; then 
+					log "VERBOSE" "Updating /var/run/laptop-mode-tools/nolm-mountopts."
+					if [ -f /var/run/laptop-mode-tools/nolm-mountopts ] ; then
 						sed -i "s|^$DEV .*$||" /var/run/laptop-mode-tools/nolm-mountopts
 					fi
 					echo $DEV $OPTS >> /var/run/laptop-mode-tools/nolm-mountopts
@@ -267,12 +267,12 @@ control_mount_options() {
 					log "VERBOSE" "Deduced fstype for $MP as $FST."
 				fi
 				# Strip stuff like ext3,ext2 into just ext3.
-				log "VERBOSE" "Reducing file system type." 
+				log "VERBOSE" "Reducing file system type."
 				FST=${FST%%,*}
 
 				case "$FST" in
 					"ext3"|"reiserfs"|"ext4dev"|"ext4")
-						log "VERBOSE" "Removing commit mount option from original options." 
+						log "VERBOSE" "Removing commit mount option from original options."
 						PARSEDOPTS="$(remove_numeric_mount_option commit "$OPTS")"
 						log "VERBOSE" "Executing: mount $DEV $MP -t $FST -o remount,$PARSEDOPTS,commit=$MAX_LOST_WORK_SECONDS$NOATIME_OPT"
 						if (! mount $DEV "$MP" -t $FST -o remount,$PARSEDOPTS,commit=$MAX_LOST_WORK_SECONDS$NOATIME_OPT) ; then
@@ -298,7 +298,7 @@ control_mount_options() {
 					log "VERBOSE" "Executing: /sbin/blockdev $READAHEAD_OPTION $(($LM_READAHEAD * 2)) $DEV"
 					log "VERBOSE" "`/sbin/blockdev $READAHEAD_OPTION $(($LM_READAHEAD * 2)) $DEV 2>&1`"
 				fi
-				
+
 			fi
 		fi
 	done
@@ -307,7 +307,7 @@ control_mount_options() {
 
 if [ "$CONTROL_READAHEAD" -ne 0 ] ; then
 	if /sbin/blockdev --help 2>&1 | grep -Fq -- '--setfra' ; then
-		READAHEAD_OPTION=--setfra					
+		READAHEAD_OPTION=--setfra
 	else
 		READAHEAD_OPTION=--setra
 		if [ "$KLEVEL" = "2.4" ] ; then
@@ -321,7 +321,7 @@ fi
 
 if [ $CONTROL_NOATIME -eq 1 ] ; then
 	if [ "$KLEVEL" = "2.4" ] ; then
-		log "VERBOSE" "Relatime is not supported on 2.4 kernels. Using noatime instead" 
+		log "VERBOSE" "Relatime is not supported on 2.4 kernels. Using noatime instead"
 		USE_RELATIME=0
 	elif [ "$KLEVEL" = "2.6" -a "$KMINOR" -lt 23 ] ; then
 		log "VERBOSE" "Relatime is not supported on kernels before 2.6.23. Using noatime instead."
@@ -335,7 +335,7 @@ if [ $CONTROL_NOATIME -eq 1 ] ; then
 fi
 
 
-# Adjust kernel settings and mount options (but only if data loss 
+# Adjust kernel settings and mount options (but only if data loss
 # sensitive features are active)
 if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 1 ] ; then
 	# Take MAX_LOST_WORK_SECONDS from LM_BATT_MAX_LOST_WORK_SECONDS or LM_AC_MAX_LOST_WORK_SECONDS_WITH_LM, depending on power state.
@@ -366,7 +366,7 @@ if [ "$ACTIVATE_WITH_POSSIBLE_DATA_LOSS" -eq 1 ] ; then
 		# But not for these -- they are also used in normal
 		# operation.
 		log "VERBOSE" "Adjusting XFS kernel parameters for 2.6.6 kernel."
-		set_sysctl /proc/sys/fs/xfs/age_buffer       $XFS_AGE 
+		set_sysctl /proc/sys/fs/xfs/age_buffer       $XFS_AGE
 		set_sysctl /proc/sys/fs/xfs/sync_interval    $XFS_AGE
 	elif [ -f /proc/sys/fs/xfs/age_buffer_centisecs ] ; then
 		# (2.6.7 upwards)

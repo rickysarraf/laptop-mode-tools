@@ -1,54 +1,54 @@
 #! /bin/sh
-# 
+#
 # Laptop mode tools module: Intel HDA integrated audio power saving mode.
 #
 
 if [ x$CONTROL_INTEL_HDA_POWER = x1 ]  || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_INTEL_HDA_POWER = xauto ]; then
-    if [ $ON_AC -eq 1 ]; then
+	if [ $ON_AC -eq 1 ]; then
 		if [ "$ACTIVATE" -eq 1 ]; then
 			INTEL_HDA_POWERSAVE="$LM_AC_INTEL_HDA_POWERSAVE"
 		else
 			INTEL_HDA_POWERSAVE="$NOLM_AC_INTEL_HDA_POWERSAVE"
 		fi
-    else
-	    INTEL_HDA_POWERSAVE="$BATT_INTEL_HDA_POWERSAVE"
-    fi
+	else
+		INTEL_HDA_POWERSAVE="$BATT_INTEL_HDA_POWERSAVE"
+	fi
 
-    # Handle Intel HDA Power Save
-    if [ -w /sys/module/snd_hda_intel/parameters/power_save ]; then
-        if [ x$INTEL_HDA_POWERSAVE = x1 ]; then
-                echo $INTEL_HDA_DEVICE_TIMEOUT > /sys/module/snd_hda_intel/parameters/power_save
-                log "VERBOSE" "Intel HDA power save mode enabled with timeout $INTEL_HDA_DEVICE_TIMEOUT."
-                if [ -c /dev/dsp ]; then
-                    # This can fail if the audio device is busy.
-                    # Since this failure is non-fatal (worst case is that the timer changes
-                    # don't get activated), we don't bother if it was successful or not
-                    #(exec 2>/dev/null; echo 1 > /dev/dsp;)
-                    # Better way
-                    echo 1 2>/dev/null >/dev/dsp
-                    log "VERBOSE" "Initialize timer change by close/open /dev/dsp"
-                fi
-        else
-                echo 0 > /sys/module/snd_hda_intel/parameters/power_save
-                log "VERBOSE" "Intel HDA power save mode disabled."
-        fi
-    else
-            log "VERBOSE" "Intel HDA power saving is not available on this system."
-    fi
+	# Handle Intel HDA Power Save
+	if [ -w /sys/module/snd_hda_intel/parameters/power_save ]; then
+		if [ x$INTEL_HDA_POWERSAVE = x1 ]; then
+			echo $INTEL_HDA_DEVICE_TIMEOUT > /sys/module/snd_hda_intel/parameters/power_save
+			log "VERBOSE" "Intel HDA power save mode enabled with timeout $INTEL_HDA_DEVICE_TIMEOUT."
+			if [ -c /dev/dsp ]; then
+				# This can fail if the audio device is busy.
+				# Since this failure is non-fatal (worst case is that the timer changes
+				# don't get activated), we don't bother if it was successful or not
+				#(exec 2>/dev/null; echo 1 > /dev/dsp;)
+				# Better way
+				echo 1 2>/dev/null >/dev/dsp
+				log "VERBOSE" "Initialize timer change by close/open /dev/dsp"
+			fi
+		else
+			echo 0 > /sys/module/snd_hda_intel/parameters/power_save
+			log "VERBOSE" "Intel HDA power save mode disabled."
+		fi
+	else
+		log "VERBOSE" "Intel HDA power saving is not available on this system."
+	fi
 
-    # Handle Intel HDA Controller Power Savings.
-    if [ x$INTEL_HDA_DEVICE_CONTROLLER = x1 -a x$INTEL_HDA_POWERSAVE = x1 ]; then
-        POWER_SAVE="Y"
-    else
-        POWER_SAVE="N"
-    fi
+	# Handle Intel HDA Controller Power Savings.
+	if [ x$INTEL_HDA_DEVICE_CONTROLLER = x1 -a x$INTEL_HDA_POWERSAVE = x1 ]; then
+		POWER_SAVE="Y"
+	else
+		POWER_SAVE="N"
+	fi
 
-    if [ -w /sys/module/snd_hda_intel/parameters/power_save_controller ]; then
-        echo $POWER_SAVE > /sys/module/snd_hda_intel/parameters/power_save_controller
-        log "VERBOSE" "Intel HDA Controller power save set to $POWER_SAVE."
-    else
-        log "VERBOSE" "Sound Card doesn't seem to support Controller Power Save."
-    fi
+	if [ -w /sys/module/snd_hda_intel/parameters/power_save_controller ]; then
+		echo $POWER_SAVE > /sys/module/snd_hda_intel/parameters/power_save_controller
+		log "VERBOSE" "Intel HDA Controller power save set to $POWER_SAVE."
+	else
+		log "VERBOSE" "Sound Card doesn't seem to support Controller Power Save."
+	fi
 else
 	log "VERBOSE" "Intel HDA audio power setting is disabled."
 fi

@@ -55,7 +55,7 @@ if [ x$CONTROL_CPU_FREQUENCY = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL
 			THIS_CPU_MINFREQ="$CPU_MINFREQ"
 			THIS_CPU_GOVERNOR="$CPU_GOVERNOR"
 			THIS_CPU_IGNORE_NICE_LOAD="$CPU_IGNORE_NICE_LOAD"
-			
+
 			case "$CPU_MAXFREQ" in
 			"slowest")
 				THIS_CPU_MAXFREQ=`cat $THISCPU/cpufreq/cpuinfo_min_freq`
@@ -67,7 +67,7 @@ if [ x$CONTROL_CPU_FREQUENCY = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL
 				THIS_CPU_MAXFREQ=`cat $THISCPU/cpufreq/cpuinfo_max_freq`
 				;;
 			esac
-			
+
 			case "$CPU_MINFREQ" in
 			"slowest")
 				THIS_CPU_MINFREQ=`cat $THISCPU/cpufreq/cpuinfo_min_freq`
@@ -137,7 +137,7 @@ if [ x$CONTROL_CPU_THROTTLING = x1 ]  || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTR
 			*)
 				THIS_CPU_THROTTLING="$CPU_THROTTLING"
 			esac
-			
+
 			log "VERBOSE" "Setting throttling level for cpu $THISCPU to $THIS_CPU_THROTTLING."
 			set_sysctl $THISCPU/throttling $THIS_CPU_THROTTLING
 		fi

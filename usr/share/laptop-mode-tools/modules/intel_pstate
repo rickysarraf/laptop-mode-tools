@@ -8,7 +8,7 @@ INTEL_PSTATE_SYSFS=/sys/devices/system/cpu/intel_pstate
 # Set intel_pstate sysfs parameter
 # Parameter 1: parameter name
 # Parameter 2: the value
-set_intel_pstate_param() {
+set_intel_pstate_param () {
 	if [ -f "$INTEL_PSTATE_SYSFS/$1" ]; then
 		log "VERBOSE" "Executing: echo $2 > $INTEL_PSTATE_SYSFS/$1"
 		if ! echo "$2" > "$INTEL_PSTATE_SYSFS/$1" ; then
