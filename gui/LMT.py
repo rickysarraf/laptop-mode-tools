@@ -5,7 +5,9 @@ except ImportError:
     from PySide import QtGui, QtCore
     print "Using PySide"
 
-import os, sys, shutil
+import os
+import sys
+import shutil
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -15,6 +17,7 @@ except AttributeError:
 COMMENT_IDENTIFIER = "#__COMMENT"
 CONTROL_IDENTIFIER = "CONTROL_"
 CONFIG_DIR = "/etc/laptop-mode/conf.d"
+
 
 class Log():
     def debug(self, str):
@@ -26,20 +29,25 @@ class Log():
     def err(self, str):
         sys.stderr.write(str + "\n")
 
+
 class MainWidget(QtGui.QWidget):
     def __init__(self, parent=None):
         QtGui.QWidget.__init__(self, parent)
 
         # Check for root privileges
         if os.geteuid() != 0:
-            QtGui.QMessageBox.critical(self, "Error", "You need to run with root priviliges\nPlease use kdesudo, gksu or sudo/sux")
+            msg = "You need to run with root priviliges\n" \
+                  "Please use kdesudo, gksu or sudo/sux"
+            QtGui.QMessageBox.critical(self, "Error", msg)
             sys.exit(1)
         else:
-            QtGui.QMessageBox.warning(self, "Warning", "This tool is running with root priviliges")
+            msg = "This tool is running with root priviliges"
+            QtGui.QMessageBox.warning(self, "Warning", msg)
 
         # Set Fixed Layout
         self.resize(532, 600)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed,
+                                       QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.sizePolicy().hasHeightForWidth())
@@ -47,9 +55,8 @@ class MainWidget(QtGui.QWidget):
         self.setMinimumSize(QtCore.QSize(532, 600))
         self.setMaximumSize(QtCore.QSize(532, 600))
 
-
         self.layout = QtGui.QVBoxLayout(self)
-        self.layout.setContentsMargins(20,70,20,70)
+        self.layout.setContentsMargins(20, 70, 20, 70)
         self.layout.setSpacing(0)
 
         self.scrollArea = QtGui.QScrollArea()
@@ -70,31 +77,35 @@ class MainWidget(QtGui.QWidget):
             self.subLayout = QtGui.QHBoxLayout()
 
             self.checkBoxName = "checkBox" + "_" + eachOption
-            self.checkBoxList[self.checkBoxName] = QtGui.QCheckBox(self.checkBoxName, self)
-            self.checkBoxList[self.checkBoxName].setObjectName(self.checkBoxName)
-            self.checkBoxList[self.checkBoxName].setText("Enable module %s" % eachOption)
+            checkBoxList = QtGui.QCheckBox(self.checkBoxName, self)
+            self.checkBoxList[self.checkBoxName] = checkBoxList
+            checkBoxList.setObjectName(self.checkBoxName)
+            checkBoxList.setText("Enable module %s" % eachOption)
 
             if self.tooltip is not '':
-                self.checkBoxList[self.checkBoxName].setToolTip(self.tooltip)
+                checkBoxList.setToolTip(self.tooltip)
             else:
-                self.checkBoxList[self.checkBoxName].setToolTip("Configuration settings for %s" % eachOption)
+                tooltip = "Configuration settings for %s" % eachOption
+                checkBoxList.setToolTip(tooltip)
 
             if self.configBool is True:
-                self.checkBoxList[self.checkBoxName].setChecked(True)
+                checkBoxList.setChecked(True)
 
-            self.subLayout.addWidget(self.checkBoxList[self.checkBoxName])
+            self.subLayout.addWidget(checkBoxList)
             self.vbox.addLayout(self.subLayout)
         self.scrollArea.setWidget(self.window)
 
         self.pushButtonSleep = QtGui.QPushButton(self)
-        self.pushButtonSleep.setGeometry(QtCore.QRect(101, 550, 71, 27))
-        self.pushButtonSleep.setObjectName(_fromUtf8("pushButtonSleep"))
-        self.pushButtonSleep.setToolTip(_fromUtf8("Trigger Suspend to RAM aka Sleep"))
+        btnSleep = self.pushButtonSleep
+        btnSleep.setGeometry(QtCore.QRect(101, 550, 71, 27))
+        btnSleep.setObjectName(_fromUtf8("pushButtonSleep"))
+        btnSleep.setToolTip(_fromUtf8("Trigger Suspend to RAM aka Sleep"))
 
         self.pushButtonHibernate = QtGui.QPushButton(self)
-        self.pushButtonHibernate.setGeometry(QtCore.QRect(21, 550, 71, 27))
-        self.pushButtonHibernate.setObjectName(_fromUtf8("pushButtonHibernate"))
-        self.pushButtonHibernate.setToolTip(_fromUtf8("Trigger Suspend to Disk aka Hibernate"))
+        btnHib = self.pushButtonHibernate
+        btnHib.setGeometry(QtCore.QRect(21, 550, 71, 27))
+        btnHib.setObjectName(_fromUtf8("pushButtonHibernate"))
+        btnHib.setToolTip(_fromUtf8("Trigger Suspend to Disk aka Hibernate"))
 
         self.pushButtonApply = QtGui.QPushButton(self)
         self.pushButtonApply.setGeometry(QtCore.QRect(431, 550, 61, 27))
@@ -109,22 +120,27 @@ class MainWidget(QtGui.QWidget):
         self.label = QtGui.QLabel(self)
         self.label.setObjectName("label")
         self.label.setGeometry(QtCore.QRect(25, 50, 400, 16))
-        self.label.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Maximum)
+        self.label.setSizePolicy(QtGui.QSizePolicy.Expanding,
+                                 QtGui.QSizePolicy.Maximum)
 
         self.setGeometry(100, 100, 800, 600)
 
         # Connect the clicked signal of the Ok button to it's slot
-        QtCore.QObject.connect(self.pushButtonApply, QtCore.SIGNAL("clicked()"),
-                self.writeConfig )
+        QtCore.QObject.connect(self.pushButtonApply,
+                               QtCore.SIGNAL("clicked()"),
+                               self.writeConfig)
 
-        QtCore.QObject.connect(self.pushButtonDiscard, QtCore.SIGNAL("clicked()"),
-                sys.exit )
+        QtCore.QObject.connect(self.pushButtonDiscard,
+                               QtCore.SIGNAL("clicked()"),
+                               sys.exit)
 
-        QtCore.QObject.connect(self.pushButtonSleep, QtCore.SIGNAL("clicked()"),
-                self.sleep )
+        QtCore.QObject.connect(self.pushButtonSleep,
+                               QtCore.SIGNAL("clicked()"),
+                               self.sleep)
 
-        QtCore.QObject.connect(self.pushButtonHibernate, QtCore.SIGNAL("clicked()"),
-                self.hibernate )
+        QtCore.QObject.connect(self.pushButtonHibernate,
+                               QtCore.SIGNAL("clicked()"),
+                               self.hibernate)
 
         self.retranslateUi()
 
@@ -159,18 +175,21 @@ class MainWidget(QtGui.QWidget):
         for eachWriteOption in self.configOptions.keys():
             checkBoxName = "checkBox_" + eachWriteOption
             if self.checkBoxList[checkBoxName].isChecked() is True:
-                ret = self.populateValues(self.configOptions[eachWriteOption], 1)
+                val = 1
             else:
-                ret = self.populateValues(self.configOptions[eachWriteOption], 0)
+                val = 0
+            ret = self.populateValues(self.configOptions[eachWriteOption], val)
 
             if ret is False:
                 log.debug("Couldn't apply setting for %s" % checkBoxName)
                 finalResult = False
 
         if finalResult is False:
-            QtGui.QMessageBox.critical(self, "Error", "Couldn't apply all requested settings")
+            QtGui.QMessageBox.critical(self, "Error",
+                                       "Couldn't apply all requested settings")
         else:
-            QtGui.QMessageBox.information(self, "Success", "Applied all requested settings")
+            QtGui.QMessageBox.information(self, "Success",
+                                          "Applied all requested settings")
 
     def populateValues(self, path, value):
         try:
@@ -180,7 +199,9 @@ class MainWidget(QtGui.QWidget):
                 if line.startswith(CONTROL_IDENTIFIER):
                     newline = line.split("=")[0] + "=" + str(value)
                     writeHandle.write(newline)
-                    writeHandle.write("\n") ### You need this newline, otherwise the next line gets overlapped here
+                    # You need this newline, otherwise the next line gets
+                    # overlapped here
+                    writeHandle.write("\n")
                 else:
                     writeHandle.write(line)
             readHandle.close()
@@ -192,12 +213,19 @@ class MainWidget(QtGui.QWidget):
             return False
 
     def retranslateUi(self):
-        self.setWindowTitle(QtGui.QApplication.translate("MainWidget", "Laptop Mode Tools Configuration Tool", None, QtGui.QApplication.UnicodeUTF8))
-        self.pushButtonApply.setText(QtGui.QApplication.translate("MainWidget", "Apply", None, QtGui.QApplication.UnicodeUTF8))
-        self.pushButtonDiscard.setText(QtGui.QApplication.translate("MainWidget", "Exit", None, QtGui.QApplication.UnicodeUTF8))
-        self.pushButtonSleep.setText(QtGui.QApplication.translate("MainWidget", "Sleep", None, QtGui.QApplication.UnicodeUTF8))
-        self.pushButtonHibernate.setText(QtGui.QApplication.translate("MainWidget", "Hibernate", None, QtGui.QApplication.UnicodeUTF8))
-        self.label.setText(QtGui.QApplication.translate("MainWidget", "Laptop Mode Tools - Module Configuration", None, QtGui.QApplication.UnicodeUTF8))
+
+        def trans(text):
+            return QtGui.QApplication.translate("MainWidget",
+                                                text,
+                                                None,
+                                                QtGui.QApplication.UnicodeUTF8)
+
+        self.setWindowTitle(trans("Laptop Mode Tools Configuration Tool"))
+        self.pushButtonApply.setText(trans("Apply"))
+        self.pushButtonDiscard.setText(trans("Exit"))
+        self.pushButtonSleep.setText(trans("Sleep"))
+        self.pushButtonHibernate.setText(trans("Hibernate"))
+        self.label.setText(trans("Laptop Mode Tools - Module Configuration"))
 
     def findConfig(self, configDir):
         if configDir is None:
@@ -206,7 +234,8 @@ class MainWidget(QtGui.QWidget):
         # TODO: Do we need to take care of the vendor specific overrides ???
         for configFile in os.listdir(configDir):
             if os.access(os.path.join(configDir, configFile), os.F_OK) is True:
-                self.configOptions[configFile.split(".")[0]] = os.path.join(configDir, configFile)
+                fn = os.path.join(configDir, configFile)
+                self.configOptions[configFile.split(".")[0]] = fn
             else:
                 pass
 
@@ -226,22 +255,24 @@ class MainWidget(QtGui.QWidget):
                 self.tooltip = self.tooltip + line.lstrip(COMMENT_IDENTIFIER)
             elif line.startswith(CONTROL_IDENTIFIER):
                 boolValue = line.split("=")[1]
-                boolValue = boolValue.rstrip("\n") ### Bloody boolValue could inherit the '\n' new line
+                # Bloody boolValue could inherit the '\n' new line
+                boolValue = boolValue.rstrip("\n")
 
                 if boolValue == str(1) or "\"auto\"" in boolValue:
                     self.configBool = True
                 else:
                     self.configBool = False
 
-        # This will ensure that even if we don't read any string, tooltip doesn't fail
+        # This will ensure that even if we don't read any string, tooltip
+        # doesn't fail
         self.tooltip = self.tooltip + ''
 
-if __name__=="__main__":
+if __name__ == "__main__":
     from sys import argv, exit
 
     log = Log()
-    a=QtGui.QApplication(argv)
-    win=MainWidget()
+    a = QtGui.QApplication(argv)
+    win = MainWidget()
     win.show()
     win.raise_()
     exit(a.exec_())
