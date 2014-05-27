@@ -182,8 +182,8 @@ if ( ! $INSTALL -m 755 usr/share/laptop-mode-tools/module-helpers/* "$DESTDIR/us
 fi
 
 if ( ! $INSTALL -m 744 man/* "$DESTDIR/$MAN_D/man8" ) ; then
-  echo "$0: Could not copy manual pages to $DESTDIR/$MAN_D/man8. Installation failed."
-  exit 23
+	echo "$0: Could not copy manual pages to $DESTDIR/$MAN_D/man8. Installation failed."
+	exit 23
 fi
 
 
@@ -202,8 +202,8 @@ fi
 
 # udev rule
 if ( ! $INSTALL -D -m 644 etc/rules/99-laptop-mode.rules "$DESTDIR/$UDEV_D/rules.d/99-laptop-mode.rules" ) ; then
-    echo "$0: Failed to install udev rule into $UDEV_D/rules.d/ Installation failed."
-    exit 23
+	echo "$0: Failed to install udev rule into $UDEV_D/rules.d/ Installation failed."
+	exit 23
 fi
 
 # udev helper tool
@@ -353,30 +353,30 @@ if [ "$INIT_D" != "none" ] ; then
 		fi
 	fi
 
-    # Check for acpid and restart if running
-    acpi_pid=`pidof acpid`
-    if [ ! -z $acpi_pid ]; then
-        echo "Reloading acpid daemon"
-        killall -SIGHUP acpid;
-    fi
+	# Check for acpid and restart if running
+	acpi_pid=`pidof acpid`
+	if [ ! -z $acpi_pid ]; then
+		echo "Reloading acpid daemon"
+		killall -SIGHUP acpid;
+	fi
 
-    apm_pid=`pidof apmd`
-    if [ ! -z $apm_pid ]; then
-        echo "Reloading apmd daemon"
-        killall -SIGHUP apmd;
-    fi
+	apm_pid=`pidof apmd`
+	if [ ! -z $apm_pid ]; then
+		echo "Reloading apmd daemon"
+		killall -SIGHUP apmd;
+	fi
 
-    pbbuttonsd_pid=`pidof pbbuttonsd`
-    if [ ! -z $pbbuttonsd_pid ]; then
-        echo "Reloading pbbuttonsd daemon"
-        killall -SIGHUP pbbuttonsd;
-    fi
+	pbbuttonsd_pid=`pidof pbbuttonsd`
+	if [ ! -z $pbbuttonsd_pid ]; then
+		echo "Reloading pbbuttonsd daemon"
+		killall -SIGHUP pbbuttonsd;
+	fi
 
-    pmud_pid=`pidof pmud`
-    if [ ! -z $pmud_pid ]; then
-        echo "Reloading pmud daemon"
-        killall -SIGHUP pmud;
-    fi
+	pmud_pid=`pidof pmud`
+	if [ ! -z $pmud_pid ]; then
+		echo "Reloading pmud daemon"
+		killall -SIGHUP pmud;
+	fi
 fi
 
 echo "Installation complete."
