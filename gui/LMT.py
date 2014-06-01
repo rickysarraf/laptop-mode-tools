@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 try:
     from PyQt4 import QtGui, QtCore
     print "Using PyQT4"
