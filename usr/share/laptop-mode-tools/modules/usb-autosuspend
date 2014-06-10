@@ -26,7 +26,9 @@ listed_by_type() {
 	device_base=`basename $device`
 	list=$2
 	for driver_type in $list; do
-		if grep -q DRIVER=$driver_type $device/uevent; then
+		# The device could have been removed in the meantime
+		[ -r $device/uevent ] || continue
+		if grep -s -q DRIVER=$driver_type $device/uevent; then
 			return 0
 		fi
 		# Check child devices as well.  The actual driver type is
