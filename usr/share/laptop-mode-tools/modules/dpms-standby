@@ -16,9 +16,9 @@ getXuser() {
 
 	export XAUTHORITY=""
 	if [ x"$user" != x"" ]; then
-        	xauthdir=`getent passwd $user | cut -d: -f6`
+		xauthdir=`getent passwd $user | cut -d: -f6`
 		if [ -f "$xauthdir/.Xauthority" ]; then
-        		export XAUTHORITY=$xauthdir/.Xauthority
+			export XAUTHORITY=$xauthdir/.Xauthority
 		fi
 	else
 		export XAUTHORITY=""
@@ -53,10 +53,10 @@ if [ x$CONTROL_DPMS_STANDBY = x1 ]  || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL
 			log "VERBOSE" "Determining Xauthority for display $displaynum"
 			getXuser;
 			if [ x"$XAUTHORITY" != x"" ]; then
-				export DISPLAY=":$displaynum"	    
+				export DISPLAY=":$displaynum"
 				if su $XUSER -c "xset dpms $STANDBY $SUSPEND $OFF" 2>> $OUTPUT | grep -q display 2>&1 ; then
 					log "VERBOSE" "Unable to set DPMS timeouts: X is not running on $DISPLAY"
-				else 
+				else
 					log "VERBOSE" "Set screen $DISPLAY for the user $XUSER to standby in $STANDBY s, suspend in $SUSPEND s, powerdown in $OFF s using Xauthority $XAUTHORITY"
 				fi
 			else

@@ -17,7 +17,7 @@ if [ x$CONTROL_BRIGHTNESS = x1 ] ; then
 	if [ -f /var/run/laptop-mode-tools/state-brightness-command ] ; then
 		OLD_BRIGHTNESS_COMMAND="$( cat /var/run/laptop-mode-tools/state-brightness-command )"
 	fi
-	
+
 	if [ "$FORCE" -ne 0 -o "$BRIGHTNESS_COMMAND" != "$OLD_BRIGHTNESS_COMMAND" ] ; then
 		log "VERBOSE" "Set LCD brightness using command $BRIGHTNESS_COMMAND \> $BRIGHTNESS_OUTPUT."
 		if ( $BRIGHTNESS_COMMAND > $BRIGHTNESS_OUTPUT ) ; then

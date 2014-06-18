@@ -29,15 +29,15 @@ if [ x$CONTROL_BLUETOOTH = x1 ] ; then
 			log "VERBOSE" "Disabling ThinkPad Bluetooth device"
 			echo "disable" > /proc/acpi/ibm/bluetooth
 		fi
-		
+
 		for INTF in $BLUETOOTH_INTERFACES ; do
 			[ -d /sys/class/bluetooth/$INTF ] || continue
-			log "VERBOSE" "`hciconfig $INTF down 2>&1`" 
+			log "VERBOSE" "`hciconfig $INTF down 2>&1`"
 		done
 		# This may take a while to work because the module may be
 		# temporarily in use; we try three times. We don't use rmmod
 		# --wait, because that might hang!
-		modprobe -rq hci_usb || (sleep 1 ; modprobe -rq hci_usb) || (sleep 1 ; modprobe -rq hci_usb)		
+		modprobe -rq hci_usb || (sleep 1 ; modprobe -rq hci_usb) || (sleep 1 ; modprobe -rq hci_usb)
 	fi
 fi
 

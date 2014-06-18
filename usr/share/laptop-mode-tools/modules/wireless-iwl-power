@@ -1,5 +1,5 @@
 #! /bin/sh
-# 
+#
 # Laptop mode tools module, called from /usr/sbin/laptop_mode.
 # Configuration in /etc/laptop-mode/conf.d/wireless-iwl-power.conf.
 #
@@ -24,27 +24,27 @@ findWifiIfsByDriver () {
 			# the driver.
 			LINK_TARGET=`readlink $DEVICE/device/driver`
 			LINK_TARGET=${LINK_TARGET##*/}
-			ENABLED=`cat $DEVICE/device/enable` 
-			
+			ENABLED=`[ -r $DEVICE/device/enabled ] && cat $DEVICE/device/enabled || cat $DEVICE/device/enable`
+
 			if [ $ENABLED -eq 1 -a "$LINK_TARGET" = "$1" ] ; then
 				# add the interface name to the list
 				WIFI_IFNAMES="$WIFI_IFNAMES ${DEVICE##*/}"
-                        else
-                                log "VERBOSE" "$DEVICE doesn't seem to be enabled. Radio Switched off?";
+			else
+				log "VERBOSE" "$DEVICE doesn't seem to be enabled. Radio Switched off?";
 			fi
-                else
-                        # LP: #369113
-                        # Kernel's 2.6.29 and above have been reported to be missing
-                        # the $DEVICE/wireless folder.
-                        dev=`basename $DEVICE`
+		else
+			# LP: #369113
+			# Kernel's 2.6.29 and above have been reported to be missing
+			# the $DEVICE/wireless folder.
+			dev=`basename $DEVICE`
 
-			# Inverting return values, we get "0" for wireless device, 
+			# Inverting return values, we get "0" for wireless device,
 			# and "1" for non-wireless device.
 			($IWCONFIG $dev 2>&1 | grep -q "no wireless extensions.") && ret=1 || ret=0
-                        if [ "$ret" = "0" ]; then
-			        # add the interface name to the list
-		    		WIFI_IFNAMES="$WIFI_IFNAMES ${DEVICE##*/}"
-                        fi
+			if [ "$ret" = "0" ]; then
+				# add the interface name to the list
+				WIFI_IFNAMES="$WIFI_IFNAMES ${DEVICE##*/}"
+			fi
 		fi
 	done
 }
@@ -78,6 +78,7 @@ if [ x$CONTROL_IWL_POWER = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_IWL
 	[ -d /sys/module/iwl3945 ] && findWifiIfsByDriver iwl3945
 	[ -d /sys/module/iwl4965 ] && findWifiIfsByDriver iwl4965
 	[ -d /sys/module/iwlagn ] && findWifiIfsByDriver iwlagn
+	[ -d /sys/module/iwlwifi ] && findWifiIfsByDriver iwlwifi
 	for IF in $WIFI_IFNAMES ; do
 		if [ $ON_AC -eq 1 ] ; then
 			log "VERBOSE" "On AC power: setting power level for $IF to $IWL_AC_POWER."

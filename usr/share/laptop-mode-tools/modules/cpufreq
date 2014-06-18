@@ -45,12 +45,17 @@ if [ x$CONTROL_CPU_FREQUENCY = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL
 		CPU_IGNORE_NICE_LOAD="$BATT_CPU_IGNORE_NICE_LOAD"
 	fi
 	for THISCPU in /sys/devices/system/cpu/* ; do
+		if [ -f "$THISCPU/cpufreq/scaling_driver" ] &&
+		   [ "$(cat $THISCPU/cpufreq/scaling_driver)" = "intel_pstate" ]
+		then
+			continue # intel_pstate is a bit different - so it should be handled by its own module
+		fi
 		if [ -e $THISCPU/cpufreq/cpuinfo_min_freq ]; then
 			THIS_CPU_MAXFREQ="$CPU_MAXFREQ"
 			THIS_CPU_MINFREQ="$CPU_MINFREQ"
 			THIS_CPU_GOVERNOR="$CPU_GOVERNOR"
 			THIS_CPU_IGNORE_NICE_LOAD="$CPU_IGNORE_NICE_LOAD"
-			
+
 			case "$CPU_MAXFREQ" in
 			"slowest")
 				THIS_CPU_MAXFREQ=`cat $THISCPU/cpufreq/cpuinfo_min_freq`
@@ -62,7 +67,7 @@ if [ x$CONTROL_CPU_FREQUENCY = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL
 				THIS_CPU_MAXFREQ=`cat $THISCPU/cpufreq/cpuinfo_max_freq`
 				;;
 			esac
-			
+
 			case "$CPU_MINFREQ" in
 			"slowest")
 				THIS_CPU_MINFREQ=`cat $THISCPU/cpufreq/cpuinfo_min_freq`
@@ -132,7 +137,7 @@ if [ x$CONTROL_CPU_THROTTLING = x1 ]  || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTR
 			*)
 				THIS_CPU_THROTTLING="$CPU_THROTTLING"
 			esac
-			
+
 			log "VERBOSE" "Setting throttling level for cpu $THISCPU to $THIS_CPU_THROTTLING."
 			set_sysctl $THISCPU/throttling $THIS_CPU_THROTTLING
 		fi
