@@ -1,3 +1,15 @@
+1.65 - Wed Jun 18 19:22:35 IST 2014
+    * fix grep error on missing $device/uevent
+    * ethernet: replace sysfs/enabled by 'ip link down'
+    * wireless-iwl-power: sysfs attr enbable -> enabled
+    * wireless-iwl-power: Add iwlwifi support
+    * Use Runtime Power Managemet Framework is more robust now. Deprecates module
+      usb-autosuspend
+    * Fix multiple hibernate issue
+    * When resuming, run LMT in force initialization mode
+    * Add module for Intel PState driver
+    * GUI: Implement suspend/hibernate interface
+
 1.64 - Sun Sep  1 13:15:02 IST 2013
     * Don't touch USB Controller power settings. The individual devices, when plugged
       in, while on battery, inherit the power settings from the USB controller

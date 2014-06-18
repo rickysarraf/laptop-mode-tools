@@ -35,7 +35,7 @@ set -a
 
 # The laptop mode tools version number. Extracted by the installer makefile
 # as well, so don't change the format!
-LMTVERSION=1.64
+LMTVERSION=1.65
 
 # This script is loaded from multiple scripts to set the config defaults
 # and to read the configuration on top of those. Only when the command is
