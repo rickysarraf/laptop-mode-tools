@@ -1,5 +1,5 @@
 #! /bin/sh
-# 
+#
 # Laptop mode tools module: Battery level polling.
 #
 
@@ -17,7 +17,7 @@ if [ x$ENABLE_BATTERY_LEVEL_POLLING = x1 ] ; then
 		else
 			if ! pidof -x lm-polling-daemon ; then
 				log "VERBOSE" "On battery and there was no polling daemon yet, starting the polling daemon."
-			
+
 				# If there is no polling daemon, we start one.
 				#/usr/share/laptop-mode-tools/module-helpers/lm-polling-daemon < /dev/null > /dev/null 2> /dev/null &
 				/usr/share/laptop-mode-tools/module-helpers/lm-polling-daemon &

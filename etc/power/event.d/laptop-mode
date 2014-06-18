@@ -6,7 +6,7 @@
 #               memory management buffer flush timeouts
 # requirements: laptop-mode support in kernel
 #               laptopmode.sh somewhere on your system
-# limitations : none 
+# limitations : none
 #
 # --- end of public part -- don't change below this line ---
 
@@ -16,20 +16,20 @@ LMODE=/usr/sbin/laptop_mode
 [ -x $LMODE ] || exit 0
 
 if [ -w /proc/sys/vm/laptop_mode ]; then
-    case "$1" in
-      powersave)
-  	$LMODE "start"
-	echo "3 " $LMODE "start"
-	;;
-      custom)
-        $LMODE "auto"
-        ;;
-      performance)
-        $LMODE "stop"
-        ;;
-    esac
-elif [ -x logger ]; then	
-  logger -p daemon.error -t laptop-mode "Laptop-mode support missing in kernel."
+	case "$1" in
+		powersave)
+			$LMODE "start"
+			echo "3 " $LMODE "start"
+			;;
+		custom)
+			$LMODE "auto"
+			;;
+		performance)
+			$LMODE "stop"
+			;;
+	esac
+elif [ -x logger ]; then
+	logger -p daemon.error -t laptop-mode "Laptop-mode support missing in kernel."
 fi
 
 

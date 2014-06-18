@@ -1,5 +1,5 @@
 #! /bin/sh
-# 
+#
 # Laptop mode tools module: power saving for IPW3945, IPW2200 and IPW2100 using
 #                           the Intel ipw drivers.
 #
@@ -62,7 +62,7 @@ if [ x$CONTROL_IPW_POWER = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_IPW
 	findWifiIfsByDriver() {
 		local DEVICE;
 		local LINK_TARGET;
-                local ENABLED;
+		local ENABLED;
 		WIFI_IFNAMES=""
 
 		for DEVICE in /sys/class/net/*; do
@@ -71,27 +71,27 @@ if [ x$CONTROL_IPW_POWER = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_IPW
 				# the driver.
 				LINK_TARGET=`readlink $DEVICE/device/driver`
 				LINK_TARGET=${LINK_TARGET##*/}
-                                ENABLED=`cat $DEVICE/device/enable`
+				ENABLED=`[ -r $DEVICE/device/enabled ] && cat $DEVICE/device/enabled || cat $DEVICE/device/enable`
 
 				if [ $ENABLED -eq 1 -a "$LINK_TARGET" = "$1" ]; then
 					# add the interface name to the list
-		    		        WIFI_IFNAMES="$WIFI_IFNAMES ${DEVICE##*/}"
-                                else
-                                        log "VERBOSE" "$DEVICE doesn't seem to be enabled. Radio Switched off?";
+					WIFI_IFNAMES="$WIFI_IFNAMES ${DEVICE##*/}"
+				else
+					log "VERBOSE" "$DEVICE doesn't seem to be enabled. Radio Switched off?";
 				fi
-                        else
-                                # LP: #369113
-                                # Kernel's 2.6.29 and above have been reported to be missing
-                                # the $DEVICE/wireless folder.
-                                dev=`basename $DEVICE`
+			else
+				# LP: #369113
+				# Kernel's 2.6.29 and above have been reported to be missing
+				# the $DEVICE/wireless folder.
+				dev=`basename $DEVICE`
 
-				# Inverting return values, we get "0" for wireless device, 
+				# Inverting return values, we get "0" for wireless device,
 				# and "1" for non-wireless device.
 				($IWCONFIG $dev 2>&1 | grep -q "no wireless extensions.") && ret=1 || ret=0
-                                if [ "$ret" = "0" ]; then
+				if [ "$ret" = "0" ]; then
 					# add the interface name to the list
-		    		        WIFI_IFNAMES="$WIFI_IFNAMES ${DEVICE##*/}"
-                                fi
+					WIFI_IFNAMES="$WIFI_IFNAMES ${DEVICE##*/}"
+				fi
 			fi
 		done
 	}

@@ -16,7 +16,7 @@ is_capable() {
 	local dev=${1#/dev/}
 	local MEDIA=
 	local BUS=
-	
+
 	# Make sure the drive exists before checking anything.
 	if ! [ -e $1 ]; then
 		return 1;
@@ -33,7 +33,7 @@ is_capable() {
 	fi
 
 	if [ "$IS_ROTATIONAL" -eq 0 ]; then
-		log "VERBOSE" "Disk $THISHD is a NAND (SSD / Flash) Device. Not apply power management savings" 
+		log "VERBOSE" "Disk $THISHD is a NAND (SSD / Flash) Device. Not apply power management savings"
 		return 1
 	fi
 
@@ -126,7 +126,7 @@ is_capable() {
 		# not normally the "sdparm" command.
 		*:ata:HDPARM ) return 0 ;;
 		*:ata:SDPARM ) return 1 ;;
-		
+
 		# SCSI drives support the "sdparm" command, but
 		# not normally the "hdparm" command.
 		*:scsi:SDPARM ) return 0 ;;
@@ -147,10 +147,10 @@ is_capable() {
 
 # Preparation: determine the tools we have available.
 if [ -x "$(which hdparm 2> /dev/null)" ]; then
-  HDPARM_AVAILABLE=1
+	HDPARM_AVAILABLE=1
 fi
 if [ -x "$(which sdparm 2> /dev/null)" ]; then
-  SDPARM_AVAILABLE=1
+	SDPARM_AVAILABLE=1
 fi
 HAVE_UDEVINFO=0
 if [ -x "$(which udevadm 2> /dev/null)" ]; then
@@ -201,7 +201,7 @@ if [ x$CONTROL_HD_POWERMGMT = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_
 					log "VERBOSE" "Executing: hdparm -B $HD_POWERMGMT $THISHD"
 					log "VERBOSE" "`hdparm -B $HD_POWERMGMT $THISHD 2>&1`"
 				else
-					log "ERR" "ERROR: hdparm not installed."				
+					log "ERR" "ERROR: hdparm not installed."
 				fi
 			else
 				log "VERBOSE" "Skipping $THISHD: powermgmt only possible with hdparm but drive does not"

@@ -4,11 +4,11 @@
 # It can detect programs that perform regular, non-bursty disk operations,
 # and network services that listen on external addresses. When started,
 # lm-profiler will run for 10 minutes (or a configured number of minutes),
-# after which it will provide a series of recommendations. 
+# after which it will provide a series of recommendations.
 #
-# It will try to find init scripts for any programs that it recommends for 
-# stopping, and it will ask if you want to place links to those scripts in 
-# /etc/laptop-mode/batt-stop, so that laptop mode tools will automatically 
+# It will try to find init scripts for any programs that it recommends for
+# stopping, and it will ask if you want to place links to those scripts in
+# /etc/laptop-mode/batt-stop, so that laptop mode tools will automatically
 # stop those daemons when battery mode is detected.
 #
 #
@@ -86,7 +86,7 @@ stop_profiling(){
 # strings in a space-separated list passed as the first parameter.
 format_params(){
 	for PARAM in $1 ; do
-		echo -n "-e $PARAM " 
+		echo -n "-e $PARAM "
 	done
 }
 
@@ -108,7 +108,7 @@ process_dmesg_diff(){
 		# 3. Parse out the name of the process.
 		# 4. Filter out IGNORE_PROGRAMS.
 		# 5. Write process name to output.
-		
+
 		diff -u $LEFT $RIGHT \
 			|grep '^+' \
 			|grep -o '[^[:space:]]*([0-9]*): WRITE' \
@@ -185,7 +185,7 @@ profilenet(){
 	netstat -anp |grep ^tcp.*LISTEN |grep -v "Program name" |awk -v FS="/" '{print $2}' |sort |uniq |\
 	tr -d ['(',')','[',']']
 }
-			
+
 
 #
 # PROFILING RUN

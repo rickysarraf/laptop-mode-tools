@@ -50,7 +50,7 @@ case $1 in
   restart|reload|force-reload)
     # Full restart: first stop laptop mode completely (to restore default mount options etc.)
     mkdir -p /var/run/laptop-mode-tools
-    rm -f /var/run/laptop-mode-tools/enabled    
+    rm -f /var/run/laptop-mode-tools/enabled
     if RESULT=`/usr/sbin/laptop_mode stop` ; then
       log_success_msg "$RESULT"
     else
@@ -81,7 +81,7 @@ case $1 in
     echo
     /usr/sbin/laptop_mode status
     ;;
-    
+
   *)
     echo "Usage: $0 {stop|start|restart|reload|force-reload|status}" >&2
     exit 2

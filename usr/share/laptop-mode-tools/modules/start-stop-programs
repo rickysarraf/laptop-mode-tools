@@ -18,7 +18,7 @@ if [ x$CONTROL_START_STOP = x1 ] ; then
    exec 8>&-
    exec 9>&-
    log "VERBOSE" "Released locks for descriptors 8 & 9"
-             
+
 
    #
    # Undo the previous state.
@@ -39,18 +39,18 @@ if [ x$CONTROL_START_STOP = x1 ] ; then
 	# next state change. Note: we actually
 	# write the actions to the file in reverse order,
 	# so we can execute the commands easily afterwards.
-	echo > /var/run/laptop-mode-tools/start-stop-undo-actions 
-		
-	   
+	echo > /var/run/laptop-mode-tools/start-stop-undo-actions
+
+
 	if [ $ON_AC -eq 1 ] ; then
-		if [ "$ACTIVATE" -eq 1 ] ; then		
+		if [ "$ACTIVATE" -eq 1 ] ; then
 			START_STOP_DIR_PREFIX=/etc/laptop-mode/lm-ac
 			START_SERVICES="$LM_AC_START"
-			STOP_SERVICES="$LM_AC_STOP"			
+			STOP_SERVICES="$LM_AC_STOP"
 		else
 			START_STOP_DIR_PREFIX=/etc/laptop-mode/nolm-ac
 			START_SERVICES="$NOLM_AC_START"
-			STOP_SERVICES="$NOLM_AC_STOP"			
+			STOP_SERVICES="$NOLM_AC_STOP"
 		fi
 	else
 		START_STOP_DIR_PREFIX=/etc/laptop-mode/batt
@@ -90,7 +90,7 @@ if [ x$CONTROL_START_STOP = x1 ] ; then
 	log "VERBOSE" "STOP_SERVICES = $STOP_SERVICES"
 	if [ "$START_SERVICES" != "" -o "$STOP_SERVICES" != "" ] ; then
 		log "MSG" "Starting/stopping services"
-	
+
 		# Determine how we can start/restart services.
 
 		STARTCMD='$RCPROG$SERVICE start'

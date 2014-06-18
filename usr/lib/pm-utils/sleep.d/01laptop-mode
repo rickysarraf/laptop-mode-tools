@@ -3,20 +3,20 @@
 # 01laptop-mode: Re-apply laptop mode tools settings
 
 if [ -f /etc/pm/sleep.d/99laptop-mode ]; then
-    continue
+	continue
 else
-    case "$1" in
-	    hibernate|suspend)
-		    # Stopping is not required.
-		    ;;
-	    thaw|resume)
-		    # Make laptop mode tools forcibly re-apply the hardware settings
-		    # that laptop mode tools applies.			
-		    if [ -e /usr/sbin/laptop_mode ] ; then
-			    /usr/sbin/laptop_mode auto force
-		    fi
-		    ;;
-	    *) exit $NA
-		    ;;
-    esac
+	case "$1" in
+		hibernate|suspend)
+			# Stopping is not required.
+			;;
+		thaw|resume)
+			# Make laptop mode tools forcibly re-apply the hardware settings
+			# that laptop mode tools applies.			
+			if [ -e /usr/sbin/laptop_mode ] ; then
+				/usr/sbin/laptop_mode auto force
+			fi
+			;;
+		*) exit $NA
+			;;
+	esac
 fi
