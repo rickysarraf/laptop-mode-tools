@@ -1,12 +1,12 @@
 disable batt throttle as there have been many reports of breakage
 Index: laptop-mode-tools/etc/laptop-mode/conf.d/ethernet.conf
 ===================================================================
---- laptop-mode-tools.orig/etc/laptop-mode/conf.d/ethernet.conf	2013-09-15 21:46:48.286535161 +0530
-+++ laptop-mode-tools/etc/laptop-mode/conf.d/ethernet.conf	2013-09-15 21:46:48.282535161 +0530
+--- laptop-mode-tools.orig/etc/laptop-mode/conf.d/ethernet.conf	2014-06-19 12:02:10.950193044 +0530
++++ laptop-mode-tools/etc/laptop-mode/conf.d/ethernet.conf	2014-06-19 12:03:24.134708022 +0530
 @@ -26,7 +26,7 @@
  CONTROL_ETHERNET="auto"
  
- # Handle throttling of the ethernet deivce under specific circumstances
+ # Handle throttling of the ethernet device under specific circumstances
 -BATT_THROTTLE_ETHERNET=1
 +BATT_THROTTLE_ETHERNET=0
  LM_AC_THROTTLE_ETHERNET=0
