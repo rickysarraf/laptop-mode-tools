@@ -1,152 +1,143 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
+# -*- coding: utf-8 -*-
 
-try:
-    from PyQt4 import QtGui, QtCore
-    print "Using PyQT4"
-except ImportError:
-    from PySide import QtGui, QtCore
-    print "Using PySide"
 
-import os
+""" Laptop Mode Tools """
+
+
 import sys
-import shutil
+from getpass import getuser
+from os import access, F_OK, geteuid, listdir, path
+from shutil import move
+from webbrowser import open_new_tab
 
 try:
-    _fromUtf8 = QtCore.QString.fromUtf8
-except AttributeError:
-    _fromUtf8 = lambda s: s
+    from PyQt4.QtGui import (QWidget, QMessageBox, QVBoxLayout, QHBoxLayout,
+                             QGroupBox, QScrollArea, QCheckBox, QPushButton,
+                             QApplication, QMainWindow, QIcon, QDialogButtonBox,
+                             QColor, QGraphicsDropShadowEffect, QShortcut)
+    print("Using PyQt4")
+except ImportError:
+    from PySide.QtGui import (QWidget, QMessageBox, QVBoxLayout, QHBoxLayout,
+                              QGroupBox, QScrollArea, QCheckBox, QPushButton,
+                              QApplication, QMainWindow, QIcon, QShortcut,
+                              QDialogButtonBox, QColor,
+                              QGraphicsDropShadowEffect)
+    print("Using PySide")
 
+
+# constants
 COMMENT_IDENTIFIER = "#__COMMENT"
 CONTROL_IDENTIFIER = "CONTROL_"
 CONFIG_DIR = "/etc/laptop-mode/conf.d"
+WEBPAGE_URL = "http://samwel.tk/laptop_mode"
+
+
+###############################################################################
 
 
 class Log():
-    def debug(self, str):
-        sys.stderr.write(str + "\n")
+    def debug(self, string_to_log):
+        sys.stderr.write(string_to_log + "\n")
 
-    def msg(self, str):
-        sys.stdout.write(str + "\n")
+    def msg(self, string_to_log):
+        sys.stdout.write(string_to_log + "\n")
 
-    def err(self, str):
-        sys.stderr.write(str + "\n")
+    def err(self, string_to_log):
+        sys.stderr.write(string_to_log + "\n")
 
 
-class MainWidget(QtGui.QWidget):
+class MainWidget(QMainWindow):
     def __init__(self, parent=None):
-        QtGui.QWidget.__init__(self, parent)
-
+        QMainWindow.__init__(self, parent)
+        self.configOptions, self.checkBoxList, self.configBool = {}, {}, None
         # Check for root privileges
-        if os.geteuid() != 0:
-            msg = "You need to run with root priviliges\n" \
-                  "Please use kdesudo, gksu or sudo/sux"
-            QtGui.QMessageBox.critical(self, "Error", msg)
+        if geteuid() != 0:
+            msg = ("{} is not root. You need to run with root priviliges\n"
+                   "Please use kdesudo, gksu or sudo/sux.").format(getuser())
+            QMessageBox.critical(self, __doc__ + "- Error", msg)
             sys.exit(1)
         else:
-            msg = "This tool is running with root priviliges"
-            QtGui.QMessageBox.warning(self, "Warning", msg)
-
-        # Set Fixed Layout
-        self.resize(532, 600)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed,
-                                       QtGui.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.sizePolicy().hasHeightForWidth())
-        self.setSizePolicy(sizePolicy)
-        self.setMinimumSize(QtCore.QSize(532, 600))
-        self.setMaximumSize(QtCore.QSize(532, 600))
-
-        self.layout = QtGui.QVBoxLayout(self)
-        self.layout.setContentsMargins(20, 70, 20, 70)
-        self.layout.setSpacing(0)
-
-        self.scrollArea = QtGui.QScrollArea()
+            msg = "This tool is running with root priviliges."
+            QMessageBox.warning(self, __doc__ + "- Warning", msg)
+        # title, icon and sizes
+        self.setWindowTitle(__doc__)
+        self.setMinimumSize(600, 600)
+        self.setMaximumSize(2048, 2048)
+        self.resize(600, 600)
+        self.setWindowIcon(QIcon.fromTheme("preferences-system"))
+        self.menuBar().addMenu("&File").addAction("Exit", exit)
+        QShortcut("Ctrl+q", self, activated=lambda: self.close())
+        # main group
+        main_group = QGroupBox("Module configuration")
+        self.setCentralWidget(main_group)
+        self.layout = QVBoxLayout(main_group)
+        # scrollarea widgets
+        self.scrollArea, self.window = QScrollArea(), QWidget()
         self.layout.addWidget(self.scrollArea)
-
-        self.window = QtGui.QWidget(self)
-        self.vbox = QtGui.QVBoxLayout(self.window)
-
-        self.configOptions = {}
+        self.vbox = QVBoxLayout(self.window)
+        # Graphic effect
+        glow = QGraphicsDropShadowEffect(self)
+        glow.setOffset(0)
+        glow.setBlurRadius(99)
+        glow.setColor(QColor(99, 255, 255))
+        self.scrollArea.setGraphicsEffect(glow)
+        glow.setEnabled(True)
+        # config loading stuff
         self.findConfig(CONFIG_DIR)
-
-        self.checkBoxList = {}
-        self.configBool = None
-
-        for eachOption in self.configOptions.keys():
+        for eachOption in tuple(self.configOptions.keys()):
 
             self.readConfig(eachOption, self.configOptions)
-            self.subLayout = QtGui.QHBoxLayout()
+            self.subLayout = QHBoxLayout()
 
-            self.checkBoxName = "checkBox" + "_" + eachOption
-            checkBoxList = QtGui.QCheckBox(self.checkBoxName, self)
+            self.checkBoxName = "checkBox_" + eachOption
+            checkBoxList = QCheckBox(self.checkBoxName, self)
             self.checkBoxList[self.checkBoxName] = checkBoxList
             checkBoxList.setObjectName(self.checkBoxName)
-            checkBoxList.setText("Enable module %s" % eachOption)
+            checkBoxList.setText("Enable module {}".format(eachOption))
 
             if self.tooltip is not '':
                 checkBoxList.setToolTip(self.tooltip)
             else:
-                tooltip = "Configuration settings for %s" % eachOption
+                tooltip = "Configuration settings for {}".format(eachOption)
                 checkBoxList.setToolTip(tooltip)
 
-            if self.configBool is True:
+            if self.configBool:
                 checkBoxList.setChecked(True)
 
             self.subLayout.addWidget(checkBoxList)
             self.vbox.addLayout(self.subLayout)
         self.scrollArea.setWidget(self.window)
 
-        self.pushButtonSleep = QtGui.QPushButton(self)
-        btnSleep = self.pushButtonSleep
-        btnSleep.setGeometry(QtCore.QRect(101, 550, 71, 27))
-        btnSleep.setObjectName(_fromUtf8("pushButtonSleep"))
-        btnSleep.setToolTip(_fromUtf8("Trigger Suspend to RAM aka Sleep"))
+        # Bottom Buttons Bar
+        self.pushButtonSleep = QPushButton("Sleep")
+        self.pushButtonSleep.setToolTip("Trigger Suspend to RAM aka Sleep")
+        self.pushButtonSleep.clicked.connect(self.sleep)
+        self.pushButtonHibernate = QPushButton("Hibernate")
+        self.pushButtonHibernate.setToolTip("Trigger Suspend to Disk Hibernate")
+        self.pushButtonHibernate.clicked.connect(self.hibernate)
+        self.buttonBox = QDialogButtonBox()
+        self.buttonBox.setStandardButtons(
+            QDialogButtonBox.Ok | QDialogButtonBox.Close |
+            QDialogButtonBox.Help)
+        self.buttonBox.addButton(self.pushButtonHibernate,
+                                 QDialogButtonBox.ActionRole)
+        self.buttonBox.addButton(self.pushButtonSleep,
+                                 QDialogButtonBox.ActionRole)
+        self.layout.addWidget(self.buttonBox)
+        self.buttonBox.rejected.connect(exit)
+        self.buttonBox.accepted.connect(self.writeConfig)
+        self.buttonBox.helpRequested.connect(lambda: open_new_tab(WEBPAGE_URL))
 
-        self.pushButtonHibernate = QtGui.QPushButton(self)
-        btnHib = self.pushButtonHibernate
-        btnHib.setGeometry(QtCore.QRect(21, 550, 71, 27))
-        btnHib.setObjectName(_fromUtf8("pushButtonHibernate"))
-        btnHib.setToolTip(_fromUtf8("Trigger Suspend to Disk aka Hibernate"))
-
-        self.pushButtonApply = QtGui.QPushButton(self)
-        self.pushButtonApply.setGeometry(QtCore.QRect(431, 550, 61, 27))
-        self.pushButtonApply.setObjectName(_fromUtf8("pushButtonApply"))
-        self.pushButtonApply.setToolTip(_fromUtf8("Apply checked changes"))
-
-        self.pushButtonDiscard = QtGui.QPushButton(self)
-        self.pushButtonDiscard.setGeometry(QtCore.QRect(361, 550, 61, 27))
-        self.pushButtonDiscard.setObjectName(_fromUtf8("pushButtonDiscard"))
-        self.pushButtonDiscard.setToolTip(_fromUtf8("Exit application"))
-
-        self.label = QtGui.QLabel(self)
-        self.label.setObjectName("label")
-        self.label.setGeometry(QtCore.QRect(25, 50, 400, 16))
-        self.label.setSizePolicy(QtGui.QSizePolicy.Expanding,
-                                 QtGui.QSizePolicy.Maximum)
-
-        self.setGeometry(100, 100, 800, 600)
-
-        # Connect the clicked signal of the Ok button to it's slot
-        QtCore.QObject.connect(self.pushButtonApply,
-                               QtCore.SIGNAL("clicked()"),
-                               self.writeConfig)
-
-        QtCore.QObject.connect(self.pushButtonDiscard,
-                               QtCore.SIGNAL("clicked()"),
-                               sys.exit)
-
-        QtCore.QObject.connect(self.pushButtonSleep,
-                               QtCore.SIGNAL("clicked()"),
-                               self.sleep)
-
-        QtCore.QObject.connect(self.pushButtonHibernate,
-                               QtCore.SIGNAL("clicked()"),
-                               self.hibernate)
-
-        self.retranslateUi()
+    def closeEvent(self, event):
+        ' Ask to Quit '
+        the_conditional_is_true = QMessageBox.question(
+            self, __doc__.title(), 'Quit ?.', QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No) == QMessageBox.Yes
+        event.accept() if the_conditional_is_true else event.ignore()
 
     def sleep(self):
+        """Method to make the computer Sleep."""
         try:
             sysfsFP = open("/sys/power/state", 'w')
         except:
@@ -160,6 +151,7 @@ class MainWidget(QtGui.QWidget):
                 return False
 
     def hibernate(self):
+        """Method to make the computer Hibernate."""
         try:
             sysfsFP = open("/sys/power/state", 'w')
         except:
@@ -173,8 +165,9 @@ class MainWidget(QtGui.QWidget):
                 return False
 
     def writeConfig(self):
+        """Method to get a configuration for the App."""
         finalResult = True
-        for eachWriteOption in self.configOptions.keys():
+        for eachWriteOption in tuple(self.configOptions.keys()):
             checkBoxName = "checkBox_" + eachWriteOption
             if self.checkBoxList[checkBoxName].isChecked() is True:
                 val = 1
@@ -187,16 +180,17 @@ class MainWidget(QtGui.QWidget):
                 finalResult = False
 
         if finalResult is False:
-            QtGui.QMessageBox.critical(self, "Error",
+            QMessageBox.critical(self, "Error",
                                        "Couldn't apply all requested settings")
         else:
-            QtGui.QMessageBox.information(self, "Success",
+            QMessageBox.information(self, "Success",
                                           "Applied all requested settings")
 
-    def populateValues(self, path, value):
+    def populateValues(self, _path, value):
+        """Method to populate values from a file path."""
         try:
-            readHandle = open(path, 'r')
-            writeHandle = open(path + ".tmp", 'w')
+            readHandle = open(_path, 'r')
+            writeHandle = open(_path + ".tmp", 'w')
             for line in readHandle.readlines():
                 if line.startswith(CONTROL_IDENTIFIER):
                     newline = line.split("=")[0] + "=" + str(value)
@@ -208,40 +202,27 @@ class MainWidget(QtGui.QWidget):
                     writeHandle.write(line)
             readHandle.close()
             writeHandle.close()
-            shutil.move(path + ".tmp", path)
+            move(_path + ".tmp", _path)
             return True
         except:
-            log.debug("Failed in populateValues() when operating on %s" % path)
+            log.debug("Failed in populateValues() when operating on %s" % _path)
             return False
 
-    def retranslateUi(self):
-
-        def trans(text):
-            return QtGui.QApplication.translate("MainWidget",
-                                                text,
-                                                None,
-                                                QtGui.QApplication.UnicodeUTF8)
-
-        self.setWindowTitle(trans("Laptop Mode Tools Configuration Tool"))
-        self.pushButtonApply.setText(trans("Apply"))
-        self.pushButtonDiscard.setText(trans("Exit"))
-        self.pushButtonSleep.setText(trans("Sleep"))
-        self.pushButtonHibernate.setText(trans("Hibernate"))
-        self.label.setText(trans("Laptop Mode Tools - Module Configuration"))
-
     def findConfig(self, configDir):
+        """Take a configDir and find the configuration for the App."""
         if configDir is None:
             return False
 
         # TODO: Do we need to take care of the vendor specific overrides ???
-        for configFile in os.listdir(configDir):
-            if os.access(os.path.join(configDir, configFile), os.F_OK) is True:
-                fn = os.path.join(configDir, configFile)
+        for configFile in listdir(configDir):
+            if access(path.join(configDir, configFile), F_OK) is True:
+                fn = path.join(configDir, configFile)
                 self.configOptions[configFile.split(".")[0]] = fn
             else:
                 pass
 
     def readConfig(self, key, configOptionsDict):
+        """Take a key and dict and read the configurations for the App."""
         self.tooltip = ''
 
         if key is None or configOptionsDict is None:
@@ -269,12 +250,18 @@ class MainWidget(QtGui.QWidget):
         # doesn't fail
         self.tooltip = self.tooltip + ''
 
-if __name__ == "__main__":
-    from sys import argv, exit
 
+###############################################################################
+
+
+if __name__ == "__main__":
     log = Log()
-    a = QtGui.QApplication(argv)
-    win = MainWidget()
-    win.show()
-    win.raise_()
-    exit(a.exec_())
+    application = QApplication(sys.argv)
+    application.setApplicationName(__doc__.strip().lower())
+    application.setOrganizationName(__doc__.strip().title())
+    application.setOrganizationDomain(__doc__.strip().title())
+    application.setWindowIcon(QIcon.fromTheme("preferences-system"))
+    window = MainWidget()
+    window.show()
+    window.raise_()
+    sys.exit(application.exec_())
