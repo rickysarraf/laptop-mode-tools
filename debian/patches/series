@@ -1,2 +1,3 @@
 gui-desktop-file.patch
 disable-ethernet-e1000e.patch
+delete-usb-module.patch
