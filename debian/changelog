@@ -1,3 +1,13 @@
+laptop-mode-tools (1.65-2) unstable; urgency=medium
+
+  * [bd609f9] Add patch delete-usb-module.patch to deactivate usb-module
+    (Closes: #752681)
+  * [d3e7e01] Refresh and Drop patches, where applicable
+  * [6cac1dd] Add Keywords section to comply with fd.o
+  * [33f325f] Fix init script for  facility
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sat, 19 Jul 2014 16:52:20 +0530
+
 laptop-mode-tools (1.65-1) unstable; urgency=medium
 
   * [f34c67a] Fix .desktop inconveniences.
