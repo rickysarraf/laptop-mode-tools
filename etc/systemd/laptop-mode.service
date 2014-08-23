@@ -2,7 +2,7 @@
 Description=Laptop Mode Tools
 
 [Service]
-Type=oneshot
+Type=simple
 RemainAfterExit=yes
 ExecStart=/usr/sbin/laptop_mode init auto
 ExecStop=/usr/sbin/laptop_mode init stop
