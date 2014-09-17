@@ -1119,6 +1119,10 @@ lmt_main_function ()
 }
 
 lmt_load_config "$@";
+if [ x$ENABLE_LAPTOP_MODE_TOOLS = x0 ]; then
+	log "MSG" "Laptop Mode Tools disabled in config file\n";
+	exit 1;
+fi
 
 # We do a special run of battery polling daemon here so that it does not get
 # plagued by the lock. We need the polling daemon to be independent of the REQ and INVOC locks.
