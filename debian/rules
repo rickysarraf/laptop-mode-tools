@@ -102,6 +102,7 @@ binary-indep: build install
 	dh_installdocs
 	dh_installinit --name laptop-mode -- defaults 99
 	dh_installman man/*
+	dh_lintian
 	dh_compress
 	dh_fixperms
 	dh_installdeb
