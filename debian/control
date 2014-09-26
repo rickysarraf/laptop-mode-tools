@@ -12,7 +12,7 @@ Package: laptop-mode-tools
 Architecture: all
 Depends: ${misc:Depends}, lsb-base (>= 3.0-10), util-linux (>= 2.13), psmisc
 Recommends: hdparm, sdparm, ethtool, net-tools, wireless-tools, udev, python-qt4
-Suggests: acpid | apmd | pbbuttonsd | pmud, python
+Suggests: acpid | apmd | pbbuttonsd | pmud
 Conflicts: noflushd
 Description: Tools for Power Savings based on battery/AC status
  Laptop mode is a Linux kernel feature that allows your laptop to save 
