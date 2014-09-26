@@ -1,3 +1,10 @@
+1.66 - Fri Sep 26 13:37:17 IST 2014
+    * Handle device names with whitespaces. Thanks: Zoltan Hidvegi
+    * Detach reliably closing all descriptors. Thanks: Matthew Gabeler-Lee
+    * Add new Radeon power saving module. Thanks: M. Ziebell
+    * Don't run LMT if it is disabled in config file. Thanks: bendlas@Github
+    * GUI Tool refactoring. Thanks to Juan.
+
 1.65 - Wed Jun 18 19:22:35 IST 2014
     * fix grep error on missing $device/uevent
     * ethernet: replace sysfs/enabled by 'ip link down'

@@ -35,7 +35,7 @@ set -a
 
 # The laptop mode tools version number. Extracted by the installer makefile
 # as well, so don't change the format!
-LMTVERSION=1.65
+LMTVERSION=1.66
 
 # This script is loaded from multiple scripts to set the config defaults
 # and to read the configuration on top of those. Only when the command is
@@ -165,38 +165,38 @@ LOGGER=`which logger`;
 
 log ()
 {
-# $1 should be msg type
-# $2 should be the real msg
-if [ x$LOG_TO_SYSLOG = x1 ]; then
-	# NOTE: Add the check on $2 being empty, once you are confident
-	# that there aren't any bugs in logging. And no bugs in executing
-	# modules and logging
-	if [ -x $LOGGER -a "$1" != "STATUS" ]; then
-		#if [ -z $2 ]; then
-		#    continue
-		#elif [ "$1" = "MSG" ]; then
-		if [ "$1" = "MSG" ]; then
-			logger -p daemon.info -t laptop-mode "$2";
-		elif [ "$1" = "ERR" ]; then
-			logger -p daemon.err -t laptop-mode "$2";
-		elif [ "$1" = "VERBOSE" ]; then
-			if [ x$VERBOSE_OUTPUT = x1 ]; then
-				logger -p daemon.debug -t laptop-mode "$2";
+	# $1 should be msg type
+	# $2 should be the real msg
+	if [ x$LOG_TO_SYSLOG = x1 ]; then
+		# NOTE: Add the check on $2 being empty, once you are confident
+		# that there aren't any bugs in logging. And no bugs in executing
+		# modules and logging
+		if [ -x $LOGGER -a "$1" != "STATUS" ]; then
+			#if [ -z $2 ]; then
+			#    continue
+			#elif [ "$1" = "MSG" ]; then
+			if [ "$1" = "MSG" ]; then
+				logger -p daemon.info -t laptop-mode "$2";
+			elif [ "$1" = "ERR" ]; then
+				logger -p daemon.err -t laptop-mode "$2";
+			elif [ "$1" = "VERBOSE" ]; then
+				if [ x$VERBOSE_OUTPUT = x1 ]; then
+					logger -p daemon.debug -t laptop-mode "$2";
+				fi
+			else
+				logger -p daemon.notice -t laptop-mode "$2";
 			fi
-		else
-			logger -p daemon.notice -t laptop-mode "$2";
 		fi
 	fi
-fi
 
-if [ "$1" = "VERBOSE" ]; then
-	$LM_VERBOSE &&  echo "$2" >>/dev/fd/2;
-elif [ "$1" = "ERR" ]; then
-	echo "$2" >>/dev/fd/2;
-else
-	# Message of type MSG and STATUS can go to stdout.
-	echo "$2" >>/dev/fd/1;
-fi
+	if [ "$1" = "VERBOSE" ]; then
+		$LM_VERBOSE &&  echo "$2" >>/dev/fd/2;
+	elif [ "$1" = "ERR" ]; then
+		echo "$2" >>/dev/fd/2;
+	else
+		# Message of type MSG and STATUS can go to stdout.
+		echo "$2" >>/dev/fd/1;
+	fi
 }
 
 enableDebug ()
@@ -533,98 +533,101 @@ lmt_load_config ()
 		log "STATUS" "Readahead states:"
 		cat /etc/mtab | while read DEV MP FST OPTS DUMP PASS ; do
 		# skip funny stuff
-		case "$FST" in
-			rootfs|unionfs|tmpfs|squashfs|sysfs|usbfs|proc|devpts) continue
-				;;
-		esac
-		if [ -b $DEV ] ; then
-			if [ -r $DEV ] ; then
-				log "STATUS" "   $DEV: $((`blockdev --getra $DEV` / 2)) kB"
-			else
-				log "STATUS" "   Cannot read $DEV, permission denied - $0 needs to be run as root"
+			case "$FST" in
+				rootfs|unionfs|tmpfs|squashfs|sysfs|usbfs|proc|devpts) continue
+					;;
+			esac
+			if [ -b $DEV ] ; then
+				if [ -r $DEV ] ; then
+					log "STATUS" "   $DEV: $((`blockdev --getra $DEV` / 2)) kB"
+				else
+					log "STATUS" "   Cannot read $DEV, permission denied - $0 needs to be run as root"
+				fi
 			fi
+		done
+
+		log "STATUS" " "
+		if [ -e /var/run/laptop-mode-tools/enabled ] ; then
+			log "STATUS" "Laptop Mode Tools is allowed to run: /var/run/laptop-mode-tools/enabled exists."
+		else
+			log "STATUS" "Laptop Mode Tools is NOT allowed to run: /var/run/laptop-mode-tools/enabled does not exist."
 		fi
-	done
-	log "STATUS" " "
-	if [ -e /var/run/laptop-mode-tools/enabled ] ; then
-		log "STATUS" "Laptop Mode Tools is allowed to run: /var/run/laptop-mode-tools/enabled exists."
-	else
-		log "STATUS" "Laptop Mode Tools is NOT allowed to run: /var/run/laptop-mode-tools/enabled does not exist."
-	fi
-	log "STATUS" " "
-	STATFILES="/proc/sys/vm/laptop_mode /proc/apm /proc/pmu/info /proc/sys/vm/bdflush /proc/sys/vm/dirty_ratio /proc/sys/fs/xfs/age_buffer /proc/sys/fs/xfs/sync_interval /proc/sys/fs/xfs/lm_age_buffer /proc/sys/fs/xfs/lm_sync_interval /proc/sys/vm/pagebuf/lm_flush_age /proc/sys/fs/xfs/xfsbufd_centisecs /proc/sys/fs/xfs/xfssyncd_centisecs /proc/sys/vm/dirty_background_ratio /proc/sys/vm/dirty_expire_centisecs /proc/sys/fs/xfs/age_buffer/centisecs /proc/sys/vm/dirty_writeback_centisecs /sys/devices/system/cpu/*/cpufreq/cpuinfo_*_freq /sys/devices/system/cpu/*/cpufreq/scaling_governor /proc/acpi/button/lid/*/state /proc/acpi/ac_adapter/*/state /proc/acpi/battery/*/state /sys/class/power_supply/*/online /sys/class/power_supply/*/state"
-	for THISFILE in $STATFILES ; do
-		if [ -e "$THISFILE" ] ; then
-			log "STATUS" "$THISFILE:"
-			if [ -r "$THISFILE" ] ; then
-				cat "$THISFILE" | sed "s/^/   /"
-			else
-				log "STATUS" "   Not accessible, permission denied - $0 needs to be run as root."
+
+		log "STATUS" " "
+		STATFILES="/proc/sys/vm/laptop_mode /proc/apm /proc/pmu/info /proc/sys/vm/bdflush /proc/sys/vm/dirty_ratio /proc/sys/fs/xfs/age_buffer /proc/sys/fs/xfs/sync_interval /proc/sys/fs/xfs/lm_age_buffer /proc/sys/fs/xfs/lm_sync_interval /proc/sys/vm/pagebuf/lm_flush_age /proc/sys/fs/xfs/xfsbufd_centisecs /proc/sys/fs/xfs/xfssyncd_centisecs /proc/sys/vm/dirty_background_ratio /proc/sys/vm/dirty_expire_centisecs /proc/sys/fs/xfs/age_buffer/centisecs /proc/sys/vm/dirty_writeback_centisecs /sys/devices/system/cpu/*/cpufreq/cpuinfo_*_freq /sys/devices/system/cpu/*/cpufreq/scaling_governor /proc/acpi/button/lid/*/state /proc/acpi/ac_adapter/*/state /proc/acpi/battery/*/state /sys/class/power_supply/*/online /sys/class/power_supply/*/state"
+
+		for THISFILE in $STATFILES ; do
+			if [ -e "$THISFILE" ] ; then
+				log "STATUS" "$THISFILE:"
+				if [ -r "$THISFILE" ] ; then
+					cat "$THISFILE" | sed "s/^/   /"
+				else
+					log "STATUS" "   Not accessible, permission denied - $0 needs to be run as root."
+				fi
+				log "STATUS" " "
 			fi
-			log "STATUS" " "
+		done
+
+	elif [ "$1" != "readconfig" -a "$1" != "defaults" ] ; then
+
+		#############################################################################
+
+		KLEVEL="$(uname -r |
+		{
+			IFS='.-' read a b c
+			echo $a.$b
+		}
+		)"
+		KMINOR="$(uname -r |
+		{
+			IFS='.-' read a b c d
+			# Strip any stuff from the end -- only the initial digits are part of the KMINOR.
+			echo $c | sed -e 's/\([[:digit:]]*\).*/\1/'
+		}
+		)"
+
+		# Stop exporting everything -- what we do from here is private.
+		set +a
+
+		if [ "$1" = "--version" ] ; then
+			log "MSG" "Laptop Mode Tools $LMTVERSION"
+			exit 0
 		fi
-	done
 
-elif [ "$1" != "readconfig" -a "$1" != "defaults" ] ; then
+		if [ ! -e /proc/sys/vm/laptop_mode ] ; then
+			log "ERR" "Kernel does not have support for laptop mode. Please apply the laptop mode"
+			log "ERR" "patch or install a newer kernel."
+			exit 1
+		fi
 
-	#############################################################################
+		if [ ! -w /proc/sys/vm/laptop_mode ] ; then
+			log "ERR" "You do not have enough privileges to enable laptop_mode."
+			exit 1
+		fi
 
-	KLEVEL="$(uname -r |
-	{
-		IFS='.-' read a b c
-		echo $a.$b
-	}
-	)"
-	KMINOR="$(uname -r |
-	{
-		IFS='.-' read a b c d
-		# Strip any stuff from the end -- only the initial digits are part of the KMINOR.
-		echo $c | sed -e 's/\([[:digit:]]*\).*/\1/'
-	}
-	)"
-
-	# Stop exporting everything -- what we do from here is private.
-	set +a
-
-	if [ "$1" = "--version" ] ; then
-		log "MSG" "Laptop Mode Tools $LMTVERSION"
-		exit 0
+		while [ "$1" != "" ] ; do
+			case "$1" in
+				init) INIT=1 ;;
+				force) FORCE=1 ;;
+				# Old options. We always do "auto" for any option now, but
+				# we still have to accept the options.
+				start) ;;
+				stop) INITSCRIPT_STOP=1 ;;
+				auto) ;;
+				modules=*)
+					MODULES=$1
+					MODULES=${MODULES#"modules="}
+					;;
+				devices=*)
+					DEVICES=$1
+					DEVICES=${DEVICES#"devices="}
+					;;
+				*) log "ERR" "Unrecognized option $1."
+					exit 1 ;;
+			esac
+			shift
+		done
 	fi
-
-	if [ ! -e /proc/sys/vm/laptop_mode ] ; then
-		log "ERR" "Kernel does not have support for laptop mode. Please apply the laptop mode"
-		log "ERR" "patch or install a newer kernel."
-		exit 1
-	fi
-
-	if [ ! -w /proc/sys/vm/laptop_mode ] ; then
-		log "ERR" "You do not have enough privileges to enable laptop_mode."
-		exit 1
-	fi
-
-	while [ "$1" != "" ] ; do
-		case "$1" in
-			init) INIT=1 ;;
-		force) FORCE=1 ;;
-		# Old options. We always do "auto" for any option now, but
-		# we still have to accept the options.
-		start) ;;
-	stop) INITSCRIPT_STOP=1 ;;
-auto) ;;
-			modules=*)
-				MODULES=$1
-				MODULES=${MODULES#"modules="}
-				;;
-			devices=*)
-				DEVICES=$1
-				DEVICES=${DEVICES#"devices="}
-				;;
-			*) log "ERR" "Unrecognized option $1."
-				exit 1 ;;
-		esac
-		shift
-	done
-fi
 }
 
 
@@ -1119,6 +1122,10 @@ lmt_main_function ()
 }
 
 lmt_load_config "$@";
+if [ x$ENABLE_LAPTOP_MODE_TOOLS = x0 ]; then
+	log "MSG" "Laptop Mode Tools disabled in config file\n";
+	exit 1;
+fi
 
 # We do a special run of battery polling daemon here so that it does not get
 # plagued by the lock. We need the polling daemon to be independent of the REQ and INVOC locks.
