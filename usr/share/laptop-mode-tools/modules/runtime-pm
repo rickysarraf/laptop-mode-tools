@@ -105,18 +105,18 @@ if [ x$CONTROL_RUNTIME_AUTOSUSPEND = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$C
 				fi
 
 				if [ x$USE_DEVICE = x1 ]; then
-					if [ -f $runtime_device/power/autosuspend ]; then
-						echo $AUTOSUSPEND_TIMEOUT > $runtime_device/power/autosuspend;
+					if [ -f "$runtime_device"/power/autosuspend ]; then
+						echo $AUTOSUSPEND_TIMEOUT > "$runtime_device"/power/autosuspend;
 						log "VERBOSE" "Enabling auto suspend mode for device $runtime_device"
 					else
 						log "VERBOSE" "Not enabling auto suspend mode for device $runtime_device"
 					fi
 
-					if [ -f $runtime_device/power/control ]; then
-						echo "auto" > $runtime_device/power/control;
+					if [ -f "$runtime_device"/power/control ]; then
+						echo "auto" > "$runtime_device"/power/control;
 						log "VERBOSE" "Enabling auto power level for device $runtime_device."
-					elif [ -f $runtime_device/power/level ]; then
-						echo "auto" > $runtime_device/power/level;
+					elif [ -f "$runtime_device"/power/level ]; then
+						echo "auto" > "$runtime_device"/power/level;
 						log "VERBOSE" "Enabling auto power level for device $runtime_device."
 					else
 						log "VERBOSE" "Not enabling auto power level for device $runtime_device"
@@ -129,18 +129,18 @@ if [ x$CONTROL_RUNTIME_AUTOSUSPEND = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$C
 		if [ "$DEVICE_LIST" != "" ]; then
 			for runtime_device in $DEVICE_LIST;
 			do
-				if [ -f $runtime_device/power/autosuspend ]; then
-					echo $AUTOSUSPEND_TIMEOUT > $runtime_device/power/autosuspend;
+				if [ -f "$runtime_device"/power/autosuspend ]; then
+					echo $AUTOSUSPEND_TIMEOUT > "$runtime_device"/power/autosuspend;
 					log "VERBOSE" "Disabling auto suspend mode for device $runtime_device."
 				else
 					log "VERBOSE" "Not disabling auto suspend mode for device $runtime_device"
 				fi
 
-				if [ -f $runtime_device/power/control ]; then
-					echo "on" > $runtime_device/power/control;
+				if [ -f "$runtime_device"/power/control ]; then
+					echo "on" > "$runtime_device"/power/control;
 					log "VERBOSE" "Enabling ON power level for device $runtime_device."
-				elif [ -f $runtime_device/power/level ]; then
-					echo "on" > $runtime_device/power/level;
+				elif [ -f "$runtime_device"/power/level ]; then
+					echo "on" > "$runtime_device"/power/level;
 					log "VERBOSE" "Enabling ON power level for device $runtime_device."
 				else
 					log "VERBOSE" "Not enabling ON power level for device $runtime_device"
