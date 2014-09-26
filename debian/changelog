@@ -1,3 +1,12 @@
+laptop-mode-tools (1.66-1) unstable; urgency=medium
+
+  * [d7a9738] Imported Upstream version 1.66
+  * [2f27e53] Drop Suggests on hal (Closes: #761334)
+  * [ddb2ff8] Drop patches not needed anymore
+  * [d864cd0] Add override for python dependency
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Fri, 26 Sep 2014 20:26:59 +0530
+
 laptop-mode-tools (1.65-2) unstable; urgency=medium
 
   * [bd609f9] Add patch delete-usb-module.patch to deactivate usb-module
