@@ -1,3 +1,13 @@
+laptop-mode-tools (1.66-2) unstable; urgency=medium
+
+  Starting with version 1.65, Laptop Mode Tools has dropped support for
+  the usb-autosuspend module. The module and its functionality is now
+  provided through the runtime-pm module
+  .
+  Users are advised to migrate their settings to the new module
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sun, 19 Oct 2014 20:11:47 +0530
+
 laptop-mode-tools (1.64-1) unstable; urgency=low
 
   With this version, Laptop Mode Tools introduces a basic graphical
