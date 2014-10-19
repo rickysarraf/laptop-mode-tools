@@ -1,3 +1,10 @@
+laptop-mode-tools (1.66-2) unstable; urgency=medium
+
+  * [c96a271] Add NEWS entry about usb-autosuspend module's removal
+    (Closes: #762173)
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sun, 19 Oct 2014 20:14:48 +0530
+
 laptop-mode-tools (1.66-1) unstable; urgency=medium
 
   * [d7a9738] Imported Upstream version 1.66
