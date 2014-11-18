@@ -17,23 +17,45 @@ set_intel_pstate_param () {
 	fi
 }
 
+# Set kernel setting, showing an error if this fails.
+# Parameter 1: sysctl/proc path
+# Parameter 2: the value
+set_sysctl() {
+    log "VERBOSE" "Executing: echo $2 > $1"
+    if ! echo "$2" > "$1" ; then
+        echo "SETTING OF KERNEL PARAMETER FAILED: echo $2 \> $1"
+    fi
+}
+
 if [ x$CONTROL_INTEL_PSTATE = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_INTEL_PSTATE = xauto ]; then
 	if [ $ON_AC -eq 1 ] ; then
 		if [ "$ACTIVATE" -eq 1 ] ; then
 			INTEL_PSTATE_PERF_MIN_PCT="$LM_AC_INTEL_PSTATE_PERF_MIN_PCT"
 			INTEL_PSTATE_PERF_MAX_PCT="$LM_AC_INTEL_PSTATE_PERF_MAX_PCT"
 			INTEL_PSTATE_NO_TURBO="$LM_AC_INTEL_PSTATE_NO_TURBO"
+			INTEL_PSTATE_GOVERNOR="$LM_AC_INTEL_PSTATE_GOVERNOR"
 		else
 			INTEL_PSTATE_PERF_MIN_PCT="$NOLM_AC_INTEL_PSTATE_PERF_MIN_PCT"
 			INTEL_PSTATE_PERF_MAX_PCT="$NOLM_AC_INTEL_PSTATE_PERF_MAX_PCT"
 			INTEL_PSTATE_NO_TURBO="$NOLM_AC_INTEL_PSTATE_NO_TURBO"
+			INTEL_PSTATE_GOVERNOR="$NOLM_AC_INTEL_PSTATE_GOVERNOR"
 		fi
 	else
 		INTEL_PSTATE_PERF_MIN_PCT="$BATT_INTEL_PSTATE_PERF_MIN_PCT"
 		INTEL_PSTATE_PERF_MAX_PCT="$BATT_INTEL_PSTATE_PERF_MAX_PCT"
 		INTEL_PSTATE_NO_TURBO="$BATT_INTEL_PSTATE_NO_TURBO"
+		INTEL_PSTATE_GOVERNOR="$BATT_INTEL_PSTATE_GOVERNOR"
 	fi
 	set_intel_pstate_param max_perf_pct "$INTEL_PSTATE_PERF_MAX_PCT"
 	set_intel_pstate_param min_perf_pct "$INTEL_PSTATE_PERF_MIN_PCT"
 	set_intel_pstate_param no_turbo "$INTEL_PSTATE_NO_TURBO"
+	
+	for THISCPU in /sys/devices/system/cpu/* ; do
+		if [ -f "$THISCPU/cpufreq/scaling_driver" ] &&
+		   [ "$(cat $THISCPU/cpufreq/scaling_driver)" = "intel_pstate" ]
+		then
+			log "VERBOSE" "Setting CPU frequency governor for cpu $THISCPU to $INTEL_PSTATE_GOVERNOR."
+			set_sysctl $THISCPU/cpufreq/scaling_governor $INTEL_PSTATE_GOVERNOR
+		fi
+	done
 fi
