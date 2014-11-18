@@ -46,9 +46,6 @@ if [ x$CONTROL_INTEL_PSTATE = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_
 		INTEL_PSTATE_NO_TURBO="$BATT_INTEL_PSTATE_NO_TURBO"
 		INTEL_PSTATE_GOVERNOR="$BATT_INTEL_PSTATE_GOVERNOR"
 	fi
-	set_intel_pstate_param max_perf_pct "$INTEL_PSTATE_PERF_MAX_PCT"
-	set_intel_pstate_param min_perf_pct "$INTEL_PSTATE_PERF_MIN_PCT"
-	set_intel_pstate_param no_turbo "$INTEL_PSTATE_NO_TURBO"
 	
 	for THISCPU in /sys/devices/system/cpu/* ; do
 		if [ -f "$THISCPU/cpufreq/scaling_driver" ] &&
@@ -58,4 +55,8 @@ if [ x$CONTROL_INTEL_PSTATE = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_
 			set_sysctl $THISCPU/cpufreq/scaling_governor $INTEL_PSTATE_GOVERNOR
 		fi
 	done
+	
+	set_intel_pstate_param max_perf_pct "$INTEL_PSTATE_PERF_MAX_PCT"
+	set_intel_pstate_param min_perf_pct "$INTEL_PSTATE_PERF_MIN_PCT"
+	set_intel_pstate_param no_turbo "$INTEL_PSTATE_NO_TURBO"
 fi
