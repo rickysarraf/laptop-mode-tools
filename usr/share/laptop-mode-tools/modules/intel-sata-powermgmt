@@ -4,33 +4,44 @@
 #
 
 if [ x$CONTROL_INTEL_SATA_POWER = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_INTEL_SATA_POWER = xauto ]; then
-	SATA_POWER="$LM_AC_ACTIVATE_SATA_POWER"
 	# Set defaults (these settings were added later)
-	[ "$BATT_ACTIVATE_SATA_POWER" ] || BATT_ACTIVATE_SATA_POWER=1
-	[ "$LM_AC_ACTIVATE_SATA_POWER" ] || LM_AC_ACTIVATE_SATA_POWER=0
-	[ "$NOLM_AC_ACTIVATE_SATA_POWER" ] || NOLM_AC_ACTIVATE_SATA_POWER=0
+	if [ -z "$BATT_SATA_POLICY" ]; then
+		if [ -z "$BATT_ACTIVATE_SATA_POWER" -o "$BATT_ACTIVATE_SATA_POWER" -eq 1 ]; then
+			BATT_SATA_POLICY=min_power
+		else
+			BATT_SATA_POLICY=max_performance
+		fi
+	fi
+	if [ -z "$LM_AC_SATA_POLICY" ]; then
+		if [ "$LM_AC_ACTIVATE_SATA_POWER" -eq 1 ]; then
+			LM_AC_SATA_POLICY=min_power
+		else
+			LM_AC_SATA_POLICY=max_performance
+		fi
+	fi
+	if [ -z "$NOLM_AC_SATA_POLICY" ]; then
+		if [ "$NOLM_AC_ACTIVATE_SATA_POWER" -eq 1 ]; then
+			NOLM_AC_SATA_POLICY=min_power
+		else
+			NOLM_AC_SATA_POLICY=max_performance
+		fi
+	fi
 
 	# Determine setting
 	if [ $ON_AC -eq 1 ]; then
 		if [ "$ACTIVATE" -eq 1 ]; then
-			SATA_POWER="$LM_AC_ACTIVATE_SATA_POWER"
+			SATA_POLICY="$LM_AC_SATA_POLICY"
 		else
-			SATA_POWER="$NOLM_AC_ACTIVATE_SATA_POWER"
+			SATA_POLICY="$NOLM_AC_SATA_POLICY"
 		fi
 	else
-		SATA_POWER="$BATT_ACTIVATE_SATA_POWER"
-	fi
-
-	if [ "$SATA_POWER" -eq 1 ]; then
-		SATA_POWER="min_power"
-	else
-		SATA_POWER="max_performance"
+		SATA_POLICY="$BATT_SATA_POLICY"
 	fi
 
 	for POLICYFILE in /sys/class/scsi_host/*/link_power_management_policy ; do
 		if [ -f $POLICYFILE ] ; then
-			log "VERBOSE" "Intel SATA link power saving set to $SATA_POWER for $POLICYFILE."
-			echo $SATA_POWER > $POLICYFILE
+			log "VERBOSE" "Intel SATA link power saving set to $SATA_POLICY for $POLICYFILE."
+			echo $SATA_POLICY > $POLICYFILE
 		else
 			log "VERBOSE" "Intel SATA link power saving enabled but not supported by system for $POLICYFILE."
 		fi
