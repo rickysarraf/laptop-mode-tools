@@ -61,6 +61,13 @@ if [ x$CONTROL_ETHERNET = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_ETHE
 	for DEVICE in $ETHERNET_DEVICES ; do
 		log "VERBOSE" "ethernet: $DEVICE"
 
+		# Carrier detection
+		if $IPTOOL link show $DEVICE | grep -q NO-CARRIER; then
+		    carrier=false
+		else
+		    carrier=true
+		fi
+
 		# Wakeup-on-LAN handling
 		if [ x$DISABLE_WAKEUP_ON_LAN = x1 ] ; then
 			ret=`$ETHTOOL -s $DEVICE wol d 2>&1`
@@ -104,7 +111,7 @@ if [ x$CONTROL_ETHERNET = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_ETHE
 		# Handle throttling
 		if [ x$THROTTLE_ETHERNET = x1 ] ; then
 			# Handle Speed Throttling
-			ret=`$ETHTOOL -s $DEVICE speed $THROTTLE_SPEED 2>&1`
+			ret=`$ETHTOOL -s $DEVICE speed $THROTTLE_SPEED autoneg off 2>&1`
 			exit_status=$?;
 			log "VERBOSE" "$ret";
 			if [ $exit_status -eq 0 ]; then
@@ -114,19 +121,19 @@ if [ x$CONTROL_ETHERNET = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_ETHE
 			fi
 		else
 			# Handle Speed Throttling
-			ret=`$ETHTOOL -s $DEVICE speed $MAX_SPEED 2>&1`
+			ret=`$ETHTOOL -s $DEVICE autoneg on 2>&1`
 			exit_status=$?;
 			log "VERBOSE" "$ret";
 			if [ $exit_status -eq 0 ]; then
-				log "VERBOSE" "Restored speed to $MAX_SPEED Mbit for $DEVICE"
+				log "VERBOSE" "Restored auto-negotiation for $DEVICE"
 			else
-				log "VERBOSE" "Could not restore speed for $DEVICE"
+				log "VERBOSE" "Could set auto-negotiation for $DEVICE"
 			fi
 		fi
 
 		# Shut down interface
 		if [ x$DISABLE_ETHERNET = x1 ]; then
-			if $IPTOOL link show $DEVICE | grep -q NO-CARRIER; then
+			if !$carrier; then
 				log "VERBOSE" "ethernet: Disabling ethernet device $DEVICE"
 				$IPTOOL link set dev $DEVICE down
 			else
