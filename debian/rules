@@ -101,6 +101,7 @@ binary-indep: build install
 	dh_installchangelogs Documentation/revision-history.txt
 	dh_installdocs
 	dh_installinit --name laptop-mode -- defaults 99
+	dh_systemd_enable
 	dh_installman man/*
 	dh_lintian
 	dh_compress
