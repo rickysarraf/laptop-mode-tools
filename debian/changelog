@@ -1,3 +1,11 @@
+laptop-mode-tools (1.67-1) unstable; urgency=medium
+
+  * [eec4249] Enable systemd during install
+  * [0387859] Imported Upstream version 1.67
+    (Closes: #782076, #781436, #771529)
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Fri, 03 Jul 2015 22:30:48 +0530
+
 laptop-mode-tools (1.66-2) unstable; urgency=medium
 
   * [c96a271] Add NEWS entry about usb-autosuspend module's removal
