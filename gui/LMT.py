@@ -62,7 +62,7 @@ class MainWidget(QMainWindow):
             QMessageBox.warning(self, __doc__ + "- Warning", msg)
         # title, icon and sizes
         self.setWindowTitle(__doc__)
-        self.setMinimumSize(600, 600)
+        self.setMinimumSize(400, 400)
         self.setMaximumSize(2048, 2048)
         self.resize(600, 600)
         self.setWindowIcon(QIcon.fromTheme("preferences-system"))
