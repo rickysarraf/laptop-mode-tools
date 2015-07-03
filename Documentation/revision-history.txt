@@ -1,3 +1,15 @@
+1.67 - Thu Jul  2 17:05:07 IST 2015
+    * Relax minimum window size to accomodate low res screens
+    * Fix variable name to comply with our "constants" assuptions
+    * Get more aggressive in power saving for Intel HD Audio
+    * Account Device Mapper devices
+    * Add swsusp freeze support
+    * Switch battery-level-polling default to True
+    * Detect ethernet carrier, early and relibaly
+    * changes the boolean setting *_ACTIVATE_SATA_POWER to a customizable
+      *_SATA_POLICY, with backward-compatible defaults and documentation
+      Thanks Yuir D'Elia
+
 1.66 - Fri Sep 26 13:37:17 IST 2014
     * Handle device names with whitespaces. Thanks: Zoltan Hidvegi
     * Detach reliably closing all descriptors. Thanks: Matthew Gabeler-Lee

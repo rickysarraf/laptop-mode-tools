@@ -61,6 +61,13 @@ if [ x$CONTROL_ETHERNET = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_ETHE
 	for DEVICE in $ETHERNET_DEVICES ; do
 		log "VERBOSE" "ethernet: $DEVICE"
 
+		# Carrier detection
+		if $IPTOOL link show $DEVICE | grep -q NO-CARRIER; then
+			carrier="false";
+		else
+			carrier="true";
+		fi
+
 		# Wakeup-on-LAN handling
 		if [ x$DISABLE_WAKEUP_ON_LAN = x1 ] ; then
 			ret=`$ETHTOOL -s $DEVICE wol d 2>&1`
@@ -125,13 +132,9 @@ if [ x$CONTROL_ETHERNET = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_ETHE
 		fi
 
 		# Shut down interface
-		if [ x$DISABLE_ETHERNET = x1 ]; then
-			if $IPTOOL link show $DEVICE | grep -q NO-CARRIER; then
-				log "VERBOSE" "ethernet: Disabling ethernet device $DEVICE"
-				$IPTOOL link set dev $DEVICE down
-			else
-				log "VERBOSE" "ethernet: Not disabling ethernet device $DEVICE with active carrier."
-			fi
+		if [ x$DISABLE_ETHERNET = x1 -a $carrier = "false" ]; then
+			log "VERBOSE" "ethernet: Disabling ethernet device $DEVICE"
+			$IPTOOL link set dev $DEVICE down
 		elif [ x$DISABLE_ETHERNET = x0 ]; then
 			$IPTOOL link set dev $DEVICE up
 			log "VERBOSE" "ethernet: Re-enabling ethernet device $DEVICE"
