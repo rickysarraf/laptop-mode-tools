@@ -3,7 +3,7 @@
 # Laptop mode tools module: Battery level polling.
 #
 
-if [ x$ENABLE_BATTERY_LEVEL_POLLING = x1 ] ; then
+if [ x$CONTROL_BATTERY_LEVEL_POLLING = x1 ] ; then
 	log "VERBOSE" "Battery level polling is enabled."
 
 	if [ x$BLACKLIST_IN_FLOCK = x1 ]; then
