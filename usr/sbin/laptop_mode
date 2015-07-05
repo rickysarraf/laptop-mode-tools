@@ -446,6 +446,7 @@ lmt_load_config ()
 	fi
 
 
+	log "VERBOSE" "Laptop Mode Tools invoked by parent: $PPID"
 
 	# Determine the power state.
 
