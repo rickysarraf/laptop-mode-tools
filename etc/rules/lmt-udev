@@ -49,4 +49,3 @@ else
 fi
 
 exit 0
-) </dev/null >/dev/null 2>&1 &
