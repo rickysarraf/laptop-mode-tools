@@ -1,0 +1,15 @@
+Some common problems and fixing them
+
+
+My USB Mouse / Keyboard stops working after seconds of inactivity
+-----------------------------------------------------------------
+
+Many devices advertise power savings but misbehave when power savings
+is triggered. Laptop Mode Tools, by default, enabled power savings
+for all devices.
+
+If you have devices, that mis-behave when running on battery, you
+can blacklist them.
+
+For details on blacklisting the device, please refer to the configuration
+details in /etc/laptop-mode/conf.d/runtime-pm.conf
