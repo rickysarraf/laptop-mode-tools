@@ -1,0 +1,13 @@
+[Unit]
+Description=Laptop Mode Tools - Battery Polling Service
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart=@/usr/sbin/laptop_mode auto
+ExecReload=@/usr/sbin/laptop_mode auto
+StandardOutput=tty
+StandardError=tty
+
+[Install]
+WantedBy=multi-user.target

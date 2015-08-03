@@ -220,6 +220,16 @@ if [ "${SYSTEMD}" = "yes" ]; then
 		echo "$0: Failed to install systemd service into $SYSTEMD_UNIT_D Installation failed."
 	fi
 
+	# timer file
+	if ( ! $INSTALL -D -m 644 etc/systemd/laptop-mode.timer "$DESTDIR/$SYSTEMD_UNIT_D/laptop-mode.timer" ) ; then
+		echo "$0: Failed to install systemd timer into $SYSTEMD_UNIT_D Installation failed."
+	fi
+
+	# and timer's calling service file
+	if ( ! $INSTALL -D -m 644 etc/systemd/lmt-poll.service "$DESTDIR/$SYSTEMD_UNIT_D/lmt-poll.service" ) ; then
+		echo "$0: Failed to install systemd poll service into $SYSTEMD_UNIT_D Installation failed."
+	fi
+
 	# and systemd's tmpfiles.d
 	if ( ! $INSTALL -D -m 644 etc/systemd/laptop-mode.conf.tmpfiles "$DESTDIR/${TMPFILES_D}/laptop-mode.conf" ) ; then
 		echo "$0: Failed to install systemd tmpfiles into ${TMPFILES_D} Installation failed."
