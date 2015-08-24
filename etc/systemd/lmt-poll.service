@@ -1,5 +1,7 @@
 [Unit]
 Description=Laptop Mode Tools - Battery Polling Service
+Documentation=man:laptop_mode(8) man:laptop-mode.conf(8)
+Documentation=http://samwel.tk/laptop_mode
 
 [Service]
 Type=oneshot
