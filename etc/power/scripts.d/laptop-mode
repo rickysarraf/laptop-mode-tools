@@ -11,7 +11,7 @@
 # --- end of public part -- don't change below this line ---
 
 set -e
-LMODE=/usr/sbin/laptop_mode
+LMODE=/lib/udev/lmt-udev
 
 [ -x $LMODE ] || exit 0
 
