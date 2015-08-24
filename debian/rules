@@ -81,6 +81,8 @@ install: build
 	install -m644 etc/rules/99-laptop-mode.rules $(DESTDIR)/lib/udev/rules.d
 	install -m755 etc/rules/lmt-udev $(DESTDIR)/lib/udev/lmt-udev
 	install -m644 etc/systemd/laptop-mode.service $(DESTDIR)/lib/systemd/system/laptop-mode.service
+	install -m644 etc/systemd/laptop-mode.timer $(DESTDIR)/lib/systemd/system/laptop-mode.timer
+	install -m644 etc/systemd/lmt-poll.service $(DESTDIR)/lib/systemd/system/lmt-poll.service
 	install -m644 etc/systemd/laptop-mode.conf.tmpfiles $(DESTDIR)/usr/lib/tmpfiles.d/laptop-mode.conf
 	install -m755 usr/lib/pm-utils/sleep.d/* $(DESTDIR)/usr/lib/pm-utils/sleep.d
 	install -m755 usr/sbin/laptop_mode $(DESTDIR)/usr/sbin
