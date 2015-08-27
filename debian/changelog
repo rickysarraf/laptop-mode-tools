@@ -1,6 +1,9 @@
-laptop-mode-tools (1.68-1) UNRELEASED; urgency=medium
+laptop-mode-tools (1.68-1) unstable; urgency=medium
 
-  * New Upstream Test Release
+  * [cdd4475] Add timer/polling service in debian/rules
+  * [614f267] Start systemd on install
+  * [bf02434] Add debian/gbp.conf
+  * [a49399f] Update release-checklist
 
  -- Ritesh Raj Sarraf <rrs@debian.org>  Mon, 24 Aug 2015 16:15:23 +0200
 
