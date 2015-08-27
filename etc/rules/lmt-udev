@@ -1,7 +1,8 @@
 #!/bin/sh -e
-# /usr is not guaranteed to be mounted when udev starts
 
-(
+
+# /usr is not guaranteed to be mounted when udev starts
+non_systemd_way() {
 	if [ -e /lib/udev/hotplug.functions ]; then
 		. /lib/udev/hotplug.functions
 		wait_for_file /usr/sbin/laptop_mode
@@ -21,5 +22,30 @@
 		mesg "$file did not appear before the timeout!"
 		exit 1
 	fi
+}
 
-) </dev/null >/dev/null 2>&1 &
+
+
+# Under systemd, we don't do synchronous operations, so we can run in the foreground;
+# And we need also need to run in foreground, because forked children get kill immediately
+# under systemd/udev
+
+if [ -d /run/systemd/system ]; then
+	exec systemctl --no-block reload-or-restart laptop-mode
+else
+	# Under sysvinit/upstart, we need to fork as we start the long-running
+	# /usr/sbin/laptop_mode process.
+	#
+	# Also, if this happens during boot, we may want to wait until /usr is available
+	# This else stanza is going to be used rarely, because going forward we are
+	# going to use systemd.
+	# But for compatibility reasons, we'll carry this
+	#
+	# That said, we background the execution here, because, otherwise udevd will wait
+	# for this process which will block
+	
+	exec > /dev/null 2>dev/null
+	non_systemd_way "$@" &
+fi
+
+exit 0
