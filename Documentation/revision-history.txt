@@ -1,3 +1,18 @@
+1.68 - Thu Aug 27 22:36:43 IST 2015
+    * Fix all instances for BATTERY_LEVEL_POLLING
+    * Group kill the polling daemon so that its child process get the same signal
+    * Release the descriptor explicitly
+    * Add identifier about who's our parent
+    * Narrow down our power_supply subsystem event check condition
+    * Fine tune the .service file
+    * On my ultrabook, AC as reported as ACAD
+    * Enhance lmt-udev to better work with systemd
+    * Add a timer based polling for LMT. It is the equivalent of battery-polling-daemon,
+      using systemd
+    * Disable battery level polling by default, because most systems will have systemd running
+    * Add documentation reference in systemd files
+    * Update release-checklist
+
 1.67 - Thu Jul  2 17:05:07 IST 2015
     * Relax minimum window size to accomodate low res screens
     * Fix variable name to comply with our "constants" assuptions
