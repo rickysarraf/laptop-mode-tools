@@ -3,7 +3,7 @@
 # Laptop mode tools module: Battery level polling.
 #
 
-if [ x$ENABLE_BATTERY_LEVEL_POLLING = x1 ] ; then
+if [ x$CONTROL_BATTERY_LEVEL_POLLING = x1 ] ; then
 	log "VERBOSE" "Battery level polling is enabled."
 
 	if [ x$BLACKLIST_IN_FLOCK = x1 ]; then
@@ -13,7 +13,8 @@ if [ x$ENABLE_BATTERY_LEVEL_POLLING = x1 ] ; then
 			log "VERBOSE" "On AC, stopping the polling daemon."
 
 			# In AC mode we disable the polling daemon.
-			killall -q lm-polling-daemon
+			killall -gq lm-polling-daemon
+			$FLOCK -u 7;
 		else
 			if ! pidof -x lm-polling-daemon ; then
 				log "VERBOSE" "On battery and there was no polling daemon yet, starting the polling daemon."

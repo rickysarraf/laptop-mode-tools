@@ -1,0 +1,12 @@
+[Unit]
+Description=Runs Laptop Mode Tools - Polling Service, every 150 seconds
+
+
+[Timer]
+# Let's run every 150 secs, to poll the battery
+OnUnitActiveSec=150s
+OnActiveSec=150s
+Unit=lmt-poll.service
+
+[Install]
+WantedBy=multi-user.target
