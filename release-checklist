@@ -5,6 +5,5 @@
 * Tag the release
 * Create git tarball using 'git archive --format=tar --prefix=laptop-mode-tools_N.NN/ GIT_VERSION_TAG | gzip > laptop-mode-tools_N.NN.tar.gz
 * Update Bart's site
-* Update freshmeat
 * Update Launchpad's Release page
 * Send Release Announcement
