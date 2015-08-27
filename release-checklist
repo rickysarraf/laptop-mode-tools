@@ -1,5 +1,6 @@
 * Update version in usr/sbin/laptop_mode
-* Put release date in Documentation/revision-history
+* Put release date in Documentation/revision-history. Eg: git log 1.67...HEAD --pretty=format:'%s' --reverse,
+  or use alias 'mychlog' from the .gitconfig
 * Update laptop-mode-tools.spec
 * Create git tarball using 'git archive --format=tar --prefix=laptop-mode-tools_N.NN/ GIT_VERSION_TAG | gzip > laptop-mode-tools_N.NN.tar.gz
 * Update Bart's site
