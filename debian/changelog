@@ -1,3 +1,9 @@
+laptop-mode-tools (1.68-2) unstable; urgency=medium
+
+  * [b7e3536] Add patch to add ExecReload target for systemd
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sat, 29 Aug 2015 20:53:52 +0530
+
 laptop-mode-tools (1.68-1) unstable; urgency=medium
 
   * [cdd4475] Add timer/polling service in debian/rules
