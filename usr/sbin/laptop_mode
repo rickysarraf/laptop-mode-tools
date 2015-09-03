@@ -190,12 +190,12 @@ log ()
 	fi
 
 	if [ "$1" = "VERBOSE" ]; then
-		$LM_VERBOSE &&  echo "$2" >>/dev/fd/2;
+		$LM_VERBOSE &&  echo "$2" >&2;
 	elif [ "$1" = "ERR" ]; then
-		echo "$2" >>/dev/fd/2;
+		echo "$2" >&2;
 	else
 		# Message of type MSG and STATUS can go to stdout.
-		echo "$2" >>/dev/fd/1;
+		echo "$2" >&2;
 	fi
 }
 
