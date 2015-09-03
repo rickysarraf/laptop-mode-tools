@@ -1,3 +1,10 @@
+laptop-mode-tools (1.68-3) unstable; urgency=medium
+
+  * [de3ca4e] Add patch to fix spam of messages on console.
+    Thanks to Moritz Muehlenhoff (Closes: #797805)
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Thu, 03 Sep 2015 16:39:32 +0530
+
 laptop-mode-tools (1.68-2) unstable; urgency=medium
 
   * [b7e3536] Add patch to add ExecReload target for systemd
