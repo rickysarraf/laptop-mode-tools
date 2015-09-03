@@ -1,3 +1,4 @@
 add-reload-systemd.patch
 gui-desktop-file.patch
 disable-ethernet-e1000e.patch
+no-msg-on-console.patch
