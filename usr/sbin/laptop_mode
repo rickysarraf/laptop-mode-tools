@@ -195,7 +195,7 @@ log ()
 		echo "$2" >&2;
 	else
 		# Message of type MSG and STATUS can go to stdout.
-		echo "$2" >&2;
+		echo "$2" >&1;
 	fi
 }
 
