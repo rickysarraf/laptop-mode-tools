@@ -81,7 +81,8 @@ fi
 %{_sysconfdir}/apm/event.d/*
 %{_sysconfdir}/power/scripts.d/*
 %{_sysconfdir}/power/event.d/*
-%{_usr}/sbin/*
+#%{_usr}/sbin/*
+%{_sbindir}/*
 %{_usr}/share/laptop-mode-tools/modules/*
 %{_usr}/share/laptop-mode-tools/module-helpers/*
 %{_usr}/lib/pm-utils/sleep.d/*
