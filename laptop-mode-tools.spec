@@ -74,6 +74,8 @@ fi
 %config %{_initrddir}/laptop-mode
 /lib/udev/lmt-udev
 /lib/systemd/system/laptop-mode.service
+/lib/systemd/system/laptop-mode.timer
+/lib/systemd/system/lmt-poll.service
 /lib/udev/rules.d/99-laptop-mode.rules
 
 %{_sysconfdir}/apm/event.d/*
