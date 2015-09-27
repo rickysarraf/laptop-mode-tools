@@ -91,7 +91,6 @@ fi
 
 %dir %{_sysconfdir}/acpi/events
 %dir %{_sysconfdir}/acpi/actions
-%dir %{_usr}/sbin
 %dir %{_usr}/lib/pm-utils/sleep.d
 %dir %{_usr}/lib/tmpfiles.d
 %dir %{_usr}/share/laptop-mode-tools/modules
