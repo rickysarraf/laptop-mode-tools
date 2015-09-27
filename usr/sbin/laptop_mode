@@ -1115,6 +1115,9 @@ lmt_main_function ()
 			log "VERBOSE" "Module $SCRIPT is not executable or is to be skipped."
 		fi
 	done
+	
+	# Wait for the forks to complete
+	wait
 
 	exit 0
 
