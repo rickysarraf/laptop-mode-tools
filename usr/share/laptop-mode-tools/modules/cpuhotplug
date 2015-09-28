@@ -1,0 +1,26 @@
+#! /bin/sh
+#
+# Laptop mode tools module to handle CPU Hot Plugging
+#
+
+
+if [ x$CONTROL_CPU_HOTPLUG = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_CPU_HOTPLUG = xauto ]; then
+	if [ $ON_AC -eq 1 ] ; then
+		if [ "$ACTIVATE" -eq 1 ] ; then
+			ECHO_VAL="$LM_AC_CPU_HOTPLUG"
+		else
+			ECHO_VAL="$NOLM_AC_CPU_HOTPLUG"
+		fi
+	else
+		ECHO_VAL="$BATT_CPU_HOTPLUG"
+	fi
+
+	for THISCPU in /sys/devices/system/cpu/cpu[0-9]* ; do
+		if [ -e "$THISCPU/online" ]
+			log "VERBOSE" "Bringing CPU $THISCPU to $ECHO_VAL";
+			echo $ECHO_VAL > $THISCPU/online;
+		else
+			log "VERBOSE" "CPU $THISCPU cannot be hot plugged";
+		fi
+	done
+fi
