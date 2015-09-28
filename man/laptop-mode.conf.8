@@ -294,6 +294,14 @@ Specify the list of ethernet devices to control. Defaults to eth0
 Set this to 1 if you want to completely disable your ethernet device when running on
 battery. Default is 0
 
+.SS "\fI/etc/laptop-mode/conf.d/cpuhotplug.conf\fP"
+
+The cpuhotplug module allows you to switch off the CPU cores when running on battery
+
+.IP "\fBCONTROL_CPU_HOTPLUG\fP" 10 
+When this option is enabled, Laptop Mode Tools can hotplug your CPU, thus switching
+it offline, and conserving some power.
+NOTE: This module is NOT enabled by default
 
 .SS "\fI/etc/laptop-mode/conf.d/cpufreq.conf\fP"
 
