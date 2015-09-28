@@ -15,10 +15,17 @@ if [ x$CONTROL_CPU_HOTPLUG = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_C
 		ECHO_VAL="$BATT_CPU_HOTPLUG"
 	fi
 
+	# To disable the CPU, write 0. So flip it here.
+	if [ x$ECHO_VAL = x1 ]; then
+		CPU_VAL=0;
+	else
+		CPU_VAL=1;
+	fi
+
 	for THISCPU in /sys/devices/system/cpu/cpu[0-9]* ; do
 		if [ -e "$THISCPU/online" ]
 			log "VERBOSE" "Bringing CPU $THISCPU to $ECHO_VAL";
-			echo $ECHO_VAL > $THISCPU/online;
+			echo $CPU_VAL > $THISCPU/online;
 		else
 			log "VERBOSE" "CPU $THISCPU cannot be hot plugged";
 		fi
