@@ -23,7 +23,7 @@ if [ x$CONTROL_CPU_HOTPLUG = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_C
 	fi
 
 	for THISCPU in /sys/devices/system/cpu/cpu[0-9]* ; do
-		if [ -e "$THISCPU/online" ]
+		if [ -e "$THISCPU/online" ]; then
 			log "VERBOSE" "Bringing CPU $THISCPU to $ECHO_VAL";
 			echo $CPU_VAL > $THISCPU/online;
 		else
