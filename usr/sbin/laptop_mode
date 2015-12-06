@@ -1151,7 +1151,7 @@ if [ x$CONTROL_BATTERY_LEVEL_POLLING = x1 ] && [ x$BLACKLIST_IN_FLOCK = x1 ]; th
 				log "VERBOSE" "On battery and there was no polling daemon yet, starting the polling daemon."
 
 				# If there is no polling daemon, we start one.
-				/usr/share/laptop-mode-tools/module-helpers/lm-polling-daemon < /dev/null > /dev/null 2> /dev/null &
+				setsid /usr/share/laptop-mode-tools/module-helpers/lm-polling-daemon < /dev/null > /dev/null 2> /dev/null &
 			fi
 		else
 			log "VERBOSE" "Lock acquisition on descriptor 7 failed with pid $$";
