@@ -76,6 +76,12 @@ if [ x$CONTROL_ETHERNET = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_ETHE
 			THROTTLE_ETHERNET="$NOLM_AC_THROTTLE_ETHERNET"
 		fi
 
+		# One off a case.
+		# So that when  back on AC, we can resume the speed back to MAX.
+		if [ x$THROTTLE_ETHERNET = x0 ]; then
+			THROTTLE_SPEED=$MAX_SPEED;
+		fi
+
 		if [ x$DISABLE_ETHERNET_ON_BATTERY = x1 ]; then
 			# We are ON_AC and Disable feature is requested
 			# So we might be required to re-enable the device.
