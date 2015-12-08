@@ -121,16 +121,6 @@ if [ x$CONTROL_ETHERNET = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_ETHE
 			else
 				log "VERBOSE" "Could not throttle speed for $DEVICE"
 			fi
-		else
-			# Handle Speed Throttling
-			ret=`$ETHTOOL -s $DEVICE speed $MAX_SPEED 2>&1`
-			exit_status=$?;
-			log "VERBOSE" "$ret";
-			if [ $exit_status -eq 0 ]; then
-				log "VERBOSE" "Restored speed to $MAX_SPEED Mbit for $DEVICE"
-			else
-				log "VERBOSE" "Could not restore speed for $DEVICE"
-			fi
 		fi
 
 		# Shut down interface
