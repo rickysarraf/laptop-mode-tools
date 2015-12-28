@@ -44,7 +44,7 @@ else
 	# That said, we background the execution here, because, otherwise udevd will wait
 	# for this process which will block
 	
-	exec > /dev/null 2>dev/null
+	exec > /dev/null 2>/dev/null
 	non_systemd_way "$@" &
 fi
 
