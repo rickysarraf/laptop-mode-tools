@@ -28,7 +28,7 @@ Notes
 
 * To configure the laptop mode scripts, edit `/etc/laptop-mode/laptop-mode.conf`.
 
-* The laptop mode FAQ can be found at <http://samwel.tk/laptop_mode/faq>
+* The laptop mode FAQ can be found at <https://github.com/rickysarraf/laptop-mode-tools/wiki/FAQ>
 
 * The revision history is included in the `Documentation` directory.
 
@@ -43,4 +43,4 @@ Notes
 References
 ----------
 
-The laptop mode tools website: <http://samwel.tk/laptop_mode/>
+The laptop mode tools website: <https://github.com/rickysarraf/laptop-mode-tools/>
