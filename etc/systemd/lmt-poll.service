@@ -6,8 +6,8 @@ Documentation=http://samwel.tk/laptop_mode
 [Service]
 Type=oneshot
 RemainAfterExit=no
-ExecStart=/lib/udev/lmt-udev
-ExecReload=/lib/udev/lmt-udev
+ExecStart=/lib/udev/lmt-udev auto
+ExecReload=/lib/udev/lmt-udev auto
 StandardOutput=journal
 StandardError=journal
 
