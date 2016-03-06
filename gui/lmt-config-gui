@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Needed for annoying QT MIT bug
+export QT_X11_NO_MITSHM=1
+
+python2 /usr/share/laptop-mode-tools/lmt.py
