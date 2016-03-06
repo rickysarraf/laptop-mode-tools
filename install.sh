@@ -159,7 +159,7 @@ if ( ! $INSTALL -m 644 usr/share/polkit-1/actions/org.linux.lmt.gui.policy "$DES
 	echo "$0: Failed to install $DESTDIR/usr/share/polkit-1/actions/org.linux.lmt.gui.policy Installation failed."
 	exit 11
 fi
-"$DESTDIR/usr/share/polkit-1/actions"
+
 if ( ! $INSTALL -m 755 usr/sbin/lm-syslog-setup "$DESTDIR/usr/sbin" ) ; then
 	echo "$0: Failed to install $DESTDIR/usr/sbin/lm-syslog-setup. installation failed."
 	exit 25
