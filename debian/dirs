@@ -1,2 +1,3 @@
 usr/sbin
 usr/share/laptop-mode-tools/modules
+usr/share/applications/polkit-1/actions
