@@ -6,10 +6,10 @@ Documentation=http://samwel.tk/laptop_mode
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=@/usr/sbin/laptop_mode init auto
-ExecStop=@/usr/sbin/laptop_mode init stop
-ExecStopPost=@/bin/rm -f /var/run/laptop-mode-tools/enabled
-ExecReload=@/usr/sbin/laptop_mode auto
+ExecStart=/usr/sbin/laptop_mode init auto
+ExecStop=/usr/sbin/laptop_mode init stop
+ExecStopPost=/bin/rm -f /var/run/laptop-mode-tools/enabled
+ExecReload=/usr/sbin/laptop_mode auto
 StandardOutput=journal
 StandardError=journal
 
