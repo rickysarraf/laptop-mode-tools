@@ -35,7 +35,7 @@ set -a
 
 # The laptop mode tools version number. Extracted by the installer makefile
 # as well, so don't change the format!
-LMTVERSION=1.68
+LMTVERSION=1.68.1
 
 # This script is loaded from multiple scripts to set the config defaults
 # and to read the configuration on top of those. Only when the command is
@@ -190,12 +190,12 @@ log ()
 	fi
 
 	if [ "$1" = "VERBOSE" ]; then
-		$LM_VERBOSE &&  echo "$2" >>/dev/fd/2;
+		$LM_VERBOSE &&  echo "$2" >&2;
 	elif [ "$1" = "ERR" ]; then
-		echo "$2" >>/dev/fd/2;
+		echo "$2" >&2;
 	else
 		# Message of type MSG and STATUS can go to stdout.
-		echo "$2" >>/dev/fd/1;
+		echo "$2" >&1;
 	fi
 }
 
@@ -1115,6 +1115,9 @@ lmt_main_function ()
 			log "VERBOSE" "Module $SCRIPT is not executable or is to be skipped."
 		fi
 	done
+	
+	# Wait for the forks to complete
+	wait
 
 	exit 0
 
@@ -1148,7 +1151,7 @@ if [ x$CONTROL_BATTERY_LEVEL_POLLING = x1 ] && [ x$BLACKLIST_IN_FLOCK = x1 ]; th
 				log "VERBOSE" "On battery and there was no polling daemon yet, starting the polling daemon."
 
 				# If there is no polling daemon, we start one.
-				/usr/share/laptop-mode-tools/module-helpers/lm-polling-daemon < /dev/null > /dev/null 2> /dev/null &
+				setsid /usr/share/laptop-mode-tools/module-helpers/lm-polling-daemon < /dev/null > /dev/null 2> /dev/null &
 			fi
 		else
 			log "VERBOSE" "Lock acquisition on descriptor 7 failed with pid $$";

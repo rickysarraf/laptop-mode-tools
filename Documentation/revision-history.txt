@@ -1,3 +1,15 @@
+1.68.1 - Sun Sep 27 14:00:13 IST 2015
+    * Update details about runtime-pm in manpage
+    * Revert "Drop out reload"
+    * Log error more descriptively
+    * Write to common stderr. Do not hardcode a specific one
+    * Call lmt-udev in lmt-poll. Don't call the laptop_mode binary directly.
+      Helps in a lot of housekeeping
+    * Direct stderr/stdout to journal
+    * Fix stdout descriptor
+    * Install the new .timer and poll service
+    * Use _sbindir for RPM
+
 1.68 - Thu Aug 27 22:36:43 IST 2015
     * Fix all instances for BATTERY_LEVEL_POLLING
     * Group kill the polling daemon so that its child process get the same signal
@@ -881,12 +893,12 @@ Special thaks go to Jan Polacek, who contributed a very big chunk of work.
       (and an initial implementation). You can put links to init scripts (or
       any other scripts that take "start" and "stop" commands) in the
       following directories:
-          o /etc/laptop-mode/nolm-ac-start
-          o /etc/laptop-mode/nolm-ac-stop
-          o /etc/laptop-mode/lm-ac-start
-          o /etc/laptop-mode/lm-ac-stop
-          o /etc/laptop-mode/batt-start
-          o /etc/laptop-mode/batt-stop
+      o /etc/laptop-mode/nolm-ac-start
+      o /etc/laptop-mode/nolm-ac-stop
+      o /etc/laptop-mode/lm-ac-start
+      o /etc/laptop-mode/lm-ac-stop
+      o /etc/laptop-mode/batt-start
+      o /etc/laptop-mode/batt-stop
     * Added the ability to adjust X-windows DPMS timing, using
       CONTROL_DPMS_STANDBY. Thanks to Jan Polacek.
     * Fixes to useless output of hdparm when laptop mode tries to determine

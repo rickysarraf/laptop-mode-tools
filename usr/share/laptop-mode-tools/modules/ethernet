@@ -32,11 +32,54 @@ if [ x$CONTROL_ETHERNET = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_ETHE
 	fi
 
 
+	# Determine speed capability of physical device
+	speed=`$MIITOOL -v $DEVICE 2>/dev/null | grep capabilities | tr ' ' '\n' |\
+		sort -n | sed -ne '/^1.*/p' | cut -d "b" -f1`
+	if [ -z "$speed" ]; then
+		speed=0;
+	fi
+	max_s=0;
+	min_s=100000;
+	for s in $speed;
+	do
+		if [ $s -gt $max_s ]; then
+			max_s=$s
+		fi
+		if [ $s -lt $min_s ]; then
+			min_s=$s
+		fi
+	done
+	MAX_SPEED=$max_s;
+
+	case "$THROTTLE_SPEED" in
+		"slowest")
+			THROTTLE_SPEED=$min_s
+			;;
+		"fastest")
+			THROTTLE_SPEED=$max_s
+			;;
+	esac
+
+	# Carrier detection
+	if $IPTOOL link show $DEVICE | grep -q NO-CARRIER; then
+		carrier="false";
+	else
+		carrier="true";
+	fi
+
+
+	# What state we are in
 	if [ $ON_AC -eq 1 ]; then
 		if [ "$ACTIVATE" -eq 1 ]; then
 			THROTTLE_ETHERNET="$LM_AC_THROTTLE_ETHERNET"
 		else
 			THROTTLE_ETHERNET="$NOLM_AC_THROTTLE_ETHERNET"
+		fi
+
+		# One off a case.
+		# So that when  back on AC, we can resume the speed back to MAX.
+		if [ x$THROTTLE_ETHERNET = x0 ]; then
+			THROTTLE_SPEED=$MAX_SPEED;
 		fi
 
 		if [ x$DISABLE_ETHERNET_ON_BATTERY = x1 ]; then
@@ -61,13 +104,6 @@ if [ x$CONTROL_ETHERNET = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_ETHE
 	for DEVICE in $ETHERNET_DEVICES ; do
 		log "VERBOSE" "ethernet: $DEVICE"
 
-		# Carrier detection
-		if $IPTOOL link show $DEVICE | grep -q NO-CARRIER; then
-			carrier="false";
-		else
-			carrier="true";
-		fi
-
 		# Wakeup-on-LAN handling
 		if [ x$DISABLE_WAKEUP_ON_LAN = x1 ] ; then
 			ret=`$ETHTOOL -s $DEVICE wol d 2>&1`
@@ -80,34 +116,6 @@ if [ x$CONTROL_ETHERNET = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_ETHE
 			fi
 		fi
 
-		# Determine speed
-		speed=`$MIITOOL -v $DEVICE 2>/dev/null | grep capabilities | tr ' ' '\n' |\
-			sort -n | sed -ne '/^1.*/p' | cut -d "b" -f1`
-		if [ -z "$speed" ]; then
-			speed=0;
-		fi
-		max_s=0;
-		min_s=100000;
-		for s in $speed;
-		do
-			if [ $s -gt $max_s ]; then
-				max_s=$s
-			fi
-			if [ $s -lt $min_s ]; then
-				min_s=$s
-			fi
-		done
-		MAX_SPEED=$max_s;
-
-		case "$THROTTLE_SPEED" in
-			"slowest")
-				THROTTLE_SPEED=$min_s
-				;;
-			"fastest")
-				THROTTLE_SPEED=$max_s
-				;;
-		esac
-
 		# Handle throttling
 		if [ x$THROTTLE_ETHERNET = x1 ] ; then
 			# Handle Speed Throttling
@@ -118,16 +126,6 @@ if [ x$CONTROL_ETHERNET = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_ETHE
 				log "VERBOSE" "Throttled speed to $THROTTLE_SPEED Mbit for $DEVICE"
 			else
 				log "VERBOSE" "Could not throttle speed for $DEVICE"
-			fi
-		else
-			# Handle Speed Throttling
-			ret=`$ETHTOOL -s $DEVICE speed $MAX_SPEED 2>&1`
-			exit_status=$?;
-			log "VERBOSE" "$ret";
-			if [ $exit_status -eq 0 ]; then
-				log "VERBOSE" "Restored speed to $MAX_SPEED Mbit for $DEVICE"
-			else
-				log "VERBOSE" "Could not restore speed for $DEVICE"
 			fi
 		fi
 

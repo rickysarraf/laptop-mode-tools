@@ -3,7 +3,7 @@
 
 Summary: Tools for power savings based on battery/AC status
 Name: laptop-mode-tools
-Version: 1.68
+Version: 1.68.1
 Release: 1
 License: GPL
 Group: System Environment/Base
@@ -74,12 +74,15 @@ fi
 %config %{_initrddir}/laptop-mode
 /lib/udev/lmt-udev
 /lib/systemd/system/laptop-mode.service
+/lib/systemd/system/laptop-mode.timer
+/lib/systemd/system/lmt-poll.service
 /lib/udev/rules.d/99-laptop-mode.rules
 
 %{_sysconfdir}/apm/event.d/*
 %{_sysconfdir}/power/scripts.d/*
 %{_sysconfdir}/power/event.d/*
-%{_usr}/sbin/*
+#%{_usr}/sbin/*
+%{_sbindir}/*
 %{_usr}/share/laptop-mode-tools/modules/*
 %{_usr}/share/laptop-mode-tools/module-helpers/*
 %{_usr}/lib/pm-utils/sleep.d/*
@@ -88,7 +91,6 @@ fi
 
 %dir %{_sysconfdir}/acpi/events
 %dir %{_sysconfdir}/acpi/actions
-%dir %{_usr}/sbin
 %dir %{_usr}/lib/pm-utils/sleep.d
 %dir %{_usr}/lib/tmpfiles.d
 %dir %{_usr}/share/laptop-mode-tools/modules
@@ -99,6 +101,9 @@ fi
 
 
 %changelog
+* Sun Sep 27 2015 Ritesh Raj Sarraf <rrs@researchut.com> - 1.68.1-1
+- Updated to release 1.68.1
+
 * Thu Aug 27 2015 Ritesh Raj Sarraf <rrs@researchut.com> - 1.68-1
 - Updated to release 1.68.
 

@@ -25,26 +25,34 @@ non_systemd_way() {
 }
 
 
+## For Debug only
+#export LMT_DEBUG="/tmp/__lmt__debug.txt"
+[ -z $LMT_DEBUG ] || rm -f $LMT_DEBUG
+##
 
 # Under systemd, we don't do synchronous operations, so we can run in the foreground;
 # And we need also need to run in foreground, because forked children get kill immediately
 # under systemd/udev
 
-if [ -d /run/systemd/system ]; then
+# The seconds "auto" evaluation is to determine if it is a standard execution;
+# i.e. a reload/restart or a device plug/unplug
+
+if [ -d /run/systemd/system ] && [ "$@" = "auto" ]; then
+	[ -z $LMT_DEBUG ] || echo "systemd is $PPID $$ $@" > $LMT_DEBUG
 	exec systemctl --no-block reload-or-restart laptop-mode
 else
+	[ -z $LMT_DEBUG ] || echo "regulard is $PPID $$ $@" > $LMT_DEBUG
 	# Under sysvinit/upstart, we need to fork as we start the long-running
 	# /usr/sbin/laptop_mode process.
 	#
 	# Also, if this happens during boot, we may want to wait until /usr is available
-	# This else stanza is going to be used rarely, because going forward we are
-	# going to use systemd.
-	# But for compatibility reasons, we'll carry this
 	#
 	# That said, we background the execution here, because, otherwise udevd will wait
 	# for this process which will block
 	
-	exec > /dev/null 2>dev/null
+	# This stanza will also be called for device plug/unplug events
+
+	exec > /dev/null 2>/dev/null
 	non_systemd_way "$@" &
 fi
 

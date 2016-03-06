@@ -85,7 +85,9 @@ With this option alone, you can enable all auto modules. Incase you need to fine
 These options determine whether laptop mode will be activated when the
 computer is on battery or on AC power, respectively. Note that if the
 system service laptop-mode is not started, then laptop mode will never
-be started, even if this option is enabled. 
+be started, even if this option is enabled.
+
+The ENABLE_LAPTOP_MODE_ON_AC setting is useful when you want to run on a headless machine, in low-power mode, for eg. a Jukebox.
  
 .IP "\fBENABLE_LAPTOP_MODE_WHEN_LID_CLOSED\fP" 10 
 When this option is enabled, laptop mode will be activated when the laptop's lid is 
@@ -292,8 +294,17 @@ Specify the list of ethernet devices to control. Defaults to eth0
 
 .IP "\fBDISABLE_ETHERNET_ON_BATTERY\fP" 10 
 Set this to 1 if you want to completely disable your ethernet device when running on
-battery. Default is 0
+battery, and when no carrier is detected on the interface (e.g., no active cable is
+plugged in). Default is 0
 
+.SS "\fI/etc/laptop-mode/conf.d/cpuhotplug.conf\fP"
+
+The cpuhotplug module allows you to switch off the CPU cores when running on battery
+
+.IP "\fBCONTROL_CPU_HOTPLUG\fP" 10 
+When this option is enabled, Laptop Mode Tools can hotplug your CPU, thus switching
+it offline, and conserving some power.
+NOTE: This module is NOT enabled by default
 
 .SS "\fI/etc/laptop-mode/conf.d/cpufreq.conf\fP"
 
@@ -566,15 +577,45 @@ mode when on battery. This module is part of auto modules. Thus enabling
 auto modules setting will activate this module automatically. PCIe ASPM may
 require that the pcie_aspm=force kernel option is enabled.
 
+.SS "\fI/etc/laptop-mode/conf.d/usb-autosuspend.conf\fP"
+
+This option has been superseded by the new runtime-pm.conf settings
+
 .SS "\fI/etc/laptop-mode/conf.d/runtime-pm.conf\fP"
 
 The runtime-pm module allows you to enable the Runtime Power Management
 framework for the Linux kernel.
-.IP "\fBCONTROL_RUNTIME_PM\fP" 10
-If this option is enabled, laptop mode tools will automatically enable the
-Kernel's Runtime Power Management settings. The power saving settings are always
-enabled, not only on battery power.
 
+.IP "\fBCONTROL_RUNTIME_AUTOSUSPEND\fP" 10
+If this option is enabled, laptop mode tools will automatically enable the
+USB autosuspend feature for all devices. The USB autosuspend feature will always
+be enabled, not only on battery power.
+
+.IP "\fBAUTOSUSPEND_RUNTIME_DEVID_BLACKLIST\fP" 10
+Here, you can specify the list of USB IDs that should not use autosuspend.
+Use lsusb to find out the IDs of your USB devices.
+Example: AUTOSUSPEND_RUNTIME_DEVID_BLACKLIST="046d:c025 0123:abcd"
+
+.IP "\fBAUTOSUSPEND_RUNTIME_DEVTYPE_BLACKLIST\fP" 10
+Here, you can specify the list of device driver that should not use autosuspend.
+The driver type is given by "DRIVER=..." in a device's uevent file
+Example: AUTOSUSPEND_RUNTIME_DEVTYPE_BLACKLIST="usbhid usb-storage usbmouse"
+
+.IP "\fBAUTOSUSPEND_USE_WHITELIST\fP" 10
+Set this to use opt-in/whitelist instead of opt-out/blacklist for deciding
+which devices should be autosuspended.
+AUTOSUSPEND_USE_WHITELIST=0 means AUTOSUSPEND_*_BLACKLIST will be used.
+AUTOSUSPEND_USE_WHITELIST=1 means AUTOSUSPEND_*_WHITELIST will be used.
+
+.IP "\fBAUTOSUSPEND_RUNTIME_DEVID_WHITELIST\fP" 10
+The list of Device IDs that should use autosuspend. Use system commands or
+look into sysfs to find out the IDs of your devices.
+Example: AUTOSUSPEND_DEVID_WHITELIST="046d:c025 0123:abcd"
+
+.IP "\fBAUTOSUSPEND_RUNTIME_DEVTYPE_WHITELIST\fP" 10
+The list of device driver types that should use autosuspend. The driver
+type is given by "DRIVER=..." in a device's uevent file.
+Example: AUTOSUSPEND_DEVTYPE_WHITELIST="usbhid usb-storage usbmouse"
 
 .SS "\fI/etc/laptop-mode/conf.d/intel-hda-powersave.conf\fP"
 
@@ -743,21 +784,6 @@ Set this to 0 to disable execution of custom commands during power state changes
 .IP "\fBNOLM_AC_EXEC_COMMAND_1=\fP" 10
 Here you can specify your custom command that will need to be executed. The numbers can grow upto 9. The command needs to be specified in double quotes
 
-
-.SS "\fI/etc/laptop-mode/conf.d/usb-autosuspend.conf\fP"
-
-The usb-autosuspend module allows you to automatically enable the Linux
-kernel's USB autosuspend feature for all USB devices.
-
-.IP "\fBCONTROL_USB_AUTOSUSPEND\fP" 10
-If this option is enabled, laptop mode tools will automatically enable the
-USB autosuspend feature for all devices. The USB autosuspend feature will always
-be enabled, not only on battery power.
-
-.IP "\fBAUTOSUSPEND_USBID_BLACKLIST\fP" 10
-Here, you can specify the list of USB IDs that should not use autosuspend.
-Use lsusb to find out the IDs of your USB devices.
-Example: AUTOSUSPEND_USBID_BLACKLIST="046d:c025 0123:abcd"
 
 .SS "\fI/etc/laptop-mode/conf.d/eee-superhe.conf\fP"
 The eee-superhe module allows you to control the CPU frequency scalling on the

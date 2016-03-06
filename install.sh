@@ -118,6 +118,7 @@ $INSTALL -d -m 755 "$DESTDIR/usr/share/laptop-mode-tools/modules"
 $INSTALL -d -m 755 "$DESTDIR/usr/share/laptop-mode-tools/module-helpers"
 $INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode/conf.d"
 $INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode/modules"
+$INSTALL -d -m 755 "$DESTDIR/usr/share/polkit-1/actions"
 $INSTALL -d -m 755 "$DESTDIR/usr/sbin"
 $INSTALL -d -m 755 "$DESTDIR/$UDEV_D/rules.d"
 $INSTALL -d -m 755 "$DESTDIR/$MAN_D/man8"
@@ -154,6 +155,11 @@ if ( ! $INSTALL -m 755 usr/sbin/laptop_mode "$DESTDIR/usr/sbin" ) ; then
 	exit 11
 fi
 
+if ( ! $INSTALL -m 644 usr/share/polkit-1/actions/org.linux.lmt.gui.policy "$DESTDIR/usr/share/polkit-1/actions/" ) ; then
+	echo "$0: Failed to install $DESTDIR/usr/share/polkit-1/actions/org.linux.lmt.gui.policy Installation failed."
+	exit 11
+fi
+"$DESTDIR/usr/share/polkit-1/actions"
 if ( ! $INSTALL -m 755 usr/sbin/lm-syslog-setup "$DESTDIR/usr/sbin" ) ; then
 	echo "$0: Failed to install $DESTDIR/usr/sbin/lm-syslog-setup. installation failed."
 	exit 25
