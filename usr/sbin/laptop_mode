@@ -15,7 +15,7 @@
 #
 # Maintainer:             Ritesh Raj Sarraf (rrs@researchut.com)
 # Original Author:        Bart Samwel (bart@samwel.tk)
-# Project home page: http://samwel.tk/laptop_mode
+# Project home page: http://github.com/rickysarraf/laptop-mode-tools
 #
 # Contributors to this script:   Bart Samwel
 #				 Kiko Piris
@@ -35,7 +35,7 @@ set -a
 
 # The laptop mode tools version number. Extracted by the installer makefile
 # as well, so don't change the format!
-LMTVERSION=1.68.1
+LMTVERSION=1.69
 
 # This script is loaded from multiple scripts to set the config defaults
 # and to read the configuration on top of those. Only when the command is

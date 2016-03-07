@@ -1,3 +1,25 @@
+1.69 - Mon Mar  7 17:44:42 IST 2016
+    * Wait for all forked modules to complete
+    * Add new module: cputhotplug
+    * CPU online/offine is reverse here
+    * Fix shell syntax
+    * Install policykit file
+    * Detach polling daemon from main process
+    * Do NOT touch speed if throttling is not set
+    * Restore to MAX speed when back to AC Power
+    * Fix manpage about DISABLE_ETHERNET_ON_BATTERY setting
+    * Update documentation about ENABLE_LAPTOP_MODE_ON_AC setting
+    * Change powersaving default for USB class devices
+    * Drop usbhid from default (black)list
+    * Add usb keyboard driver to the list default list
+    * Be consistent with passing args to LMT from different invokers
+    * Honor device plug/unplug events on a per device basis;
+      like how Chromium initially submitted this patch
+    * Also be consistent with option in the event parser
+    * Update links in README.md
+    * Update new github homepage location
+    * Add lmt-config-gui shell script
+
 1.68.1 - Sun Sep 27 14:00:13 IST 2015
     * Update details about runtime-pm in manpage
     * Revert "Drop out reload"
