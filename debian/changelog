@@ -1,3 +1,44 @@
+laptop-mode-tools (1.69-1) unstable; urgency=medium
+
+  New Upstream Release [ The Maha Shiva Ratri Release ]
+
+  * [3949674] Update details about runtime-pm in manpage
+  * [83b49f5] Call lmt-udev in lmt-poll. Don't call the laptop_mode
+    binary directly. Helps in a lot of housekeeping
+  * [fdd6b5d] Direct stderr/stdout to journal
+  * [2ce90a8] Install the new .timer and poll service
+  * [56db2fb] Wait for all forked modules to complete.
+    Thanks to Tomas Janousek
+  * [ee1ffe7] Add new module: cputhotplug
+  * [c08cc13] CPU online/offine is reverse here
+  * [49451d1] Install policykit file
+  * [cc9f46c] Detach polling daemon from main process.
+    Thanks to Tomas Ebenlendr (Closes: #807134)
+  * [b0d1a88] Do NOT touch speed is throttling is not set.
+    Thanks to Steve McIntyre (Closes: #807338)
+  * [733eb81] Restore to MAX speed when back to AC Power
+  * [67a5cf1] Fix manpage about DISABLE_ETHERNET_ON_BATTERY setting.
+    Thanks to Daniel Kahn Gillmor (Closes: #786444)
+  * [c878358] Update documentation about ENABLE_LAPTOP_MODE_ON_AC
+    setting. Thanks to Daniel Kahn Gillmor
+  * [811228d] Fix syntax error in install.sh.
+    Thanks to Latot
+  * [650c85a] Fix typo in /lib/udev/lmt-udev.
+    Thanks to Kelsey Byers (Closes: #809181)
+  * [57e2cf4] Change powersaving default for USB class devices
+    (Closes: #812541)
+  * [ec0fe8b] Drop usbhid from default (black)list
+  * [06770f7] Add usb keyboard driver to the list default list
+  * [1302f8d] Honor device plug/unplug events on a per device basis;
+    like how Chromium initially submitted this patch
+  * [1e3e0a1] Update links in README.md
+  * [faa613c] Update new github homepage location
+  * [d904d89] Drop 2 patches that have been applied upstream
+  * [2c410ac] Ship new policykit action file
+  * [e967db9] Prepare 1.69 release
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Mon, 07 Mar 2016 18:16:36 +0530
+
 laptop-mode-tools (1.68-3) unstable; urgency=medium
 
   * [de3ca4e] Add patch to fix spam of messages on console.
