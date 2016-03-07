@@ -30,7 +30,7 @@ except ImportError:
 COMMENT_IDENTIFIER = "#__COMMENT"
 CONTROL_IDENTIFIER = "CONTROL_"
 CONFIG_DIR = "/etc/laptop-mode/conf.d"
-WEBPAGE_URL = "http://samwel.tk/laptop_mode"
+WEBPAGE_URL = "http://github.com/rickysarraf/laptop-mode-tools"
 
 
 ###############################################################################

@@ -7,7 +7,7 @@ Version: 1.68.1
 Release: 1
 License: GPL
 Group: System Environment/Base
-URL: http://www.samwel.tk/laptop_mode
+URL: http://github.com/rickysarraf/laptop-mode-tools
 Vendor: Laptop Mode Tools Developers
 Distribution: RPM Based distributions
 Packager: Ritesh Raj Sarraf <rrs@researchut.com>

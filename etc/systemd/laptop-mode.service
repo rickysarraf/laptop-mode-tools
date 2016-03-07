@@ -1,7 +1,7 @@
 [Unit]
 Description=Laptop Mode Tools
 Documentation=man:laptop_mode(8) man:laptop-mode.conf(8)
-Documentation=http://samwel.tk/laptop_mode
+Documentation=http://github.com/rickysarraf/laptop-mode-tools
 
 [Service]
 Type=oneshot
