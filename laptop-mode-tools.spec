@@ -85,6 +85,7 @@ fi
 %{_sbindir}/*
 %{_usr}/share/laptop-mode-tools/modules/*
 %{_usr}/share/laptop-mode-tools/module-helpers/*
+%{_usr}/share/polkit-1/actions/org.linux.lmt.gui.policy
 %{_usr}/lib/pm-utils/sleep.d/*
 %{_usr}/lib/tmpfiles.d/laptop-mode.conf
 
