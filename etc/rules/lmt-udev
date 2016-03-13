@@ -38,8 +38,8 @@ non_systemd_way() {
 # i.e. a reload/restart or a device plug/unplug
 
 if [ -d /run/systemd/system ] && [ x$1 = xauto ]; then
-	exec systemctl --no-block reload-or-restart laptop-mode
 	[ -z $LMT_DEBUG ] || echo "systemd is $PPID $$ $@" > $LMT_DEBUG
+	exec systemctl --no-block reload-or-restart laptop-mode
 else
 	# Under sysvinit/upstart, we need to fork as we start the long-running
 	# /usr/sbin/laptop_mode process.
