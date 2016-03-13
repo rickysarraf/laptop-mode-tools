@@ -37,7 +37,7 @@ non_systemd_way() {
 # The seconds "auto" evaluation is to determine if it is a standard execution;
 # i.e. a reload/restart or a device plug/unplug
 
-if [ -d /run/systemd/system ] && [ "$@" = "auto" ]; then
+if [ -d /run/systemd/system ] && [ x$1 = xauto ]; then
 	exec systemctl --no-block reload-or-restart laptop-mode
 	[ -z $LMT_DEBUG ] || echo "systemd is $PPID $$ $@" > $LMT_DEBUG
 else
