@@ -1,3 +1,20 @@
+laptop-mode-tools (1.69.1-1) unstable; urgency=medium
+
+  * [380dc06] Prepare 1.69.1 minor bugfix release
+  * [6c65fcc] Add  polkit file in RPM
+  * [c0bc391] Update default list of USB type devices
+  * [96e4508] Relax the list of blacklisted USB devices
+  * [ff03abd] USB HID core driver is needed for blacklisting other
+    devices of same family
+  * [8213f87] When on AC, revert back to full power
+  * [458e7da] Log after completion of execution
+  * [e58d41e] Fix bashism. array will fail for string comparison in dash
+  * [355a33e] We need to log before execution otherwise the shell is
+    lost
+  * [6b9a844] Break cyclic loop. Hopefully my last systemd error :-(
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Tue, 15 Mar 2016 16:21:03 +0530
+
 laptop-mode-tools (1.69-1) unstable; urgency=medium
 
   New Upstream Release [ The Maha Shiva Ratri Release ]
