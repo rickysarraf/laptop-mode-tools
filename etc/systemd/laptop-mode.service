@@ -12,6 +12,7 @@ ExecStopPost=/bin/rm -f /var/run/laptop-mode-tools/enabled
 ExecReload=/usr/sbin/laptop_mode auto
 StandardOutput=journal
 StandardError=journal
+TasksMax=infinity
 
 [Install]
 WantedBy=multi-user.target
