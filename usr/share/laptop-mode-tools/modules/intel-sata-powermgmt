@@ -34,8 +34,10 @@ if [ x$CONTROL_INTEL_SATA_POWER = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONT
 		else
 			SATA_POLICY="$NOLM_AC_SATA_POLICY"
 		fi
+                RUNTIME_PM_AHCI=0
 	else
 		SATA_POLICY="$BATT_SATA_POLICY"
+                RUNTIME_PM_AHCI=1
 	fi
 
 	for POLICYFILE in /sys/class/scsi_host/*/link_power_management_policy ; do
@@ -46,6 +48,27 @@ if [ x$CONTROL_INTEL_SATA_POWER = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONT
 			log "VERBOSE" "Intel SATA link power saving enabled but not supported by system for $POLICYFILE."
 		fi
 	done
+
+        if [ x$CONTROL_AHCI_RUNTIME_PM = x1 ]; then 
+                # Enable Runtime PM for AHCI Class Ports
+                for port in /sys/bus/devices/*/ata*/power/control ; do
+                        if [ -f $port ]; then
+                                log "VERBOSE" "Setting AHCI Runtime PM value for $port to value: $RUNTIME_PM_AHCI"
+                                echo $RUNTIME_PM_AHCI > $port;
+                        fi
+                done
+
+                # Now scan through available devices that are marked for power savings
+                # Let's scan through all block devices, typically there aren't many, even after considering the virtual block devices
+                for device in /sys/block/*/device/power/control ; do
+                        if [ -f $device ]; then
+                                log "VERBOSE" "Setting AHCI Runtime PM value for $device to value: $RUNTIME_PM_AHCI"
+                                echo $RUNTIME_PM_AHCI > $device;
+                        fi
+                done
+        else
+                log "VERBOSE" "AHCI Runtime PM is disabled"
+        fi
 else
 	log "VERBOSE" "Intel SATA link power saving disabled."
 fi
