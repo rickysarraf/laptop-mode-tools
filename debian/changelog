@@ -1,3 +1,11 @@
+laptop-mode-tools (1.69.2-1) unstable; urgency=medium
+
+  Minor Bug Fix Release
+
+  * [8bbf7b9] Set limit of tasks to infinity
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sun, 27 Mar 2016 21:44:57 +0530
+
 laptop-mode-tools (1.69.1-1) unstable; urgency=medium
 
   * [380dc06] Prepare 1.69.1 minor bugfix release
