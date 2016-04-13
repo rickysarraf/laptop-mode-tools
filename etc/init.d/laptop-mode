@@ -37,8 +37,6 @@ fi
 
 case $1 in
   start)
-    mkdir -p /var/run/laptop-mode-tools
-    touch /var/run/laptop-mode-tools/enabled
     if RESULT=`/usr/sbin/laptop_mode auto` ; then
       log_success_msg "$RESULT"
     else
