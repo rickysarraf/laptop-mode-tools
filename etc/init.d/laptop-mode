@@ -37,6 +37,11 @@ fi
 
 case $1 in
   start)
+    # Clean-up any possibilities of a leftover
+    # From the initscript, we want a clean start
+    test -f /var/run/laptop-mode-tools/enabled && rm -f /var/run/laptop-mode-tools/enabled
+    test -f /var/run/laptop-mode-tools/state && rm -f /var/run/laptop-mode-tools/state
+
     if RESULT=`/usr/sbin/laptop_mode auto` ; then
       log_success_msg "$RESULT"
     else
@@ -44,20 +49,13 @@ case $1 in
     fi
     ;;
 
-  restart|reload|force-reload)
-    # Full restart: first stop laptop mode completely (to restore default mount options etc.)
-    mkdir -p /var/run/laptop-mode-tools
-    rm -f /var/run/laptop-mode-tools/enabled
-    if RESULT=`/usr/sbin/laptop_mode stop` ; then
-      log_success_msg "$RESULT"
-    else
-      log_failure_msg "$RESULT"
-    fi
+  restart)
+      $0 stop;
+      $0 start;
+    ;;
 
-    # Now remove files containing stored status, re-enable, and start it up again.
-    rm -f /var/run/laptop-mode-tools/*
-    touch /var/run/laptop-mode-tools/enabled
-    if RESULT=`/usr/sbin/laptop_mode auto force` ; then
+  reload|force-reload)
+    if RESULT=`/usr/sbin/laptop_mode auto` ; then
       log_success_msg "$RESULT"
     else
       log_failure_msg "$RESULT"
@@ -65,12 +63,16 @@ case $1 in
     ;;
 
   stop)
-    rm -f /var/run/laptop-mode-tools/enabled
     if RESULT=`/usr/sbin/laptop_mode stop` ; then
       log_success_msg "$RESULT"
     else
       log_failure_msg "$RESULT"
     fi
+
+    # Clean-up any possibilities of a leftover
+    # From the initscript, we want a clean start
+    test -f /var/run/laptop-mode-tools/enabled && rm -f /var/run/laptop-mode-tools/enabled
+    test -f /var/run/laptop-mode-tools/state && rm -f /var/run/laptop-mode-tools/state
     ;;
 
   status)
