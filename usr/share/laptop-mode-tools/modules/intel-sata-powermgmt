@@ -51,7 +51,7 @@ if [ x$CONTROL_INTEL_SATA_POWER = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONT
 
         if [ x$CONTROL_AHCI_RUNTIME_PM = x1 ]; then 
                 # Enable Runtime PM for AHCI Class Ports
-                for port in /sys/bus/devices/*/ata*/power/control ; do
+                for port in /sys/bus/pci/devices/*/ata*/power/control ; do
                         if [ -f $port ]; then
                                 log "VERBOSE" "Setting AHCI Runtime PM value for $port to value: $RUNTIME_PM_AHCI"
                                 echo $RUNTIME_PM_AHCI > $port;
