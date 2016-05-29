@@ -34,10 +34,10 @@ if [ x$CONTROL_INTEL_SATA_POWER = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONT
 		else
 			SATA_POLICY="$NOLM_AC_SATA_POLICY"
 		fi
-                RUNTIME_PM_AHCI=0
+                RUNTIME_PM_AHCI="on"
 	else
 		SATA_POLICY="$BATT_SATA_POLICY"
-                RUNTIME_PM_AHCI=1
+                RUNTIME_PM_AHCI="auto"
 	fi
 
 	for POLICYFILE in /sys/class/scsi_host/*/link_power_management_policy ; do
