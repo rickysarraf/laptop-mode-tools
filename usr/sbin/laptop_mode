@@ -576,6 +576,9 @@ lmt_load_config ()
 			fi
 		done
 
+                # Post status, gracefully exit here
+                exit 0;
+
 	elif [ "$1" != "readconfig" -a "$1" != "defaults" ] ; then
 
 		#############################################################################
