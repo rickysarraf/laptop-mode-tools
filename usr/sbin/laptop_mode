@@ -476,7 +476,7 @@ lmt_load_config ()
 
                                         fi
 				else
-					log "VERBOSE" "Marking it as non-AC because there's battery in Discharging state"
+					log "VERBOSE" "Marking it as non-AC because there's battery $POWER_SUPPLY in Discharging state"
 					ON_AC=0
 					break
 				fi
