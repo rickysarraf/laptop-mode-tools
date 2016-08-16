@@ -455,15 +455,14 @@ lmt_load_config ()
 	export ON_AC=0
 	for POWER_SUPPLY in /sys/class/power_supply/* ; do
 		if [ -f $POWER_SUPPLY/type ] ; then
+			FOUND_SYS_CLASS_POWER_SUPPLY_AC=1
 			if [ "$(cat $POWER_SUPPLY/type)" = "Mains" ]; then
 				log "VERBOSE" "Determining power state from $POWER_SUPPLY/online."
-				FOUND_SYS_CLASS_POWER_SUPPLY_AC=1
 				if [ "$(cat $POWER_SUPPLY/online)" = 1 ]; then
 					ON_AC=1
 				fi
                         elif [ "$(cat $POWER_SUPPLY/type)" = "Battery" ]; then
 				log "VERBOSE" "Determining power state from status of battery $POWER_SUPPLY."
-				FOUND_SYS_CLASS_POWER_SUPPLY_AC=1
                                 #INFO: Because there are and will always be br0ken batteries
 				if [ "$(cat $POWER_SUPPLY/status)" != "Discharging" ]; then
 				        if [ "$(cat $POWER_SUPPLY/status)" != "Unknown" ]; then
