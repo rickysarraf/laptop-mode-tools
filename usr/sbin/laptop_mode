@@ -465,7 +465,7 @@ lmt_load_config ()
 				log "VERBOSE" "Determining power state from status of battery $POWER_SUPPLY."
                                 #INFO: Because there are and will always be br0ken batteries
 				if [ "$(cat $POWER_SUPPLY/status)" != "Discharging" ]; then
-				        if [ "$(cat $POWER_SUPPLY/status)" != "Unknown" ]; then
+				        if [ "$(cat $POWER_SUPPLY/status)" = "Unknown" ]; then
                                                 log "ERR" "You have a broken battery. Cannot determine actual state"
                                                 log "ERR" "Please report this to the linux-acpi developers"
                                                 log "ERR" "Not determining any state from this device: $POWER_SUPPLY"
