@@ -26,6 +26,10 @@ except ImportError:
     print("Using PySide")
 
 
+
+# This seems to be needed, atleast of Debian
+os.putenv('QT_X11_NO_MITSHM', "1")
+
 # constants
 COMMENT_IDENTIFIER = "#__COMMENT"
 CONTROL_IDENTIFIER = "CONTROL_"
