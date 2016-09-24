@@ -5,7 +5,7 @@ Maintainer: Ritesh Raj Sarraf <rrs@debian.org>
 Homepage: http://github.com/rickysarraf/laptop-mode-tools
 Uploaders: Bart Samwel <bart@samwel.tk>
 Build-Depends: debhelper (>= 5), dh-systemd
-Standards-Version: 3.9.4
+Standards-Version: 3.9.8
 
 Package: laptop-mode-tools
 Architecture: all
