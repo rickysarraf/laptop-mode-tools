@@ -1,3 +1,24 @@
+laptop-mode-tools (1.70-1) unstable; urgency=medium
+
+  * [22d254b] Prepare Laptop Mode Tools 1.70 release
+  * [e187118] Add AHCI Runtime PM support
+  * [0745723] Fix defaults for Intel P State Driver.
+    Thanks to George Caswell and Matthew Gabeler-Lee (Closes: #814578)
+  * [ad5a1af] Fix init script for same cleanups as systemd service
+  * [dafc4c9] Clean up state before/after execution.
+    Thanks to Tomas Janousek (Closes: #798777)
+  * [d8827ef] Make CPU Hotplugging more customized.
+    Thanks to cjones24
+  * [6e4e9ab] Don't act on remove event for USB devices
+  * [c59e637] Relax execution of full LMT modules (Closes: #752718)
+  * [09b9831] Try harder to determine power state.
+    Thanks to github/snugglej and github/0rkaM
+  * [f945073] Bump Standards Version to 3.9.8
+  * [93f5fde] Use dh_prep instead of dh_clean -k
+  * [b61bf1c] Bump debhelper compatibility to 9
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sat, 24 Sep 2016 19:45:20 +0530
+
 laptop-mode-tools (1.69.2-1) unstable; urgency=medium
 
   Minor Bug Fix Release
