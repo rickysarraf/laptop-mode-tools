@@ -1,3 +1,24 @@
+1.70 - Sat Sep 24 16:51:02 IST 2016
+    * Deal harder with broken battery states
+    * On machines with 2+ batteries, determine states from all batteries
+    * Limit status message logging frequency. Some machines tend to send
+      ACPI events too often. Thanks Maciej S. Szmigiero
+    * Try harder to determine power states. As reports have shown, the
+      power_supply subsystem has had incorrect state reporting on many machines,
+      for both, BAT and AC.
+    * Relax conditional events where Laptop Mode Tools should be executed. This
+      affected for use cases of Laptop being docked and undocked
+      Thanks Daniel Koch.
+    * CPU Hotplug settings extended
+    * Cleanup states for improved Laptop Mode Tools invocation
+      Thanks: Tomas Janousek
+    * Align Intel P State default to what the actual driver (intel_pstate.c) uses
+      Thanks: George Caswell and Matthew Gabeler-Lee
+    * Add support for AHCI Runtime PM in module intel-sata-powermgmt
+    * Many systemd and initscript fixes
+    * Relax default USB device list. This avoids the long standing issues with
+      USB devices (mice, keyboard) that mis-behaved during autosuspend
+
 1.69 - Mon Mar  7 17:44:42 IST 2016
     * Wait for all forked modules to complete
     * Add new module: cputhotplug
