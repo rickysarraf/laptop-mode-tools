@@ -7,7 +7,7 @@
 
 import sys
 from getpass import getuser
-from os import access, F_OK, geteuid, listdir, path
+from os import access, F_OK, geteuid, listdir, path, putenv
 from shutil import move
 from webbrowser import open_new_tab
 
@@ -28,7 +28,7 @@ except ImportError:
 
 
 # This seems to be needed, atleast of Debian
-os.putenv('QT_X11_NO_MITSHM', "1")
+putenv('QT_X11_NO_MITSHM', "1")
 
 # constants
 COMMENT_IDENTIFIER = "#__COMMENT"
