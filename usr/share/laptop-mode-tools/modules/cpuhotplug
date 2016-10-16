@@ -16,22 +16,55 @@ max_available_cpus() {
 	fi
 }
 
+# Get a list of cpus to control from a number of cpus that user wants to
+# disable.
+get_cpus_from_number() {
+	counter=0
+	cpu_list=
 
-get_numeric_val() {
+	for cpu in /sys/devices/system/cpu/cpu[0-9]* ; do
+		if [ $counter -le $1 ]; then
+			counter=$(expr $counter + 1)
+		else
+			break
+		fi
+
+		cpu_list="$cpu_list $cpu"
+	done
+}
+
+# Get a list of cpus from a list of cpu ids. Where each id is of the form
+# cpu<integer>.
+get_cpus_from_ids() {
+	cpu_list=
+
+	for cpu_id in $1 ; do
+		cpu_path="/sys/devices/system/cpu/$cpu_id"
+		if [ -d "$cpu_path" ] ; then
+			cpu_list="$cpu_list $cpu_path"
+		fi
+	done
+}
+
+# Get a list of cpus to control from DISABLE_AVAILABLE_CPU value.
+get_cpus_to_control() {
 	num_cpu=`max_available_cpus`
 
 	case "$1" in
 		"quarter")
-			disable_cpus=$(echo $num_cpu*1/4 | bc)
+			get_cpus_from_number $(echo $num_cpu*1/4 | bc)
 			;;
 		"half")
-			disable_cpus=$(echo $num_cpu*1/2 | bc)
+			get_cpus_from_number $(echo $num_cpu*1/2 | bc)
 			;;
 		"3quarter")
-			disable_cpus=$(echo $num_cpu*3/4 | bc)
+			get_cpus_from_number $(echo $num_cpu*3/4 | bc)
 			;;
 		[0-9]*)
-			disable_cpus=$1;
+			get_cpus_from_number $1
+			;;
+		cpu*)
+			get_cpus_from_ids "$1"
 			;;
 	esac
 }
@@ -55,16 +88,9 @@ if [ x$CONTROL_CPU_HOTPLUG = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_C
 		CPU_VAL=1
 	fi
 
-	counter=0;
-	get_numeric_val $DISABLE_AVAILABLE_CPU
+	get_cpus_to_control "$DISABLE_AVAILABLE_CPU"
 
-	for THISCPU in /sys/devices/system/cpu/cpu[0-9]* ; do
-		if [ $counter -le $disable_cpus ]; then
-			counter=$(expr $counter + 1)
-		else
-			break
-		fi
-
+	for THISCPU in $cpu_list ; do
 		if [ -e "$THISCPU/online" ]; then
 			log "VERBOSE" "Bringing CPU $THISCPU to $ECHO_VAL"
 			echo $CPU_VAL > $THISCPU/online
