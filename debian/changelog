@@ -1,3 +1,9 @@
+laptop-mode-tools (1.70-2) unstable; urgency=medium
+
+  * [873f6a4] Add patch to fix import error
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sun, 16 Oct 2016 15:18:59 +0530
+
 laptop-mode-tools (1.70-1) unstable; urgency=medium
 
   * [22d254b] Prepare Laptop Mode Tools 1.70 release
