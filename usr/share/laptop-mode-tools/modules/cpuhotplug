@@ -6,34 +6,34 @@
 
 # Determine number cpu cores on machine
 max_available_cpus() {
-    CPU=/sys/devices/system/cpu/present
-    if [ -f $CPU ]; then
-        max_cpu=$(cat $CPU | cut -d '-' -f2)
-        max_cpu=$(expr $max_cpu + 1)
-        echo $max_cpu
-    else
-        echo -1
-    fi
+	CPU=/sys/devices/system/cpu/present
+	if [ -f $CPU ]; then
+		max_cpu=$(cat $CPU | cut -d '-' -f2)
+		max_cpu=$(expr $max_cpu + 1)
+		echo $max_cpu
+	else
+		echo -1
+	fi
 }
 
 
 get_numeric_val() {
-    num_cpu=`max_available_cpus`
+	num_cpu=`max_available_cpus`
 
-    case "$1" in
-        "quarter")
-            disable_cpus=$(echo $num_cpu*1/4 | bc)
-            ;;
-        "half")
-            disable_cpus=$(echo $num_cpu*1/2 | bc)
-            ;;
-        "3quarter")
-            disable_cpus=$(echo $num_cpu*3/4 | bc)
-            ;;
-        [0-9]*)
-            disable_cpus=$1;
-            ;;
-    esac
+	case "$1" in
+		"quarter")
+			disable_cpus=$(echo $num_cpu*1/4 | bc)
+			;;
+		"half")
+			disable_cpus=$(echo $num_cpu*1/2 | bc)
+			;;
+		"3quarter")
+			disable_cpus=$(echo $num_cpu*3/4 | bc)
+			;;
+		[0-9]*)
+			disable_cpus=$1;
+			;;
+	esac
 }
 
 
@@ -55,15 +55,15 @@ if [ x$CONTROL_CPU_HOTPLUG = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_C
 		CPU_VAL=1
 	fi
 
-        counter=0;
-        get_numeric_val $DISABLE_AVAILABLE_CPU
+	counter=0;
+	get_numeric_val $DISABLE_AVAILABLE_CPU
 
 	for THISCPU in /sys/devices/system/cpu/cpu[0-9]* ; do
-                if [ $counter -le $disable_cpus ]; then
-                        counter=$(expr $counter + 1)
-                else
-                        break
-                fi
+		if [ $counter -le $disable_cpus ]; then
+			counter=$(expr $counter + 1)
+		else
+			break
+		fi
 
 		if [ -e "$THISCPU/online" ]; then
 			log "VERBOSE" "Bringing CPU $THISCPU to $ECHO_VAL"
