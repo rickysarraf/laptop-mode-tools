@@ -1,0 +1,34 @@
+From 976be20c0f5bc8078952c0a9a0661c8fb936f994 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Aur=C3=A9lien=20COUDERC?= <zecoucou@free.fr>
+Date: Mon, 26 Sep 2016 00:35:36 +0200
+Subject: [PATCH] Fix incorrect import of os.putenv
+
+---
+ gui/LMT.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/gui/LMT.py b/gui/LMT.py
+index 1654d47..02ec528 100644
+--- a/gui/LMT.py
++++ b/gui/LMT.py
+@@ -7,7 +7,7 @@
+ 
+ import sys
+ from getpass import getuser
+-from os import access, F_OK, geteuid, listdir, path
++from os import access, F_OK, geteuid, listdir, path, putenv
+ from shutil import move
+ from webbrowser import open_new_tab
+ 
+@@ -28,7 +28,7 @@ except ImportError:
+ 
+ 
+ # This seems to be needed, atleast of Debian
+-os.putenv('QT_X11_NO_MITSHM', "1")
++putenv('QT_X11_NO_MITSHM', "1")
+ 
+ # constants
+ COMMENT_IDENTIFIER = "#__COMMENT"
+-- 
+2.9.3
+
