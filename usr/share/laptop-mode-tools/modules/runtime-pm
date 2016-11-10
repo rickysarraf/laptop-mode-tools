@@ -7,15 +7,30 @@
 listed_by_id() {
 	device=$1
 	list=$2
+
+	if ! idvendor=$(cat $device/idVendor 2>/dev/null) || \
+	   ! idproduct=$(cat $device/idProduct 2>/dev/null); then
+		return 1
+	fi
+
 	for devid in $list; do
-		if ! echo $devid | grep -q ':'; then
-			log "MSG" "WARNING: Invalid entry \"$devid\" in \"$2\"."
-		fi
-		vendor=$(echo $devid | cut -d: -f1)
-		product=$(echo $devid | cut -d: -f2)
-		grep -qi $vendor $device/idVendor 2>/dev/null\
-		 && grep -qi $product $device/idProduct 2>/dev/null\
-		 && return 0
+	    case $devid in
+		    *:*) ;;
+		    *) continue;;
+		esac
+
+		vendor=${devid%:*}
+		product=${devid#*:}
+
+		case $idvendor in
+		    ${vendor})
+			case $idproduct in
+			    ${product})	return 0;;
+			    *) ;;
+			esac
+			;;
+		    *);;
+		esac
 	done
 	return 1
 }
