@@ -453,6 +453,7 @@ lmt_load_config ()
 	# First try /sys/class/power_supply/*
 	FOUND_SYS_CLASS_POWER_SUPPLY_AC=0
 	export ON_AC=0
+	BATTERY_NOT_DISCHARGING=0
 	for POWER_SUPPLY in /sys/class/power_supply/* ; do
 		if [ -f $POWER_SUPPLY/type ] ; then
 			FOUND_SYS_CLASS_POWER_SUPPLY_AC=1
@@ -471,9 +472,7 @@ lmt_load_config ()
                                                 log "ERR" "Please report this to the linux-acpi developers"
                                                 log "ERR" "Not determining any state from this device: $POWER_SUPPLY"
                                         else
-                                                log "VERBOSE" "Marking it as online ON_AC becasue there are no more states to care for"
-					        ON_AC=1
-
+						BATTERY_NOT_DISCHARGING=1
                                         fi
 				else
 					log "VERBOSE" "Marking it as non-AC because there's battery $POWER_SUPPLY in Discharging state"
@@ -483,6 +482,11 @@ lmt_load_config ()
 			fi
 		fi
 	done
+
+	if [ $FOUND_SYS_CLASS_POWER_SUPPLY_AC != 1 ] && [ $BATTERY_NOT_DISCHARGING = 1 ]; then
+		log "VERBOSE" "Marking it as online ON_AC because we found no AC and the battery is not discharging"
+		ON_AC=1
+	fi
 
 	if [ $FOUND_SYS_CLASS_POWER_SUPPLY_AC = 1 ] ; then
 		# Already found it!
