@@ -21,10 +21,7 @@ findWifiIfs () {
 
 		# Check if it is a wireless device
 		#
-		# Inverting return values, we get "0" for wireless device,
-		# and "1" for non-wireless device.
-		($IWCONFIG $IFNAME 2>&1 | grep -q "no wireless extensions.") && ret=1 || ret=0
-		if [ "$ret" = "0" ]; then
+		if isWifiIf $IFNAME; then
 			# Yes, it is a wireless device.
 			if [ -h $SYSDEVICE/device/driver ]; then
 				# Read the driver name
@@ -48,6 +45,32 @@ findWifiIfs () {
 	done
 }
 
+isWifiIf() {
+	local IF=$1
+
+	if [ -n "$IW" ]; then
+		$IW dev $IF info > /dev/null 2>&1
+		ret=$?
+	else
+		# Inverting return values, we get "0" for wireless device,
+		# and "1" for non-wireless device.
+		($IWCONFIG $IF 2>&1 | grep -q "no wireless extensions.") && ret=1 || ret=0
+	fi
+
+	return $ret
+}
+
+setPowerSave() {
+	local IF=$1
+	local ONOFF=$2
+
+	if [ -n "$IW" ]; then
+		$IW dev $IF set power_save $ONOFF
+	else
+		$IWCONFIG $IF power $ONOFF
+	fi
+}
+
 if [ x$CONTROL_WIRELESS_POWER_SAVING = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_WIRELESS_POWER_SAVING = xauto ]; then
 	log "VERBOSE" "Setting power saving for generic wireless interfaces."
 
@@ -56,13 +79,20 @@ if [ x$CONTROL_WIRELESS_POWER_SAVING = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x
 	[ "$WIRELESS_BATT_POWER_SAVING" ] || WIRELESS_BATT_POWER_SAVING=1
 
 	# Find executables
-	if [ -x /sbin/iwconfig ] ; then
-		IWCONFIG=/sbin/iwconfig
-	elif [ -x /usr/sbin/iwconfig ] ; then
-		IWCONFIG=/usr/sbin/iwconfig
+	if [ -x /sbin/iw ] ; then
+		IW=/sbin/iw
+	elif [ -x /usr/sbin/iw ] ; then
+		IW=/usr/sbin/iw
 	else
-		log "VERBOSE" "iwconfig is not installed"
-		IWCONFIG=/bin/false
+		log "VERBOSE" "iw is not installed"
+		if [ -x /sbin/iwconfig ] ; then
+			IWCONFIG=/sbin/iwconfig
+		elif [ -x /usr/sbin/iwconfig ] ; then
+			IWCONFIG=/usr/sbin/iwconfig
+		else
+			log "VERBOSE" "iwconfig is not installed"
+			IW=/bin/false
+		fi
 	fi
 
 	# Translate 1 => on, 0 => off
@@ -76,12 +106,12 @@ if [ x$CONTROL_WIRELESS_POWER_SAVING = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x
 	for IF in $WIFI_IFNAMES ; do
 		if [ $ON_AC -eq 1 ] ; then
 			log "VERBOSE" "On AC power: setting power saving mode for $IF to $WIRELESS_AC_POWER_SAVING_ONOFF."
-			if ( ! $IWCONFIG $IF power $WIRELESS_AC_POWER_SAVING_ONOFF ) ; then
+			if ( ! setPowerSave $IF $WIRELESS_AC_POWER_SAVING_ONOFF ) ; then
 				log "ERR" "Failed to re-set power saving mode for wireless card"
 			fi
 		else
 			log "VERBOSE" "On battery: setting power saving mode for $IF to $WIRELESS_BATT_POWER_SAVING_ONOFF."
-			if ( ! $IWCONFIG $IF power $WIRELESS_BATT_POWER_SAVING_ONOFF ) ; then
+			if ( ! setPowerSave $IF $WIRELESS_BATT_POWER_SAVING_ONOFF ) ; then
 				log "ERR" "Failed to set power saving mode for wireless card"
 			fi
 		fi
