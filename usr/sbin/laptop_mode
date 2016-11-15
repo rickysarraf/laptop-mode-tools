@@ -472,6 +472,7 @@ lmt_load_config ()
                                                 log "ERR" "Please report this to the linux-acpi developers"
                                                 log "ERR" "Not determining any state from this device: $POWER_SUPPLY"
                                         else
+                                                log "VERBOSE" "In Battery state, but battery does not report discharge"
 						BATTERY_NOT_DISCHARGING=1
                                         fi
 				else
