@@ -792,19 +792,19 @@ lmt_main_function ()
 						fi
 						log "VERBOSE" "Remaining charge: $REMAINING"
 
-						if [ -f $BATT/charge_full_design ] ; then
-							CAPACITY=$(cat $BATT/charge_full_design)
-						elif [ -f $BATT/energy_full_design ] ; then
-							CAPACITY=$(cat $BATT/energy_full_design)
+						if [ -f $BATT/charge_full ] ; then
+							CAPACITY=$(cat $BATT/charge_full)
+						elif [ -f $BATT/energy_full ] ; then
+							CAPACITY=$(cat $BATT/energy_full)
 						else
 							CAPACITY=0
 						fi
 						if [ -z "$CAPACITY" -o "$CAPACITY" -eq 0 ] ; then
-							log "VERBOSE" "Battery does not report design full charge, using non-design full charge."
-							if [ -f $BATT/charge_full ] ; then
-								CAPACITY=$(cat $BATT/charge_full)
+							log "VERBOSE" "Battery does not report a recent full charge, using original design value instead."
+							if [ -f $BATT/charge_full_design ] ; then
+								CAPACITY=$(cat $BATT/charge_full_design)
 							elif [ -f $BATT/energy_full_design ] ; then
-								CAPACITY=$(cat $BATT/energy_full)
+								CAPACITY=$(cat $BATT/energy_full_design)
 							else
 								CAPACITY=0
 							fi
