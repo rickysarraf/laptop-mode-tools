@@ -1,0 +1,35 @@
+#! /bin/sh
+#
+# Laptop mode tools module: control Keyboard Backlight
+#
+
+# Control Keyboard Backlight
+if [ x$CONTROL_KBDLIGHT = x1 ] ; then
+	if [ $ON_AC -eq 1 ]; then
+		if [ "$ACTIVATE" -eq 1 ]; then
+			BRIGHTNESS_COMMAND="$LM_AC_KBDLIGHT_COMMAND"
+		else
+			BRIGHTNESS_COMMAND="$NOLM_AC_KBDLIGHT_COMMAND"
+		fi
+	else
+		BRIGHTNESS_COMMAND="$BATT_KBDLIGHT_COMMAND"
+	fi
+	if [ -f /var/run/laptop-mode-tools/state-kbdlight-command ] ; then
+		OLD_BRIGHTNESS_COMMAND="$( cat /var/run/laptop-mode-tools/state-kbdlight-command )"
+	fi
+
+	if [ "$FORCE" -ne 0 -o "$BRIGHTNESS_COMMAND" != "$OLD_BRIGHTNESS_COMMAND" ] ; then
+		log "VERBOSE" "Set Keyboard Backlight using command $BRIGHTNESS_COMMAND \> $KBD_BRIGHTNESS_OUTPUT."
+		if ( $BRIGHTNESS_COMMAND > $KBD_BRIGHTNESS_OUTPUT ) ; then
+			log "VERBOSE" "Command succeeded."
+		else
+			log "ERR" "The configured Keyboard Backlight command of the kbd-backlight module failed."
+			log "ERR" "Please check your configuration in /etc/laptop-mode/conf.d/kbd-backlight.conf."
+			log "ERR" "Command failed."
+		fi
+		echo -n $BRIGHTNESS_COMMAND > /var/run/laptop-mode-tools/state-kbdlight-command
+	else
+		log "VERBOSE" "Not setting Keyboard Backlight -- command was the same as last time."
+	fi
+fi
+

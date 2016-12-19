@@ -453,6 +453,30 @@ using a utility like "toshset", you should include the entire toshset
 command line as the command, and set the output file to "/dev/null".
 
 
+.SS "\fI/etc/laptop-mode/conf.d/kbd-backlight.conf\fP"
+
+The kbd-backlight module allows you to control the brightness of your LCD
+screen.
+
+.IP "\fBCONTROL_KBDLIGHT\fP" 10
+When this option is enabled, laptop mode will adjust your keyboard backlight
+brightness settings, if possible. You must configure the following settings
+for this to work.
+
+.IP "\fBBATT_KBDLIGHT_COMMAND\fP" 10
+.IP "\fBLM_AC_KBDLIGHT_COMMAND\fP" 10
+.IP "\fBNOLM_AC_KBDLIGHT_COMMAND\fP" 10
+.IP "\fBKBD_BRIGHTNESS_OUTPUT\fP" 10
+The \fBKBDLIGHT_COMMAND\fP settings specify commands that should be executed
+in order to set the brightness of your keyboard backlight.
+The \fBKBD_BRIGHTNESS_OUTPUT\fP setting specifies where the output of the 
+command will be written. For instance, if your keyboard's backlight brightness 
+is adjusted  by writing a numeric value 3 to a file called \fI/proc/brightness\fP, 
+you should set the command to "echo 3" and the output file to "/proc/brightness". 
+If your LCD's brightness is adjusted using a utility like "toshset", you should 
+include the entire toshset command line as the command, and set the output file 
+to "/dev/null".
+
 
 
 .SS "\fI/etc/laptop-mode/conf.d/auto-hibernate.conf\fP"
