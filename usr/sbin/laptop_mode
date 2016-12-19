@@ -658,101 +658,8 @@ lmt_load_config ()
 	fi
 }
 
-
-# The main workhorse.
-lmt_main_function ()
+checkBattery ()
 {
-
-	mkdir -p /var/run/laptop-mode-tools
-
-	# Used to display laptop mode state later on. This is the enabled/disabled
-	# state for laptop mode processing, it tells us nothing about whether laptop
-	# mode is actually _active_.
-	STATE=disabled
-	if [ x$ENABLE_LAPTOP_MODE_TOOLS = x1 ]; then
-		touch /var/run/laptop-mode-tools/enabled
-		STATE=enabled
-	fi
-
-	if [ "$ENABLE_LAPTOP_MODE_ON_BATTERY" -eq 0 -a "$ENABLE_LAPTOP_MODE_ON_AC" -eq 0 -a "$ENABLE_LAPTOP_MODE_WHEN_LID_CLOSED" -eq 0 ] ; then
-		STATE=disabled
-	fi
-
-
-	# Determine whether to activate or deactivate laptop mode.
-	ACTIVATE=0
-
-	if [ "$ON_AC" -eq 1 ] ; then
-		if [ "$ENABLE_LAPTOP_MODE_ON_AC" -ne 0 ] ; then
-			log "VERBOSE" "On AC power: Activating, because ENABLE_LAPTOP_MODE_ON_AC is set."
-			ACTIVATE=1
-		else
-			log "VERBOSE" "On AC power: Deactivating, because ENABLE_LAPTOP_MODE_ON_AC is not set."
-			ACTIVATE=0
-		fi
-	else
-		if [ "$ENABLE_LAPTOP_MODE_ON_BATTERY" -ne 0 ] ; then
-			log "VERBOSE" "On battery power: Activating, because ENABLE_LAPTOP_MODE_ON_BATTERY is set."
-			ACTIVATE=1
-		else
-			log "VERBOSE" "On battery power: Deactivating, because ENABLE_LAPTOP_MODE_ON_BATTERY is not set."
-			ACTIVATE=0
-		fi
-	fi
-
-	if [ "$ENABLE_LAPTOP_MODE_WHEN_LID_CLOSED" -ne 0 -a "$ACTIVATE" -eq 0 ] ; then
-		if [ -f /proc/acpi/button/lid/*/state ] ; then
-			if ( grep -q "closed" /proc/acpi/button/lid/*/state ) ; then
-				log "VERBOSE" 'Setting action to "start" because the lid is closed (says /proc/acpi/button/lid/*/state).'
-				ACTIVATE=1
-			fi
-		elif ( which hal-find-by-property >/dev/null ) ; then
-			HAL_LID_BUTTON=$($HAL_FIND_BY_PROPERTY --key "button.type" --string "lid")
-			if [ "$HAL_LID_BUTTON" != "" ] ; then
-				HAL_LID_BUTTON_STATE=$(hal-get-property --udi $(hal-find-by-property --key "button.type" --string "lid") --key "button.state.value")
-				if [ "$HAL_LID_BUTTON_STATE" = "true" ] ; then
-					log "VERBOSE" "Setting action to \"start\" because the lid is closed (says HAL)."
-					ACTIVATE=1
-				fi
-			fi
-		else
-			log "MSG" "Warning: ENABLE_LAPTOP_MODE_WHEN_LID_CLOSED is set, but there is no file"
-			log "MSG" "/proc/acpi/button/lid/.../state, and hal information is not available either!"
-		fi
-	fi
-
-	# If the init script has not been run or has been run with the "stop"
-	# argument, then we should never start laptop mode.
-	if [ ! -f /var/run/laptop-mode-tools/enabled -o x$INITSCRIPT_STOP = x1 ] ; then
-		log "VERBOSE" "Laptop mode disabled because /var/run/laptop-mode-tools/enabled is missing."
-		STATE=disabled
-	fi
-
-	if [ "$ACTIVATE" -eq 1 ]; then
-		if [ x$ENABLE_LAPTOP_MODE_TOOLS = x0 ]; then
-			log "VERBOSE" "Not starting laptop mode because it is disabled in /etc/laptop-mode/laptop-mode.conf"
-			STATE=disabled
-		fi
-	fi
-
-	if [ "$STATE" = "disabled" ] ; then
-		ACTIVATE=0
-	fi
-
-	# Check whether we are allowed to activate the data-loss-sensitive stuff.
-	# If the battery charge is too low, we want to disable this, but not the
-	# other power-saving stuff.
-
-	if [ "$ACTIVATE" -eq 0 ] ; then
-		ACTIVATE_WITH_POSSIBLE_DATA_LOSS=0
-	elif [ "$ON_AC" = 1 ] ; then
-		log "VERBOSE" "On AC, not checking minimum battery charge."
-		ACTIVATE_WITH_POSSIBLE_DATA_LOSS=1
-	else
-		ACTIVATE_WITH_POSSIBLE_DATA_LOSS=1
-		ENOUGH_CHARGE=0
-		ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=0
-
 		# Weird way of checking that /sys/class/power_supply is not empty -- but it works.
 		if [ "$(echo /sys/class/power_supply/*)" != '/sys/class/power_supply/*' ] ; then
 			log "VERBOSE" "Not on AC and we have battery information in /sys/class/power_supply/BAT* -- checking minimum battery charge."
@@ -1039,18 +946,125 @@ lmt_main_function ()
 			ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=1
 			log "VERBOSE" "Not on AC and could not check battery state -- data loss sensitive features stay enabled and auto-hibernation will not work."
 		fi
+}
+
+# The main workhorse.
+lmt_main_function ()
+{
+
+	mkdir -p /var/run/laptop-mode-tools
+
+	# Used to display laptop mode state later on. This is the enabled/disabled
+	# state for laptop mode processing, it tells us nothing about whether laptop
+	# mode is actually _active_.
+	STATE=disabled
+	if [ x$ENABLE_LAPTOP_MODE_TOOLS = x1 ]; then
+		touch /var/run/laptop-mode-tools/enabled
+		STATE=enabled
+	fi
+
+	if [ "$ENABLE_LAPTOP_MODE_ON_BATTERY" -eq 0 -a "$ENABLE_LAPTOP_MODE_ON_AC" -eq 0 -a "$ENABLE_LAPTOP_MODE_WHEN_LID_CLOSED" -eq 0 ] ; then
+		STATE=disabled
+	fi
+
+
+	# Determine whether to activate or deactivate laptop mode.
+	ACTIVATE=0
+
+	if [ "$ON_AC" -eq 1 ] ; then
+		if [ "$ENABLE_LAPTOP_MODE_ON_AC" -ne 0 ] ; then
+			log "VERBOSE" "On AC power: Activating, because ENABLE_LAPTOP_MODE_ON_AC is set."
+			ACTIVATE=1
+		else
+			log "VERBOSE" "On AC power: Deactivating, because ENABLE_LAPTOP_MODE_ON_AC is not set."
+			ACTIVATE=0
+		fi
+	else
+		if [ "$ENABLE_LAPTOP_MODE_ON_BATTERY" -ne 0 ] ; then
+			log "VERBOSE" "On battery power: Activating, because ENABLE_LAPTOP_MODE_ON_BATTERY is set."
+			ACTIVATE=1
+		else
+			log "VERBOSE" "On battery power: Deactivating, because ENABLE_LAPTOP_MODE_ON_BATTERY is not set."
+			ACTIVATE=0
+		fi
+	fi
+
+	if [ "$ENABLE_LAPTOP_MODE_WHEN_LID_CLOSED" -ne 0 -a "$ACTIVATE" -eq 0 ] ; then
+		if [ -f /proc/acpi/button/lid/*/state ] ; then
+			if ( grep -q "closed" /proc/acpi/button/lid/*/state ) ; then
+				log "VERBOSE" 'Setting action to "start" because the lid is closed (says /proc/acpi/button/lid/*/state).'
+				ACTIVATE=1
+			fi
+		elif ( which hal-find-by-property >/dev/null ) ; then
+			HAL_LID_BUTTON=$($HAL_FIND_BY_PROPERTY --key "button.type" --string "lid")
+			if [ "$HAL_LID_BUTTON" != "" ] ; then
+				HAL_LID_BUTTON_STATE=$(hal-get-property --udi $(hal-find-by-property --key "button.type" --string "lid") --key "button.state.value")
+				if [ "$HAL_LID_BUTTON_STATE" = "true" ] ; then
+					log "VERBOSE" "Setting action to \"start\" because the lid is closed (says HAL)."
+					ACTIVATE=1
+				fi
+			fi
+		else
+			log "MSG" "Warning: ENABLE_LAPTOP_MODE_WHEN_LID_CLOSED is set, but there is no file"
+			log "MSG" "/proc/acpi/button/lid/.../state, and hal information is not available either!"
+		fi
+	fi
+
+	# If the init script has not been run or has been run with the "stop"
+	# argument, then we should never start laptop mode.
+	if [ ! -f /var/run/laptop-mode-tools/enabled -o x$INITSCRIPT_STOP = x1 ] ; then
+		log "VERBOSE" "Laptop mode disabled because /var/run/laptop-mode-tools/enabled is missing."
+		STATE=disabled
+	fi
+
+	if [ "$ACTIVATE" -eq 1 ]; then
+		if [ x$ENABLE_LAPTOP_MODE_TOOLS = x0 ]; then
+			log "VERBOSE" "Not starting laptop mode because it is disabled in /etc/laptop-mode/laptop-mode.conf"
+			STATE=disabled
+		fi
+	fi
+
+	if [ "$STATE" = "disabled" ] ; then
+		ACTIVATE=0
+	fi
+
+	# Check whether we are allowed to activate the data-loss-sensitive stuff.
+	# If the battery charge is too low, we want to disable this, but not the
+	# other power-saving stuff.
+
+	if [ "$ACTIVATE" -eq 0 ] ; then
+		ACTIVATE_WITH_POSSIBLE_DATA_LOSS=0
+	elif [ "$ON_AC" = 1 ] ; then
+		log "VERBOSE" "On AC, not checking minimum battery charge."
+		ACTIVATE_WITH_POSSIBLE_DATA_LOSS=1
+	else
+		ACTIVATE_WITH_POSSIBLE_DATA_LOSS=1
+		ENOUGH_CHARGE=0
+		ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=0
+
+		log "VERBOSE" "Calling checkBattery now"
+		checkBattery;
+
 		if [ "$ENABLE_AUTO_HIBERNATION" -ne 0 -a "$ENOUGH_CHARGE_TO_PREVENT_HIBERNATION" -eq 0 ] ; then
 			log "VERBOSE" "None of the batteries have a charge above the auto-hibernation level."
-			log "VERBOSE" "Starting hibernation."
-			if [ -x $HIBERNATE_COMMAND ]; then
-				$HIBERNATE_COMMAND
-			elif [ -f /sys/power/state ]; then
-				grep -q disk /sys/power/state && echo disk > /sys/power/state
-			fi
+			log "VERBOSE" "Let's sleep for 3 seconds before we hibernate: Broken Batteries"
+			sleep 3;
 
-			# Don't continue -- if things are configured correctly, then we
-			# will be called on resume.
-			exit 0
+			log "VERBOSE" "Now checkBattery again"
+			checkBattery;
+
+			if [ "$ENOUGH_CHARGE_TO_PREVENT_HIBERNATION" -eq 0 ] ; then
+				log "VERBOSE" "Starting hibernation."
+				if [ -x $HIBERNATE_COMMAND ]; then
+					$HIBERNATE_COMMAND
+				elif [ -f /sys/power/state ]; then
+					grep -q disk /sys/power/state && echo disk > /sys/power/state
+				fi
+
+				# Don't continue -- if things are configured correctly, then we
+				# will be called on resume.
+				exit 0
+			fi
 		fi
 		if [ "$ENOUGH_CHARGE" -eq 0 ] ; then
 			log "VERBOSE" "None of the batteries have a charge above the minimum level."
