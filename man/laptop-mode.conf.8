@@ -479,6 +479,20 @@ to "/dev/null".
 
 
 
+.IP "\fBCONTROL_VGASWITCHEROO\fP" 10
+When this option is enabled, laptop mode will use the vgaswitcheroo inteface
+to disable the unused hybrid graphics card.
+For this module to work, you need to ensure you have debugfs enabled/mounted
+
+.IP "\fBBATT_ENABLE_VGASWITCHEROO\fP" 10
+.IP "\fBLM_AC_ENABLE_VGASWITCHEROO\fP" 10
+.IP "\fBNOLM_AC_ENABLE_VGASWITCHEROO\fP" 10
+.IP "\fBVGASWITCHEROO_FILE\fP" 10
+The above settings specify under what modes should vgaswitcheroo interface be
+used to enable/disable hybrid graphics.
+The \fBVGASWITCHEROO_FILE\fP setting specifies the vgaswitcheroo interface
+to talk to the Linux kernel for hybrid graphics power savings
+
 .SS "\fI/etc/laptop-mode/conf.d/auto-hibernate.conf\fP"
 
 The auto-hibernate module allows you to automatically hibernate your computer
