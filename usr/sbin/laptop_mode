@@ -660,202 +660,73 @@ lmt_load_config ()
 
 checkBattery ()
 {
-		# Weird way of checking that /sys/class/power_supply is not empty -- but it works.
-		if [ "$(echo /sys/class/power_supply/*)" != '/sys/class/power_supply/*' ] ; then
-			log "VERBOSE" "Not on AC and we have battery information in /sys/class/power_supply/BAT* -- checking minimum battery charge."
-			for BATT in /sys/class/power_supply/* ; do
-				BATT_TYPE=$(cat $BATT/type)
-				log "VERBOSE" "$BATT is of type $BATT_TYPE."
-				if [ "$BATT_TYPE" != "Battery" ] ; then
-					log "VERBOSE" "Not of type \"Battery\", skipping."
-				else
-					PREV_ENOUGH_CHARGE=$ENOUGH_CHARGE
-					PREV_ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=$ENOUGH_CHARGE_TO_PREVENT_HIBERNATION
-
-					log "VERBOSE" "Checking levels for $BATT."
-					PRESENT=$(cat $BATT/present)
-					log "VERBOSE" "Present: $PRESENT."
-
-					# Only do if the battery is present
-					if [ "$PRESENT" -eq 1 ] ; then
-						FOUND_AN_ENABLED_CHECK=0
-						FOUND_AN_ENABLED_HIBERNATION_CHECK=0
-
-						# Get the remaining capacity.
-						IN_UAH=0
-						IN_UWH=0
-						if [ -f $BATT/charge_now ] ; then
-							REMAINING=$(cat $BATT/charge_now)
-							IN_UAH=1 # charge_* is in microAmpere-hours
-						elif [ -f $BATT/energy_now ] ; then
-							REMAINING=$(cat $BATT/energy_now)
-							IN_UWH=1 # energy_* is in microWatt-hours
-						else
-							REMAINING=0
-						fi
-						if [ -z "$REMAINING" -o "$REMAINING" -eq 0 ] ; then
-							log "VERBOSE" "Battery does not report remaining charge. Perhaps it is not present?"
-							REMAINING=0
-						fi
-						log "VERBOSE" "Remaining charge: $REMAINING"
-
-						if [ -f $BATT/charge_full_design ] ; then
-							CAPACITY=$(cat $BATT/charge_full_design)
-						elif [ -f $BATT/energy_full_design ] ; then
-							CAPACITY=$(cat $BATT/energy_full_design)
-						else
-							CAPACITY=0
-						fi
-						if [ -z "$CAPACITY" -o "$CAPACITY" -eq 0 ] ; then
-							log "VERBOSE" "Battery does not report design full charge, using non-design full charge."
-							if [ -f $BATT/charge_full ] ; then
-								CAPACITY=$(cat $BATT/charge_full)
-							elif [ -f $BATT/energy_full_design ] ; then
-								CAPACITY=$(cat $BATT/energy_full)
-							else
-								CAPACITY=0
-							fi
-							if [ -z "$CAPACITY" -o "$CAPACITY" -eq 0 ] ; then
-								log "VERBOSE" "Battery does not report non-design full charge."
-								CAPACITY=0
-							fi
-						fi
-						log "VERBOSE" "Full capacity: $CAPACITY"
-
-						# Check the charge percentage
-						if [ "$MINIMUM_BATTERY_CHARGE_PERCENT" -ne 0 ] ; then
-							FOUND_AN_ENABLED_CHECK=1
-							if [ "$CAPACITY" -eq 0 ] ; then
-								log "MSG" "WARNING: Battery does not report a capacity. Minimum battery"
-								log "MSG" "charge checking does not work without a design capacity."
-								ENOUGH_CHARGE=1
-							elif [ "$(($REMAINING * 100 / $CAPACITY))" -ge "$MINIMUM_BATTERY_CHARGE_PERCENT" ] ; then
-								ENOUGH_CHARGE=1
-							fi
-						fi
-						if [ "$AUTO_HIBERNATION_BATTERY_CHARGE_PERCENT" -ne 0 ] ; then
-							FOUND_AN_ENABLED_HIBERNATION_CHECK=1
-							if [ "$CAPACITY" -eq 0 ] ; then
-								log "MSG" "WARNING: Battery does not report a design capacity. Auto hibernation"
-								log "MSG" "does not work without a design capacity."
-								ENOUGH_CHARGE=1
-							elif [ "$(($REMAINING * 100 / $CAPACITY))" -ge "$AUTO_HIBERNATION_BATTERY_CHARGE_PERCENT" ] ; then
-								ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=1
-							fi
-						fi
-
-						if [ -f $BATT/alarm ]; then
-							# $BATT/alarm is the design_capacity_warning of a battery.
-							ALARM_LEVEL=$(cat $BATT/alarm)
-						elif [ -f $BATT/energy_full ]; then
-							# On Arm, it has been reported that there's no design_capacity_warning.
-							# The design_capacity_warning is 5% of the energy_full value
-							ENERGY_FULL=$(cat $BATT/energy_full)
-							ALARM_LEVEL=$(expr $ENERGY_FULL \* 5 / 100)
-						else
-							# If nothing is available, we don't want to touch hibernation.
-							# We'll rather report it
-							log "ERR" "You seem to have a broken battery"
-							log "ERR" "Cannot determine design_capacity_warning"
-							log "ERR" "Disabling hibernation"
-							ENOUGH_CHARGE=1
-						fi
-
-						if [ "$ALARM_LEVEL" -ne 0 ] && [ "$DISABLE_BATTERY_ALARM_CHECK" -ne 1 ]; then
-							if [ "$REMAINING" -le "$ALARM_LEVEL" ] ; then
-								# Restore the state we had before checking this battery, so that
-								# this battery does not count as having enough charge.
-								ENOUGH_CHARGE=$PREV_ENOUGH_CHARGE
-							elif [ "$FOUND_AN_ENABLED_CHECK" -eq 0 ] ; then
-								# This is the only check that is enabled. In that case a non-critical
-								# battery level counts as "enough". (If we would count non-critical
-								# battery levels as enough *always*, then the other settings would
-								# have no effect; this is only a final fallback.)
-								ENOUGH_CHARGE=1
-							fi
-						fi
-						if [ "$AUTO_HIBERNATION_ON_CRITICAL_BATTERY_LEVEL" -ne 0 ] ; then
-							if [ "$REMAINING" -le "$ALARM_LEVEL" ] ; then
-								ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=$PREV_ENOUGH_CHARGE_TO_PREVENT_HIBERNATION
-							elif [ "$FOUND_AN_ENABLED_HIBERNATION_CHECK" -eq 0 ] ; then
-								ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=1
-							fi
-						fi
-
-						#
-						# Fallback: hard values
-						#
-						if [ "$IN_UAH" -ne 0 ] ; then
-							if [ "$MINIMUM_BATTERY_CHARGE_MAH" -ne 0 ] ; then
-								FOUND_AN_ENABLED_CHECK=1
-								if [ "$REMAINING" -ge $((1000*"$MINIMUM_BATTERY_CHARGE_MAH")) ] ; then
-									ENOUGH_CHARGE=1
-								fi
-							fi
-							if [ "$AUTO_HIBERNATION_BATTERY_CHARGE_MAH" -ne 0 ] ; then
-								FOUND_AN_ENABLED_HIBERNATION_CHECK=1
-								if [ "$REMAINING" -ge $((1000*"$AUTO_HIBERNATION_BATTERY_CHARGE_MAH")) ] ; then
-									ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=1
-								fi
-							fi
-						elif [ "$IN_UWH" -ne 0 ] ; then
-							if [ "$MINIMUM_BATTERY_CHARGE_MWH" -ne 0 ] ; then
-								FOUND_AN_ENABLED_CHECK=1
-								if [ "$REMAINING" -ge $((1000*"$MINIMUM_BATTERY_CHARGE_MWH")) ] ; then
-									ENOUGH_CHARGE=1
-								fi
-							fi
-							if [ "$AUTO_HIBERNATION_BATTERY_CHARGE_MWH" -ne 0 ] ; then
-								FOUND_AN_ENABLED_HIBERNATION_CHECK=1
-								if [ "$REMAINING" -ge $((1000*"$AUTO_HIBERNATION_BATTERY_CHARGE_MWH")) ] ; then
-									ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=1
-								fi
-							fi
-						else
-							log "ERR" "Failed to determine battery charge. Battery charge units are not in"
-							log "ERR" "mWh, uWh, mAh or uAh."
-						fi
-
-					else
-						log "VERBOSE" "Battery is not present."
-					fi
-				fi
-			done
-		elif [ "$(echo /proc/acpi/battery/*)" != '/proc/acpi/battery/*' ] ; then
-			log "VERBOSE" "Not on AC and we have batteries in /proc/acpi/battery -- checking minimum battery charge."
-			for BATT in /proc/acpi/battery/* ; do
+	# Weird way of checking that /sys/class/power_supply is not empty -- but it works.
+	if [ "$(echo /sys/class/power_supply/*)" != '/sys/class/power_supply/*' ] ; then
+		log "VERBOSE" "Not on AC and we have battery information in /sys/class/power_supply/BAT* -- checking minimum battery charge."
+		for BATT in /sys/class/power_supply/* ; do
+			BATT_TYPE=$(cat $BATT/type)
+			log "VERBOSE" "$BATT is of type $BATT_TYPE."
+			if [ "$BATT_TYPE" != "Battery" ] ; then
+				log "VERBOSE" "Not of type \"Battery\", skipping."
+			else
 				PREV_ENOUGH_CHARGE=$ENOUGH_CHARGE
 				PREV_ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=$ENOUGH_CHARGE_TO_PREVENT_HIBERNATION
 
-				BATT_STATE=$BATT/state
-				BATT_INFO=$BATT/info
-				log "VERBOSE" "Checking info and state for $BATT."
+				log "VERBOSE" "Checking levels for $BATT."
+				PRESENT=$(cat $BATT/present)
+				log "VERBOSE" "Present: $PRESENT."
 
 				# Only do if the battery is present
-				if ( grep -q 'present:.*yes' $BATT_INFO ) ; then
+				if [ "$PRESENT" -eq 1 ] ; then
 					FOUND_AN_ENABLED_CHECK=0
 					FOUND_AN_ENABLED_HIBERNATION_CHECK=0
 
 					# Get the remaining capacity.
-					REMAINING=`grep "remaining capacity:" $BATT_STATE | sed  "s/.* \([0-9][0-9]* \).*/\1/" `
-					if [ -z "$REMAINING" ] ; then
-						log "VERBOSE" "Battery does not report remaining charte. Perhaps it is not present?"
+					IN_UAH=0
+					IN_UWH=0
+					if [ -f $BATT/charge_now ] ; then
+						REMAINING=$(cat $BATT/charge_now)
+						IN_UAH=1 # charge_* is in microAmpere-hours
+					elif [ -f $BATT/energy_now ] ; then
+						REMAINING=$(cat $BATT/energy_now)
+						IN_UWH=1 # energy_* is in microWatt-hours
+					else
+						REMAINING=0
+					fi
+					if [ -z "$REMAINING" -o "$REMAINING" -eq 0 ] ; then
+						log "VERBOSE" "Battery does not report remaining charge. Perhaps it is not present?"
 						REMAINING=0
 					fi
 					log "VERBOSE" "Remaining charge: $REMAINING"
 
-					CAPACITY=`grep "design capacity:" $BATT_INFO | sed  "s/.* \([0-9][0-9]* \).*/\1/" `
-					if [ -z "$CAPACITY" ] ; then
-						log "VERBOSE" "Battery does not report capacity. Perhaps it is not present?"
+					if [ -f $BATT/charge_full_design ] ; then
+						CAPACITY=$(cat $BATT/charge_full_design)
+					elif [ -f $BATT/energy_full_design ] ; then
+						CAPACITY=$(cat $BATT/energy_full_design)
+					else
 						CAPACITY=0
 					fi
-					log "VERBOSE" "Design capacity: $CAPACITY"
+					if [ -z "$CAPACITY" -o "$CAPACITY" -eq 0 ] ; then
+						log "VERBOSE" "Battery does not report design full charge, using non-design full charge."
+						if [ -f $BATT/charge_full ] ; then
+							CAPACITY=$(cat $BATT/charge_full)
+						elif [ -f $BATT/energy_full_design ] ; then
+							CAPACITY=$(cat $BATT/energy_full)
+						else
+							CAPACITY=0
+						fi
+						if [ -z "$CAPACITY" -o "$CAPACITY" -eq 0 ] ; then
+							log "VERBOSE" "Battery does not report non-design full charge."
+							CAPACITY=0
+						fi
+					fi
+					log "VERBOSE" "Full capacity: $CAPACITY"
 
 					# Check the charge percentage
 					if [ "$MINIMUM_BATTERY_CHARGE_PERCENT" -ne 0 ] ; then
 						FOUND_AN_ENABLED_CHECK=1
 						if [ "$CAPACITY" -eq 0 ] ; then
-							log "MSG" "WARNING: Battery does not report a design capacity. Minimum battery"
+							log "MSG" "WARNING: Battery does not report a capacity. Minimum battery"
 							log "MSG" "charge checking does not work without a design capacity."
 							ENOUGH_CHARGE=1
 						elif [ "$(($REMAINING * 100 / $CAPACITY))" -ge "$MINIMUM_BATTERY_CHARGE_PERCENT" ] ; then
@@ -873,52 +744,25 @@ checkBattery ()
 						fi
 					fi
 
-					#
-					# Fallback: hard values.
-					#
-					# Determine the reporting unit.
-					IN_MAH=0
-					IN_MWH=0
-					if ( grep -q mWh $BATT_INFO ) ; then
-						IN_MWH=1
-					elif ( grep -q mAh $BATT_INFO ) ; then
-						IN_MAH=1
-					fi
-
-					if [ "$IN_MAH" -ne 0 ] ; then
-						if [ "$MINIMUM_BATTERY_CHARGE_MAH" -ne 0 ] ; then
-							FOUND_AN_ENABLED_CHECK=1
-							if [ "$REMAINING" -ge "$MINIMUM_BATTERY_CHARGE_MAH" ] ; then
-								ENOUGH_CHARGE=1
-							fi
-						fi
-						if [ "$AUTO_HIBERNATION_BATTERY_CHARGE_MAH" -ne 0 ] ; then
-							FOUND_AN_ENABLED_HIBERNATION_CHECK=1
-							if [ "$REMAINING" -ge "$AUTO_HIBERNATION_BATTERY_CHARGE_MAH" ] ; then
-								ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=1
-							fi
-						fi
-					elif [ "$IN_MWH" -ne 0 ] ; then
-						if [ "$MINIMUM_BATTERY_CHARGE_MWH" -ne 0 ] ; then
-							FOUND_AN_ENABLED_CHECK=1
-							if [ "$REMAINING" -ge "$MINIMUM_BATTERY_CHARGE_MWH" ] ; then
-								ENOUGH_CHARGE=1
-							fi
-						fi
-						if [ "$AUTO_HIBERNATION_BATTERY_CHARGE_MWH" -ne 0 ] ; then
-							FOUND_AN_ENABLED_HIBERNATION_CHECK=1
-							if [ "$REMAINING" -ge "$AUTO_HIBERNATION_BATTERY_CHARGE_MWH" ] ; then
-								ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=1
-							fi
-						fi
+					if [ -f $BATT/alarm ]; then
+						# $BATT/alarm is the design_capacity_warning of a battery.
+						ALARM_LEVEL=$(cat $BATT/alarm)
+					elif [ -f $BATT/energy_full ]; then
+						# On Arm, it has been reported that there's no design_capacity_warning.
+						# The design_capacity_warning is 5% of the energy_full value
+						ENERGY_FULL=$(cat $BATT/energy_full)
+						ALARM_LEVEL=$(expr $ENERGY_FULL \* 5 / 100)
 					else
-						log "ERR" "Failed to determine battery charge. Battery charge units are not in"
-						log "ERR" "mWh or mAh."
+						# If nothing is available, we don't want to touch hibernation.
+						# We'll rather report it
+						log "ERR" "You seem to have a broken battery"
+						log "ERR" "Cannot determine design_capacity_warning"
+						log "ERR" "Disabling hibernation"
+						ENOUGH_CHARGE=1
 					fi
 
-					CAP_STATE=`sed -r 's/^capacity state:\s*(.*)\s*$/\1/;t;d' "$BATT_STATE"`
-					if [ "$DISABLE_LAPTOP_MODE_ON_CRITICAL_BATTERY_LEVEL" -ne 0 ] ; then
-						if [ "$CAP_STATE" = "critical" ] ; then
+					if [ "$ALARM_LEVEL" -ne 0 ] && [ "$DISABLE_BATTERY_ALARM_CHECK" -ne 1 ]; then
+						if [ "$REMAINING" -le "$ALARM_LEVEL" ] ; then
 							# Restore the state we had before checking this battery, so that
 							# this battery does not count as having enough charge.
 							ENOUGH_CHARGE=$PREV_ENOUGH_CHARGE
@@ -931,21 +775,177 @@ checkBattery ()
 						fi
 					fi
 					if [ "$AUTO_HIBERNATION_ON_CRITICAL_BATTERY_LEVEL" -ne 0 ] ; then
-						if [ "$CAP_STATE" = "critical" ] ; then
+						if [ "$REMAINING" -le "$ALARM_LEVEL" ] ; then
 							ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=$PREV_ENOUGH_CHARGE_TO_PREVENT_HIBERNATION
 						elif [ "$FOUND_AN_ENABLED_HIBERNATION_CHECK" -eq 0 ] ; then
 							ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=1
 						fi
 					fi
+
+					#
+					# Fallback: hard values
+					#
+					if [ "$IN_UAH" -ne 0 ] ; then
+						if [ "$MINIMUM_BATTERY_CHARGE_MAH" -ne 0 ] ; then
+							FOUND_AN_ENABLED_CHECK=1
+							if [ "$REMAINING" -ge $((1000*"$MINIMUM_BATTERY_CHARGE_MAH")) ] ; then
+								ENOUGH_CHARGE=1
+							fi
+						fi
+						if [ "$AUTO_HIBERNATION_BATTERY_CHARGE_MAH" -ne 0 ] ; then
+							FOUND_AN_ENABLED_HIBERNATION_CHECK=1
+							if [ "$REMAINING" -ge $((1000*"$AUTO_HIBERNATION_BATTERY_CHARGE_MAH")) ] ; then
+								ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=1
+							fi
+						fi
+					elif [ "$IN_UWH" -ne 0 ] ; then
+						if [ "$MINIMUM_BATTERY_CHARGE_MWH" -ne 0 ] ; then
+							FOUND_AN_ENABLED_CHECK=1
+							if [ "$REMAINING" -ge $((1000*"$MINIMUM_BATTERY_CHARGE_MWH")) ] ; then
+								ENOUGH_CHARGE=1
+							fi
+						fi
+						if [ "$AUTO_HIBERNATION_BATTERY_CHARGE_MWH" -ne 0 ] ; then
+							FOUND_AN_ENABLED_HIBERNATION_CHECK=1
+							if [ "$REMAINING" -ge $((1000*"$AUTO_HIBERNATION_BATTERY_CHARGE_MWH")) ] ; then
+								ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=1
+							fi
+						fi
+					else
+						log "ERR" "Failed to determine battery charge. Battery charge units are not in"
+						log "ERR" "mWh, uWh, mAh or uAh."
+					fi
+
 				else
 					log "VERBOSE" "Battery is not present."
 				fi
-			done
-		else
-			ENOUGH_CHARGE=1
-			ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=1
-			log "VERBOSE" "Not on AC and could not check battery state -- data loss sensitive features stay enabled and auto-hibernation will not work."
-		fi
+			fi
+		done
+	elif [ "$(echo /proc/acpi/battery/*)" != '/proc/acpi/battery/*' ] ; then
+		log "VERBOSE" "Not on AC and we have batteries in /proc/acpi/battery -- checking minimum battery charge."
+		for BATT in /proc/acpi/battery/* ; do
+			PREV_ENOUGH_CHARGE=$ENOUGH_CHARGE
+			PREV_ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=$ENOUGH_CHARGE_TO_PREVENT_HIBERNATION
+
+			BATT_STATE=$BATT/state
+			BATT_INFO=$BATT/info
+			log "VERBOSE" "Checking info and state for $BATT."
+
+			# Only do if the battery is present
+			if ( grep -q 'present:.*yes' $BATT_INFO ) ; then
+				FOUND_AN_ENABLED_CHECK=0
+				FOUND_AN_ENABLED_HIBERNATION_CHECK=0
+
+				# Get the remaining capacity.
+				REMAINING=`grep "remaining capacity:" $BATT_STATE | sed  "s/.* \([0-9][0-9]* \).*/\1/" `
+				if [ -z "$REMAINING" ] ; then
+					log "VERBOSE" "Battery does not report remaining charte. Perhaps it is not present?"
+					REMAINING=0
+				fi
+				log "VERBOSE" "Remaining charge: $REMAINING"
+
+				CAPACITY=`grep "design capacity:" $BATT_INFO | sed  "s/.* \([0-9][0-9]* \).*/\1/" `
+				if [ -z "$CAPACITY" ] ; then
+					log "VERBOSE" "Battery does not report capacity. Perhaps it is not present?"
+					CAPACITY=0
+				fi
+				log "VERBOSE" "Design capacity: $CAPACITY"
+
+				# Check the charge percentage
+				if [ "$MINIMUM_BATTERY_CHARGE_PERCENT" -ne 0 ] ; then
+					FOUND_AN_ENABLED_CHECK=1
+					if [ "$CAPACITY" -eq 0 ] ; then
+						log "MSG" "WARNING: Battery does not report a design capacity. Minimum battery"
+						log "MSG" "charge checking does not work without a design capacity."
+						ENOUGH_CHARGE=1
+					elif [ "$(($REMAINING * 100 / $CAPACITY))" -ge "$MINIMUM_BATTERY_CHARGE_PERCENT" ] ; then
+						ENOUGH_CHARGE=1
+					fi
+				fi
+				if [ "$AUTO_HIBERNATION_BATTERY_CHARGE_PERCENT" -ne 0 ] ; then
+					FOUND_AN_ENABLED_HIBERNATION_CHECK=1
+					if [ "$CAPACITY" -eq 0 ] ; then
+						log "MSG" "WARNING: Battery does not report a design capacity. Auto hibernation"
+						log "MSG" "does not work without a design capacity."
+						ENOUGH_CHARGE=1
+					elif [ "$(($REMAINING * 100 / $CAPACITY))" -ge "$AUTO_HIBERNATION_BATTERY_CHARGE_PERCENT" ] ; then
+						ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=1
+					fi
+				fi
+
+				#
+				# Fallback: hard values.
+				#
+				# Determine the reporting unit.
+				IN_MAH=0
+				IN_MWH=0
+				if ( grep -q mWh $BATT_INFO ) ; then
+					IN_MWH=1
+				elif ( grep -q mAh $BATT_INFO ) ; then
+					IN_MAH=1
+				fi
+
+				if [ "$IN_MAH" -ne 0 ] ; then
+					if [ "$MINIMUM_BATTERY_CHARGE_MAH" -ne 0 ] ; then
+						FOUND_AN_ENABLED_CHECK=1
+						if [ "$REMAINING" -ge "$MINIMUM_BATTERY_CHARGE_MAH" ] ; then
+							ENOUGH_CHARGE=1
+						fi
+					fi
+					if [ "$AUTO_HIBERNATION_BATTERY_CHARGE_MAH" -ne 0 ] ; then
+						FOUND_AN_ENABLED_HIBERNATION_CHECK=1
+						if [ "$REMAINING" -ge "$AUTO_HIBERNATION_BATTERY_CHARGE_MAH" ] ; then
+							ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=1
+						fi
+					fi
+				elif [ "$IN_MWH" -ne 0 ] ; then
+					if [ "$MINIMUM_BATTERY_CHARGE_MWH" -ne 0 ] ; then
+						FOUND_AN_ENABLED_CHECK=1
+						if [ "$REMAINING" -ge "$MINIMUM_BATTERY_CHARGE_MWH" ] ; then
+							ENOUGH_CHARGE=1
+						fi
+					fi
+					if [ "$AUTO_HIBERNATION_BATTERY_CHARGE_MWH" -ne 0 ] ; then
+						FOUND_AN_ENABLED_HIBERNATION_CHECK=1
+						if [ "$REMAINING" -ge "$AUTO_HIBERNATION_BATTERY_CHARGE_MWH" ] ; then
+							ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=1
+						fi
+					fi
+				else
+					log "ERR" "Failed to determine battery charge. Battery charge units are not in"
+					log "ERR" "mWh or mAh."
+				fi
+
+				CAP_STATE=`sed -r 's/^capacity state:\s*(.*)\s*$/\1/;t;d' "$BATT_STATE"`
+				if [ "$DISABLE_LAPTOP_MODE_ON_CRITICAL_BATTERY_LEVEL" -ne 0 ] ; then
+					if [ "$CAP_STATE" = "critical" ] ; then
+						# Restore the state we had before checking this battery, so that
+						# this battery does not count as having enough charge.
+						ENOUGH_CHARGE=$PREV_ENOUGH_CHARGE
+					elif [ "$FOUND_AN_ENABLED_CHECK" -eq 0 ] ; then
+						# This is the only check that is enabled. In that case a non-critical
+						# battery level counts as "enough". (If we would count non-critical
+						# battery levels as enough *always*, then the other settings would
+						# have no effect; this is only a final fallback.)
+						ENOUGH_CHARGE=1
+					fi
+				fi
+				if [ "$AUTO_HIBERNATION_ON_CRITICAL_BATTERY_LEVEL" -ne 0 ] ; then
+					if [ "$CAP_STATE" = "critical" ] ; then
+						ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=$PREV_ENOUGH_CHARGE_TO_PREVENT_HIBERNATION
+					elif [ "$FOUND_AN_ENABLED_HIBERNATION_CHECK" -eq 0 ] ; then
+						ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=1
+					fi
+				fi
+			else
+				log "VERBOSE" "Battery is not present."
+			fi
+		done
+	else
+		ENOUGH_CHARGE=1
+		ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=1
+		log "VERBOSE" "Not on AC and could not check battery state -- data loss sensitive features stay enabled and auto-hibernation will not work."
+	fi
 }
 
 # The main workhorse.
