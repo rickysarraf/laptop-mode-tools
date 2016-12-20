@@ -15,6 +15,13 @@ if [ x$CONTROL_VGASWITCHEROO = x1 ] ; then
 		VGASWITCHEROO_TRIGGER="$BATT_ENABLE_VGASWITCHEROO"
 	fi
 
+        # Invert settings' values
+        if [ $VGASWITCHEROO_TRIGGER -eq 0 ]; then
+            VGASWITCHEROO_TRIGGER="ON"
+        else
+            VGASWITCHEROO_TRIGGER="OFF"
+        fi
+
 	if [ -f $VGASWITCHEROO_FILE ] ; then
             log "VERBOSE" "Found vgaswitcheroo interface $VGASWITCHEROO_FILE"
             log "VERBOSE" "Trigger vgaswitcheroo with value: $VGASWITCHEROO_TRIGGER"
