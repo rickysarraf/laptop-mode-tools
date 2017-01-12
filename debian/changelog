@@ -1,3 +1,48 @@
+laptop-mode-tools (1.71-1) unstable; urgency=medium
+
+  [ Aurélien COUDERC ]
+  * [976be20] Fix incorrect import of os.putenv
+
+  [ Aliaksey Artamonau ]
+  * [709297e] cpuhotplug: remove unnecessary semicolons
+  * [5bc862e] cpuhotplug: use tabs for indentation everywhere
+  * [85df2ef] cpuhotplug: allow disabling specific cpus
+
+
+  [ Matthias Kaehlcke ]
+  * [8709399] runtime-pm: refactor listed_by_id()
+  * [bfe29fd] wireless-power: Use iw and fallback to iwconfig if it not
+    available
+  * [f47bee1] Prefer available AC supply information over battery state
+    to determine ON_AC
+  * [97a456d] runtime-pm: Refactor list_by_type()
+
+  [ Ritesh Raj Sarraf ]
+  * [904b072] Fix documentation on where we read battery capacity from.
+    Thanks to github/blag, github/carbohydratesn
+  * [847ad92] Update README.md
+  * [b864b5d] Add verbose message on top of Matthias's change
+  * [49bdb7f] On startup, we want to force the full execution of LMT.
+    Because there could be many devices that discover slow. From them,
+    this invocation will have given enough time to initialize.
+    Secondly, LMT could have been invoked way too early during boot,
+    by udev. In such cases, we'd have enough delta for it to act in
+    force mode
+  * [f4d6b93] auto only takes care of power state changes. Device
+    hotplugs need a forced execution for LMT to apply the proper
+    settings
+  * [515c086] kbd-backlight: New module to control keyboard backlight
+    brightness. Thanks to Roman V. Nikolaev (github/rshadow)
+  * [bca28ce] Include Transmit power saving in wireless cards.
+    Thanks to Roman V. Nikolaev (github/rshadow)
+  * [7ef0ab6] Try harder to check battery charge
+  * [b156605] New module: vgaswitcheroo.
+    Thanks to Roman V. Nikolaev
+  * [b1a3be6] Revive bluetooth module. Use rfkill primarily.
+    Also don't unload (incomplete list of) kernel modules
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Thu, 12 Jan 2017 19:17:14 +0530
+
 laptop-mode-tools (1.70-2) unstable; urgency=medium
 
   * [873f6a4] Add patch to fix import error
