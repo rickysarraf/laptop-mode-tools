@@ -1,3 +1,22 @@
+1.71 - Thu Jan 12 13:30:50 IST 2017
+    * Fix incorrect import of os.putenv
+    * Merge pull request #74 from Coucouf/fix-os-putenv
+    * Fix documentation on where we read battery capacity from
+    * cpuhotplug: allow disabling specific cpus
+    * Merge pull request #78 from aartamonau/cpuhotplug
+    * runtime-pm: refactor listed_by_id()
+    * wireless-power: Use iw and fallback to iwconfig if it not available
+    * Prefer available AC supply information over battery state to determine ON_AC
+    * On startup, we want to force the full execution of LMT.
+    * Device hotplugs need a forced execution for LMT to apply the proper settings
+    * runtime-pm: Refactor list_by_type()
+    * kbd-backlight: New module to control keyboard backlight brightness
+    * Include Transmit power saving in wireless cards
+    * Don't run in a subshell
+    * Try harder to check battery charge
+    * New module: vgaswitcheroo
+    * Revive bluetooth module. Use rfkill primarily. Also don't unload (incomplete list of) kernel modules
+
 1.70 - Sat Sep 24 16:51:02 IST 2016
     * Deal harder with broken battery states
     * On machines with 2+ batteries, determine states from all batteries

@@ -46,13 +46,14 @@ else
 	#
 	# Also, if this happens during boot, we may want to wait until /usr is available
 	#
-	# That said, we background the execution here, because, otherwise udevd will wait
-	# for this process which will block
-	
+	# On newer systemd/udev (232-3 over here), the behavior has changed in my tests.
+	# Now, it'll immediately and quietly kill the process that is backgrounded
+	# systemd is nice, but I hate when it tries to become a magician
+	#
 	# This stanza will also be called for device plug/unplug events
 
 	exec > /dev/null 2>/dev/null
-	non_systemd_way "$@" &
+	non_systemd_way "$@"
 	[ -z $LMT_DEBUG ] || echo "regulard is $PPID $$ $@" > $LMT_DEBUG
 fi
 

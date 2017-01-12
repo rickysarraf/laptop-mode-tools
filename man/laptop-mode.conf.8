@@ -77,7 +77,7 @@ Set this to 1 if you would like to execute the entire laptop-mode program in deb
 
 .IP "\fBENABLE_AUTO_MODULES\fP" 10 
 Set this to 1 to enable all laptop mode tools modules that are termed safe to be enabled and are marked auto.
-With this option alone, you can enable all auto modules. Incase you need to fine-control the behavior of individual modules, you can modify them accordingly. Default is 1
+With this option alone, you can enable all auto modules. In case you need to fine-control the behavior of individual modules, you can modify them accordingly. Default is 1
 
 
 .IP "\fBENABLE_LAPTOP_MODE_ON_BATTERY\fP" 10 
@@ -453,7 +453,45 @@ using a utility like "toshset", you should include the entire toshset
 command line as the command, and set the output file to "/dev/null".
 
 
+.SS "\fI/etc/laptop-mode/conf.d/kbd-backlight.conf\fP"
 
+The kbd-backlight module allows you to control the brightness of your LCD
+screen.
+
+.IP "\fBCONTROL_KBDLIGHT\fP" 10
+When this option is enabled, laptop mode will adjust your keyboard backlight
+brightness settings, if possible. You must configure the following settings
+for this to work.
+
+.IP "\fBBATT_KBDLIGHT_COMMAND\fP" 10
+.IP "\fBLM_AC_KBDLIGHT_COMMAND\fP" 10
+.IP "\fBNOLM_AC_KBDLIGHT_COMMAND\fP" 10
+.IP "\fBKBD_BRIGHTNESS_OUTPUT\fP" 10
+The \fBKBDLIGHT_COMMAND\fP settings specify commands that should be executed
+in order to set the brightness of your keyboard backlight.
+The \fBKBD_BRIGHTNESS_OUTPUT\fP setting specifies where the output of the 
+command will be written. For instance, if your keyboard's backlight brightness 
+is adjusted  by writing a numeric value 3 to a file called \fI/proc/brightness\fP, 
+you should set the command to "echo 3" and the output file to "/proc/brightness". 
+If your LCD's brightness is adjusted using a utility like "toshset", you should 
+include the entire toshset command line as the command, and set the output file 
+to "/dev/null".
+
+
+
+.IP "\fBCONTROL_VGASWITCHEROO\fP" 10
+When this option is enabled, laptop mode will use the vgaswitcheroo inteface
+to disable the unused hybrid graphics card.
+For this module to work, you need to ensure you have debugfs enabled/mounted
+
+.IP "\fBBATT_ENABLE_VGASWITCHEROO\fP" 10
+.IP "\fBLM_AC_ENABLE_VGASWITCHEROO\fP" 10
+.IP "\fBNOLM_AC_ENABLE_VGASWITCHEROO\fP" 10
+.IP "\fBVGASWITCHEROO_FILE\fP" 10
+The above settings specify under what modes should vgaswitcheroo interface be
+used to enable/disable hybrid graphics.
+The \fBVGASWITCHEROO_FILE\fP setting specifies the vgaswitcheroo interface
+to talk to the Linux kernel for hybrid graphics power savings
 
 .SS "\fI/etc/laptop-mode/conf.d/auto-hibernate.conf\fP"
 
@@ -473,7 +511,7 @@ auto-hibernation is triggered. Normally, this is set to something like
 
 .IP "\fBAUTO_HIBERNATION_BATTERY_CHARGE_PERCENT\fP" 10
 The battery level threshold for auto-hibernation, as a percentage of total
-battery capacity.
+battery design capacity.
 
 .IP "\fBAUTO_HIBERNATION_ON_CRITICAL_BATTERY_LEVEL\fP" 10
 When this option is enabled, auto-hibernation will kick in when the battery
@@ -782,7 +820,7 @@ Set this to 0 to disable execution of custom commands during power state changes
 .IP "\fBLM_AC_EXEC_COMMAND_1=\fP" 10
 .IP "\fBNOLM_AC_EXEC_COMMAND_0=\fP" 10
 .IP "\fBNOLM_AC_EXEC_COMMAND_1=\fP" 10
-Here you can specify your custom command that will need to be executed. The numbers can grow upto 9. The command needs to be specified in double quotes
+Here you can specify your custom command that will need to be executed. The numbers can grow up to 9. The command needs to be specified in double quotes
 
 
 .SS "\fI/etc/laptop-mode/conf.d/eee-superhe.conf\fP"

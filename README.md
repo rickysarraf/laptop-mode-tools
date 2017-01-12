@@ -38,7 +38,9 @@ Notes
   and tricks. Note that some of the tips are outdated and superseded by FAQ
   questions.
 
-
+GUI Configuration Tool
+----------------------
+![lmt-config-gui](https://github.com/rickysarraf/__pr0n/raw/master/LMT%20GUI.png)
 
 References
 ----------

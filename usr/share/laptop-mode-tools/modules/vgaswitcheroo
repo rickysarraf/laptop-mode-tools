@@ -1,0 +1,37 @@
+#! /bin/sh
+#
+# Laptop mode tools module: vgaswitcheroo for hybrid graphics
+#
+
+
+if [ x$CONTROL_VGASWITCHEROO = x1 ] ; then
+	if [ $ON_AC -eq 1 ]; then
+		if [ "$ACTIVATE" -eq 1 ]; then
+			VGASWITCHEROO_TRIGGER="$LM_AC_ENABLE_VGASWITCHEROO"
+		else
+			VGASWITCHEROO_TRIGGER="$NOLM_AC_ENABLE_VGASWITCHEROO"
+		fi
+	else
+		VGASWITCHEROO_TRIGGER="$BATT_ENABLE_VGASWITCHEROO"
+	fi
+
+        # Invert settings' values
+        if [ $VGASWITCHEROO_TRIGGER -eq 0 ]; then
+            VGASWITCHEROO_TRIGGER="ON"
+        else
+            VGASWITCHEROO_TRIGGER="OFF"
+        fi
+
+	if [ -f $VGASWITCHEROO_FILE ] ; then
+            log "VERBOSE" "Found vgaswitcheroo interface $VGASWITCHEROO_FILE"
+            log "VERBOSE" "Trigger vgaswitcheroo with value: $VGASWITCHEROO_TRIGGER"
+            echo $VGASWITCHEROO_TRIGGER > $VGASWITCHEROO_FILE && \
+                log "VERBOSE" "Successfully triggered vgaswitcheroo with value: $VGASWITCHEROO_TRIGGER" || \
+                log "VERBOSE" "Failed to trigger vgaswitcheroo with value: $VGASWITCHEROO_TRIGGER"
+        else
+            log "VERBOSE" "Cannot find vgaswitcheroo inteface. Is debugfs enabled?"
+	fi
+else
+	log "VERBOSE" "vgaswitcheroo module is disabled"
+fi
+
