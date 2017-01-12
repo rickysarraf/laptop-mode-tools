@@ -1,3 +1,2 @@
-0001-Fix-incorrect-import-of-os.putenv.patch
 gui-desktop-file.patch
 disable-ethernet-e1000e.patch
