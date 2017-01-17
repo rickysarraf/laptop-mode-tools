@@ -20,7 +20,7 @@ This will install laptop mode, which will be enabled automatically
 when your laptop works on batteries.
 
 Debian users, please install the Debian package that can
-be found on the home page and in the unstable repository!
+be found in the Debian Package repository at <https://packages.debian.org/search?keywords=laptop-mode-tools>
 
 
 Notes
