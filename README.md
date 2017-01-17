@@ -45,4 +45,4 @@ GUI Configuration Tool
 References
 ----------
 
-The laptop mode tools website: <http://rickysarraf.github.io/laptop-mode-tools/>
+The laptop mode tools website: <https://github.com/rickysarraf/laptop-mode-tools/wiki>
