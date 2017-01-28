@@ -16,7 +16,8 @@ if [ x$CONTROL_BRIGHTNESS = x1 ] ; then
 	fi
 
 	log "VERBOSE" "Set LCD brightness using command $BRIGHTNESS_COMMAND \> $BRIGHTNESS_OUTPUT."
-	if ( $BRIGHTNESS_COMMAND > $BRIGHTNESS_OUTPUT ) ; then
+	$BRIGHTNESS_COMMAND > $BRIGHTNESS_OUTPUT;
+	if [ $? -eq 0 ]; then
 		log "MSG" "LCD Brightness Command succeeded."
 	else
 		log "ERR" "The configured LCD brightness command of the lcd-brightness module failed."
