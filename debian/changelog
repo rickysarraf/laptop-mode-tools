@@ -1,3 +1,19 @@
+laptop-mode-tools (1.71.50-1) UNRELEASED; urgency=medium
+
+  * [a0bf411] Dropt patch 0001-Fix-incorrect-import-of-os.putenv.patch. Merged upstream
+  * [70f3a7e] qatest gbp.conf
+  * [2642ebc] Fix manpage spelling error
+  * [1266b6c] Fix examples in runtime-pm module conf.
+    Thanks to Luo Lei
+  * [6cedaf8] Fix Debian package link.
+    Thanks to Florian Auer
+  * [ff6362f] Fix link to homepage, which is the wiki
+  * [ae76b14] Add rfkill to Recommends
+  * [cee3874] Comparing current vs old brightness value is wrong. There are many consumers that can fiddle around with the brightness value. So instead of guesswork, just write down what the user has asked
+  * [a2d4af9] Run within....
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sun, 29 Jan 2017 15:34:35 +0530
+
 laptop-mode-tools (1.71-1) unstable; urgency=medium
 
   [ Aurélien COUDERC ]
