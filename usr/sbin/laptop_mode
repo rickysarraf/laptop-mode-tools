@@ -456,8 +456,9 @@ lmt_load_config ()
 	BATTERY_NOT_DISCHARGING=0
 	for POWER_SUPPLY in /sys/class/power_supply/* ; do
 		if [ -f $POWER_SUPPLY/type ] ; then
-			FOUND_SYS_CLASS_POWER_SUPPLY_AC=1
 			if [ "$(cat $POWER_SUPPLY/type)" = "Mains" ]; then
+				log "VERBOSE" "Found AC power supply $POWER_SUPPLY"
+				FOUND_SYS_CLASS_POWER_SUPPLY_AC=1
 				log "VERBOSE" "Determining power state from $POWER_SUPPLY/online."
 				if [ "$(cat $POWER_SUPPLY/online)" = 1 ]; then
 					ON_AC=1
