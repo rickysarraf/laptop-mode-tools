@@ -525,7 +525,7 @@ lmt_load_config ()
 	elif [ $BATTERY_NOT_DISCHARGING = 1 ]; then
 		log "VERBOSE" "Marking it as online ON_AC because we found no AC and the battery is not discharging"
 		ON_AC=1
-	elif [ $BATTERY_NOT_DISCHARGING = 0]; then
+	elif [ $BATTERY_NOT_DISCHARGING = 0 ]; then
 		log "VERBOSE" "Marking it as offline ON_AC because we found no AC and the battery is discharging"
 		ON_AC=0
 	else
