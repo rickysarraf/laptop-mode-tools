@@ -11,8 +11,9 @@ laptop-mode-tools (1.71.50-1) UNRELEASED; urgency=medium
   * [ae76b14] Add rfkill to Recommends
   * [cee3874] Comparing current vs old brightness value is wrong. There are many consumers that can fiddle around with the brightness value. So instead of guesswork, just write down what the user has asked
   * [a2d4af9] Run within....
+  * [c440578] update debian tag for qatest branch
 
- -- Ritesh Raj Sarraf <rrs@debian.org>  Sun, 29 Jan 2017 15:34:35 +0530
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sun, 29 Jan 2017 15:39:37 +0530
 
 laptop-mode-tools (1.71-1) unstable; urgency=medium
 
