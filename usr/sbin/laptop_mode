@@ -484,14 +484,12 @@ lmt_load_config ()
 		fi
 	done
 
-	if [ $FOUND_SYS_CLASS_POWER_SUPPLY_AC != 1 ] && [ $BATTERY_NOT_DISCHARGING = 1 ]; then
-		log "VERBOSE" "Marking it as online ON_AC because we found no AC and the battery is not discharging"
-		ON_AC=1
-	fi
-
 	if [ $FOUND_SYS_CLASS_POWER_SUPPLY_AC = 1 ] ; then
 		# Already found it!
 		log "VERBOSE" "Not trying other options, already found a power supply."
+	elif [ $BATTERY_NOT_DISCHARGING = 1 ]; then
+		log "VERBOSE" "Marking it as online ON_AC because we found no AC and the battery is not discharging"
+		ON_AC=1
 	elif [ -d /proc/acpi/ac_adapter ] ; then
 		log "VERBOSE" "Determining power state from /proc/acpi/ac_adapter."
 		ADAPTERS_FOUND=0
