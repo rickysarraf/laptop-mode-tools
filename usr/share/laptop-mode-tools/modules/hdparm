@@ -238,20 +238,20 @@ if [ x$CONTROL_HD_IDLE_TIMEOUT = x1 ] ; then
 	log "VERBOSE" "(hdparm configuration value = $HD_IDLE_TIMEOUT.)"
 	for THISHD in $HD ; do
 		if is_capable $THISHD IDLE_TIMEOUT ; then
-			if is_capable $THISHD HDPARM ; then
-				if [ "$HDPARM_AVAILABLE" = "1" ]; then
-					log "VERBOSE" "Executing: hdparm -S $HD_IDLE_TIMEOUT $THISHD"
-					log "VERBOSE" "`hdparm -S $HD_IDLE_TIMEOUT $THISHD 2>&1`"
-				else
-					log "VERBOSE" "ERROR: hdparm not installed."
-				fi
-			elif is_capable $THISHD SDPARM ; then
+			if is_capable $THISHD SDPARM ; then
 				if [ "$SDPARM_AVAILABLE" = "1" ]; then
 					HD_IDLE_TIMEOUT_DECISECONDS=$(($HD_IDLE_TIMEOUT_SECONDS*10))
 					log "VERBOSE" "Executing: sdparm -q -s SCT=$HD_IDLE_TIMEOUT_DECISECONDS $THISHD"
 					log "VERBOSE" "`sdparm -q -s SCT=$HD_IDLE_TIMEOUT_DECISECONDS $THISHD 2>&1`"
 				else
 					log "ERR" "ERROR: sdparm not installed."
+				fi
+			elif is_capable $THISHD HDPARM ; then
+				if [ "$HDPARM_AVAILABLE" = "1" ]; then
+					log "VERBOSE" "Executing: hdparm -S $HD_IDLE_TIMEOUT $THISHD"
+					log "VERBOSE" "`hdparm -S $HD_IDLE_TIMEOUT $THISHD 2>&1`"
+				else
+					log "VERBOSE" "ERROR: hdparm not installed."
 				fi
 			else
 				log "VERBOSE" "Skipping $THISHD: drive supports neither hdparm nor sdparm."
