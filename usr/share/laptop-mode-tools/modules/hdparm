@@ -282,7 +282,14 @@ if [ x$CONTROL_HD_WRITECACHE = x1 ] ; then
 	log "VERBOSE" "Setting write cache on drives to $HD_WRITECACHE."
 	for THISHD in $HD ; do
 		if is_capable $THISHD WRITECACHE ; then
-			if is_capable $THISHD HDPARM ; then
+			if is_capable $THISHD SDPARM ; then
+				if [ "$SDPARM_AVAILABLE" = "1" ]; then
+					log "VERBOSE" "Executing: sdparm Write Cache $HD_WRITECACHE $THISHD"
+					log "VERBOSE" "`sdparm --set WCE=$HD_WRITECACHE $THISHD 2>&1`"
+				else
+					log "ERR" "ERROR: sdparm not installed."
+				fi
+			elif is_capable $THISHD HDPARM ; then
 				if [ "$HDPARM_AVAILABLE" = "1" ]; then
 					log "VERBOSE" "Executing: hdparm -W $HD_WRITECACHE $THISHD"
 					log "VERBOSE" "`hdparm -W $HD_WRITECACHE $THISHD 2>&1`"
