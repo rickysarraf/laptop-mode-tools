@@ -1,4 +1,4 @@
-laptop-mode-tools (1.71.51-1) UNRELEASED; urgency=medium
+laptop-mode-tools (1.71.52-1) UNRELEASED; urgency=medium
 
   * [a0bf411] Dropt patch 0001-Fix-incorrect-import-of-os.putenv.patch. Merged upstream
   * [70f3a7e] qatest gbp.conf
@@ -13,8 +13,12 @@ laptop-mode-tools (1.71.51-1) UNRELEASED; urgency=medium
   * [a2d4af9] Run within....
   * [c440578] update debian tag for qatest branch
   * [4078557] Avoid double checks for FOUND_SYS_CLASS_POWER_SUPPLY_AC
+  * [c3a847e] Give sdparm higher precedence than hdparm
+  * [145972c] Enable sdparm for Write Cache
+  * [26d95c6] Give sdparm higher precedence than hdparm
+  * [c53f650] Enable sdparm for Write Cache
 
- -- Ritesh Raj Sarraf <rrs@debian.org>  Sun, 19 Feb 2017 16:17:58 +0530
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sun, 19 Feb 2017 18:16:11 +0530
 
 laptop-mode-tools (1.71-1) unstable; urgency=medium
 
