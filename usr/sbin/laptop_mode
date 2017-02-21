@@ -456,8 +456,9 @@ lmt_load_config ()
 	BATTERY_NOT_DISCHARGING=0
 	for POWER_SUPPLY in /sys/class/power_supply/* ; do
 		if [ -f $POWER_SUPPLY/type ] ; then
-			FOUND_SYS_CLASS_POWER_SUPPLY_AC=1
 			if [ "$(cat $POWER_SUPPLY/type)" = "Mains" ]; then
+				log "VERBOSE" "Found AC power supply $POWER_SUPPLY"
+				FOUND_SYS_CLASS_POWER_SUPPLY_AC=1
 				log "VERBOSE" "Determining power state from $POWER_SUPPLY/online."
 				if [ "$(cat $POWER_SUPPLY/online)" = 1 ]; then
 					ON_AC=1
@@ -477,7 +478,6 @@ lmt_load_config ()
                                         fi
 				else
 					log "VERBOSE" "Marking it as non-AC because there's battery $POWER_SUPPLY in Discharging state"
-					ON_AC=0
 					break
 				fi
 			fi
@@ -525,6 +525,12 @@ lmt_load_config ()
 		else
 			ON_AC=1
 		fi
+	elif [ $BATTERY_NOT_DISCHARGING = 1 ]; then
+		log "VERBOSE" "Marking it as online ON_AC because we found no AC and the battery is not discharging"
+		ON_AC=1
+	elif [ $BATTERY_NOT_DISCHARGING = 0 ]; then
+		log "VERBOSE" "Marking it as offline ON_AC because we found no AC and the battery is discharging"
+		ON_AC=0
 	else
 		log "VERBOSE" "No /sys/class/power_supply, ACPI, APM or PMU power management information found -- assuming AC power is present."
 		ON_AC=1
