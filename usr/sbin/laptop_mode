@@ -451,12 +451,12 @@ lmt_load_config ()
 	# Determine the power state.
 
 	# First try /sys/class/power_supply/*
-	FOUND_SYS_CLASS_POWER_SUPPLY_AC=0
+	SYSFS_POWER_SUPPLY=0
 	export ON_AC=0
 	BATTERY_NOT_DISCHARGING=0
 	for POWER_SUPPLY in /sys/class/power_supply/* ; do
 		if [ -f $POWER_SUPPLY/type ] ; then
-			FOUND_SYS_CLASS_POWER_SUPPLY_AC=1
+			SYSFS_POWER_SUPPLY=1
 			if [ "$(cat $POWER_SUPPLY/type)" = "Mains" ]; then
 				log "VERBOSE" "Determining power state from $POWER_SUPPLY/online."
 				if [ "$(cat $POWER_SUPPLY/online)" = 1 ]; then
@@ -484,7 +484,7 @@ lmt_load_config ()
 		fi
 	done
 
-	if [ $FOUND_SYS_CLASS_POWER_SUPPLY_AC = 1 ] ; then
+	if [ $SYSFS_POWER_SUPPLY = 1 ] ; then
 		# Already found it!
 		log "VERBOSE" "Not trying other options, already found a power supply."
 	elif [ $BATTERY_NOT_DISCHARGING = 1 ]; then
