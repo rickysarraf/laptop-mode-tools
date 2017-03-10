@@ -76,7 +76,7 @@ setPowerSave() {
                 if [ $ONOFF = "ON" ]; then
                     $IWCONFIG $IF txpower auto
                 else
-                    $IW dev $IF txpower fixed
+                    $IWCONFIG $IF txpower fixed
                 fi
 	fi
 }
