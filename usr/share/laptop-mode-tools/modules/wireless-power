@@ -66,14 +66,14 @@ setPowerSave() {
 
 	if [ -n "$IW" ]; then
 		$IW dev $IF set power_save $ONOFF
-                if [ $ONOFF = "ON" ]; then
+                if [ $ONOFF = "on" ]; then
                     $IW dev $IF set txpower auto
                 else
                     $IW dev $IF set txpower fixed
                 fi
 	else
 		$IWCONFIG $IF power $ONOFF
-                if [ $ONOFF = "ON" ]; then
+                if [ $ONOFF = "on" ]; then
                     $IWCONFIG $IF txpower auto
                 else
                     $IWCONFIG $IF txpower fixed
@@ -106,10 +106,10 @@ if [ x$CONTROL_WIRELESS_POWER_SAVING = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x
 	fi
 
 	# Translate 1 => on, 0 => off
-	WIRELESS_AC_POWER_SAVING_ONOFF=off
-	WIRELESS_BATT_POWER_SAVING_ONOFF=off
-	[ "$WIRELESS_AC_POWER_SAVING" = 1 ] && WIRELESS_AC_POWER_SAVING_ONOFF=on
-	[ "$WIRELESS_BATT_POWER_SAVING" = 1 ] && WIRELESS_BATT_POWER_SAVING_ONOFF=on
+	WIRELESS_AC_POWER_SAVING_ONOFF="off"
+	WIRELESS_BATT_POWER_SAVING_ONOFF="off"
+	[ "$WIRELESS_AC_POWER_SAVING" = 1 ] && WIRELESS_AC_POWER_SAVING_ONOFF="on"
+	[ "$WIRELESS_BATT_POWER_SAVING" = 1 ] && WIRELESS_BATT_POWER_SAVING_ONOFF="on"
 
 	WIFI_IFNAMES=""
 	findWifiIfs
