@@ -112,12 +112,16 @@ if [ x$CONTROL_WIRELESS_POWER_SAVING = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x
 		if [ $ON_AC -eq 1 ] ; then
 			log "VERBOSE" "On AC power: setting power saving mode for $IF to $WIRELESS_AC_POWER_SAVING_ONOFF."
 			if ! setPowerSave $IF $WIRELESS_AC_POWER_SAVING_ONOFF; then
-				log "ERR" "Failed to re-set power saving mode for wireless card"
+			    log "ERR" "Failed to re-set power saving mode for wireless card"
+			else
+			    log "VERBOSE" "On AC power: Successfully set power saving mode for $IF to $WIRELESS_AC_POWER_SAVING_ONOFF."
 			fi
 		else
 			log "VERBOSE" "On battery: setting power saving mode for $IF to $WIRELESS_BATT_POWER_SAVING_ONOFF."
 			if ! setPowerSave $IF $WIRELESS_BATT_POWER_SAVING_ONOFF; then
-				log "ERR" "Failed to set power saving mode for wireless card"
+			    log "ERR" "Failed to set power saving mode for wireless card"
+			else
+			    log "VERBOSE" "On battery: Successfully set power saving mode for $IF to $WIRELESS_AC_POWER_SAVING_ONOFF."
 			fi
 		fi
 	done
