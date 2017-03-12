@@ -1,4 +1,4 @@
-laptop-mode-tools (1.71.53-1) UNRELEASED; urgency=medium
+laptop-mode-tools (1.71.54-1) UNRELEASED; urgency=medium
 
   * [a0bf411] Dropt patch 0001-Fix-incorrect-import-of-os.putenv.patch. Merged upstream
   * [70f3a7e] qatest gbp.conf
@@ -18,8 +18,14 @@ laptop-mode-tools (1.71.53-1) UNRELEASED; urgency=medium
   * [26d95c6] Give sdparm higher precedence than hdparm
   * [c53f650] Enable sdparm for Write Cache
   * [e7d0665] Rename variable to avoid confusion
+  * Fix correct program invocation.
+    Thanks to Mathias Rav
+  * Fix correct "ON" string.
+    Thanks to Andrey Polyakov
+  * For iw, txpower needs a device specific value. Hence, drop it.
+    Thanks to Andrey Polyakov
 
- -- Ritesh Raj Sarraf <rrs@debian.org>  Wed, 22 Feb 2017 13:25:03 +0530
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sun, 12 Mar 2017 17:11:45 +0530
 
 laptop-mode-tools (1.71-1) unstable; urgency=medium
 
