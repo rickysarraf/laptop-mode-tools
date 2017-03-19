@@ -1,4 +1,4 @@
-laptop-mode-tools (1.71.54-1) UNRELEASED; urgency=medium
+laptop-mode-tools (1.71.55-1) UNRELEASED; urgency=medium
 
   * [a0bf411] Dropt patch 0001-Fix-incorrect-import-of-os.putenv.patch. Merged upstream
   * [70f3a7e] qatest gbp.conf
@@ -24,8 +24,11 @@ laptop-mode-tools (1.71.54-1) UNRELEASED; urgency=medium
     Thanks to Andrey Polyakov
   * For iw, txpower needs a device specific value. Hence, drop it.
     Thanks to Andrey Polyakov
+  * Log a verbose message when set successfully
+  * Fix referencing the correct variable
+  * Xauthority could be preset at different locaiton, on newer systems
 
- -- Ritesh Raj Sarraf <rrs@debian.org>  Sun, 12 Mar 2017 17:11:45 +0530
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sun, 19 Mar 2017 15:46:57 +0530
 
 laptop-mode-tools (1.71-1) unstable; urgency=medium
 
