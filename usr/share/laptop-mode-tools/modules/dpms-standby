@@ -17,7 +17,12 @@ getXuser() {
 	export XAUTHORITY=""
 	if [ x"$user" != x"" ]; then
 		xauthdir=`getent passwd $user | cut -d: -f6`
-		if [ -f "$xauthdir/.Xauthority" ]; then
+		xauthuser=`getent passwd $user | cut -d: -f1`
+		xauthuserid=`getent passwd $user | cut -d: -f3`
+
+		if [ -f /run/user/$xauthuserid/*/Xauthority ]; then
+		    export XAUTHORITY=/run/user/$xauthuserid/*/Xauthority
+		elif [ -f "$xauthdir/.Xauthority" ]; then
 			export XAUTHORITY=$xauthdir/.Xauthority
 		fi
 	else
