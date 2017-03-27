@@ -118,7 +118,7 @@ if [ x$CONTROL_RUNTIME_AUTOSUSPEND = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$C
 					if ! blacklisted $runtime_device; then
 						USE_DEVICE=1
 					else
-						logger "Device $runtime_device is blacklisted, skipping auto suspend."
+						log "Device $runtime_device is blacklisted, skipping auto suspend."
 					fi
 				fi
 
