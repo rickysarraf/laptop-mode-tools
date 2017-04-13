@@ -4,7 +4,7 @@ Documentation=man:laptop_mode(8) man:laptop-mode.conf(8)
 Documentation=http://github.com/rickysarraf/laptop-mode-tools
 
 [Service]
-Type=oneshot
+Type=simple
 RemainAfterExit=yes
 ExecStartPre=/bin/rm -f /var/run/laptop-mode-tools/enabled
 ExecStartPre=/bin/rm -f /var/run/laptop-mode-tools/state
