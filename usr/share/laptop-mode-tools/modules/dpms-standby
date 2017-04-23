@@ -22,6 +22,7 @@ getXuser() {
 
 		if [ -f /run/user/$xauthuserid/*/Xauthority ]; then
 		    export XAUTHORITY=/run/user/$xauthuserid/*/Xauthority
+                    log "VERBOSE" "XAUTHORITY path is: $XAUTHORITY"
 		elif [ -f "$xauthdir/.Xauthority" ]; then
 			export XAUTHORITY=$xauthdir/.Xauthority
 		fi
