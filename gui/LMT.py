@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 
@@ -12,13 +12,14 @@ from shutil import move
 from webbrowser import open_new_tab
 
 try:
-    from PyQt4.QtGui import (QWidget, QMessageBox, QVBoxLayout, QHBoxLayout,
+    from PyQt5.QtWidgets import (QWidget, QMessageBox, QVBoxLayout, QHBoxLayout,
                              QGroupBox, QScrollArea, QCheckBox, QPushButton,
-                             QApplication, QMainWindow, QIcon, QDialogButtonBox,
-                             QColor, QGraphicsDropShadowEffect, QShortcut)
-    print("Using PyQt4")
+                             QApplication, QMainWindow, QDialogButtonBox,
+                             QGraphicsDropShadowEffect, QShortcut)
+    from PyQt5.QtGui import (QIcon, QColor)
+    print("Using PyQt5")
 except ImportError:
-    from PySide.QtGui import (QWidget, QMessageBox, QVBoxLayout, QHBoxLayout,
+    from PySide.QtWidgets import (QWidget, QMessageBox, QVBoxLayout, QHBoxLayout,
                               QGroupBox, QScrollArea, QCheckBox, QPushButton,
                               QApplication, QMainWindow, QIcon, QShortcut,
                               QDialogButtonBox, QColor,
