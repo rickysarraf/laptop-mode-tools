@@ -18,14 +18,6 @@ try:
                              QGraphicsDropShadowEffect, QShortcut)
     from PyQt5.QtGui import (QIcon, QColor)
     print("Using PyQt5")
-except ImportError:
-    from PySide.QtWidgets import (QWidget, QMessageBox, QVBoxLayout, QHBoxLayout,
-                              QGroupBox, QScrollArea, QCheckBox, QPushButton,
-                              QApplication, QMainWindow, QIcon, QShortcut,
-                              QDialogButtonBox, QColor,
-                              QGraphicsDropShadowEffect)
-    print("Using PySide")
-
 
 
 # This seems to be needed, atleast of Debian
