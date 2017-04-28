@@ -11,13 +11,11 @@ from os import access, F_OK, geteuid, listdir, path, putenv
 from shutil import move
 from webbrowser import open_new_tab
 
-try:
-    from PyQt5.QtWidgets import (QWidget, QMessageBox, QVBoxLayout, QHBoxLayout,
-                             QGroupBox, QScrollArea, QCheckBox, QPushButton,
-                             QApplication, QMainWindow, QDialogButtonBox,
-                             QGraphicsDropShadowEffect, QShortcut)
-    from PyQt5.QtGui import (QIcon, QColor)
-    print("Using PyQt5")
+from PyQt5.QtWidgets import (QWidget, QMessageBox, QVBoxLayout, QHBoxLayout,
+        QGroupBox, QScrollArea, QCheckBox, QPushButton,
+        QApplication, QMainWindow, QDialogButtonBox,
+        QGraphicsDropShadowEffect, QShortcut)
+from PyQt5.QtGui import (QIcon, QColor)
 
 
 # This seems to be needed, atleast of Debian
