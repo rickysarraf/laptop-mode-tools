@@ -1,0 +1,25 @@
+Backport fix from upstream for Stretch release
+Closes: 862975
+Thanks: Rowan Thorpe
+--- a/usr/share/laptop-mode-tools/modules/wireless-power
++++ b/usr/share/laptop-mode-tools/modules/wireless-power
+@@ -66,17 +66,12 @@
+ 
+ 	if [ -n "$IW" ]; then
+ 		$IW dev $IF set power_save $ONOFF
+-                if [ $ONOFF = "ON" ]; then
+-                    $IW dev $IF set txpower auto
+-                else
+-                    $IW dev $IF set txpower fixed
+-                fi
+ 	else
+ 		$IWCONFIG $IF power $ONOFF
+-                if [ $ONOFF = "ON" ]; then
++                if [ $ONOFF = "on" ]; then
+                     $IWCONFIG $IF txpower auto
+                 else
+-                    $IW dev $IF txpower fixed
++                    $IWCONFIG dev $IF txpower fixed
+                 fi
+ 	fi
+ }

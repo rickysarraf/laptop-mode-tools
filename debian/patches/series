@@ -1,2 +1,3 @@
+fix-iw-txpower-issue.patch
 gui-desktop-file.patch
 disable-ethernet-e1000e.patch
