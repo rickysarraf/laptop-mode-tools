@@ -1,3 +1,11 @@
+laptop-mode-tools (1.71-2) unstable; urgency=medium
+
+  * Add rfkill to Recommends
+  * Backport upstream fix for iw wireless command.
+    Thanks to Rowan Thorpe (Closes: #862975)
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sat, 20 May 2017 11:19:39 +0545
+
 laptop-mode-tools (1.71-1) unstable; urgency=medium
 
   [ Aurélien COUDERC ]
