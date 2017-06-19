@@ -1,5 +1,6 @@
-laptop-mode-tools (1.71.55-1) UNRELEASED; urgency=medium
+laptop-mode-tools (1.71.60-1) UNRELEASED; urgency=medium
 
+  [ Ritesh Raj Sarraf ]
   * [a0bf411] Dropt patch 0001-Fix-incorrect-import-of-os.putenv.patch. Merged upstream
   * [70f3a7e] qatest gbp.conf
   * [2642ebc] Fix manpage spelling error
@@ -27,8 +28,26 @@ laptop-mode-tools (1.71.55-1) UNRELEASED; urgency=medium
   * Log a verbose message when set successfully
   * Fix referencing the correct variable
   * Xauthority could be preset at different locaiton, on newer systems
+  * Fix typo in function call
+  * Add verbose message for what Xauth is used
+  * Fix spelling errors in tooltip.
+    Thanks to Malthe Høj-Sunesen
+  * Switch to PyQt5 and Python3
+  * Drop pyside as I don't see qt5 support for it
+  * Fix indentation error
+  * Invoke with py3 in calling script
 
- -- Ritesh Raj Sarraf <rrs@debian.org>  Sun, 19 Mar 2017 15:46:57 +0530
+  [ Maciej S. Szmigiero ]
+  * Add btrfs to list of filesystems for which we can set commit interval
+
+  [ Ritesh Raj Sarraf ]
+  * Add pkexec invocation script
+  * Add desktop file to upstream repo and invoke script
+  * Update installer to includes gui wrappers
+  * Install pkexec invocation script
+  * Call the correct pkexec script
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Mon, 19 Jun 2017 09:12:18 +0545
 
 laptop-mode-tools (1.71-1) unstable; urgency=medium
 
