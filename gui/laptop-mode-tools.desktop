@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Laptop Mode Tools Configuration
+GenericName=Laptop Mode Tools Configuration
+Exec=/usr/sbin/lmt-config-gui-pkexec
+Categories=System;
+Comment=Enable/disable Laptop Mode Tools settings
+Keywords=Preferences;

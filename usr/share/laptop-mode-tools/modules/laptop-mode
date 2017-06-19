@@ -133,7 +133,7 @@ control_mount_options() {
 		MP="$(echo $MP)"
 
 		case "$FST" in
-			ext*|reiserfs|xfs)
+			ext*|reiserfs|xfs|btrfs)
 				log "VERBOSE" "$FST mount options apply"
 				;;
 			*)
@@ -225,7 +225,7 @@ control_mount_options() {
 					SAVED_OPTS=${SAVED_OPTS#* } # trim device name
 
 					case "$FST" in
-						"ext3"|"reiserfs"|"ext4dev"|"ext4")
+						"ext3"|"reiserfs"|"ext4dev"|"ext4"|"btrfs")
 							PARSEDOPTS="$(replace_numeric_mount_option commit commit=0 $SAVED_OPTS $OPTS)"
 							PARSEDOPTS="$(replace_atime_mount_option $SAVED_OPTS $PARSEDOPTS)"
 							log "VERBOSE" "Executing: mount $DEV $MP -t $FST -o remount,$PARSEDOPTS"
@@ -271,7 +271,7 @@ control_mount_options() {
 				FST=${FST%%,*}
 
 				case "$FST" in
-					"ext3"|"reiserfs"|"ext4dev"|"ext4")
+					"ext3"|"reiserfs"|"ext4dev"|"ext4"|"btrfs")
 						log "VERBOSE" "Removing commit mount option from original options."
 						PARSEDOPTS="$(remove_numeric_mount_option commit "$OPTS")"
 						log "VERBOSE" "Executing: mount $DEV $MP -t $FST -o remount,$PARSEDOPTS,commit=$MAX_LOST_WORK_SECONDS$NOATIME_OPT"
