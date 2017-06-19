@@ -1,0 +1,8 @@
+#!/bin/sh
+
+PKEXEC=`which pkexec`;
+
+if [ -x $PKEXEC ]; then
+    echo "Exec with pkexec"
+    $PKEXEC /usr/sbin/lmt-config-gui
+fi
