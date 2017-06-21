@@ -10,7 +10,7 @@ Standards-Version: 3.9.8
 Package: laptop-mode-tools
 Architecture: all
 Depends: ${misc:Depends}, lsb-base (>= 3.0-10), util-linux (>= 2.13), psmisc
-Recommends: hdparm, sdparm, ethtool, net-tools, wireless-tools, udev, python-qt4, rfkill
+Recommends: hdparm, sdparm, ethtool, net-tools, wireless-tools, udev, python3-pyqt5, rfkill
 Suggests: acpid | apmd | pbbuttonsd | pmud
 Conflicts: noflushd
 Description: Tools for Power Savings based on battery/AC status
