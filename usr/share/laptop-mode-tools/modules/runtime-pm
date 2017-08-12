@@ -79,6 +79,14 @@ whitelisted() {
 	return 0
 }
 
+# Check if kernel version is less than or equal to provided version
+kernel_lte () {
+	kernel_version=$(uname -r | awk -F '-' '{print $1}')
+	largest_version=$(echo -e "$kernel_version\n$1" | sort -V -r | head -n 1)
+	[ "$1" = "$kernel_version" ] || [ "$1" = "$largest_version" ]
+}
+
+
 if [ x$CONTROL_RUNTIME_AUTOSUSPEND = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_RUNTIME_AUTOSUSPEND = xauto ]; then
 	if [ $ON_AC -eq 1 ]; then
 		if [ "$ACTIVATE" -eq 1 ]; then
@@ -143,10 +151,12 @@ if [ x$CONTROL_RUNTIME_AUTOSUSPEND = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$C
 			done
 		fi
 	else
-		AUTOSUSPEND_TIMEOUT=0
 		if [ "$DEVICE_LIST" != "" ]; then
 			for runtime_device in $DEVICE_LIST;
 			do
+				# Kernel = 2.6.21 autosuspend is set to 0 to disable. Kernel >= 2.6.22, -1 disables autosuspend. 
+				kernel_lte "2.6.21" && AUTOSUSPEND_TIMEOUT=0 || AUTOSUSPEND_TIMEOUT=-1
+
 				if [ -f "$runtime_device"/power/autosuspend ]; then
 					echo $AUTOSUSPEND_TIMEOUT > "$runtime_device"/power/autosuspend;
 					log "VERBOSE" "Disabling auto suspend mode for device $runtime_device."
