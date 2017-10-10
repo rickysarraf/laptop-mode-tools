@@ -79,6 +79,17 @@ whitelisted() {
 	return 0
 }
 
+# Check if kernel version is less than or equal to provided version
+kernel_lte () {
+	kernel_version=$(uname -r | awk -F '-' '{print $1}')
+	largest_version=$(echo -e "$kernel_version\n$1" | sort -V -r | head -n 1)
+	[ "$1" = "$kernel_version" ] || [ "$1" = "$largest_version" ]
+}
+
+
+# Kernel <= 2.6.37 should use /power/autosuspend. Otherwise, use autosuspend_delay_ms
+kernel_lte "2.6.37" && autosuspend_path="power/autosuspend" || autosuspend_path="power/autosuspend_delay_ms"
+
 if [ x$CONTROL_RUNTIME_AUTOSUSPEND = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_RUNTIME_AUTOSUSPEND = xauto ]; then
 	if [ $ON_AC -eq 1 ]; then
 		if [ "$ACTIVATE" -eq 1 ]; then
@@ -123,8 +134,8 @@ if [ x$CONTROL_RUNTIME_AUTOSUSPEND = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$C
 				fi
 
 				if [ x$USE_DEVICE = x1 ]; then
-					if [ -f "$runtime_device"/power/autosuspend ]; then
-						echo $AUTOSUSPEND_TIMEOUT > "$runtime_device"/power/autosuspend;
+					if [ -f "$runtime_device/$autosuspend_path" ]; then
+						echo $AUTOSUSPEND_TIMEOUT > "$runtime_device/$autosuspend_path";
 						log "VERBOSE" "Enabling auto suspend mode for device $runtime_device"
 					else
 						log "VERBOSE" "Not enabling auto suspend mode for device $runtime_device"
@@ -143,12 +154,14 @@ if [ x$CONTROL_RUNTIME_AUTOSUSPEND = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$C
 			done
 		fi
 	else
-		AUTOSUSPEND_TIMEOUT=0
 		if [ "$DEVICE_LIST" != "" ]; then
+			# Kernel = 2.6.21 autosuspend is set to 0 to disable. Kernel >= 2.6.22, -1 disables autosuspend. 
+			kernel_lte "2.6.21" && AUTOSUSPEND_TIMEOUT=0 || AUTOSUSPEND_TIMEOUT=-1
+
 			for runtime_device in $DEVICE_LIST;
 			do
-				if [ -f "$runtime_device"/power/autosuspend ]; then
-					echo $AUTOSUSPEND_TIMEOUT > "$runtime_device"/power/autosuspend;
+				if [ -f "$runtime_device/$autosuspend_path" ]; then
+					echo $AUTOSUSPEND_TIMEOUT > "$runtime_device/$autosuspend_path";
 					log "VERBOSE" "Disabling auto suspend mode for device $runtime_device."
 				else
 					log "VERBOSE" "Not disabling auto suspend mode for device $runtime_device"
