@@ -2,27 +2,28 @@
 # Laptop mode tools module to handle the DPM Profiles of a GPU (radeon driver only)
 # 
 
-RADEON_DPM_STATE="/sys/class/drm/card0/device/power_dpm_state"
-RADEON_DPM_PERFORMANCE_LEVEL="/sys/class/drm/card0/device/power_dpm_force_performance_level"
-
 if [ x$CONTROL_RADEON_DPM = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_RADEON_DPM = xauto ]; then
-	if [ -w $RADEON_DPM_STATE -a -w $RADEON_DPM_PERFORMANCE_LEVEL ]; then
-		if [ $ON_AC -eq 1 ]; then
-			if [ "$ACTIVATE" -eq 1 ]; then
-				log "VERBOSE" "Radeon power saving enabled."
-				echo battery > $RADEON_DPM_STATE
-				echo auto > $RADEON_DPM_PERFORMANCE_LEVEL
+	for CARD in /sys/class/drm/card?; do
+		RADEON_DPM_STATE=${CARD}/device/power_dpm_state
+		RADEON_DPM_PERFORMANCE_LEVEL=${CARD}/device/power_dpm_force_performance_level
+		if [ -w $RADEON_DPM_STATE -a -w $RADEON_DPM_PERFORMANCE_LEVEL ]; then
+			if [ $ON_AC -eq 1 ]; then
+				if [ "$ACTIVATE" -eq 1 ]; then
+					log "VERBOSE" "Radeon power saving enabled on ${CARD}."
+					echo battery > $RADEON_DPM_STATE
+					echo auto > $RADEON_DPM_PERFORMANCE_LEVEL
+				else
+					log "VERBOSE" "Radeon power saving disabled on ${CARD}."
+					echo performance > $RADEON_DPM_STATE
+					echo auto > $RADEON_DPM_PERFORMANCE_LEVEL
+				fi
 			else
-				log "VERBOSE" "Radeon power saving disabled"
-				echo performance > $RADEON_DPM_STATE
-				echo auto > $RADEON_DPM_PERFORMANCE_LEVEL
-			fi
+				log "VERBOSE" "Radeon power saving enabled on ${CARD}."
+				echo battery > $RADEON_DPM_STATE
+				echo low > $RADEON_DPM_PERFORMANCE_LEVEL
+       			fi
 		else
-			log "VERBOSE" "Radeon power saving enabled."
-			echo battery > $RADEON_DPM_STATE
-			echo low > $RADEON_DPM_PERFORMANCE_LEVEL
-       		fi
-	else
-		log "VERBOSE" "Radeon Power Saving is not available on this system."
-	fi
+			log "VERBOSE" "Radeon Power Saving is not available on ${CARD}."
+		fi
+	done
 fi
