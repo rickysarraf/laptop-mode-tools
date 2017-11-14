@@ -125,7 +125,7 @@ if [ x$CONTROL_RUNTIME_AUTOSUSPEND = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$C
 				if [ x$USE_DEVICE = x1 ]; then
 					if [ -f "$runtime_device"/power/autosuspend_delay_ms ]; then
 						#INFO: Takes value in milliseconds
-						echo $($AUTOSUSPEND_TIMEOUT \* 1000) > "$runtime_device"/power/autosuspend_delay_ms;
+						echo $(($AUTOSUSPEND_TIMEOUT * 1000)) > "$runtime_device"/power/autosuspend_delay_ms;
 						log "VERBOSE" "Enabling auto suspend mode for device $runtime_device"
 					elif [ -f "$runtime_device"/power/autosuspend ]; then
 						echo $AUTOSUSPEND_TIMEOUT > "$runtime_device"/power/autosuspend;
