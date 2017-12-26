@@ -8,10 +8,12 @@ listed_by_id() {
 	device=$1
 	list=$2
 
-	if ! idvendor=$(cat $device/idVendor 2>/dev/null) || \
-	   ! idproduct=$(cat $device/idProduct 2>/dev/null); then
+	if ! idvendor=$(cat $device/idVendor 2>/dev/null || cat $device/vendor 2>/dev/null) || \
+	   ! idproduct=$(cat $device/idProduct 2>/dev/null || cat $device/device 2>/dev/null); then
 		return 1
 	fi
+	idvendor=${idvendor#0x}
+	idproduct=${idproduct#0x}
 
 	for devid in $list; do
 	    case $devid in
