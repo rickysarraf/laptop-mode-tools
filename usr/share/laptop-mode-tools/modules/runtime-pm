@@ -50,6 +50,7 @@ listed_by_type() {
 	for driver_type in $list; do
 		case "$uevent_data" in
 			*DRIVER=$driver_type*) return 0 ;;
+			*DEVTYPE=$driver_type*) return 0 ;;
 		esac
 	done
 
