@@ -8,10 +8,12 @@ listed_by_id() {
 	device=$1
 	list=$2
 
-	if ! idvendor=$(cat $device/idVendor 2>/dev/null) || \
-	   ! idproduct=$(cat $device/idProduct 2>/dev/null); then
+	if ! idvendor=$(cat $device/idVendor 2>/dev/null || cat $device/vendor 2>/dev/null) || \
+	   ! idproduct=$(cat $device/idProduct 2>/dev/null || cat $device/device 2>/dev/null); then
 		return 1
 	fi
+	idvendor=${idvendor#0x}
+	idproduct=${idproduct#0x}
 
 	for devid in $list; do
 	    case $devid in
@@ -48,6 +50,7 @@ listed_by_type() {
 	for driver_type in $list; do
 		case "$uevent_data" in
 			*DRIVER=$driver_type*) return 0 ;;
+			*DEVTYPE=$driver_type*) return 0 ;;
 		esac
 	done
 
@@ -77,6 +80,16 @@ whitelisted() {
 	|| listed_by_type $1 "$AUTOSUSPEND_RUNTIME_DEVTYPE_WHITELIST"\
 	|| return 1
 	return 0
+}
+
+echo_to_file_do() {
+    echo "$1" > "$2"
+}
+echo_to_file() {
+    echo_to_file_do "$1" "$2" 2>&1 | \
+        while read REPLY; do
+            log "VERBOSE" "$REPLY"
+        done
 }
 
 if [ x$CONTROL_RUNTIME_AUTOSUSPEND = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_RUNTIME_AUTOSUSPEND = xauto ]; then
@@ -118,23 +131,27 @@ if [ x$CONTROL_RUNTIME_AUTOSUSPEND = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$C
 					if ! blacklisted $runtime_device; then
 						USE_DEVICE=1
 					else
-						logger "Device $runtime_device is blacklisted, skipping auto suspend."
+						log "Device $runtime_device is blacklisted, skipping auto suspend."
 					fi
 				fi
 
 				if [ x$USE_DEVICE = x1 ]; then
-					if [ -f "$runtime_device"/power/autosuspend ]; then
-						echo $AUTOSUSPEND_TIMEOUT > "$runtime_device"/power/autosuspend;
+					if [ -f "$runtime_device"/power/autosuspend_delay_ms ]; then
+						#INFO: Takes value in milliseconds
+						echo_to_file $(($AUTOSUSPEND_TIMEOUT * 1000)) "$runtime_device"/power/autosuspend_delay_ms
+						log "VERBOSE" "Enabling auto suspend mode for device $runtime_device"
+					elif [ -f "$runtime_device"/power/autosuspend ]; then
+						echo_to_file $AUTOSUSPEND_TIMEOUT "$runtime_device"/power/autosuspend
 						log "VERBOSE" "Enabling auto suspend mode for device $runtime_device"
 					else
 						log "VERBOSE" "Not enabling auto suspend mode for device $runtime_device"
 					fi
 
 					if [ -f "$runtime_device"/power/control ]; then
-						echo "auto" > "$runtime_device"/power/control;
+						echo_to_file "auto" "$runtime_device"/power/control
 						log "VERBOSE" "Enabling auto power level for device $runtime_device."
 					elif [ -f "$runtime_device"/power/level ]; then
-						echo "auto" > "$runtime_device"/power/level;
+						echo_to_file "auto" "$runtime_device"/power/level
 						log "VERBOSE" "Enabling auto power level for device $runtime_device."
 					else
 						log "VERBOSE" "Not enabling auto power level for device $runtime_device"
@@ -147,18 +164,21 @@ if [ x$CONTROL_RUNTIME_AUTOSUSPEND = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$C
 		if [ "$DEVICE_LIST" != "" ]; then
 			for runtime_device in $DEVICE_LIST;
 			do
-				if [ -f "$runtime_device"/power/autosuspend ]; then
-					echo $AUTOSUSPEND_TIMEOUT > "$runtime_device"/power/autosuspend;
+				if [ -f "$runtime_device"/power/autosuspend_delay_ms ]; then
+					echo_to_file $AUTOSUSPEND_TIMEOUT "$runtime_device"/power/autosuspend_delay_ms
+					log "VERBOSE" "Disabling auto suspend mode for device $runtime_device."
+				elif [ -f "$runtime_device"/power/autosuspend ]; then
+					echo_to_file $AUTOSUSPEND_TIMEOUT "$runtime_device"/power/autosuspend
 					log "VERBOSE" "Disabling auto suspend mode for device $runtime_device."
 				else
 					log "VERBOSE" "Not disabling auto suspend mode for device $runtime_device"
 				fi
 
 				if [ -f "$runtime_device"/power/control ]; then
-					echo "on" > "$runtime_device"/power/control;
+					echo_to_file "on" "$runtime_device"/power/control
 					log "VERBOSE" "Enabling ON power level for device $runtime_device."
 				elif [ -f "$runtime_device"/power/level ]; then
-					echo "on" > "$runtime_device"/power/level;
+					echo_to_file "on" "$runtime_device"/power/level
 					log "VERBOSE" "Enabling ON power level for device $runtime_device."
 				else
 					log "VERBOSE" "Not enabling ON power level for device $runtime_device"

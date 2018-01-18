@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 
@@ -11,20 +11,11 @@ from os import access, F_OK, geteuid, listdir, path, putenv
 from shutil import move
 from webbrowser import open_new_tab
 
-try:
-    from PyQt4.QtGui import (QWidget, QMessageBox, QVBoxLayout, QHBoxLayout,
-                             QGroupBox, QScrollArea, QCheckBox, QPushButton,
-                             QApplication, QMainWindow, QIcon, QDialogButtonBox,
-                             QColor, QGraphicsDropShadowEffect, QShortcut)
-    print("Using PyQt4")
-except ImportError:
-    from PySide.QtGui import (QWidget, QMessageBox, QVBoxLayout, QHBoxLayout,
-                              QGroupBox, QScrollArea, QCheckBox, QPushButton,
-                              QApplication, QMainWindow, QIcon, QShortcut,
-                              QDialogButtonBox, QColor,
-                              QGraphicsDropShadowEffect)
-    print("Using PySide")
-
+from PyQt5.QtWidgets import (QWidget, QMessageBox, QVBoxLayout, QHBoxLayout,
+        QGroupBox, QScrollArea, QCheckBox, QPushButton,
+        QApplication, QMainWindow, QDialogButtonBox,
+        QGraphicsDropShadowEffect, QShortcut)
+from PyQt5.QtGui import (QIcon, QColor)
 
 
 # This seems to be needed, atleast of Debian
