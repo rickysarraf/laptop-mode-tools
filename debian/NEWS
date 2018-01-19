@@ -1,3 +1,18 @@
+laptop-mode-tools (1.71-2) unstable; urgency=medium
+
+  Starting with the 1.68 release, there are some new files:
+  laptop-mode.service, laptop-mode.timer and lmt-poll.service.
+  lmt-poll.service is the equivalent of the module battery-level-polling
+  .
+  To enable battery level polling on a systemd init based machine,
+  please enable lmt-poll.service and laptop-mode.timer service files
+  .
+  On new installations and existing upgrades, these services are
+  enabled by default. These new service/timer files currently do not
+  honor the CONTROL_BATTERY_LEVEL_POLLING setting
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Fri, 19 Jan 2018 11:17:11 +0530
+
 laptop-mode-tools (1.66-2) unstable; urgency=medium
 
   Starting with version 1.65, Laptop Mode Tools has dropped support for
