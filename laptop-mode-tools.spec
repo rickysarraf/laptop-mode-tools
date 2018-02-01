@@ -3,7 +3,7 @@
 
 Summary: Tools for power savings based on battery/AC status
 Name: laptop-mode-tools
-Version: 1.71
+Version: 1.72
 Release: 1
 License: GPL
 Group: System Environment/Base
@@ -11,8 +11,7 @@ URL: http://github.com/rickysarraf/laptop-mode-tools
 Vendor: Laptop Mode Tools Developers
 Distribution: RPM Based distributions
 Packager: Ritesh Raj Sarraf <rrs@researchut.com>
-
-Source: http://www.samwel.tk/laptop_mode/tools/downloads/laptop-mode-tools_%{version}.tar.gz
+Source: https://github.com/rickysarraf/laptop-mode-tools/releases/download/%{version}/laptop-mode-tools_%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildArch: noarch
@@ -102,6 +101,9 @@ fi
 
 
 %changelog
+* Thu Feb  1 2018 Ritesh Raj Sarraf <rrs@researchut.com> - 1.72-1
+- Updated to release 1.72
+
 * Thu Jan 12 2017 Ritesh Raj Sarraf <rrs@researchut.com> - 1.71-1
 - Updated to release 1.71
 
