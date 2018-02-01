@@ -1,3 +1,21 @@
+laptop-mode-tools (1.72-1) unstable; urgency=medium
+
+  * New Upstream Release
+  * Switch to PyQt5 and Python3
+  * Add btrfs to list of filesystems for which we can set commit interval
+  * Add pkexec invocation script
+  * Add desktop file to upstream repo and invoke script
+  * Update installer to includes gui wrappers
+  * Install new SVG pixmap
+  * Control all available cards in radeon-dpm
+  * Prefer to use the new runtime pm autosuspend_delay_ms interface
+  * tolerate broken device interfaces quietly
+  * runtime-pm: Make {black,white}lists work with non-USB devices
+  * send echo errors to verbose log
+  * Extend blacklist by device types of devtype
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Thu, 01 Feb 2018 22:04:58 +0530
+
 laptop-mode-tools (1.71-2) unstable; urgency=medium
 
   * Add rfkill to Recommends
