@@ -66,17 +66,12 @@ setPowerSave() {
 
 	if [ -n "$IW" ]; then
 		$IW dev $IF set power_save $ONOFF
-                if [ $ONOFF = "ON" ]; then
-                    $IW dev $IF set txpower auto
-                else
-                    $IW dev $IF set txpower fixed
-                fi
 	else
 		$IWCONFIG $IF power $ONOFF
-                if [ $ONOFF = "ON" ]; then
+                if [ $ONOFF = "on" ]; then
                     $IWCONFIG $IF txpower auto
                 else
-                    $IW dev $IF txpower fixed
+                    $IWCONFIG $IF txpower fixed
                 fi
 	fi
 }
@@ -106,10 +101,10 @@ if [ x$CONTROL_WIRELESS_POWER_SAVING = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x
 	fi
 
 	# Translate 1 => on, 0 => off
-	WIRELESS_AC_POWER_SAVING_ONOFF=off
-	WIRELESS_BATT_POWER_SAVING_ONOFF=off
-	[ "$WIRELESS_AC_POWER_SAVING" = 1 ] && WIRELESS_AC_POWER_SAVING_ONOFF=on
-	[ "$WIRELESS_BATT_POWER_SAVING" = 1 ] && WIRELESS_BATT_POWER_SAVING_ONOFF=on
+	WIRELESS_AC_POWER_SAVING_ONOFF="off"
+	WIRELESS_BATT_POWER_SAVING_ONOFF="off"
+	[ "$WIRELESS_AC_POWER_SAVING" = 1 ] && WIRELESS_AC_POWER_SAVING_ONOFF="on"
+	[ "$WIRELESS_BATT_POWER_SAVING" = 1 ] && WIRELESS_BATT_POWER_SAVING_ONOFF="on"
 
 	WIFI_IFNAMES=""
 	findWifiIfs
@@ -117,12 +112,16 @@ if [ x$CONTROL_WIRELESS_POWER_SAVING = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x
 		if [ $ON_AC -eq 1 ] ; then
 			log "VERBOSE" "On AC power: setting power saving mode for $IF to $WIRELESS_AC_POWER_SAVING_ONOFF."
 			if ! setPowerSave $IF $WIRELESS_AC_POWER_SAVING_ONOFF; then
-				log "ERR" "Failed to re-set power saving mode for wireless card"
+			    log "ERR" "Failed to re-set power saving mode for wireless card"
+			else
+			    log "VERBOSE" "On AC power: Successfully set power saving mode for $IF to $WIRELESS_AC_POWER_SAVING_ONOFF."
 			fi
 		else
 			log "VERBOSE" "On battery: setting power saving mode for $IF to $WIRELESS_BATT_POWER_SAVING_ONOFF."
 			if ! setPowerSave $IF $WIRELESS_BATT_POWER_SAVING_ONOFF; then
-				log "ERR" "Failed to set power saving mode for wireless card"
+			    log "ERR" "Failed to set power saving mode for wireless card"
+			else
+			    log "VERBOSE" "On battery: Successfully set power saving mode for $IF to $WIRELESS_BATT_POWER_SAVING_ONOFF."
 			fi
 		fi
 	done
