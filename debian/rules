@@ -7,7 +7,9 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-DEB_UPSTREAM_VERSION=$(shell dpkg-parsechangelog | sed -rne 's,^Version: ([^-]+).*,\1,p')
+include /usr/share/dpkg/pkg-info.mk
+DEB_UPSTREAM_VERSION  = $(shell dpkg-parsechangelog -SVersion | cut -d- -f1)
+
 get-orig-source:
 	uscan --force-download --rename --repack\
 		--download-version=$(DEB_UPSTREAM_VERSION) --destdir=.

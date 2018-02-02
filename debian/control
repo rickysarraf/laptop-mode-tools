@@ -4,7 +4,7 @@ Priority: optional
 Maintainer: Ritesh Raj Sarraf <rrs@debian.org>
 Homepage: https://github.com/rickysarraf/laptop-mode-tools
 Uploaders: Bart Samwel <bart@samwel.tk>
-Build-Depends: debhelper (>= 11)
+Build-Depends: debhelper (>= 11), dpkg (>= 1.16.1)
 Standards-Version: 3.9.8
 
 Package: laptop-mode-tools
