@@ -1,85 +1,20 @@
-laptop-mode-tools (1.71.65-1) UNRELEASED; urgency=medium
+laptop-mode-tools (1.72-1) unstable; urgency=medium
 
-  [ Ritesh Raj Sarraf ]
-  * Fix manpage spelling error
-  * Fix examples in runtime-pm module conf.
-    Thanks to Luo Lei
-  * Fix Debian package link.
-    Thanks to Florian Auer
-  * Fix link to homepage, which is the wiki
-  * Comparing current vs old brightness value is wrong. There are many consumers that can fiddle around with the brightness value. So instead of guesswork, just write down what the user has asked
-  * Run within....
-  * Avoid double checks for FOUND_SYS_CLASS_POWER_SUPPLY_AC
-  * Give sdparm higher precedence than hdparm
-  * Enable sdparm for Write Cache
-  * Rename variable to avoid confusion
-  * Fix correct program invocation.
-    Thanks to Mathias Rav
-  * Fix correct "ON" string.
-    Thanks to Andrey Polyakov
-  * For iw, txpower needs a device specific value. Hence, drop it.
-    Thanks to Andrey Polyakov
-  * Log a verbose message when set successfully
-  * Fix referencing the correct variable
-  * Xauthority could be preset at different locaiton, on newer systems
-  * Fix typo in function call
-  * Add verbose message for what Xauth is used
-  * Fix spelling errors in tooltip.
-    Thanks to Malthe Høj-Sunesen
+  * New Upstream Release
   * Switch to PyQt5 and Python3
-  * Drop pyside as I don't see qt5 support for it
-  * Fix indentation error
-  * Invoke with py3 in calling script
-
-  [ Maciej S. Szmigiero ]
   * Add btrfs to list of filesystems for which we can set commit interval
-
-  [ Ritesh Raj Sarraf ]
   * Add pkexec invocation script
   * Add desktop file to upstream repo and invoke script
   * Update installer to includes gui wrappers
-  * Install pkexec invocation script
-  * Call the correct pkexec script
-  * Install correct source file
-  * We still need policy for the main gui script
-
-  [ Vinzenz Vietzke ]
-  * added icon plus installation rules for debian packaging
-  * - added icon - added icon path to .desktop file
-
-  [ Ritesh Raj Sarraf ]
-  * Recommend the newer Python3 PyQT5 package
   * Install new SVG pixmap
-
-  [ Vaughan Woodzell ]
   * Control all available cards in radeon-dpm
-
-  [ Ritesh Raj Sarraf ]
   * Prefer to use the new runtime pm autosuspend_delay_ms interface
-  * Install new SVG pixmap
-
-  [ NewbProgrammer101 ]
-  * Fix typo
-
-  [ yar ]
-  * fix bash syntax
   * tolerate broken device interfaces quietly
-  * tiny typo
-
-  [ Tomas Janousek ]
   * runtime-pm: Make {black,white}lists work with non-USB devices
-
-  [ Ritesh Raj Sarraf ]
-  * Add module invocation example
-
-  [ yar ]
   * send echo errors to verbose log
-
-  [ Ritesh Raj Sarraf ]
   * Extend blacklist by device types of devtype
-  * Update debian/gbp.conf
 
- -- Ritesh Raj Sarraf <rrs@debian.org>  Thu, 18 Jan 2018 11:18:35 +0530
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Thu, 01 Feb 2018 22:04:58 +0530
 
 laptop-mode-tools (1.71-2) unstable; urgency=medium
 
