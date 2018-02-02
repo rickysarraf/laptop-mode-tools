@@ -1,6 +1,17 @@
 laptop-mode-tools (1.72-1) unstable; urgency=medium
 
-  * New Upstream Release
+  [ Ritesh Raj Sarraf ]
+  * Document the new lmt-poll.service and lmt-poll.timer
+  * Drop patches, merged upstream
+  * Bump build depend to versioned debhelper
+  * Use secure uri for project homepage
+  * Use debhelper compat level 11
+  * Update debian/watch to new project home
+  * Use dh_installsystemd with compat level 11
+  * Use versioned depends on debhelper
+  * Use dpkg's feature to determine source version
+
+  New Upstream Release
   * Switch to PyQt5 and Python3
   * Add btrfs to list of filesystems for which we can set commit interval
   * Add pkexec invocation script
@@ -14,7 +25,7 @@ laptop-mode-tools (1.72-1) unstable; urgency=medium
   * send echo errors to verbose log
   * Extend blacklist by device types of devtype
 
- -- Ritesh Raj Sarraf <rrs@debian.org>  Thu, 01 Feb 2018 22:04:58 +0530
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Fri, 02 Feb 2018 11:46:17 +0530
 
 laptop-mode-tools (1.71-2) unstable; urgency=medium
 
