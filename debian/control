@@ -2,9 +2,9 @@ Source: laptop-mode-tools
 Section: utils
 Priority: optional
 Maintainer: Ritesh Raj Sarraf <rrs@debian.org>
-Homepage: http://github.com/rickysarraf/laptop-mode-tools
+Homepage: https://github.com/rickysarraf/laptop-mode-tools
 Uploaders: Bart Samwel <bart@samwel.tk>
-Build-Depends: debhelper (>= 9), dh-systemd
+Build-Depends: debhelper (>= 11), dpkg (>= 1.16.1)
 Standards-Version: 3.9.8
 
 Package: laptop-mode-tools
