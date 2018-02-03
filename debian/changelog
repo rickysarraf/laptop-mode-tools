@@ -1,3 +1,9 @@
+laptop-mode-tools (1.72-2) unstable; urgency=medium
+
+  * Add patch to extend default blacklist of devices
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sat, 03 Feb 2018 21:52:03 +0530
+
 laptop-mode-tools (1.72-1) unstable; urgency=medium
 
   [ Ritesh Raj Sarraf ]
