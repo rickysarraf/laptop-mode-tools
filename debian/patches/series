@@ -1,1 +1,2 @@
 disable-ethernet-e1000e.patch
+add-sd-to-blacklist.patch
