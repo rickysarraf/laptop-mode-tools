@@ -209,7 +209,7 @@ if ( ! $INSTALL -m 644 gui/laptop-mode-tools.svg "$DESTDIR/usr/share/pixmaps" ) 
 	exit 11
 fi
 
-if ( ! $INSTALL -m 644 gui/LMT.py "$DESTDIR/usr/share/laptop-mode-tools" ) ; then
+if ( ! $INSTALL -m 644 gui/lmt.py "$DESTDIR/usr/share/laptop-mode-tools" ) ; then
 	echo "$0: Failed to install $DESTDIR/usr/share/laptop-mode-tools/lmt.py";
 	exit 11
 fi

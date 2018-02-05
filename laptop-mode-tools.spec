@@ -83,7 +83,7 @@ fi
 #%{_usr}/sbin/*
 %{_sbindir}/*
 %{_usr}/share/applications/laptop-mode-tools.desktop
-%{_usr}/share/laptop-mode-tools/LMT.py
+%{_usr}/share/laptop-mode-tools/lmt.py
 %{_usr}/share/laptop-mode-tools/modules/*
 %{_usr}/share/laptop-mode-tools/module-helpers/*
 %{_usr}/share/pixmaps/laptop-mode-tools.svg
