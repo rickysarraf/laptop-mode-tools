@@ -133,23 +133,6 @@ ENABLE_LAPTOP_MODE_TOOLS=1
 # Initialize the PATH Variable
 export PATH="${PATH}":/bin:/sbin:/usr/bin:/usr/sbin
 
-# This is a 2 phase locking approach. LMT_REQ_LOCK is the outer lock and LMT_INVOC_LOCK is the inner lock
-# We take this approach to ensure the scenario that, "At any point when an event occurs (AC/BATT), the
-# kernel can generate multiple events spanning over a couple of events. The first event is honored and
-# lmt executes. If the last event triggered at the 9th second, there is a fair chance that a good amount
-# of state change would have occured in the OS, to honor that state, we keep an outer lock  (LMT_REQ_LOCK)
-# handy, so that those changes can also be applied and not forgotten.
-# Workflow:
-# Event-1 is generated and lmt executes (lmt runtime could span 5-10 seconds)
-# At seventh second, 4 events generate. But Event-1 is still running.
-# We don't want to discard all the remaining 4 events, but at least honor 1 so that we can act to the changes
-# that occured in the last 7 seconds.
-# So, Event-2 acquire LMT_REQ_LOCK and waits to acquire LMT_INVOC_LOCK (which is acquire by Event-1)
-LMT_REQ_LOCK="/var/lock/lmt-req.lock"
-LMT_INVOC_LOCK="/var/lock/lmt-invoc.lock"
-LMT_BATTPOLL_LOCK="/var/lock/lmt-battpoll.lock"
-FLOCK=`which flock`
-
 checkint ()
 {
 	# $1 arg should be the string/integer
@@ -160,8 +143,22 @@ checkint ()
 	# Returns 1 if it is an integer
 }
 
+
+checkCmd ()
+{
+    cmd=`which $1`;
+    if [ $? -eq 1 ]; then
+	return 1
+    fi
+    test -x $cmd || return 1;
+}
+
 # Function to handle logging
-LOGGER=`which logger`;
+if checkCmd "logger"; then
+    LOGGER=`which logger`;
+else
+    echo "No logger command available" >&2;
+fi
 
 log ()
 {
@@ -214,6 +211,28 @@ disableDebug ()
 		set +vx
 	fi
 }
+
+# This is a 2 phase locking approach. LMT_REQ_LOCK is the outer lock and LMT_INVOC_LOCK is the inner lock
+# We take this approach to ensure the scenario that, "At any point when an event occurs (AC/BATT), the
+# kernel can generate multiple events spanning over a couple of events. The first event is honored and
+# lmt executes. If the last event triggered at the 9th second, there is a fair chance that a good amount
+# of state change would have occured in the OS, to honor that state, we keep an outer lock  (LMT_REQ_LOCK)
+# handy, so that those changes can also be applied and not forgotten.
+# Workflow:
+# Event-1 is generated and lmt executes (lmt runtime could span 5-10 seconds)
+# At seventh second, 4 events generate. But Event-1 is still running.
+# We don't want to discard all the remaining 4 events, but at least honor 1 so that we can act to the changes
+# that occured in the last 7 seconds.
+# So, Event-2 acquire LMT_REQ_LOCK and waits to acquire LMT_INVOC_LOCK (which is acquire by Event-1)
+LMT_REQ_LOCK="/var/lock/lmt-req.lock"
+LMT_INVOC_LOCK="/var/lock/lmt-invoc.lock"
+LMT_BATTPOLL_LOCK="/var/lock/lmt-battpoll.lock"
+if checkCmd "flock"; then
+    FLOCK=`which flock`;
+else
+    log "ERR" "Core dependency flock unavailable. Aborting"
+    exit 1
+fi
 
 # No default on these ones -- we need to detect if they have been set, for
 # backward compatibility with MINIMUM_BATTERY_MINUTES etc.
@@ -535,6 +554,7 @@ lmt_load_config ()
 	FORCE=0         # Force reapplying the current state?
 	INITSCRIPT_STOP=0	# Track stop command from init script. Consumer is lm-polling daemon
 	POWER_SYSFS="/proc/acpi/ac_adapter/*/state /proc/acpi/battery/*/state /sys/class/power_supply/*/online /sys/class/power_supply/*/state /sys/class/power_supply/*/status"
+	BATT_DETAILS="/sys/class/power_supply/*/capacity* /sys/class/power_supply/*/energy* /sys/class/power_supply/*/manufacturer /sys/class/power_supply/*/model /sys/class/power_supply/*/technology /sys/class/power_supply/*/type"
 
 	# Evaluate options passed to laptop_mode in here
 	if [ "$1" = "status" ] ; then
@@ -596,7 +616,15 @@ lmt_load_config ()
                 exit 0;
 
 	elif [ "$1" = "power-stats" ] ; then
-		for THISFILE in $POWER_SYSFS ; do
+		if checkCmd "udevadm"; then
+		    for SUPPLY_TYPE in /sys/class/power_supply/* ; do
+			log "STATUS" "Power Supply details for $SUPPLY_TYPE"
+			log "STATUS" ""
+			udevadm info -q all $SUPPLY_TYPE;
+		    done
+		else
+		    log "VERBOSE" "No udevadm available. Using hardcoded paths";
+		    for THISFILE in $POWER_SYSFS $BATT_DETAILS; do
 			if [ -e "$THISFILE" ] ; then
 				log "STATUS" "$THISFILE:"
 				if [ -r "$THISFILE" ] ; then
@@ -606,20 +634,20 @@ lmt_load_config ()
 				fi
 				log "STATUS" " "
 			fi
-		done
-
-		for SUPPLY_TYPE in /sys/class/power_supply/* ; do
-		    log "STATUS" "Power Supply details for $SUPPLY_TYPE"
-		    log "STATUS" ""
-		    udevadm info -q all $SUPPLY_TYPE;
-		done
+		    done
+		fi
 
                 # Post status, gracefully exit here
                 exit 0;
 
 	elif [ "$1" = "power-events" ] ; then
-		log "STATUS" "Running Laptop Mode Tools in event tracing mode. Press ^C to interrupt"
-		udevadm monitor --udev --property --subsystem-match=power_supply
+		if checkCmd "udevadm"; then
+		    log "STATUS" "Running Laptop Mode Tools in event tracing mode. Press ^C to interrupt"
+		    udevadm monitor --udev --property --subsystem-match=power_supply
+		else
+		    log "ERR" "No udevadm available to run trace"
+		    exit 1;
+		fi
 
                 # Post status, gracefully exit here
                 exit 0;
