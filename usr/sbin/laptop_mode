@@ -212,6 +212,18 @@ disableDebug ()
 	fi
 }
 
+echo_to_file_do() {
+    echo "$1" > "$2";
+}
+
+echo_to_file() {
+    echo_to_file_do "$1" "$2" 2>&1 | \
+        while read REPLY; do
+            log "VERBOSE" "$REPLY"
+        done
+	echo_to_file_retval=$?;
+}
+
 # This is a 2 phase locking approach. LMT_REQ_LOCK is the outer lock and LMT_INVOC_LOCK is the inner lock
 # We take this approach to ensure the scenario that, "At any point when an event occurs (AC/BATT), the
 # kernel can generate multiple events spanning over a couple of events. The first event is honored and
@@ -619,7 +631,7 @@ lmt_load_config ()
 				log "STATUS" " "
 			fi
 		done
-
+		
                 # Post status, gracefully exit here
                 exit 0;
 
