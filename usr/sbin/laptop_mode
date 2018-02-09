@@ -535,7 +535,6 @@ lmt_load_config ()
 	FORCE=0         # Force reapplying the current state?
 	INITSCRIPT_STOP=0	# Track stop command from init script. Consumer is lm-polling daemon
 	POWER_SYSFS="/proc/acpi/ac_adapter/*/state /proc/acpi/battery/*/state /sys/class/power_supply/*/online /sys/class/power_supply/*/state /sys/class/power_supply/*/status"
-	BATT_DETAILS="/sys/class/power_supply/*/capacity* /sys/class/power_supply/*/energy* /sys/class/power_supply/*/manufacturer /sys/class/power_supply/*/model /sys/class/power_supply/*/technology /sys/class/power_supply/*/type"
 
 	# Evaluate options passed to laptop_mode in here
 	if [ "$1" = "status" ] ; then
@@ -597,7 +596,7 @@ lmt_load_config ()
                 exit 0;
 
 	elif [ "$1" = "power-stats" ] ; then
-		for THISFILE in $POWER_SYSFS $BATT_DETAILS; do
+		for THISFILE in $POWER_SYSFS ; do
 			if [ -e "$THISFILE" ] ; then
 				log "STATUS" "$THISFILE:"
 				if [ -r "$THISFILE" ] ; then
@@ -608,6 +607,19 @@ lmt_load_config ()
 				log "STATUS" " "
 			fi
 		done
+
+		for SUPPLY_TYPE in /sys/class/power_supply/* ; do
+		    log "STATUS" "Power Supply details for $SUPPLY_TYPE"
+		    log "STATUS" ""
+		    udevadm info -q all $SUPPLY_TYPE;
+		done
+
+                # Post status, gracefully exit here
+                exit 0;
+
+	elif [ "$1" = "power-events" ] ; then
+		log "STATUS" "Running Laptop Mode Tools in event tracing mode. Press ^C to interrupt"
+		udevadm monitor --udev --property --subsystem-match=power_supply
 
                 # Post status, gracefully exit here
                 exit 0;
