@@ -663,7 +663,7 @@ lmt_load_config ()
 	elif [ "$1" = "power-events" ] ; then
 		if checkCmd "udevadm"; then
 		    log "STATUS" "Running Laptop Mode Tools in event tracing mode. Press ^C to interrupt"
-		    udevadm monitor --udev --property --subsystem-match=power_supply
+		    udevadm monitor --udev --property --kernel --subsystem-match=power_supply
 		else
 		    log "ERR" "No udevadm available to run trace"
 		    exit 1;
