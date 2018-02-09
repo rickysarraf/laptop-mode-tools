@@ -565,7 +565,11 @@ lmt_load_config ()
 		log "STATUS" "Drive power status:"
 		for disk in $HD; do
 			if [ -r $disk ]; then
-				hdparm -C $disk 2>/dev/null | sed "s/^/   /"
+				if checkCmd "hdparm"; then
+				    hdparm -C $disk 2>/dev/null | sed "s/^/   /"
+				else
+				    log "ERR" "hdparm command not available"
+				fi
 			else
 				log "STATUS" "   Cannot read $disk, permission denied - $0 needs to be run as root"
 			fi
@@ -583,7 +587,11 @@ lmt_load_config ()
 			esac
 			if [ -b $DEV ] ; then
 				if [ -r $DEV ] ; then
-					log "STATUS" "   $DEV: $((`blockdev --getra $DEV` / 2)) kB"
+					if checkCmd "blockdev"; then
+					    log "STATUS" "   $DEV: $((`blockdev --getra $DEV` / 2)) kB"
+					else
+					    log "ERR" "blockdev command not available"
+					fi
 				else
 					log "STATUS" "   Cannot read $DEV, permission denied - $0 needs to be run as root"
 				fi
