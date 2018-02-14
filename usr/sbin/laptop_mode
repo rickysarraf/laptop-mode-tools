@@ -674,9 +674,11 @@ lmt_load_config ()
 	elif [ "$1" = "help" -o "$1" = "--help" -o "$1" = "-h" ]; then
 	    log "MSG" "****************************"
 	    log "MSG" "Following user commands are understood"
-	    log "MSG" "status:		Display a Laptop Mode Tools power savings status"
-	    log "MSG" "power-stats:	Display the power statistics on the machine"
-	    log "MSG" "power-events:	Trap power related events on the machine"
+	    log "MSG" "status	    :	Display a Laptop Mode Tools power savings status"
+	    log "MSG" "power-stats  :	Display the power statistics on the machine"
+	    log "MSG" "power-events :	Trap power related events on the machine"
+	    log "MSG" "help	    :	Display this help message (--help, -h)"
+	    log "MSG" "version	    :	Display program version (--version, -v)"
 	    log "MSG" "****************************"
 	    exit 0;
 	elif [ "$1" = "version" -o "$1" = "--version" -o "$1" = "-v" ]; then
