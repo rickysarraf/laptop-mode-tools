@@ -1,4 +1,4 @@
-laptop-mode-tools (1.72.50-1) UNRELEASED; urgency=medium
+laptop-mode-tools (1.72.51-1) UNRELEASED; urgency=medium
 
   * Update debian/gbp.conf
   * Drop some patches
@@ -19,8 +19,12 @@ laptop-mode-tools (1.72.50-1) UNRELEASED; urgency=medium
   * Add echo control globally
   * Also include kernel events
   * Also include subsystem type usb
+  * Drop patch add-sd-to-blacklist.patch. Merged upstream
+  * INclude Disk LPM in status
+  * Add some help about user supported commands
+  * Support multiple variants of the version command
 
- -- Ritesh Raj Sarraf <rrs@debian.org>  Wed, 14 Feb 2018 21:40:01 +0530
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Wed, 14 Feb 2018 22:02:07 +0530
 
 laptop-mode-tools (1.72-2) unstable; urgency=medium
 
