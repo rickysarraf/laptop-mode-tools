@@ -671,7 +671,14 @@ lmt_load_config ()
 
                 # Post status, gracefully exit here
                 exit 0;
-
+	elif [ "$1" = "help" -o "$1" = "--help" -o "$1" = "-h" ]; then
+	    log "MSG" "****************************"
+	    log "MSG" "Following user commands are understood"
+	    log "MSG" "status:		Display a Laptop Mode Tools power savings status"
+	    log "MSG" "power-stats:	Display the power statistics on the machine"
+	    log "MSG" "power-events:	Trap power related events on the machine"
+	    log "MSG" "****************************"
+	    exit 0;
 	elif [ "$1" != "readconfig" -a "$1" != "defaults" ] ; then
 
 		#############################################################################
