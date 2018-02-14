@@ -3,7 +3,7 @@
 
 Summary: Tools for power savings based on battery/AC status
 Name: laptop-mode-tools
-Version: 1.72
+Version: 1.72.2
 Release: 1
 License: GPL
 Group: System Environment/Base
@@ -82,8 +82,11 @@ fi
 %{_sysconfdir}/power/event.d/*
 #%{_usr}/sbin/*
 %{_sbindir}/*
+%{_usr}/share/applications/laptop-mode-tools.desktop
+%{_usr}/share/laptop-mode-tools/lmt.py
 %{_usr}/share/laptop-mode-tools/modules/*
 %{_usr}/share/laptop-mode-tools/module-helpers/*
+%{_usr}/share/pixmaps/laptop-mode-tools.svg
 %{_usr}/share/polkit-1/actions/org.linux.lmt.gui.policy
 %{_usr}/lib/pm-utils/sleep.d/*
 %{_usr}/lib/tmpfiles.d/laptop-mode.conf
@@ -93,6 +96,8 @@ fi
 %dir %{_sysconfdir}/acpi/actions
 %dir %{_usr}/lib/pm-utils/sleep.d
 %dir %{_usr}/lib/tmpfiles.d
+%dir %{_usr}/share/applications
+%dir %{_usr}/share/pixmaps
 %dir %{_usr}/share/laptop-mode-tools/modules
 %dir %{_usr}/share/laptop-mode-tools/module-helpers
 %dir %{_sysconfdir}/apm/event.d
@@ -101,8 +106,11 @@ fi
 
 
 %changelog
-* Thu Feb  1 2018 Ritesh Raj Sarraf <rrs@researchut.com> - 1.72-1
-- Updated to release 1.72
+* Sat Feb  3 2018 Ritesh Raj Sarraf <rrs@researchut.com> - 1.72.2-1
+- Updated to release 1.72.2
+
+* Thu Feb  1 2018 Ritesh Raj Sarraf <rrs@researchut.com> - 1.72.1-1
+- Updated to release 1.72.1
 
 * Thu Jan 12 2017 Ritesh Raj Sarraf <rrs@researchut.com> - 1.71-1
 - Updated to release 1.71
