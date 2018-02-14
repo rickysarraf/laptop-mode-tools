@@ -679,6 +679,9 @@ lmt_load_config ()
 	    log "MSG" "power-events:	Trap power related events on the machine"
 	    log "MSG" "****************************"
 	    exit 0;
+	elif [ "$1" = "version" -o "$1" = "--version" -o "$1" = "-v" ]; then
+	    log "MSG" "Laptop Mode Tools $LMTVERSION"
+	    exit 0;
 	elif [ "$1" != "readconfig" -a "$1" != "defaults" ] ; then
 
 		#############################################################################
@@ -699,11 +702,6 @@ lmt_load_config ()
 
 		# Stop exporting everything -- what we do from here is private.
 		set +a
-
-		if [ "$1" = "--version" ] ; then
-			log "MSG" "Laptop Mode Tools $LMTVERSION"
-			exit 0
-		fi
 
 		if [ ! -e /proc/sys/vm/laptop_mode ] ; then
 			log "ERR" "Kernel does not have support for laptop mode. Please apply the laptop mode"
