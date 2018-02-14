@@ -618,7 +618,7 @@ lmt_load_config ()
 		fi
 
 		log "STATUS" " "
-		STATFILES="/proc/sys/vm/laptop_mode /proc/apm /proc/pmu/info /proc/sys/vm/bdflush /proc/sys/vm/dirty_ratio /proc/sys/fs/xfs/age_buffer /proc/sys/fs/xfs/sync_interval /proc/sys/fs/xfs/lm_age_buffer /proc/sys/fs/xfs/lm_sync_interval /proc/sys/vm/pagebuf/lm_flush_age /proc/sys/fs/xfs/xfsbufd_centisecs /proc/sys/fs/xfs/xfssyncd_centisecs /proc/sys/vm/dirty_background_ratio /proc/sys/vm/dirty_expire_centisecs /proc/sys/fs/xfs/age_buffer/centisecs /proc/sys/vm/dirty_writeback_centisecs /sys/devices/system/cpu/*/cpufreq/cpuinfo_*_freq /sys/devices/system/cpu/*/cpufreq/scaling_governor /proc/acpi/button/lid/*/state $POWER_SYSFS"
+		STATFILES="/proc/sys/vm/laptop_mode /proc/apm /proc/pmu/info /proc/sys/vm/bdflush /proc/sys/vm/dirty_ratio /proc/sys/fs/xfs/age_buffer /proc/sys/fs/xfs/sync_interval /proc/sys/fs/xfs/lm_age_buffer /proc/sys/fs/xfs/lm_sync_interval /proc/sys/vm/pagebuf/lm_flush_age /proc/sys/fs/xfs/xfsbufd_centisecs /proc/sys/fs/xfs/xfssyncd_centisecs /proc/sys/vm/dirty_background_ratio /proc/sys/vm/dirty_expire_centisecs /proc/sys/fs/xfs/age_buffer/centisecs /proc/sys/vm/dirty_writeback_centisecs /sys/devices/system/cpu/*/cpufreq/cpuinfo_*_freq /sys/devices/system/cpu/*/cpufreq/scaling_governor /proc/acpi/button/lid/*/state /sys/class/scsi_host/*/link_power_management_policy $POWER_SYSFS"
 
 		for THISFILE in $STATFILES ; do
 			if [ -e "$THISFILE" ] ; then
@@ -671,7 +671,17 @@ lmt_load_config ()
 
                 # Post status, gracefully exit here
                 exit 0;
-
+	elif [ "$1" = "help" -o "$1" = "--help" -o "$1" = "-h" ]; then
+	    log "MSG" "****************************"
+	    log "MSG" "Following user commands are understood"
+	    log "MSG" "status:		Display a Laptop Mode Tools power savings status"
+	    log "MSG" "power-stats:	Display the power statistics on the machine"
+	    log "MSG" "power-events:	Trap power related events on the machine"
+	    log "MSG" "****************************"
+	    exit 0;
+	elif [ "$1" = "version" -o "$1" = "--version" -o "$1" = "-v" ]; then
+	    log "MSG" "Laptop Mode Tools $LMTVERSION"
+	    exit 0;
 	elif [ "$1" != "readconfig" -a "$1" != "defaults" ] ; then
 
 		#############################################################################
@@ -692,11 +702,6 @@ lmt_load_config ()
 
 		# Stop exporting everything -- what we do from here is private.
 		set +a
-
-		if [ "$1" = "--version" ] ; then
-			log "MSG" "Laptop Mode Tools $LMTVERSION"
-			exit 0
-		fi
 
 		if [ ! -e /proc/sys/vm/laptop_mode ] ; then
 			log "ERR" "Kernel does not have support for laptop mode. Please apply the laptop mode"
