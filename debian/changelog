@@ -1,3 +1,27 @@
+laptop-mode-tools (1.72.50-1) UNRELEASED; urgency=medium
+
+  * Update debian/gbp.conf
+  * Drop some patches
+  * update changelog for test
+  * Fix rpm spec file for new installable files
+  * Fix spec version
+  * Add device type 'sd' to default blacklist
+  * UPdate spec file
+  * Fix case sensitive name for lmt.py
+  * Fix case sensitive file name
+  * Separate power sysfs attributes and add sysfs status attribute
+  * Move button lid to statfile
+  * Add a power-stats status command
+  * Use udevadm as primary
+  * Use checkCmd for running commands
+  * Use checkCmd for program invocaton
+  * This shouldn't have worked. Maybe given that hal is soo old, this snippet is dead now
+  * Add echo control globally
+  * Also include kernel events
+  * Also include subsystem type usb
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Wed, 14 Feb 2018 21:40:01 +0530
+
 laptop-mode-tools (1.72-2) unstable; urgency=medium
 
   * Add patch to extend default blacklist of devices
