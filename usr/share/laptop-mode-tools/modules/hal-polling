@@ -34,7 +34,8 @@ if [ x$CONTROL_HAL_POLLING = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_H
 
 	for DEV in $HAL_POLLING_DEVICES ; do
 		# Thanks to the kernel's new in-kernel block dev polling.
-		device=`readlink $DEV`;
+		device=`realpath $DEV | awk -v FS="/" '{print $NF}'`;
+
 		if [ -f /sys/block/$device/events_poll_msecs ]; then
 			if [ x$DISABLE_HAL_POLLING = x1 ]; then
 				echo 0 > /sys/block/$device/events_poll_msecs;
