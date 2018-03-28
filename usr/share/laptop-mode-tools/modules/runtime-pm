@@ -16,23 +16,9 @@ listed_by_id() {
 	idproduct=${idproduct#0x}
 
 	for devid in $list; do
-	    case $devid in
-		    *:*) ;;
-		    *) continue;;
-		esac
-
-		vendor=${devid%:*}
-		product=${devid#*:}
-
-		case $idvendor in
-		    ${vendor})
-			case $idproduct in
-			    ${product})	return 0;;
-			    *) ;;
-			esac
-			;;
-		    *);;
-		esac
+		if [ "$devid" = "$idvendor:$idproduct" ]; then
+			return 0
+		fi
 	done
 	return 1
 }
