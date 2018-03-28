@@ -68,12 +68,18 @@ whitelisted() {
 	return 0
 }
 
-echo_to_file() {
-	echo "$1" 2>&1 >"$2" |
-		while read REPLY; do
-			log "VERBOSE" "$REPLY"
-		done
-}
+if $LM_VERBOSE; then
+	echo_to_file() {
+		echo "$1" 2>&1 >"$2" |
+			while read REPLY; do
+				log "VERBOSE" "$REPLY"
+			done
+	}
+else
+	echo_to_file() {
+		echo "$1" > "$2" 2>/dev/null
+	}
+fi
 
 if [ x$CONTROL_RUNTIME_AUTOSUSPEND = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_RUNTIME_AUTOSUSPEND = xauto ]; then
 	if [ $ON_AC -eq 1 ]; then
