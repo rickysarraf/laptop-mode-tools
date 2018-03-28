@@ -69,13 +69,13 @@ whitelisted() {
 }
 
 echo_to_file_do() {
-    echo "$1" > "$2"
+	echo "$1" > "$2"
 }
 echo_to_file() {
-    echo_to_file_do "$1" "$2" 2>&1 | \
-        while read REPLY; do
-            log "VERBOSE" "$REPLY"
-        done
+	echo_to_file_do "$1" "$2" 2>&1 | \
+		while read REPLY; do
+			log "VERBOSE" "$REPLY"
+		done
 }
 
 if [ x$CONTROL_RUNTIME_AUTOSUSPEND = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_RUNTIME_AUTOSUSPEND = xauto ]; then
