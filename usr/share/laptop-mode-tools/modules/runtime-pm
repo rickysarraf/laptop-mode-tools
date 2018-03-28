@@ -68,11 +68,8 @@ whitelisted() {
 	return 0
 }
 
-echo_to_file_do() {
-	echo "$1" > "$2"
-}
 echo_to_file() {
-	echo_to_file_do "$1" "$2" 2>&1 | \
+	echo "$1" 2>&1 >"$2" |
 		while read REPLY; do
 			log "VERBOSE" "$REPLY"
 		done
