@@ -8,8 +8,8 @@ listed_by_id() {
 	device=$1
 	list=$2
 
-	if ! { idvendor=$(< $device/idVendor ) || idvendor=$(< $device/vendor ); } 2>/dev/null || \
-	   ! { idproduct=$(< $device/idProduct ) || idproduct=$(< $device/device ); } 2>/dev/null; then
+	if ! { read -r idvendor < $device/idVendor || read -r idvendor < $device/vendor; } 2>/dev/null || \
+	   ! { read -r idproduct < $device/idProduct || read -r idproduct < $device/device; } 2>/dev/null; then
 		return 1
 	fi
 	idvendor=${idvendor#0x}
@@ -29,16 +29,16 @@ listed_by_type() {
 	device_base=${device##*/}
 	list=$2
 
-	if ! { uevent_data=$(< $device/uevent ); } 2>/dev/null; then
-		return 1
-	fi
+	[ -r $device/uevent ] || return 1
 
-	for driver_type in $list; do
-		case "$uevent_data" in
-			*DRIVER=$driver_type*) return 0 ;;
-			*DEVTYPE=$driver_type*) return 0 ;;
-		esac
-	done
+	while read -r uevent_data; do
+		for driver_type in $list; do
+			case "$uevent_data" in
+				DRIVER=$driver_type) return 0 ;;
+				DEVTYPE=$driver_type) return 0 ;;
+			esac
+		done
+	done < $device/uevent
 
 	# Check child devices as well.  The actual driver type is
 	# listed in a child device, not the top-level device.
