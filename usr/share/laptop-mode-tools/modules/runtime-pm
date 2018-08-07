@@ -8,31 +8,17 @@ listed_by_id() {
 	device=$1
 	list=$2
 
-	if ! idvendor=$(cat $device/idVendor 2>/dev/null || cat $device/vendor 2>/dev/null) || \
-	   ! idproduct=$(cat $device/idProduct 2>/dev/null || cat $device/device 2>/dev/null); then
+	if ! { read -r idvendor < $device/idVendor || read -r idvendor < $device/vendor; } 2>/dev/null || \
+	   ! { read -r idproduct < $device/idProduct || read -r idproduct < $device/device; } 2>/dev/null; then
 		return 1
 	fi
 	idvendor=${idvendor#0x}
 	idproduct=${idproduct#0x}
 
 	for devid in $list; do
-	    case $devid in
-		    *:*) ;;
-		    *) continue;;
-		esac
-
-		vendor=${devid%:*}
-		product=${devid#*:}
-
-		case $idvendor in
-		    ${vendor})
-			case $idproduct in
-			    ${product})	return 0;;
-			    *) ;;
-			esac
-			;;
-		    *);;
-		esac
+		if [ "$devid" = "$idvendor:$idproduct" ]; then
+			return 0
+		fi
 	done
 	return 1
 }
@@ -40,19 +26,19 @@ listed_by_id() {
 # Check whether the driver type is blacklisted
 listed_by_type() {
 	device=$1
-	device_base=`basename $device`
+	device_base=${device##*/}
 	list=$2
 
-	if ! uevent_data=$(cat $device/uevent 2>/dev/null); then
-		return 1
-	fi
+	[ -r $device/uevent ] || return 1
 
-	for driver_type in $list; do
-		case "$uevent_data" in
-			*DRIVER=$driver_type*) return 0 ;;
-			*DEVTYPE=$driver_type*) return 0 ;;
-		esac
-	done
+	while read -r uevent_data; do
+		for driver_type in $list; do
+			case "$uevent_data" in
+				DRIVER=$driver_type) return 0 ;;
+				DEVTYPE=$driver_type) return 0 ;;
+			esac
+		done
+	done < $device/uevent
 
 	# Check child devices as well.  The actual driver type is
 	# listed in a child device, not the top-level device.
@@ -82,15 +68,18 @@ whitelisted() {
 	return 0
 }
 
-echo_to_file_do() {
-    echo "$1" > "$2"
-}
-echo_to_file() {
-    echo_to_file_do "$1" "$2" 2>&1 | \
-        while read REPLY; do
-            log "VERBOSE" "$REPLY"
-        done
-}
+if $LM_VERBOSE; then
+	echo_to_file() {
+		echo "$1" 2>&1 >"$2" |
+			while read REPLY; do
+				log "VERBOSE" "$REPLY"
+			done
+	}
+else
+	echo_to_file() {
+		echo "$1" > "$2" 2>/dev/null
+	}
+fi
 
 if [ x$CONTROL_RUNTIME_AUTOSUSPEND = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_RUNTIME_AUTOSUSPEND = xauto ]; then
 	if [ $ON_AC -eq 1 ]; then
