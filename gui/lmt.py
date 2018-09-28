@@ -48,12 +48,12 @@ class MainWidget(QMainWindow):
         self.configOptions, self.checkBoxList, self.configBool = {}, {}, None
         # Check for root privileges
         if geteuid() != 0:
-            msg = ("{} is not root. You need to run with root priviliges\n"
+            msg = ("{} is not root. You need to run with root privileges\n"
                    "Please use kdesudo, gksu or sudo/sux.").format(getuser())
             QMessageBox.critical(self, __doc__ + "- Error", msg)
             sys.exit(1)
         else:
-            msg = "This tool is running with root priviliges."
+            msg = "This tool is running with root privileges."
             QMessageBox.warning(self, __doc__ + "- Warning", msg)
         # title, icon and sizes
         self.setWindowTitle(__doc__)
