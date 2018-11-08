@@ -1,3 +1,10 @@
+laptop-mode-tools (1.72-3) unstable; urgency=medium
+
+  * Set SATA link power policy to med_power_with_dipm.
+    Thanks to Tomas Ebenlendr (Closes: #913200)
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Thu, 08 Nov 2018 11:56:41 +0530
+
 laptop-mode-tools (1.72-2) unstable; urgency=medium
 
   * Add patch to extend default blacklist of devices
