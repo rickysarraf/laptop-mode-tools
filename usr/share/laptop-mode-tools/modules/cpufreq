@@ -24,6 +24,33 @@ get_medium_value() {
 	cat "$1" | tr ' ' '\n' | sort -n | awk -v RS="" '{n=split($0,a); print a[int((n+1)/2)]}'
 }
 
+# get_real_cpu_governor trys to correct the special governor "auto":
+#
+# 1. use ondemand on CPUs that are not using intel_pstate driver.
+# 2. on CPUs that are using intel_psatte driver:
+# 	 - use powersave if the machine is on battery
+#    - otherwise use performance.
+#
+# $1 = the CPU to be set governor on.
+# $2 = the governor to use.
+get_real_cpu_governor() {
+	local CPU=$1
+	local GOVERNOR=$2
+	if [ x$GOVERNOR = xauto ]; then
+		if [ -f "$CPU/cpufreq/scaling_driver" ] &&
+		[ "$(cat $CPU/cpufreq/scaling_driver)" = "intel_pstate" ]
+		then
+			if [ $ON_AC -eq 1 ] ; then
+				GOVERNOR=performance
+			else
+				GOVERNOR=powersave
+			fi
+		else
+			GOVERNOR=ondemand
+		fi
+	fi
+}
+
 
 if [ x$CONTROL_CPU_FREQUENCY = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_CPU_FREQUENCY = xauto ]; then
 	if [ $ON_AC -eq 1 ] ; then
@@ -45,6 +72,7 @@ if [ x$CONTROL_CPU_FREQUENCY = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL
 		CPU_IGNORE_NICE_LOAD="$BATT_CPU_IGNORE_NICE_LOAD"
 	fi
 	for THISCPU in /sys/devices/system/cpu/* ; do
+		CPU_GOVERNOR="$(get_real_cpu_governor $THISCPU $CPU_GOVERNOR)"
 		if [ -e $THISCPU/cpufreq/cpuinfo_min_freq ]; then
 			THIS_CPU_MAXFREQ="$CPU_MAXFREQ"
 			THIS_CPU_MINFREQ="$CPU_MINFREQ"
