@@ -49,7 +49,6 @@ get_real_cpu_governor() {
 			GOVERNOR=ondemand
 		fi
 	fi
-	echo $GOVERNOR
 }
 
 
