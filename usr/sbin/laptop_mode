@@ -756,7 +756,7 @@ checkBattery ()
 				PREV_ENOUGH_CHARGE_TO_PREVENT_HIBERNATION=$ENOUGH_CHARGE_TO_PREVENT_HIBERNATION
 
 				log "VERBOSE" "Checking levels for $BATT."
-				PRESENT=$(cat $BATT/present)
+				PRESENT=$(cat $BATT/present 2> /dev/null || echo "0")
 				log "VERBOSE" "Present: $PRESENT."
 
 				# Only do if the battery is present
