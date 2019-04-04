@@ -10,6 +10,11 @@
 # risks data loss).
 INTERVAL=150
 
+if [ -d /run/systemd/system ]; then
+	echo "systemd detected. Battery polling is supported through lmt-poll timer";
+	return 0;
+fi
+
 while :; do
 	sleep $INTERVAL
 
