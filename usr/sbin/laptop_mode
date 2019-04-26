@@ -705,17 +705,6 @@ lmt_load_config ()
 		# Stop exporting everything -- what we do from here is private.
 		set +a
 
-		if [ ! -e /proc/sys/vm/laptop_mode ] ; then
-			log "ERR" "Kernel does not have support for laptop mode. Please apply the laptop mode"
-			log "ERR" "patch or install a newer kernel."
-			exit 1
-		fi
-
-		if [ ! -w /proc/sys/vm/laptop_mode ] ; then
-			log "ERR" "You do not have enough privileges to enable laptop_mode."
-			exit 1
-		fi
-
 		while [ "$1" != "" ] ; do
 			case "$1" in
 				init) INIT=1 ;;
@@ -738,6 +727,17 @@ lmt_load_config ()
 			esac
 			shift
 		done
+
+		if [ ! -e /proc/sys/vm/laptop_mode ] ; then
+			log "ERR" "Kernel does not have support for laptop mode. Please apply the laptop mode"
+			log "ERR" "patch or install a newer kernel."
+			exit 1
+		fi
+
+		if [ ! -w /proc/sys/vm/laptop_mode ] ; then
+			log "ERR" "You do not have enough privileges to enable laptop_mode."
+			exit 1
+		fi
 	fi
 }
 
