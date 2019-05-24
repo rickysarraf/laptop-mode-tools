@@ -1,4 +1,4 @@
-ACTION=="change", SUBSYSTEM=="power_supply", ENV{POWER_SUPPLY_NAME}=="|AC|ACAD", RUN+="lmt-udev auto"
+ACTION=="change", SUBSYSTEM=="power_supply", ENV{POWER_SUPPLY_NAME}=="|AC|ACAD|ADP*", RUN+="lmt-udev auto"
 ACTION=="add|remove", SUBSYSTEM=="machinecheck", RUN+="lmt-udev auto"
 ACTION=="add", SUBSYSTEM=="usb", RUN+="lmt-udev force"
 
