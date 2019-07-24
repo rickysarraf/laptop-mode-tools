@@ -153,6 +153,23 @@ if [ x$CONTROL_RUNTIME_AUTOSUSPEND = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$C
 		if [ "$DEVICE_LIST" != "" ]; then
 			for runtime_device in $DEVICE_LIST;
 			do
+
+				USE_DEVICE=0
+				if [ x$AUTOSUSPEND_USE_WHITELIST = x1 ]; then
+					if whitelisted $runtime_device; then
+						USE_DEVICE=1
+					else
+						log "VERBOSE" "Device $runtime_device not whitelisted, skipping auto suspend."
+					fi
+				else
+					if ! blacklisted $runtime_device; then
+						USE_DEVICE=1
+					else
+						log "Device $runtime_device is blacklisted, skipping auto suspend."
+					fi
+				fi
+				[ x$USE_DEVICE = x1 ] || continue
+
 				if [ -f "$runtime_device"/power/autosuspend_delay_ms ]; then
 					echo_to_file $AUTOSUSPEND_TIMEOUT "$runtime_device"/power/autosuspend_delay_ms
 					log "VERBOSE" "Disabling auto suspend mode for device $runtime_device."
