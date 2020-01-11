@@ -1,3 +1,11 @@
+laptop-mode-tools (1.73.1-1) unstable; urgency=medium
+
+  [ Ritesh Raj Sarraf ]
+  * Return the cpu governor string from the function
+  * Update spec file
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sat, 11 Jan 2020 17:21:41 +0530
+
 laptop-mode-tools (1.73-1) unstable; urgency=medium
 
   [ Ritesh Raj Sarraf ]
