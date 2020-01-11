@@ -1,3 +1,20 @@
+1.73 - Sat Jan 11 14:52:11 IST 2020
+    * Respect black/white lists when disabling autosuspend
+    * Add newer power supply names
+    * Fix crash due external battery of mouse
+    * Honor configuration setting for battery level polling
+    * cpufreq: intel_pstate should use performance governors
+    * runtime-pm: Speed up by avoiding fork in echo_to_file
+    * runtime-pm: Inline echo_to_file_do
+    * runtime-pm: Fix echo_to_file* indentation
+    * runtime-pm: Speed up by avoiding fork in listed_by_{id,type}
+    * runtime-pm: Simplify vendor/product match
+    * add help and verison user commands
+    * Add a power-stats status command
+    * Separate power sysfs attributes and add sysfs status attribute
+    * Add device type 'sd' to default blacklist
+    * Fix rpm spec file for new installable files
+
 1.72 - Thu Feb  1 21:59:24 IST 2018
     * Switch to PyQt5 and Python3
     * Add btrfs to list of filesystems for which we can set commit interval
