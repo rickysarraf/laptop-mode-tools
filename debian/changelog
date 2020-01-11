@@ -1,3 +1,35 @@
+laptop-mode-tools (1.73-1) unstable; urgency=medium
+
+  [ Ritesh Raj Sarraf ]
+  * Fix spelling errors in tooltip message.
+    Thanks to Alec Wright (Closes: #909783)
+  * Battery Level Polling on systemd based system is lmt-poll timer
+  * Add newer power supply names
+  * New Upstream Release 1.73
+
+  [ Tomas Janousek ]
+  * runtime-pm: Simplify vendor/product match
+  * runtime-pm: Speed up by avoiding fork in listed_by_{id,type}
+  * runtime-pm: Fix echo_to_file* indentation
+  * runtime-pm: Inline echo_to_file_do
+  * runtime-pm: Speed up by avoiding fork in echo_to_file
+  * runtime-pm: Avoid bashisms
+
+  [ Elvis Pranskevichus ]
+  * cpufreq: intel_pstate should use performance governors
+
+  [ Hualet Wang ]
+  * cpufreq: make cpufreq work out of box on machines using
+    intel_pstate driver
+
+  [ Andrius Semionovas ]
+  * Fix crash due external battery of mouse
+
+  [ Jae-hyeon Park ]
+  * Respect black/white lists when disabling autosuspend
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sat, 11 Jan 2020 15:51:40 +0530
+
 laptop-mode-tools (1.72-3) unstable; urgency=medium
 
   * Set SATA link power policy to med_power_with_dipm.
