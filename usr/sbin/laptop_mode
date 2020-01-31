@@ -1266,7 +1266,6 @@ if [ x$CONTROL_BATTERY_LEVEL_POLLING = x1 ] && [ x$BLACKLIST_IN_FLOCK = x1 ]; th
 
 		# In AC mode we disable the polling daemon.
 		killall -gq lm-polling-daemon
-		$FLOCK -u 7;
 	elif [ x$ON_AC = x0 ]; then
 		exec 7>$LMT_BATTPOLL_LOCK;
 		if $FLOCK -n -x -w 1 7; then
