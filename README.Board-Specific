@@ -1,0 +1,4 @@
+# Configuration files that are put here will override the default ones
+# Users can copy the default configuration files here and adapt it to their system hardware
+# 
+# Configuration files are read if their names end in .conf. Eg. laptop-mode.conf
