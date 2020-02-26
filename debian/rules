@@ -73,9 +73,11 @@ install: build
 	install -m755 -d $(DESTDIR)/etc/laptop-mode/nolm-ac-start
 	install -m755 -d $(DESTDIR)/etc/laptop-mode/nolm-ac-stop
 	install -m755 -d $(DESTDIR)/etc/laptop-mode/conf.d
+	install -m755 -d $(DESTDIR)/etc/laptop-mode/conf.d/board-specific
 	install -m755 -d $(DESTDIR)/etc/laptop-mode/modules
 	install -m644 etc/laptop-mode/laptop-mode.conf $(DESTDIR)/etc/laptop-mode/laptop-mode.conf
 	install -m644 etc/laptop-mode/conf.d/* $(DESTDIR)/etc/laptop-mode/conf.d
+	install -m644 README.Board-Specific $(DESTDIR)/etc/laptop-mode/conf.d/board-specific
 	install -m755 etc/acpi/actions/* $(DESTDIR)/etc/acpi/actions
 	install -m644 etc/acpi/events/* $(DESTDIR)/etc/acpi/events
 	install -m755 etc/apm/event.d/* $(DESTDIR)/etc/apm/event.d

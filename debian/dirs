@@ -1,3 +1,4 @@
 usr/sbin
 usr/share/laptop-mode-tools/modules
 usr/share/polkit-1/actions
+etc/laptop-mode/conf.d/board-specific
