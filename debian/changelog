@@ -1,3 +1,10 @@
+laptop-mode-tools (1.73.1-2) unstable; urgency=medium
+
+  * Disable ethernet module, by default, and let the user
+    explicitly enable it
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Wed, 26 Feb 2020 23:18:13 +0530
+
 laptop-mode-tools (1.73.1-1) unstable; urgency=medium
 
   [ Ritesh Raj Sarraf ]
