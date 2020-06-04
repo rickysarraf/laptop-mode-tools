@@ -1,3 +1,4 @@
 disable-ethernet-e1000e.patch
 new-sata-link-policy.patch
 0003-Drop-unlock-because-there-is-no-lock-acquired.patch
+0004-Add-board-specific-folder-and-documentation.patch

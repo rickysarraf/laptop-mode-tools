@@ -1,0 +1,35 @@
+From: Ritesh Raj Sarraf <rrs@debian.org>
+Date: Wed, 26 Feb 2020 23:05:24 +0530
+Subject: Add board-specific folder and documentation
+
+---
+ README.Board-Specific | 4 ++++
+ install.sh            | 4 ++++
+ 2 files changed, 8 insertions(+)
+ create mode 100644 README.Board-Specific
+
+diff --git a/README.Board-Specific b/README.Board-Specific
+new file mode 100644
+index 0000000..d3d4c2d
+--- /dev/null
++++ b/README.Board-Specific
+@@ -0,0 +1,4 @@
++# Configuration files that are put here will override the default ones
++# Users can copy the default configuration files here and adapt it to their system hardware
++# 
++# Configuration files are read if their names end in .conf. Eg. laptop-mode.conf
+diff --git a/install.sh b/install.sh
+index b68424f..b1d5303 100755
+--- a/install.sh
++++ b/install.sh
+@@ -144,6 +144,10 @@ for CONF in etc/laptop-mode/conf.d/* ; do
+ 	fi
+ done
+ 
++# Install folder board-specific
++$INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode/conf.d/board-specific"
++$INSTALL -m 644 README.Board-Specific "$DESTDIR/etc/laptop-mode/conf.d/board-specific"
++
+ 
+ if [ -f "$DESTDIR/etc/laptop-mode/lm-profiler.conf" ] ; then
+ 	echo "Configuration file $DESTDIR/etc/laptop-mode/lm-profiler.conf already exists."
