@@ -1,0 +1,90 @@
+From: Ritesh Raj Sarraf <rrs@debian.org>
+Date: Fri, 31 Jan 2020 10:42:12 +0530
+Subject: Drop unlock because there is no lock acquired
+
+When running under systemd, there is no polling daemon through shell
+script. Instead, the lmt-poll.service and .timer scripts take care of
+polling the batter every 150 seconds and act accordingly.
+
+	if [ x$ON_AC = x1 ] ; then
+		log "VERBOSE" "On AC, stopping the polling daemon."
+
+		# In AC mode we disable the polling daemon.
+		killall -gq lm-polling-daemon
+		$FLOCK -u 7;
+	elif [ x$ON_AC = x0 ]; then
+		exec 7>$LMT_BATTPOLL_LOCK;
+		if $FLOCK -n -x -w 1 7; then
+			log "VERBOSE" "Lock acquisition on descriptor 7 succeeded with pid $$";
+			if ! pidof -x lm-polling-daemon ; then
+				log "VERBOSE" "On battery and there was no polling daemon yet, starting the polling daemon."
+
+				# If there is no polling daemon, we start one.
+				setsid /usr/share/laptop-mode-tools/module-helpers/lm-polling-daemon < /dev/null > /dev/null 2> /dev/null &
+			fi
+		else
+			log "VERBOSE" "Lock acquisition on descriptor 7 failed with pid $$";
+		fi
+
+In the above code, prior to implementing the systemd service/timer
+units, our lm-polling-daemon used to run and background itself. This is
+still true on non-systemd machines.
+
+But either way, since we are killing the lm-polling-daemon script
+already, there will be no lock available on non-systemd machines too,
+because the script will have been killed and lock released.
+
+On systemd machines, because there is no lm-polling-daemon running,
+there will be no lock acquired either. So there'll be nothing to unlock.
+
+And this issue was only seen when ON_AC becaues when ON_BATTERY, we are
+acquiring the lock as the first step.
+
+Also note that the above code is higly specific to non-systemd machines.
+On systemd machines, the polling service calls "/lib/udev/lmt-udev auto"
+which in turn calls the following code:
+
+if [ -d /run/systemd/system ] && [ x$1 = xauto ]; then
+        [ -z $LMT_DEBUG ] || echo "systemd is $PPID $$ $@" > $LMT_DEBUG
+        exec systemctl --no-block reload-or-restart laptop-mode
+else
+        # Under sysvinit/upstart, we need to fork as we start the long-running
+        # /usr/sbin/laptop_mode process.
+        #
+        # Also, if this happens during boot, we may want to wait until /usr is available
+        #
+        # On newer systemd/udev (232-3 over here), the behavior has changed in my tests.
+        # Now, it'll immediately and quietly kill the process that is backgrounded
+        # systemd is nice, but I hate when it tries to become a magician
+        #
+        # This stanza will also be called for device plug/unplug events
+
+        exec > /dev/null 2>/dev/null
+        non_systemd_way "$@"
+        [ -z $LMT_DEBUG ] || echo "regulard is $PPID $$ $@" > $LMT_DEBUG
+fi
+
+Jan 31 10:32:31 priyasi systemd[1]: Starting Laptop Mode Tools - Battery Polling Service...
+Jan 31 10:32:31 priyasi systemd[1]: Started Daily Cleanup of Snapper Snapshots.
+Jan 31 10:32:31 priyasi systemd[1]: Reloading Laptop Mode Tools.
+Jan 31 10:32:31 priyasi laptop_mode[12799]: flock: 7: Bad file descriptor
+Jan 31 10:32:31 priyasi systemd[1]: lmt-poll.service: Succeeded.
+Jan 31 10:32:31 priyasi laptop_mode[12776]: Laptop mode
+Jan 31 10:32:31 priyasi laptop_mode[12776]: enabled, not active [unchanged]
+Jan 31 10:32:31 priyasi systemd[1]: Started Laptop Mode Tools - Battery Polling Service.
+---
+ usr/sbin/laptop_mode | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/usr/sbin/laptop_mode b/usr/sbin/laptop_mode
+index 03d68ed..873905d 100755
+--- a/usr/sbin/laptop_mode
++++ b/usr/sbin/laptop_mode
+@@ -1266,7 +1266,6 @@ if [ x$CONTROL_BATTERY_LEVEL_POLLING = x1 ] && [ x$BLACKLIST_IN_FLOCK = x1 ]; th
+ 
+ 		# In AC mode we disable the polling daemon.
+ 		killall -gq lm-polling-daemon
+-		$FLOCK -u 7;
+ 	elif [ x$ON_AC = x0 ]; then
+ 		exec 7>$LMT_BATTPOLL_LOCK;
+ 		if $FLOCK -n -x -w 1 7; then
