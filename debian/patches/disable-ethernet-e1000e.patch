@@ -1,4 +1,14 @@
+From: Ritesh Raj Sarraf <rrs@debian.org>
+Date: Thu, 4 Jun 2020 21:26:38 +0530
+Subject: disable-ethernet-e1000e
+
 disable batt throttle as there have been many reports of breakage
+---
+ etc/laptop-mode/conf.d/ethernet.conf | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/etc/laptop-mode/conf.d/ethernet.conf b/etc/laptop-mode/conf.d/ethernet.conf
+index 11d56bf..a963f1b 100644
 --- a/etc/laptop-mode/conf.d/ethernet.conf
 +++ b/etc/laptop-mode/conf.d/ethernet.conf
 @@ -23,10 +23,10 @@
@@ -14,7 +24,7 @@ disable batt throttle as there have been many reports of breakage
  LM_AC_THROTTLE_ETHERNET=0
  NOLM_AC_THROTTLE_ETHERNET=0
  
-@@ -56,8 +56,7 @@
+@@ -56,8 +56,7 @@ THROTTLE_SPEED="slowest"
  DISABLE_WAKEUP_ON_LAN=1
  
  # A list of the ethernet devices that should be controlled.
@@ -24,7 +34,7 @@ disable batt throttle as there have been many reports of breakage
  
  # In practise, most of the times a user is on battery, she is using the wireless device
  # Under such cases, you might want to disable your ethernet interface completely, when
-@@ -66,4 +65,4 @@
+@@ -66,4 +65,4 @@ ETHERNET_DEVICES="eth0"
  # Set below setting to 1, to disable ethernet interface when on battery and
  # when no carrier is detected on the interface (e.g., no active cable is
  # plugged in).

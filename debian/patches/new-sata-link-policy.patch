@@ -1,8 +1,18 @@
+From: Ritesh Raj Sarraf <rrs@debian.org>
+Date: Thu, 4 Jun 2020 21:26:38 +0530
+Subject: new-sata-link-policy
+
 With 4.15+ kernels, Linux Intel SATA has a better link power saving policy,
 med_power_with_dipm, which should be the recommended one to use
+---
+ etc/laptop-mode/conf.d/intel-sata-powermgmt.conf | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/etc/laptop-mode/conf.d/intel-sata-powermgmt.conf b/etc/laptop-mode/conf.d/intel-sata-powermgmt.conf
+index 4cec33c..6f98d03 100644
 --- a/etc/laptop-mode/conf.d/intel-sata-powermgmt.conf
 +++ b/etc/laptop-mode/conf.d/intel-sata-powermgmt.conf
-@@ -34,6 +34,6 @@
+@@ -34,6 +34,6 @@ CONTROL_AHCI_RUNTIME_PM=1
  # while still trying to enable power-saving features), "max_performance" (power
  # management is disabled). Note that setting any level besides
  # "max_performance" also disables device hotplug.
