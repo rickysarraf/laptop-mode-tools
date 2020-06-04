@@ -1,3 +1,12 @@
+laptop-mode-tools (1.73.1-3) unstable; urgency=medium
+
+  * Add board specific directory
+  * Clean initialze patches with gbp pq
+  * Donot drop a lock when there was never a lock acquired
+  * Add a README.Board-Specific file
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Thu, 04 Jun 2020 21:48:24 +0530
+
 laptop-mode-tools (1.73.1-2) unstable; urgency=medium
 
   * Disable ethernet module, by default, and let the user
