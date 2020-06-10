@@ -1,0 +1,22 @@
+#! /bin/sh
+
+if [ x$CONTROL_NOUVEAU = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_NOUVEAU = xauto ]; then
+    if [ -f $NOUVEAU_CONTROL_FILE ]; then
+	if [ $ON_AC -eq 1 ]; then
+		if [ $ACTIVATE -eq 1 ]; then
+			NOUVEAU_VALUE="$LM_AC_NOUVEAU"
+		else
+			NOUVEAU_VALUE="$NOLM_AC_NOUVEAU"
+		fi
+	else
+		NOUVEAU_VALUE="$BATT_NOUVEAU"
+	fi
+
+	echo $NOUVEAU_VALUE > $NOUVEAU_CONTROL_FILE
+    else
+	log "VERBOSE" "Control file $NOUVEAU_CONTROL_FILE unavailable"
+    fi
+else
+    log "VERBOSE" "Module nouveau is disabled"
+fi
+
