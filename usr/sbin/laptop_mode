@@ -129,6 +129,7 @@ NOLM_AC_BRIGHTNESS_COMMAND=false
 LOG_TO_SYSLOG=1
 DEBUG=0
 ENABLE_LAPTOP_MODE_TOOLS=1
+LM_VERBOSE="[ 1 = 0 ]"
 
 # Initialize the PATH Variable
 export PATH="${PATH}":/bin:/sbin:/usr/bin:/usr/sbin
@@ -275,7 +276,7 @@ lmt_load_config ()
 				fi
 				DEBUG=0
 			else
-				log "MSG" "Warning: Configuration file $CONF is not readable, skipping."
+				log "VERBOSE" "Warning: Configuration file $CONF is not readable, skipping."
 			fi
 		done
 	done
