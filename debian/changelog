@@ -1,3 +1,22 @@
+laptop-mode-tools (1.74-1) unstable; urgency=medium
+
+  * Laptop Mode Toosl version 1.74
+  * Drop unlock because there is no lock acquired
+  * Add execute bit on module radeon-dpm
+  * Add board-specific folder and documentation
+  * Disable ethernet module by default
+  * Log the debug message first because in non_systemd_way, the
+    program exits already
+  * Add power saving module for nouveau cards
+  * Initialize LM_VERBOSE with default to disabled
+  * Disable defaults for syslog logging
+  * With 4.15+ kernels, Linux Intel SATA has a better link power saving
+    policy, med_power_with_dipm, which should be the recommended one to
+    use
+  * Drop all patches. Applied upstream and not needed any more
+
+ -- Ritesh Raj Sarraf <rrs@debian.org>  Sat, 18 Jul 2020 20:19:42 +0530
+
 laptop-mode-tools (1.73.1-3) unstable; urgency=medium
 
   * Add board specific directory
