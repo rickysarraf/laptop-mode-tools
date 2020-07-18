@@ -1,3 +1,16 @@
+1.74 - Sat Jul 18 19:10:40 IST 2020
+    * With 4.15+ kernels, Linux Intel SATA has a better link power
+      saving policy, med_power_with_dipm, which should be the recommended
+      one to use
+    * Disable defaults for syslog logging
+    * Initialize LM_VERBOSE with default to disabled
+    * Merge pull request #157 from rickysarraf/nouveau
+    * Add power saving module for nouveau cards
+    * Disable ethernet module by default
+    * Add board-specific folder and documentation
+    * Add execute bit on module radeon-dpm
+    * Drop unlock because there is no lock acquired
+
 1.73 - Sat Jan 11 14:52:11 IST 2020
     * Respect black/white lists when disabling autosuspend
     * Add newer power supply names

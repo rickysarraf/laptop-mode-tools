@@ -604,6 +604,20 @@ If this option is enabled, laptop mode tools will automatically disable the
 NMI Watchdog timer when on battery. This module is part of auto modules. Thus enabling
 auto modules setting will activate this module automatically.
 
+.SS "\fI/etc/laptop-mode/conf.d/nouveau.conf\fP"
+
+The nouveau module allows you to enable the power savings for nvidia cards with the nouveau device driver.
+Enabling this module should lower down power consumption.
+
+.IP "\fBCONTROL_NOUVEAU\fP" 10
+If this option is enabled, laptop mode tools will automatically apply the
+power savings values when on battery. This module is part of auto modules. Thus enabling
+auto modules setting will activate this module automatically.
+
+Please ensure that your nvidia card's power saving functionality are available through the nouveau driver.
+Also ensure to set the correct path for your device in "\fI/sys/kernel/debug/dri/N/pstate\fP"
+where N is the number enumerated for the device
+
 .SS "\fI/etc/laptop-mode/conf.d/pci-aspm.conf\fP"
 
 The pcie-aspm module allows you to enable the PCI Express (PCIe) Active State

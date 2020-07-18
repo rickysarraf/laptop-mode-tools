@@ -144,6 +144,10 @@ for CONF in etc/laptop-mode/conf.d/* ; do
 	fi
 done
 
+# Install folder board-specific
+$INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode/conf.d/board-specific"
+$INSTALL -m 644 README.Board-Specific "$DESTDIR/etc/laptop-mode/conf.d/board-specific"
+
 
 if [ -f "$DESTDIR/etc/laptop-mode/lm-profiler.conf" ] ; then
 	echo "Configuration file $DESTDIR/etc/laptop-mode/lm-profiler.conf already exists."

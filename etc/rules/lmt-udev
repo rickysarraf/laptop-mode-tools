@@ -52,9 +52,9 @@ else
 	#
 	# This stanza will also be called for device plug/unplug events
 
+	[ -z $LMT_DEBUG ] || echo "regulard is $PPID $$ $@" > $LMT_DEBUG
 	exec > /dev/null 2>/dev/null
 	non_systemd_way "$@"
-	[ -z $LMT_DEBUG ] || echo "regulard is $PPID $$ $@" > $LMT_DEBUG
 fi
 
 exit 0
