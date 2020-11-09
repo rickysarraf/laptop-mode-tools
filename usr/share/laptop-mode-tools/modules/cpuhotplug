@@ -52,13 +52,13 @@ get_cpus_to_control() {
 
 	case "$1" in
 		"quarter")
-			get_cpus_from_number $((num_cpu * 1/4))
+			get_cpus_from_number $(echo $num_cpu*1/4 | bc)
 			;;
 		"half")
-			get_cpus_from_number $((num_cpu * 1/2))
+			get_cpus_from_number $(echo $num_cpu*1/2 | bc)
 			;;
 		"3quarter")
-			get_cpus_from_number $((num_cpu * 3/4))
+			get_cpus_from_number $(echo $num_cpu*3/4 | bc)
 			;;
 		[0-9]*)
 			get_cpus_from_number $1
