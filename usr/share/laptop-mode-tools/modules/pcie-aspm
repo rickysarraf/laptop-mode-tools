@@ -5,31 +5,35 @@
 
 if [ x$CONTROL_PCIE_ASPM = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_PCIE_ASPM = xauto ]; then
 	if [ $ON_AC -eq 1 ]; then
-		log "VERBOSE" "On AC power: setting pcie_aspm to default"
-		if [ -f /sys/module/pcie_aspm/parameters/policy ]; then
-			echo default > /sys/module/pcie_aspm/parameters/policy 2>/dev/null
-			if [ $? -eq 0 ]; then
-				log "VERBOSE" "PCIe ASPM set to 'default'"
-			else
-				log "VERBOSE" "PCIe ASPM tweaking is prohibited by the kernel"
-			fi
+		if [ $ACTIVATE -eq 1 ]; then
+			PCIE_ASPM_POLICY=$LM_AC_PCIE_ASPM_POLICY
 		else
-			log "VERBOSE" "PCIe ASPM is not available"
+			PCIE_ASPM_POLICY=$NOLM_AC_PCIE_ASPM_POLICY
 		fi
 	else
-		log "VERBOSE" "On battery: setting pcie_aspm to powersave"
-		if [ -f /sys/module/pcie_aspm/parameters/policy ]; then
-			echo powersave > /sys/module/pcie_aspm/parameters/policy 2>/dev/null
-			if [ $? -eq 0 ]; then
-				log "VERBOSE" "PCIe ASPM set to 'powersave'"
-			else
-				log "VERBOSE" "PCIe ASPM tweaking is prohibited by the kernel"
-			fi
+		PCIE_ASPM_POLICY=$BATT_PCIE_ASPM_POLICY
+	fi
+
+	if [ -z $PCIE_ASPM_POLICY ]; then
+		if [ $ON_AC -eq 1 ]; then
+			PCIE_ASPM_POLICY="default"
 		else
-			log "VERBOSE" "PCIe ASPM is not available"
+			PCIE_ASPM_POLICY="powersave"
 		fi
+	fi
+
+	log "VERBOSE" "PCIe ASPM will be set to $PCIE_ASPM_POLICY"
+
+	if [ -f /sys/module/pcie_aspm/parameters/policy ]; then
+		echo $PCIE_ASPM_POLICY > /sys/module/pcie_aspm/parameters/policy 2>/dev/null
+		if [ $? -eq 0 ]; then
+			log "VERBOSE" "PCIe ASPM set to $PCIE_ASPM_POLICY"
+		else
+			log "VERBOSE" "PCIe ASPM tweaking is prohibited by the kernel"
+		fi
+	else
+		log "VERBOSE" "PCIe ASPM is not available"
 	fi
 else
 	log "VERBOSE" "PCIe ASPM power savings module is disabled"
 fi
-

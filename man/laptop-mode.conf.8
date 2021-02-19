@@ -624,10 +624,18 @@ The pcie-aspm module allows you to enable the PCI Express (PCIe) Active State
 Power Management (ASPM).
 
 .IP "\fBCONTROL_PCI_ASPM\fP" 10
-If this option is enabled, laptop mode tools will enable PCI ASPM powersave
-mode when on battery. This module is part of auto modules. Thus enabling
-auto modules setting will activate this module automatically. PCIe ASPM may
-require that the pcie_aspm=force kernel option is enabled.
+If this option is enabled, laptop mode tools will set PCI ASPM powersaving policy. 
+This module is part of auto modules. Thus enabling auto modules setting will activate this
+module automatically. PCIe ASPM may require that the pcie_aspm=force kernel option is enabled.
+
+.IP "\fBBATT_PCIE_ASPM_POLICY\fP" 10
+The policy of PCIe ASPM while on battery.
+
+.IP "\fBLM_AC_PCIE_ASPM_POLICY\fP" 10
+The policy of PCIe ASPM while on AC and Laptop Mode is ACTIVE.
+
+.IP "\fBNOLM_AC_PCIE_ASPM_POLICY\fP" 10
+The policy of PCIe ASPM while on AC and Laptop Mode is INACTIVE.
 
 .SS "\fI/etc/laptop-mode/conf.d/usb-autosuspend.conf\fP"
 
