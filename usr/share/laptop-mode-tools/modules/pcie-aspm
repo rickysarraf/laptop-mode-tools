@@ -15,7 +15,11 @@ if [ x$CONTROL_PCIE_ASPM = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_PCI
 	fi
 
 	if [ -z $PCIE_ASPM_POLICY ]; then
-		PCIE_ASPM_POLICY="default"
+		if [ $ON_AC -eq 1 ]; then
+			PCIE_ASPM_POLICY="default"
+		else
+			PCIE_ASPM_POLICY="powersave"
+		fi
 	fi
 
 	log "VERBOSE" "PCIe ASPM will be set to $PCIE_ASPM_POLICY"
@@ -33,4 +37,3 @@ if [ x$CONTROL_PCIE_ASPM = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL_PCI
 else
 	log "VERBOSE" "PCIe ASPM power savings module is disabled"
 fi
-
