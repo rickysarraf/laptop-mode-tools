@@ -120,7 +120,7 @@ $INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode/conf.d"
 $INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode/modules"
 $INSTALL -d -m 755 "$DESTDIR/usr/share/polkit-1/actions"
 $INSTALL -d -m 755 "$DESTDIR/usr/share/applications"
-$INSTALL -d -m 755 "$DESTDIR/usr/share/pixmaps"
+$INSTALL -d -m 755 "$DESTDIR/usr/share/icons/hicolor/scalable/apps"
 $INSTALL -d -m 755 "$DESTDIR/usr/sbin"
 $INSTALL -d -m 755 "$DESTDIR/$UDEV_D/rules.d"
 $INSTALL -d -m 755 "$DESTDIR/$MAN_D/man8"
@@ -208,8 +208,8 @@ if ( ! $INSTALL -m 755 gui/lmt-config-gui* "$DESTDIR/usr/sbin" ) ; then
 	exit 11
 fi
 
-if ( ! $INSTALL -m 644 gui/laptop-mode-tools.svg "$DESTDIR/usr/share/pixmaps" ) ; then
-	echo "$0: Failed to install $DESTDIR/usr/share/pixmaps/laptop-mode-tools.svg";
+if ( ! $INSTALL -m 644 gui/laptop-mode-tools.svg "$DESTDIR/usr/share/icons/hicolor/scalable/apps" ) ; then
+	echo "$0: Failed to install $DESTDIR/usr/share/icons/hicolor/scalable/apps/laptop-mode-tools.svg";
 	exit 11
 fi
 
