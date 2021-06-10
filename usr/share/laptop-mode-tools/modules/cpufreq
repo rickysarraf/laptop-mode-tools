@@ -86,6 +86,10 @@ if [ x$CONTROL_CPU_FREQUENCY = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL
 				;;
 			"medium")
 				THIS_CPU_MAXFREQ=$(get_medium_value $THISCPU/cpufreq/scaling_available_frequencies)
+				if [ -z "$THIS_CPU_MAXFREQ" ] ; then
+					THIS_CPU_MAXFREQ=`cat $THISCPU/cpufreq/cpuinfo_max_freq`
+					THIS_CPU_MAXFREQ="$(( $THIS_CPU_MAXFREQ / 2 ))"
+				fi
 				;;
 			"fastest")
 				THIS_CPU_MAXFREQ=`cat $THISCPU/cpufreq/cpuinfo_max_freq`
@@ -98,6 +102,10 @@ if [ x$CONTROL_CPU_FREQUENCY = x1 ] || [ x$ENABLE_AUTO_MODULES = x1 -a x$CONTROL
 				;;
 			"medium")
 				THIS_CPU_MINFREQ=$(get_medium_value $THISCPU/cpufreq/scaling_available_frequencies)
+				if [ -z "$THIS_CPU_MAXFREQ" ] ; then
+					THIS_CPU_MAXFREQ=`cat $THISCPU/cpufreq/cpuinfo_max_freq`
+					THIS_CPU_MAXFREQ="$(( $THIS_CPU_MAXFREQ / 2 ))"
+				fi
 				;;
 			"fastest")
 				THIS_CPU_MINFREQ=`cat $THISCPU/cpufreq/cpuinfo_max_freq`
