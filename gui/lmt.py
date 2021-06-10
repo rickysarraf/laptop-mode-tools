@@ -91,7 +91,7 @@ class MainWidget(QMainWindow):
             checkBoxList.setObjectName(self.checkBoxName)
             checkBoxList.setText("Enable module {}".format(eachOption))
 
-            if self.tooltip is not '':
+            if self.tooltip != '':
                 checkBoxList.setToolTip(self.tooltip)
             else:
                 tooltip = "Configuration settings for {}".format(eachOption)
