@@ -57,7 +57,7 @@ class MainWidget(QMainWindow):
             QMessageBox.warning(self, __doc__ + "- Warning", self.tr(
                 'This tool is running with root privileges.'))
         # title, icon and sizes
-        self.setWindowTitle(__doc__)
+        self.setWindowTitle(self.tr("Laptop Mode Tools"))
         self.setMinimumSize(400, 400)
         self.setMaximumSize(2048, 2048)
         self.resize(600, 600)

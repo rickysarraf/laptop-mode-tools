@@ -3,413 +3,413 @@
 <context>
     <name>MainWidget</name>
     <message>
-        <location filename="../gui/lmt.py" line="55"/>
+        <location filename="../../../../gui/lmt.py" line="53"/>
         <source>{} is not root, You need to run with root privileges.
 </source>
-        <translation>不是管理员，请以管理员身份运行</translation>
+        <translation>{} 不是管理员，请以管理员身份运行</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="60"/>
+        <location filename="../../../../gui/lmt.py" line="57"/>
         <source>This tool is running with root privileges.</source>
         <translation>该工具以管理员身份运行</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="68"/>
+        <location filename="../../../../gui/lmt.py" line="65"/>
         <source>&amp;File</source>
         <translation>文件</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="68"/>
+        <location filename="../../../../gui/lmt.py" line="65"/>
         <source>Exit</source>
         <translation>退出</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="71"/>
+        <location filename="../../../../gui/lmt.py" line="68"/>
         <source>Module configuration</source>
         <translation>模块配置</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="88"/>
+        <location filename="../../../../gui/lmt.py" line="85"/>
         <source>Configuration settings for board-specific</source>
         <translation>板级指定配置</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="89"/>
+        <location filename="../../../../gui/lmt.py" line="86"/>
         <source>Configuration settings for ac97-powersave</source>
         <translation>ac97电源节能配置</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="90"/>
+        <location filename="../../../../gui/lmt.py" line="87"/>
         <source>Configuration settings for auto-hibernat</source>
         <translation>自动待机配置</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="91"/>
+        <location filename="../../../../gui/lmt.py" line="88"/>
         <source>Configuration settings for battery-level-polling</source>
         <translation>电源电量监控配置</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="92"/>
+        <location filename="../../../../gui/lmt.py" line="89"/>
         <source>Configuration settings for bluetooth</source>
         <translation>蓝牙配置</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="93"/>
+        <location filename="../../../../gui/lmt.py" line="90"/>
         <source>Configuration settings for configuration-file-control</source>
         <translation>管理文件控制配置</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="94"/>
+        <location filename="../../../../gui/lmt.py" line="91"/>
         <source>Configuration settings for cpufreq</source>
         <translation>CPU频率配置</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="95"/>
+        <location filename="../../../../gui/lmt.py" line="92"/>
         <source>Configuration settings for cpuhotplug</source>
         <translation>CPU核热切换配置</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="96"/>
+        <location filename="../../../../gui/lmt.py" line="93"/>
         <source>Configuration settings for dpms-standby</source>
         <translation>显示待机配置</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="97"/>
+        <location filename="../../../../gui/lmt.py" line="94"/>
         <source>Configuration settings for eee-superhe</source>
         <translation>eee-superhe配置</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="98"/>
+        <location filename="../../../../gui/lmt.py" line="95"/>
         <source>Configuration settings for ethernet</source>
         <translation>网络配置</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="99"/>
+        <location filename="../../../../gui/lmt.py" line="96"/>
         <source>Configuration settings for exec-commands</source>
         <translation>命令行配置</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="100"/>
+        <location filename="../../../../gui/lmt.py" line="97"/>
         <source>Configuration settings for hal-polling</source>
         <translation>硬件监控配置</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="101"/>
+        <location filename="../../../../gui/lmt.py" line="98"/>
         <source>Configuration settings for intel_pstate</source>
         <translation>intel_pstate配置</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="102"/>
+        <location filename="../../../../gui/lmt.py" line="99"/>
         <source>Configuration settings for intel-hda-powersave</source>
         <translation>intel-hda电源节能配置</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="103"/>
+        <location filename="../../../../gui/lmt.py" line="100"/>
         <source>Configuration settings for intel-sata-powermgmt</source>
         <translation>intel-sata电源管理配置</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="104"/>
+        <location filename="../../../../gui/lmt.py" line="101"/>
         <source>Configuration settings for kbd-backlight</source>
         <translation>Kbd背光配置</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="105"/>
+        <location filename="../../../../gui/lmt.py" line="102"/>
         <source>Configuration settings for lcd-brightness</source>
         <translation>Lcd亮度配置</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="106"/>
+        <location filename="../../../../gui/lmt.py" line="103"/>
         <source>Configuration settings for nmi-watchdog</source>
         <translation>nmi-watchdog配置</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="107"/>
+        <location filename="../../../../gui/lmt.py" line="104"/>
         <source>Configuration settings for nouveau</source>
         <translation>nouveau配置</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="108"/>
+        <location filename="../../../../gui/lmt.py" line="105"/>
         <source>Configuration settings for pcie-aspm</source>
         <translation>pcie-aspm配置</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="109"/>
+        <location filename="../../../../gui/lmt.py" line="106"/>
         <source>Configuration settings for radeon-dpm</source>
         <translation>radeon-dpm配置</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="110"/>
+        <location filename="../../../../gui/lmt.py" line="107"/>
         <source>Configuration settings for runtime-pm</source>
         <translation>runtime-pm配置</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="111"/>
+        <location filename="../../../../gui/lmt.py" line="108"/>
         <source>Configuration settings for sched-mc-power-savings</source>
         <translation>sched-mc电源节能配置</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="112"/>
+        <location filename="../../../../gui/lmt.py" line="109"/>
         <source>Configuration settings for sched-smt-power-savings</source>
         <translation>sched-smt电源节能配置</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="113"/>
+        <location filename="../../../../gui/lmt.py" line="110"/>
         <source>Configuration settings for start-stop-programs</source>
         <translation>启动/停止程序配置</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="114"/>
+        <location filename="../../../../gui/lmt.py" line="111"/>
         <source>Configuration settings for terminal-blanking</source>
         <translation>terminal-blanking配置</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="115"/>
+        <location filename="../../../../gui/lmt.py" line="112"/>
         <source>Configuration settings for vgaswitcheroo</source>
         <translation>vgaswitcheroo配置</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="116"/>
+        <location filename="../../../../gui/lmt.py" line="113"/>
         <source>Configuration settings for video-out</source>
         <translation>视频输出配置</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="117"/>
+        <location filename="../../../../gui/lmt.py" line="114"/>
         <source>Configuration settings for wireless-ipw-power</source>
         <translation>wireless-ipw-power配置</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="118"/>
+        <location filename="../../../../gui/lmt.py" line="115"/>
         <source>Configuration settings for wireless-iwl-power</source>
         <translation>wireless-iwl-power配置</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="119"/>
+        <location filename="../../../../gui/lmt.py" line="116"/>
         <source>Configuration settings for wireless-power</source>
         <translation>wireless-power配置</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="123"/>
+        <location filename="../../../../gui/lmt.py" line="120"/>
         <source>Enable module board-specific</source>
         <translation>使能板级指定模块</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="124"/>
+        <location filename="../../../../gui/lmt.py" line="121"/>
         <source>Enable module ac97-powersave</source>
         <translation>使能ac97电源节能模块</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="125"/>
+        <location filename="../../../../gui/lmt.py" line="122"/>
         <source>Enable module auto-hibernat</source>
         <translation>使能自动休眠模块</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="126"/>
+        <location filename="../../../../gui/lmt.py" line="123"/>
         <source>Enable module battery-level-polling</source>
         <translation>使能电池电量监控模块</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="127"/>
+        <location filename="../../../../gui/lmt.py" line="124"/>
         <source>Enable module bluetooth</source>
         <translation>使能蓝牙模块</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="128"/>
+        <location filename="../../../../gui/lmt.py" line="125"/>
         <source>Enable module configuration-file-control</source>
         <translation>使能配置文件控制模块</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="129"/>
+        <location filename="../../../../gui/lmt.py" line="126"/>
         <source>Enable module cpufreq</source>
         <translation>使能CPU频率模块</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="130"/>
+        <location filename="../../../../gui/lmt.py" line="127"/>
         <source>Enable module cpuhotplug</source>
         <translation>使能cpu核热切换模块</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="131"/>
+        <location filename="../../../../gui/lmt.py" line="128"/>
         <source>Enable module dpms-standby</source>
         <translation>使能显示显示待机模块</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="132"/>
+        <location filename="../../../../gui/lmt.py" line="129"/>
         <source>Enable module eee-superhe</source>
         <translation>使能eee-superhe模块</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="133"/>
+        <location filename="../../../../gui/lmt.py" line="130"/>
         <source>Enable module ethernet</source>
         <translation>使能网络模块</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="134"/>
+        <location filename="../../../../gui/lmt.py" line="131"/>
         <source>Enable module exec-commands</source>
         <translation>使能命令行模块</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="135"/>
+        <location filename="../../../../gui/lmt.py" line="132"/>
         <source>Enable module hal-polling</source>
         <translation>使能硬件监控模块</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="136"/>
+        <location filename="../../../../gui/lmt.py" line="133"/>
         <source>Enable module intel_pstate</source>
         <translation>使能intel_pstate模块</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="137"/>
+        <location filename="../../../../gui/lmt.py" line="134"/>
         <source>Enable module intel-hda-powersave</source>
         <translation>使能intel-hda电源节能模块</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="138"/>
+        <location filename="../../../../gui/lmt.py" line="135"/>
         <source>Enable module intel-sata-powermgmt</source>
         <translation>使能intel-sata电源管理模块</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="139"/>
+        <location filename="../../../../gui/lmt.py" line="136"/>
         <source>Enable module kbd-backlight</source>
         <translation>使能Kbd背光模块</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="140"/>
+        <location filename="../../../../gui/lmt.py" line="137"/>
         <source>Enable module lcd-brightness</source>
         <translation>使能Lcd亮度模块</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="141"/>
+        <location filename="../../../../gui/lmt.py" line="138"/>
         <source>Enable module nmi-watchdog</source>
         <translation>使能nmi-watchdog模块</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="142"/>
+        <location filename="../../../../gui/lmt.py" line="139"/>
         <source>Enable module nouveau</source>
         <translation>使能nouveau模块</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="143"/>
+        <location filename="../../../../gui/lmt.py" line="140"/>
         <source>Enable module pcie-aspm</source>
         <translation>使能pcie-aspm模块</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="144"/>
+        <location filename="../../../../gui/lmt.py" line="141"/>
         <source>Enable module radeon-dpm</source>
         <translation>使能radeon-dpm模块</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="145"/>
+        <location filename="../../../../gui/lmt.py" line="142"/>
         <source>Enable module runtime-pm</source>
         <translation>使能runtime-pm模块</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="146"/>
+        <location filename="../../../../gui/lmt.py" line="143"/>
         <source>Enable module sched-mc-power-savings</source>
         <translation>使能sched-mc电源节能模块</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="147"/>
+        <location filename="../../../../gui/lmt.py" line="144"/>
         <source>Enable module sched-smt-power-savings</source>
         <translation>使能sched-smt电源节能模块</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="148"/>
+        <location filename="../../../../gui/lmt.py" line="145"/>
         <source>Enable module start-stop-programs</source>
         <translation>使能启动/停止程序模块</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="149"/>
+        <location filename="../../../../gui/lmt.py" line="146"/>
         <source>Enable module terminal-blanking</source>
         <translation>使能terminal-blanking模块</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="150"/>
+        <location filename="../../../../gui/lmt.py" line="147"/>
         <source>Enable module vgaswitcheroo</source>
         <translation>使能vgaswitcheroo模块</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="151"/>
+        <location filename="../../../../gui/lmt.py" line="148"/>
         <source>Enable module video-out</source>
         <translation>使能视频输出模块</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="152"/>
+        <location filename="../../../../gui/lmt.py" line="149"/>
         <source>Enable module wireless-ipw-power</source>
         <translation>使能wireless-ipw-power模块</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="153"/>
+        <location filename="../../../../gui/lmt.py" line="150"/>
         <source>Enable module wireless-iwl-power</source>
         <translation>使能wireless-iwl-power模块</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="154"/>
+        <location filename="../../../../gui/lmt.py" line="151"/>
         <source>Enable module wireless-power</source>
         <translation>使能wireless-power模块</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="181"/>
+        <location filename="../../../../gui/lmt.py" line="178"/>
         <source>Confirm</source>
         <translation>确认</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="184"/>
+        <location filename="../../../../gui/lmt.py" line="181"/>
         <source>Hibernate</source>
         <translation>休眠</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="185"/>
+        <location filename="../../../../gui/lmt.py" line="182"/>
         <source>Trigger Suspend to Disk Hibernate</source>
         <translation>触发磁盘休眠</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="189"/>
+        <location filename="../../../../gui/lmt.py" line="186"/>
         <source>Sleep</source>
         <translation>睡眠</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="190"/>
+        <location filename="../../../../gui/lmt.py" line="187"/>
         <source>Trigger Suspend to RAM aka Sleep</source>
         <translation>触发RAM休眠</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="194"/>
+        <location filename="../../../../gui/lmt.py" line="191"/>
         <source>Close</source>
         <translation>关闭</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="197"/>
+        <location filename="../../../../gui/lmt.py" line="194"/>
         <source>Help</source>
         <translation>帮助</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="221"/>
+        <location filename="../../../../gui/lmt.py" line="212"/>
         <source>Quit ?.</source>
         <translation>停止 ?.</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="270"/>
+        <location filename="../../../../gui/lmt.py" line="261"/>
         <source>Error</source>
         <translation>错误</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="270"/>
+        <location filename="../../../../gui/lmt.py" line="261"/>
         <source>Couldn&apos;t apply all requested settings</source>
         <translation>不能应用所有请求的设置</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="273"/>
+        <location filename="../../../../gui/lmt.py" line="264"/>
         <source>Success</source>
         <translation>成功</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="273"/>
+        <location filename="../../../../gui/lmt.py" line="264"/>
         <source>Applied all requested settings</source>
         <translation>应用所有请求的设置</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="324"/>
+        <location filename="../../../../gui/lmt.py" line="315"/>
         <source>If you enable this setting, laptop mode tools will automatically set the
  powersave mode of AC97 audio chipsets. This setting does not hurt, so
  there are no AC vs. battery settings: if CONTROL_AC97_POWER is set to 1,
@@ -422,7 +422,7 @@ CONTROL_AC97_POWER设置为1, 节电模式始终处于启用状态。
         </translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="329"/>
+        <location filename="../../../../gui/lmt.py" line="320"/>
         <source>Using these settings, you can make laptop mode tools automatically put your
  computer into hibernation when the battery level goes critically low.
  
@@ -454,7 +454,7 @@ laptop-mode.conf 配置文件中。如果他们仍然存在，那现在的配置
 </translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="344"/>
+        <location filename="../../../../gui/lmt.py" line="335"/>
         <source>This module allows laptop mode to react to battery level changes, even if the
  battery does not send out frequent ACPI events for such battery level changes.
  
@@ -466,7 +466,7 @@ Note that this does NOT make ACPI-only features work on non-ACPI hardware.</sour
         </translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="348"/>
+        <location filename="../../../../gui/lmt.py" line="339"/>
         <source>If you enable this module, laptop mode tools will enable/disable bluetooth
  depending on the power status of your laptop. Bluetooth uses a considerable
  amount of power (comparable to wireless networking), and disabling it is
@@ -478,7 +478,7 @@ Note that this does NOT make ACPI-only features work on non-ACPI hardware.</sour
         </translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="352"/>
+        <location filename="../../../../gui/lmt.py" line="343"/>
         <source>Laptop mode tools can automatically swap out configuration files depending on
  the power state of your system.
  
@@ -526,7 +526,7 @@ Syslog守护进程倾向于在以下情况下同步它们的日志文件
 并且该设置不会迁移。 您必须手动执行此操作。</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="375"/>
+        <location filename="../../../../gui/lmt.py" line="366"/>
         <source>Laptop mode tools can automatically adjust your kernel CPU frequency
  settings. This includes upper and lower limits and scaling governors.
  There is also support for CPU throttling, on systems that don&apos;t support
@@ -552,7 +552,7 @@ laptop-mode.conf 配置文件中。如果他们仍然存在，那现在的配置
         </translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="386"/>
+        <location filename="../../../../gui/lmt.py" line="377"/>
         <source>Laptop mode tools can automatically switch off multiple CPU cores
  when switching to battery.
 This can be very useful if your use does not involve CPU intensive
@@ -571,7 +571,7 @@ Enalbe it only if you understand what you are doing</source>
         </translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="394"/>
+        <location filename="../../../../gui/lmt.py" line="385"/>
         <source>Using these settings, you can let laptop mode tools control the X display
  standby timeouts.
 
@@ -601,13 +601,13 @@ X设置不会在登录时自动开启，这是
         </translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="409"/>
+        <location filename="../../../../gui/lmt.py" line="400"/>
         <source>Enable this setting if you have an eeepc laptop</source>
         <translation>如果您有 eeepc 笔记本电脑，请启用此设置
         </translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="410"/>
+        <location filename="../../../../gui/lmt.py" line="401"/>
         <source>There are various ways to save power with ethernet. This section allows you
  to control the speed of your ethernet connection, and your wakeup-on-LAN
  settings. Both these things can have quite a power impact if you use Ethernet.
@@ -623,7 +623,7 @@ Note: Changing ethernet device speed may require link up/down on some devices.
         </translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="416"/>
+        <location filename="../../../../gui/lmt.py" line="407"/>
         <source>If you enable this setting, laptop mode tools will execute the specified
  commands on mode change.
  Please double test your commands before adding them here</source>
@@ -633,7 +633,7 @@ Note: Changing ethernet device speed may require link up/down on some devices.
         </translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="419"/>
+        <location filename="../../../../gui/lmt.py" line="410"/>
         <source>If you enable this module, laptop mode tools will control the polling of
  your CD/DVD drives by HAL. Disabling polling saves a considerable amount of
  power, but for some older CD/DVD drives it means that inserted CDs are no
@@ -652,7 +652,7 @@ HAL的CD/DVD 驱动器。 禁用轮询可以节省大量电能，
         </translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="427"/>
+        <location filename="../../../../gui/lmt.py" line="418"/>
         <source>Laptop mode tools can automatically adjust your kernel CPU frequency
  settings. This module handles Intel PState driver, that is somewhat
  different from other cpufreq drivers.
@@ -666,12 +666,12 @@ This feature is present only on kernels 3.9 and later.</source>
         </translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="432"/>
+        <location filename="../../../../gui/lmt.py" line="423"/>
         <source>Enable this setting to save some power with your Intel HDA Audio Chipset device.</source>
         <translation>启用此设置可以在使用Intel HDA 音频芯片组设备时节省一些电量。</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="433"/>
+        <location filename="../../../../gui/lmt.py" line="424"/>
         <source>If you enable this setting, laptop mode tools will automatically enable the
  link power management mode of Intel AHCI compliant SATA chipsets.
  On newer kernels (4.6+), it can also help enable AHCI Runtime PM savings</source>
@@ -680,7 +680,7 @@ Intel AHCI 兼容SATA芯片组的链接电源管理模式。
 在较新的内核 (4.6+) 上，它还可以帮助开启AHCI运行时PM节省功能</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="436"/>
+        <location filename="../../../../gui/lmt.py" line="427"/>
         <source>Using these settings, you can make laptop mode tools automatically adjust
  your keyboard&apos;s backlight settings, if your driver supports it. The settings
  are extremely simple -- they
@@ -728,7 +728,7 @@ As far as I understand it the values are between 0 and
         </translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="485"/>
+        <location filename="../../../../gui/lmt.py" line="476"/>
         <source>If you enable this setting, laptop mode tools will automatically configure the
  NMI Watchdog timer to save power while running on battery mode.
  
@@ -740,12 +740,12 @@ NMI看门狗定时器当运行在电池模式下时，以节省电能。
         </translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="489"/>
+        <location filename="../../../../gui/lmt.py" line="480"/>
         <source>Enable this setting if you have an nvidia card with nouveau driver</source>
         <translation>如果您有带 nouveau 驱动程序的 nvidia 卡，请启用此设置</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="490"/>
+        <location filename="../../../../gui/lmt.py" line="481"/>
         <source>If you enable this setting, laptop mode tools will automatically configure
  PCIe ASPM to save power while running on battery mode.
 
@@ -760,12 +760,12 @@ PCIe ASPM 来节省电能当在电池模式下工作时。
         </translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="497"/>
+        <location filename="../../../../gui/lmt.py" line="488"/>
         <source>Enable this setting to save some power on your Radeon VGA card </source>
         <translation>启用此设置以节省 Radeon VGA 卡的电量</translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="498"/>
+        <location filename="../../../../gui/lmt.py" line="489"/>
         <source>If you enable this setting, laptop mode tools will automatically enable
  the Runtime Power Management feature for all devices.
  
@@ -785,7 +785,7 @@ NOTE: Some devices claim they support autosuspend, but implement it in a
         </translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="506"/>
+        <location filename="../../../../gui/lmt.py" line="497"/>
         <source>If you enable this setting, laptop mode tools will automatically configure the
  Linux scheduler to save power on multi-core processors while running on
  battery mode.</source>
@@ -794,7 +794,7 @@ Linux调度以节省电能，当机器运行在多核处理器的电池模式下
         </translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="509"/>
+        <location filename="../../../../gui/lmt.py" line="500"/>
         <source>If you enable this setting, laptop mode tools will automatically configure the
  Linux scheduler to save power on SMT processors while running on
  battery mode.</source>
@@ -803,7 +803,7 @@ Linux以节省电能，当机器运行在SMT处理器的电池模式下时。
         </translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="512"/>
+        <location filename="../../../../gui/lmt.py" line="503"/>
         <source>Laptop mode tools can automatically start and stop programs when entering
  various power modes. Put scripts accepting &quot;start&quot; and &quot;stop&quot; parameters
  in the directories
@@ -856,7 +856,7 @@ laptop-mode.conf 配置文件中。如果他们仍然存在，那现在的配置
         </translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="538"/>
+        <location filename="../../../../gui/lmt.py" line="529"/>
         <source>Using these settings, you can let laptop mode tools control the terminal
  blanking timeouts. This only works for linux virtual consoles.
  
@@ -874,7 +874,7 @@ laptop-mode.conf 配置文件中。如果他们仍然存在，那现在的配置
         </translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="546"/>
+        <location filename="../../../../gui/lmt.py" line="537"/>
         <source>vga_switcheroo is the Linux subsystem for laptop hybrid graphics.
  For hybrid graphics machines, the discrete graphics chip usually is
  idle most of the time.
@@ -888,7 +888,7 @@ laptop-mode.conf 配置文件中。如果他们仍然存在，那现在的配置
         </translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="551"/>
+        <location filename="../../../../gui/lmt.py" line="542"/>
         <source>It is not always possible for video hardware to detect if displays are
  actually connected to VGA out and/or TV out ports. However, an enabled video
  output port draws power, even if no display is connected. This module allows
@@ -900,7 +900,7 @@ laptop-mode.conf 配置文件中。如果他们仍然存在，那现在的配置
         </translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="555"/>
+        <location filename="../../../../gui/lmt.py" line="546"/>
         <source>If you enable this setting, laptop mode tools will automatically set the
  powersave mode of Intel IPW3945, IPW2200 and IPW2100 wireless adapters.</source>
         <translation>如果启用此设置，笔记本电脑模式工具将自动设置
@@ -908,7 +908,7 @@ Intel IPW3945、IPW2200 和 IPW2100 无线适配器的省电模式。
         </translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="557"/>
+        <location filename="../../../../gui/lmt.py" line="548"/>
         <source>If you enable this setting, laptop mode tools will automatically set
  the powersave mode of Intel wireless adapters supported by the
  iwlagn driver (including 4965, 5100, 5300, 5350, 5150, 1000, and
@@ -925,7 +925,7 @@ iwlagn 驱动程序（包括 4965、5100、5300、5350、5150、1000 和
         </translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="564"/>
+        <location filename="../../../../gui/lmt.py" line="555"/>
         <source>If you enable this setting, laptop mode tools will automatically set the
  power saving mode of wireless interfaces which support power saving using
  the iwconfig power on/off setting.</source>
@@ -934,7 +934,7 @@ iwlagn 驱动程序（包括 4965、5100、5300、5350、5150、1000 和
         </translation>
     </message>
     <message>
-        <location filename="../gui/lmt.py" line="461"/>
+        <location filename="../../../../gui/lmt.py" line="452"/>
         <source>Using these settings, you can make laptop mode tools automatically adjust
  your LCD&apos;s brightness settings. The settings are extremely simple -- they
  only allow for the execution of a command, nothing more. The reason for this
@@ -977,6 +977,11 @@ LCD 的亮度设置。设置很简单——它们
    此命令的参数。如果您使用此命令，请设置
    BRIGHTNESS_OUTPUT 到“/dev/null”。
     </translation>
+    </message>
+    <message>
+        <location filename="../../../../gui/lmt.py" line="60"/>
+        <source>Laptop Mode Tools</source>
+        <translation>笔记本电源管理工具</translation>
     </message>
 </context>
 </TS>
