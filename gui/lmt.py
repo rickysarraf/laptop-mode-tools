@@ -6,6 +6,7 @@
 
 
 import sys
+import traceback
 import os
 from getpass import getuser
 from os import access, F_OK, geteuid, listdir, path, putenv
@@ -283,6 +284,7 @@ class MainWidget(QMainWindow):
             move(_path + ".tmp", _path)
             return True
         except:
+            log.err(traceback.format_exc())
             log.debug("Failed in populateValues() when operating on %s" % _path)
             return False
 
@@ -293,11 +295,11 @@ class MainWidget(QMainWindow):
 
         # TODO: Do we need to take care of the vendor specific overrides ???
         for configFile in listdir(configDir):
-            if access(path.join(configDir, configFile), F_OK) is True:
-                fn = path.join(configDir, configFile)
+            fn = path.join(configDir, configFile)
+            if path.isfile(fn):
                 self.configOptions[configFile.split(".")[0]] = fn
             else:
-                pass
+                log.debug("vendor specific overrides are not supported in the GUI")
 
     def readConfig(self, key, configOptionsDict):
         """Take a key and dict and read the configurations for the App."""
