@@ -124,7 +124,6 @@ $INSTALL -d -m 755 "$DESTDIR/usr/share/icons/hicolor/scalable/apps"
 $INSTALL -d -m 755 "$DESTDIR/usr/sbin"
 $INSTALL -d -m 755 "$DESTDIR/$UDEV_D/rules.d"
 $INSTALL -d -m 755 "$DESTDIR/$MAN_D/man8"
-$INSTALL -d -m 755 "$DESTDIR/usr/share/laptop-mode-tools/locale"
 
 ALREADY_EXISTED=0
 
@@ -186,11 +185,6 @@ fi
 
 if ( ! $INSTALL -m 755 usr/share/laptop-mode-tools/modules/* "$DESTDIR/usr/share/laptop-mode-tools/modules" ) ; then
 	echo "$0: Failed to install modules into /usr/share/laptop-mode-tools/modules. Installation failed."
-	exit 26
-fi
-
-if ( ! $INSTALL -m 755 usr/share/laptop-mode-tools/locale/* "$DESTDIR/usr/share/laptop-mode-tools/locale" ) ; then
-	echo "$0: Failed to install locale into /usr/share/laptop-mode-tools/locale. Installation failed."
 	exit 26
 fi
 
