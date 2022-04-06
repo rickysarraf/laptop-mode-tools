@@ -488,7 +488,7 @@ lmt_load_config ()
 	BATTERY_NOT_DISCHARGING=0
 	for POWER_SUPPLY in /sys/class/power_supply/* ; do
 		if [ -f $POWER_SUPPLY/type ] ; then
-			SYSFS_POWER_SUPPLY=1
+		    	SYSFS_POWER_SUPPLY=$(( SYSFS_POWER_SUPPLY + 1 ))
 			if [ "$(cat $POWER_SUPPLY/type)" = "Mains" ]; then
 				log "VERBOSE" "Determining power state from $POWER_SUPPLY/online."
 				if [ "$(cat $POWER_SUPPLY/online)" = 1 ]; then
@@ -497,6 +497,14 @@ lmt_load_config ()
 				fi
                         elif [ "$(cat $POWER_SUPPLY/type)" = "Battery" ]; then
 				log "VERBOSE" "Determining power state from status of battery $POWER_SUPPLY."
+				#INFO: Because there are and will always be br0ken drivers
+				if [ ! -f $POWER_SUPPLY/status ]; then
+					log "ERR" "Your power_supply is lacking a status node"
+					log "ERR" "Its driver might be reporting a wrong type"
+					log "ERR" "Ignoring this battery"
+					SYSFS_POWER_SUPPLY=$(( SYSFS_POWER_SUPPLY - 1 ))
+					continue
+				fi
                                 #INFO: Because there are and will always be br0ken batteries
 				if [ "$(cat $POWER_SUPPLY/status)" != "Discharging" ]; then
 				        if [ "$(cat $POWER_SUPPLY/status)" = "Unknown" ]; then
@@ -512,11 +520,15 @@ lmt_load_config ()
 					ON_AC=0
 					break
 				fi
+			else
+			    log "VERBOSE" "Power_supply has unexpected type $(cat $POWER_SUPPLY/type)"
+			    log "VERBOSE" "Ignoring it"
+			    SYSFS_POWER_SUPPLY=$(( SYSFS_POWER_SUPPLY - 1 ))
 			fi
 		fi
 	done
 
-	if [ $SYSFS_POWER_SUPPLY = 1 ] ; then
+	if [ $SYSFS_POWER_SUPPLY -gt 0 ] ; then
 		# Already found it!
 		log "VERBOSE" "Not trying other options, already found a power supply."
 	elif [ $BATTERY_NOT_DISCHARGING = 1 ]; then
