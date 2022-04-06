@@ -488,7 +488,6 @@ lmt_load_config ()
 	BATTERY_NOT_DISCHARGING=0
 	for POWER_SUPPLY in /sys/class/power_supply/* ; do
 		if [ -f $POWER_SUPPLY/type ] ; then
-			SYSFS_POWER_SUPPLY=1
 			if [ "$(cat $POWER_SUPPLY/type)" = "Mains" ]; then
 				log "VERBOSE" "Determining power state from $POWER_SUPPLY/online."
 				if [ "$(cat $POWER_SUPPLY/online)" = 1 ]; then
@@ -512,7 +511,11 @@ lmt_load_config ()
 					ON_AC=0
 					break
 				fi
+                        elif [ "$(cat $POWER_SUPPLY/type)" = "USB" ]; then
+                            log "VERBOSE" "USB charger detected. We need at least one battery, otherwise bad things may happen on desktops."
+                            continue
 			fi
+                        SYSFS_POWER_SUPPLY=1
 		fi
 	done
 
