@@ -486,11 +486,13 @@ lmt_load_config ()
 	SYSFS_POWER_SUPPLY=0
 	export ON_AC=0
 	BATTERY_NOT_DISCHARGING=0
+    AC_ADAPTER_CONNECTED=0
 	for POWER_SUPPLY in /sys/class/power_supply/* ; do
 		if [ -f $POWER_SUPPLY/type ] ; then
 			SYSFS_POWER_SUPPLY=1
 			if [ "$(cat $POWER_SUPPLY/type)" = "Mains" ]; then
 				log "VERBOSE" "Determining power state from $POWER_SUPPLY/online."
+                AC_ADAPTER_CONNECTED=1
 				if [ "$(cat $POWER_SUPPLY/online)" = 1 ]; then
 					ON_AC=1
                     break
@@ -516,12 +518,13 @@ lmt_load_config ()
 		fi
 	done
 
-	if [ ON_AC = 1 -a $SYSFS_POWER_SUPPLY = 1 ] ; then
+	if [ $SYSFS_POWER_SUPPLY = 1 ] ; then
 		# Already found it!
 		log "VERBOSE" "Not trying other options, already found a power supply."
-	elif [ $BATTERY_NOT_DISCHARGING = 1 ]; then
-		log "VERBOSE" "Marking it as online ON_AC because we found no AC and the battery is not discharging"
-		ON_AC=1
+        if [ $AC_ADAPTER_CONNECTED = 0 -a $BATTERY_NOT_DISCHARGING = 1 ]; then
+            log "VERBOSE" "No AC adapter found in /sys/class/power_supply and battery is not discharging. Marking it as online AC"
+            ON_AC=1
+        fi  
 	elif [ -d /proc/acpi/ac_adapter ] ; then
 		log "VERBOSE" "Determining power state from /proc/acpi/ac_adapter."
 		ADAPTERS_FOUND=0
