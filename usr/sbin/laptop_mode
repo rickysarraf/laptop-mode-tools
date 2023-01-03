@@ -581,7 +581,7 @@ lmt_load_config ()
 				log "VERBOSE" "No SCSI/IDE disks present";
 				continue
 			elif [ -r $disk ]; then
-				log "STATUS" "Drive power status:"
+				log "STATUS" "SCSI/IDE Drive power status:"
 				if checkCmd "hdparm"; then
 				    hdparm -C $disk 2>/dev/null | sed "s/^/   /"
 				else
@@ -597,7 +597,7 @@ lmt_load_config ()
 				log "VERBOSE" "No NVMe disks present";
 				continue
 			elif [ -r $disk ]; then
-				log "STATUS" "Drive power status:"
+				log "STATUS" "NVMe Drive power status:"
 				if checkCmd "nvme"; then
 				    nvme smart-log $disk 2>/dev/null | sed "s/^/   /"
 				else
