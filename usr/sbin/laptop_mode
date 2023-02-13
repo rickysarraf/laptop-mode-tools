@@ -90,6 +90,7 @@ NOLM_AC_CPU_GOVERNOR=ondemand
 NOLM_AC_CPU_IGNORE_NICE_LOAD=0
 CONTROL_CPU_FREQUENCY=0
 HD="/dev/[hs]d[abcdefgh]"
+NVME="/dev/nvme[0-9]"
 CONTROL_SYSLOG_CONF=0
 LM_AC_SYSLOG_CONF=/etc/syslog-on-ac-with-lm.conf
 NOLM_AC_SYSLOG_CONF=/etc/syslog-on-ac-without-lm.conf
@@ -575,9 +576,12 @@ lmt_load_config ()
 		log "STATUS" "Mounts:"
 		mount | grep ^/dev | sed "s/^/   /"
 		log "STATUS" " "
-		log "STATUS" "Drive power status:"
 		for disk in $HD; do
-			if [ -r $disk ]; then
+			if ! [ -e $disk ]; then
+				log "VERBOSE" "No SCSI/IDE disks present";
+				continue
+			elif [ -r $disk ]; then
+				log "STATUS" "SCSI/IDE Drive power status:"
 				if checkCmd "hdparm"; then
 				    hdparm -C $disk 2>/dev/null | sed "s/^/   /"
 				else
@@ -587,6 +591,23 @@ lmt_load_config ()
 				log "STATUS" "   Cannot read $disk, permission denied - $0 needs to be run as root"
 			fi
 		done
+
+		for disk in $NVME; do
+			if ! [ -e $disk ]; then
+				log "VERBOSE" "No NVMe disks present";
+				continue
+			elif [ -r $disk ]; then
+				log "STATUS" "NVMe Drive power status:"
+				if checkCmd "nvme"; then
+				    nvme smart-log $disk 2>/dev/null | sed "s/^/   /"
+				else
+				    log "ERR" "nvme command not available"
+				fi
+			else
+				log "STATUS" "   Cannot read $disk, permission denied - $0 needs to be run as root"
+			fi
+		done
+
 		log "STATUS" " "
 		log "STATUS" "(NOTE: drive settings affected by Laptop Mode cannot be retrieved.)"
 
