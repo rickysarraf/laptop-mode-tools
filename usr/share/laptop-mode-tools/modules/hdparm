@@ -47,9 +47,9 @@ is_capable() {
 	if [ $HAVE_UDEVINFO -ne 0 ] ; then
 		log "VERBOSE" "Querying $1 media type using udevinfo: "
 		if [ -x "$UDEVADM" ]; then
-			eval "$(udevadm info -q env -n $1 | egrep '(ID_TYPE=|ID_BUS=)' )"
+			eval "$(udevadm info -q env -n $1 | grep -E '(ID_TYPE=|ID_BUS=)' )"
 		else
-			eval "$(udevinfo -q env -n $1 | egrep '(ID_TYPE=|ID_BUS=)' )"
+			eval "$(udevinfo -q env -n $1 | grep -E '(ID_TYPE=|ID_BUS=)' )"
 		fi
 		if [ -n "$ID_TYPE" -a -n "$ID_BUS" ] ; then
 			log "VERBOSE" "type '$ID_TYPE' on bus '$ID_BUS' detected"
