@@ -383,7 +383,7 @@ class MainWidget(QMainWindow):
                                                         "\n"
                                                         "IMPORTANT: This feature may break Linux Software Suspend\n"
                                                         "\n"
-                                                        "Enalbe it only if you understand what you are doing"),
+                                                        "Enable it only if you understand what you are doing"),
             'dpms-standby': lambda: self.tooltip + self.tr("Using these settings, you can let laptop mode tools control the X display\n "
                                                         "standby timeouts.\n"
                                                         "\n"
