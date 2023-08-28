@@ -191,6 +191,44 @@ profilenet(){
 # PROFILING RUN
 #
 
+
+# On newner Linux systems, 5.14+ the /proc/sys/vm/block_dump interface is gone and users are
+# encouraged to make use of the Linux Tracing infrastructure
+
+BTRACE=$(which btrace)
+if [ -f /proc/sys/vm/block_dump ]; then
+	echo "Using older block_dump interface";
+	continue
+elif [ -n "$BTRACE" ]; then
+	if [ -f "$BTRACE" ]; then
+		VALID_DEVICES="";
+		# Get list of block devices
+		DEVICES=$(lsblk -rd | grep disk | grep -v SWAP | grep -v loop | cut -d ' ' -f1)
+		if [ -z "$DEVICES" ]; then
+			echo "No block devices detected";
+			exit 1;
+		fi
+		echo "Detected list of devices are: $DEVICES"
+		for dev in $DEVICES;
+		do
+			if [ -b /dev/$dev ]; then
+				VALID_DEVICES="$VALID_DEVICES /dev/$dev ";
+			fi
+		done
+		echo "Validated list of devices are: $VALID_DEVICES";
+
+		echo "Using blktrace interface";
+		$BTRACE -s -t -w $PROFILE_RUN_LENGTH  $VALID_DEVICES
+		exit 0
+	else
+		echo "No suitable tooling available to run lm-profiler";
+		exit 1;
+	fi
+else
+	echo "No suitable tooling available to run lm-profiler";
+	exit 1;
+fi
+
 # Disable profiling if the script gets interrupted.
 trap "stop_profiling; echo; exit 10" EXIT HUP INT ABRT QUIT SEGV TERM
 
