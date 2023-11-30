@@ -46,6 +46,29 @@ get_cpus_from_ids() {
 	done
 }
 
+# Get the lowest max_freq of all cores, to retrieve what are the
+# ecores(efficient cores) and only enable them + cpu0 and cpu1
+get_cpus_from_lower_max_freq(){
+
+  # evaluating if cpuinfo_max_freq exists and
+  # using cpu0 as the sane default lower max_freq
+  if [  -f /sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq ]; then
+    lowest_maxfreq=$(cat /sys/devices/system/cpu/cpu*/cpufreq/cpuinfo_max_freq| sort -u| head -1)
+  else
+    log "VERBOSE" "cpufreq modules not loaded. Can't proceed with finding lowest max frequency"
+  fi
+
+  # playing safe with kernel by not removing the first CPU and it's related HT
+  cpu_list="/sys/devices/system/cpu/cpu0 /sys/devices/system/cpu/cpu1"
+
+  for cpu in /sys/devices/system/cpu/cpu[0-9]* ; do
+    current_freq=$(cat $cpu/cpufreq/cpuinfo_max_freq)
+    if [ $current_freq -eq $lowest_maxfreq ]; then
+      cpu_list="$cpu_list $cpu"
+    fi
+  done
+}
+
 # Get a list of cpus to control from DISABLE_AVAILABLE_CPU value.
 get_cpus_to_control() {
 	num_cpu=`max_available_cpus`
@@ -59,6 +82,9 @@ get_cpus_to_control() {
 			;;
 		"3quarter")
 			get_cpus_from_number $((num_cpu * 3/4))
+			;;
+		"ecores")
+			get_cpus_from_lower_max_freq
 			;;
 		[0-9]*)
 			get_cpus_from_number $1
