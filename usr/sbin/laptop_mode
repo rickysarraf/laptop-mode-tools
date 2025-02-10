@@ -768,7 +768,7 @@ checkBattery ()
 	# Weird way of checking that /sys/class/power_supply is not empty -- but it works.
 	if [ "$(echo /sys/class/power_supply/*)" != '/sys/class/power_supply/*' ] ; then
 		log "VERBOSE" "Not on AC and we have battery information in /sys/class/power_supply/BAT* -- checking minimum battery charge."
-		for BATT in /sys/class/power_supply/* ; do
+		for BATT in /sys/class/power_supply/BAT* ; do
 			BATT_TYPE=$(cat $BATT/type)
 			log "VERBOSE" "$BATT is of type $BATT_TYPE."
 			if [ "$BATT_TYPE" != "Battery" ] ; then
