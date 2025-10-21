@@ -13,12 +13,12 @@ from os import access, F_OK, geteuid, listdir, path, putenv
 from shutil import move
 from webbrowser import open_new_tab
 
-from PyQt5.QtWidgets import (QWidget, QMessageBox, QVBoxLayout, QHBoxLayout,
+from PyQt6.QtWidgets import (QWidget, QMessageBox, QVBoxLayout, QHBoxLayout,
         QGroupBox, QScrollArea, QCheckBox, QPushButton,
         QApplication, QMainWindow, QDialogButtonBox,
-        QGraphicsDropShadowEffect, QShortcut)
-from PyQt5.QtGui import (QIcon, QColor)
-from PyQt5.QtCore import Qt, QTranslator, center
+        QGraphicsDropShadowEffect)
+from PyQt6.QtGui import (QIcon, QColor, QShortcut)
+from PyQt6.QtCore import Qt, QTranslator
 
 # This seems to be needed, atleast of Debian
 putenv('QT_X11_NO_MITSHM', "1")
@@ -197,22 +197,22 @@ class MainWidget(QMainWindow):
 
         self.buttonBox = QDialogButtonBox()
         self.buttonBox.addButton(self.pushButtonOk,
-                                 QDialogButtonBox.ActionRole)
+                                 QDialogButtonBox.ButtonRole.ActionRole)
         self.buttonBox.addButton(self.pushButtonHibernate,
-                                 QDialogButtonBox.ActionRole)
+                                 QDialogButtonBox.ButtonRole.ActionRole)
         self.buttonBox.addButton(self.pushButtonSleep,
-                                 QDialogButtonBox.ActionRole)
+                                 QDialogButtonBox.ButtonRole.ActionRole)
         self.buttonBox.addButton(self.pushButtonClose,
-                                 QDialogButtonBox.ActionRole)
+                                 QDialogButtonBox.ButtonRole.ActionRole)
         self.buttonBox.addButton(self.pushButtonHelp,
-                                 QDialogButtonBox.ActionRole)
+                                 QDialogButtonBox.ButtonRole.ActionRole)
         self.layout.addWidget(self.buttonBox)
 
     def closeEvent(self, event):
         ' Ask to Quit '
         the_conditional_is_true = QMessageBox.question(
-            self, __doc__.title(), self.tr('Quit ?.'), QMessageBox.Yes | QMessageBox.No,
-            QMessageBox.No) == QMessageBox.Yes
+            self, __doc__.title(), self.tr('Quit ?.'), QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No) == QMessageBox.StandardButton.Yes
         event.accept() if the_conditional_is_true else event.ignore()
 
     def sleep(self):
@@ -594,4 +594,4 @@ if __name__ == "__main__":
     window = MainWidget()
     window.show()
     window.raise_()
-    sys.exit(application.exec_())
+    sys.exit(application.exec())
