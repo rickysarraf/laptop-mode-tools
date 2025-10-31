@@ -42,6 +42,10 @@ GUI Configuration Tool
 ----------------------
 ![lmt-config-gui](https://github.com/rickysarraf/__pr0n/raw/master/LMT%20GUI.png)
 
+Internationalization
+----------------------
+Refer to the section Internationalization in https://github.com/rickysarraf/laptop-mode-tools/wiki
+
 References
 ----------
 
