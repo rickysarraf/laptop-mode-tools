@@ -73,7 +73,7 @@ replace_numeric_mount_option () {
 	OPTS="$4"
 	PARSEDOPTS="$(remove_numeric_mount_option $OPT $OPTS)"
 
-	if echo ",$REPLACEMENT_OPTS," | grep ",$OPT=[0123456789]+," > /dev/null ; then
+	if echo ",$REPLACEMENT_OPTS," | grep ",$OPT=[0123456789]\+," > /dev/null ; then
 		echo -n "$PARSEDOPTS,$OPT="
 		echo ",$REPLACEMENT_OPTS," | sed \
 		 -e 's/.*,'"$OPT"'=//'	\
